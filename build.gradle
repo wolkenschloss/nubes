@@ -1,0 +1,37 @@
+
+buildscript {
+
+    ext {
+        quarkusVersion = '1.13.4.FINAL'
+    }
+
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath "gradle.plugin.io.quarkus:quarkus-gradle-plugin:1.13.4.Final"
+    }
+}
+
+allprojects {
+    group 'family.haschka.mycloud'
+    version '0.0.1-SNAPSHOT'
+}
+
+subprojects {
+
+    repositories {
+        mavenCentral()
+    }
+
+    ext {
+        JAVA_VERSION = JavaVersion.VERSION_11
+        JUNIT_VERSION = '5.7.0'
+        QUARKUS_PLATFORM_GROUID = 'io.quarkus'
+        QUARKUS_PLATFORM_ARTIFACTID = 'quarkus-universe-bom'
+        QUARKUS_PLATFORM_VERSION = '1.13.4.Final'
+    }
+}

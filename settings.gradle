@@ -1,0 +1,6 @@
+rootProject.name = 'mycloud'
+
+include 'service'
+include 'core'
+
+

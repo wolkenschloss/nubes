@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_VERSION}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${JUNIT_VERSION}"
+}
+
+test {
+    useJUnitPlatform()
+}
