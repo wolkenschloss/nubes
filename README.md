@@ -25,5 +25,23 @@ Jetzt kann man nur Rezepte damit verwalten.
     
 ### Architekturentscheidungen
 
-1. 
-    
+#### Getroffene Entscheidungen
+
+Für die Quellcode- und Projektverwaltung wird [GitHub] verwendet.
+
+Für die Zusammenarbeit ist die Organisation [Wolkenschloss]
+auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen 
+Zugang (Free Plan). Für einen Vergleich der Organisationskonten siehe auch 
+[Compare Plans](https://github.com/organizations/wolkenschloss/billing/plans).
+
+Im [Wolkenschloss] können private Projekte angelegt werden, die nur für 
+Teammitgliedern sichtbar sind. Allerdings stehen nicht alle GitHub 
+Funktionen im *Free Plan* zur Verfügung.
+
+#### Offene Entscheidung
+
+- [ ] Unter welcher Lizenz soll das Projekt veröffentlicht werden?
+- [ ] Wie wird die CI/CD Pipeline realisiert?
+
+[Wolkenschloss]: https://github.com/wolkenschloss
+[GitHub]: https://github.com/
