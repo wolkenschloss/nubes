@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_VERSION}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${JUNIT_VERSION}"
+    testImplementation platform("org.junit:junit-bom:${JUNIT_VERSION}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 java {
@@ -15,12 +15,9 @@ java {
 
 test {
     useJUnitPlatform()
-}
 
-tasks.register('info') {
-    doLast {
-        println "Gradle Runtime"
-        println "Java Vendor:  ${System.properties['java.vendor']}"
-        println "Java Version: ${System.properties['java.version']}"
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
     }
 }

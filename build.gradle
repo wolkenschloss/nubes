@@ -29,8 +29,8 @@ subprojects {
     }
 
     ext {
-        JAVA_TOOLCHAIN_VERSION = 16
-        JUNIT_VERSION = '5.7.0'
+        JAVA_TOOLCHAIN_VERSION = 11
+        JUNIT_VERSION = '5.7.2'
         QUARKUS_PLATFORM_GROUID = 'io.quarkus'
         QUARKUS_PLATFORM_ARTIFACTID = 'quarkus-universe-bom'
         QUARKUS_PLATFORM_VERSION = '1.13.4.Final'
