@@ -27,7 +27,7 @@ Jetzt kann man nur Rezepte damit verwalten.
 
 #### Getroffene Entscheidungen
 
-Für die Quellcode- und Projektverwaltung wird [GitHub] verwendet.
+##### Für die Quellcode- und Projektverwaltung wird [GitHub] verwendet
 
 Für die Zusammenarbeit ist die Organisation [Wolkenschloss]
 auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen 
@@ -38,6 +38,30 @@ Im [Wolkenschloss] können private Projekte angelegt werden, die nur für
 Teammitgliedern sichtbar sind. Allerdings stehen nicht alle GitHub 
 Funktionen im *Free Plan* zur Verfügung.
 
+##### Die Anzahl der Abhängigkeiten ist so gering wie möglich zu halten
+
+Die Zeit für Builds auf öffentlichen Servern ist für kostenlose Zugänge in 
+der Regel beschränkt. Abhängigkeiten werden bei jedem Build aus den öffentlichen 
+Repositories geladen. Der Download von Drittkomponenten verlängert die Dauer 
+des Builds.
+
+##### Konventionelle Commits
+
+[Konventionelle Commits] werden für Commit Messages verwendet.
+
+Eine Systematik für Commit Messages gehört zum professionellen Arbeiten und
+verbessert die Team-Zusammenarbeit.
+
+Aus den *konventionellen Commits* können automatisch verarbeitet werden und 
+sind von Menschen gut lesbar. 
+
+##### Semantic Versioning
+
+[Semantic Versioning] ist ein weit verbreitetes Verfahren wie Versionsnummern 
+gewählt und erhöht werden. Mit einer von Anfang an einheitlichen Vergabe der 
+Versionsnummern wird das professionelle Arbeiten im Team unterstützt. Es 
+gibt keine Auseinandersetzung bezüglich der Versionsnummern.
+
 #### Offene Entscheidung
 
 - [ ] Unter welcher Lizenz soll das Projekt veröffentlicht werden?
@@ -45,3 +69,5 @@ Funktionen im *Free Plan* zur Verfügung.
 
 [Wolkenschloss]: https://github.com/wolkenschloss
 [GitHub]: https://github.com/
+[Konventionelle Commits]: https://www.conventionalcommits.org/de/v1.0.0/
+[Semantic Versioning]: https://semver.org/lang/de/
