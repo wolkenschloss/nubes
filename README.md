@@ -71,3 +71,16 @@ gibt keine Auseinandersetzung bezüglich der Versionsnummern.
 [GitHub]: https://github.com/
 [Konventionelle Commits]: https://www.conventionalcommits.org/de/v1.0.0/
 [Semantic Versioning]: https://semver.org/lang/de/
+
+## Quellcode Verwaltung
+
+- [Git] Mono-Repository
+- [GitHub] Remote Repository
+
+[Git]: https://git-scm.com/
+
+## Build Prozess
+
+- [Gradle] Multi-Projekt
+
+[Gradle]: https://gradle.org/

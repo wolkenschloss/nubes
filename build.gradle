@@ -25,10 +25,11 @@ subprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 
     ext {
-        JAVA_VERSION = JavaVersion.VERSION_11
+        JAVA_VERSION = 16
         JUNIT_VERSION = '5.7.0'
         QUARKUS_PLATFORM_GROUID = 'io.quarkus'
         QUARKUS_PLATFORM_ARTIFACTID = 'quarkus-universe-bom'
