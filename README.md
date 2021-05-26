@@ -83,4 +83,8 @@ gibt keine Auseinandersetzung bezüglich der Versionsnummern.
 
 - [Gradle] Multi-Projekt
 
+Das Projekt muss gleichermaßen mit [Gradle] in der Kommandozeile und 
+[IntelliJ] gebaut und getestet werden können.
+
 [Gradle]: https://gradle.org/
+[IntelliJ]: https://www.jetbrains.com/de-de/idea/

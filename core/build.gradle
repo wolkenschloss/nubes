@@ -9,7 +9,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(JAVA_VERSION))
+        languageVersion.set(JavaLanguageVersion.of(JAVA_TOOLCHAIN_VERSION))
     }
 }
 
