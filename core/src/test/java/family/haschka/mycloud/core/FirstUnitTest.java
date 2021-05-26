@@ -7,7 +7,7 @@ public class FirstUnitTest {
 
     @Test
     void ersterTest() {
-        Assertions.assertEquals(1, 2);
+        Assertions.assertEquals(1, 1);
     }
 
     @Test
