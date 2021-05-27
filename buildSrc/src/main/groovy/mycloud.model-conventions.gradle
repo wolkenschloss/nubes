@@ -1,0 +1,17 @@
+plugins {
+    id 'mycloud.java-conventions'
+}
+
+dependencies {
+    testImplementation platform("org.junit:junit-bom:5.7.2")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+}

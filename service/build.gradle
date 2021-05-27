@@ -16,12 +16,6 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
-}
-
 test {
     useJUnitPlatform()
 }
