@@ -1,0 +1,13 @@
+plugins {
+    id 'mycloud.java-conventions'
+    id 'io.quarkus'
+}
+
+dependencies {
+    implementation enforcedPlatform("io.quarkus:quarkus-universe-bom:1.13.4.Final")
+    testImplementation 'io.quarkus:quarkus-junit5'
+}
+
+test {
+    useJUnitPlatform()
+}

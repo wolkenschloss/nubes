@@ -1,27 +1,12 @@
 plugins {
-    id 'java'
-    id 'io.quarkus'
+    id 'mycloud.service-conventions'
 }
 
 dependencies {
-
-    implementation enforcedPlatform("${project.QUARKUS_PLATFORM_GROUID}:${project.QUARKUS_PLATFORM_ARTIFACTID}:${project.QUARKUS_PLATFORM_VERSION}")
-
     implementation 'io.quarkus:quarkus-grpc'
     implementation 'io.quarkus:quarkus-config-yaml'
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-resteasy'
 
     implementation project(':core')
-    testImplementation 'io.quarkus:quarkus-junit5'
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(JAVA_TOOLCHAIN_VERSION))
-    }
-}
-
-test {
-    useJUnitPlatform()
 }

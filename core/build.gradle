@@ -1,26 +1,3 @@
 plugins {
-    id 'java'
-}
-
-dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_VERSION}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${JUNIT_VERSION}"
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(JAVA_TOOLCHAIN_VERSION))
-    }
-}
-
-test {
-    useJUnitPlatform()
-}
-
-tasks.register('info') {
-    doLast {
-        println "Gradle Runtime"
-        println "Java Vendor:  ${System.properties['java.vendor']}"
-        println "Java Version: ${System.properties['java.version']}"
-    }
+    id 'mycloud.model-conventions'
 }
