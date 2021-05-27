@@ -1,5 +1,11 @@
 # MyCloud
 
+![GitHub](https://img.shields.io/github/license/wolkenschloss/mycloud)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/wolkenschloss/mycloud)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wolkenschloss/mycloud/gradle-build)
+![Build Status](https://github.com/AxonFramework/AxonFramework/workflows/Axon%20Framework/badge.svg?branch=master)
+![Latest Tag](https://badgen.net/github/tag/micromatch/micromatch)
+
 Irgendwann wird das vielleicht ein Nextcloud-Nachfolger.
 Jetzt kann man nur Rezepte damit verwalten.
 
@@ -103,6 +109,7 @@ auf [opensource.org](https://opensource.org/licenses/Apache-2.0)
     - Copyright Hinweis
     - Lizenz (SPDX)
     - Git Naming Conventions -> [Pull Request Naming](https://namingconvention.org/git/pull-request-naming.html)
+    - Git Branch Name [Branching](https://gist.github.com/digitaljhelms/4287848)
     - weitere
 
 [Wolkenschloss]: https://github.com/wolkenschloss
