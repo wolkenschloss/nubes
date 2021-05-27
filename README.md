@@ -1,10 +1,9 @@
 # MyCloud
 
 ![GitHub](https://img.shields.io/github/license/wolkenschloss/mycloud)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/wolkenschloss/mycloud)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wolkenschloss/mycloud/gradle-build)
 ![Build Status](https://github.com/AxonFramework/AxonFramework/workflows/Axon%20Framework/badge.svg?branch=master)
-![Latest Tag](https://badgen.net/github/tag/micromatch/micromatch)
+
+![Example Workflow](https://github.com/wolkenschloss/mycloud/actions/workflows/gradle-build.yml/badge.svg)
 
 Irgendwann wird das vielleicht ein Nextcloud-Nachfolger.
 Jetzt kann man nur Rezepte damit verwalten.
@@ -207,6 +206,12 @@ Dazu gibt es
 bei [IDEs Support (IntelliJ Platform) | JetBrains](https://intellij-support.jetbrains.com/hc/en-us)
 einen
 Support-Eintrag [How to see debug logging when running gradle inside IntelliJ?](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360000420140-How-to-see-debug-logging-when-running-gradle-inside-IntelliJ-)
+
+### Badges
+
+Dokumentation zu den Build Badges in GitHub:
+https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge
+
 
 [Gradle]: https://gradle.org/
 
