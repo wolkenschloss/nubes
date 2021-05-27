@@ -20,23 +20,31 @@ Jetzt kann man nur Rezepte damit verwalten.
     - Keine Lizenzgebühren
     - Keine gemieteten Server
     - ...
-4. Das Projekt ist zunächst nur für die teilnehmenden Mitglieder bestimmt.    
+4. Das Projekt ist zunächst nur für die teilnehmenden Mitglieder bestimmt.
     - Keine öffentlich sichtbaren Code Repositories und Artefakte.
-    
+
 ### Architekturentscheidungen
 
 #### Getroffene Entscheidungen
 
 ##### Für die Quellcode- und Projektverwaltung wird [GitHub] verwendet
 
+Alternativen:
+
+- JetBrains [Space](https://www.jetbrains.com/space/)  
+  Keine Erfahrung. Relativ neues Produkt. Wahrscheinlich gute Alternative zu
+  Github.
+- Selbst gehostet (z.B. Gitlab und Jenkins)
+  Hoher Aufwand für Installation und Betrieb.
+
 Für die Zusammenarbeit ist die Organisation [Wolkenschloss]
-auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen 
-Zugang (Free Plan). Für einen Vergleich der Organisationskonten siehe auch 
+auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen Zugang (
+Free Plan). Für einen Vergleich der Organisationskonten siehe auch
 [Compare Plans](https://github.com/organizations/wolkenschloss/billing/plans).
 
-Im [Wolkenschloss] können private Projekte angelegt werden, die nur für 
-Teammitgliedern sichtbar sind. Allerdings stehen nicht alle GitHub 
-Funktionen im *Free Plan* zur Verfügung.
+Im [Wolkenschloss] können private Projekte angelegt werden, die nur für
+Teammitgliedern sichtbar sind. Allerdings stehen nicht alle GitHub Funktionen
+im *Free Plan* zur Verfügung.
 
 ##### Die Anzahl der Abhängigkeiten ist so gering wie möglich zu halten
 
@@ -137,30 +145,32 @@ Fehlermeldung:
 
 ### Gradle Daemons
 
-Bei der ganzen Umstellung der JDK, sollte man darauf achten, dass die von 
-Gradle gestarteten Daemons auch mal getötet werden sollten:
+Bei der ganzen Umstellung der JDK, sollte man darauf achten, dass die von Gradle
+gestarteten Daemons auch mal getötet werden sollten:
 
-Den Status der Gradle Daemons gibt folgende Kommano aus:
+Den Status der Gradle Daemons gibt folgende Kommando aus:
 
-``sh
-administrator@upc14-bmws:~/.local/src/mycloud$ ./gradlew --status
-Initialized native services in: /home/administrator/.gradle/native
-PID STATUS   INFO
-68566 IDLE     7.0.2
-108768 IDLE     7.0.2
-109081 IDLE     7.0.2
-100651 STOPPED  (stop command received)
+``sh administrator@upc14-bmws:~/.local/src/mycloud$ ./gradlew --status Initialized native services in: /home/administrator/.gradle/native PID STATUS   INFO 68566 IDLE     7.0.2 108768 IDLE     7.0.2 109081 IDLE     7.0.2 100651 STOPPED  (stop command received)
 ``
 
 ### gradle.properties
 
 Die Datei `/gradle.properties` wird von IntelliJ nur teilweise berücksichtigt.
-Alle Properties, die einen Punkt enthalten scheinen von IntelliJ ignoriert 
-zu werden. Eigene Properties ohne Punkt scheinen zu funktionieren.
+Alle Properties, die einen Punkt enthalten scheinen von IntelliJ ignoriert zu
+werden. Eigene Properties ohne Punkt im Bezeichner funktionieren.
 
 Um den Debug Level bei Builds durch IntelliJ zu beeinflussen, muss Gradle eine
-der Optionen `--quiet`, `--warn`, `--info` oder `--debug` als Argument in 
-der Run Konfiguration übergeben werden.  
+der Optionen `--quiet`, `--warn`, `--info` oder `--debug` als Argument in der
+Run Konfiguration übergeben werden.
+
+Die Einstellungen in der Datei `idea.properties` vorzunehmen zeigt ebenfalls
+keine Wirkung.
+
+Dazu gibt es
+bei [IDEs Support (IntelliJ Platform) | JetBrains](https://intellij-support.jetbrains.com/hc/en-us)
+einen
+Support-Eintrag [How to see debug logging when running gradle inside IntelliJ?](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360000420140-How-to-see-debug-logging-when-running-gradle-inside-IntelliJ-)
 
 [Gradle]: https://gradle.org/
+
 [IntelliJ]: https://www.jetbrains.com/de-de/idea/
