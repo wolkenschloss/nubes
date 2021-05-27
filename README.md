@@ -1,5 +1,8 @@
 # MyCloud
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Gradle Build](https://github.com/wolkenschloss/mycloud/actions/workflows/gradle-build.yml/badge.svg)
+
 Irgendwann wird das vielleicht ein Nextcloud-Nachfolger.
 Jetzt kann man nur Rezepte damit verwalten.
 
@@ -103,6 +106,7 @@ auf [opensource.org](https://opensource.org/licenses/Apache-2.0)
     - Copyright Hinweis
     - Lizenz (SPDX)
     - Git Naming Conventions -> [Pull Request Naming](https://namingconvention.org/git/pull-request-naming.html)
+    - Git Branch Name [Branching](https://gist.github.com/digitaljhelms/4287848)
     - weitere
 
 [Wolkenschloss]: https://github.com/wolkenschloss
@@ -200,6 +204,12 @@ Dazu gibt es
 bei [IDEs Support (IntelliJ Platform) | JetBrains](https://intellij-support.jetbrains.com/hc/en-us)
 einen
 Support-Eintrag [How to see debug logging when running gradle inside IntelliJ?](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360000420140-How-to-see-debug-logging-when-running-gradle-inside-IntelliJ-)
+
+### Badges
+
+Dokumentation zu den Build Badges in GitHub:
+https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge
+
 
 [Gradle]: https://gradle.org/
 
