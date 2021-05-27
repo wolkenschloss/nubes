@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'mycloud.java-conventions'
     id 'io.quarkus'
 }
 
@@ -18,7 +18,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(JAVA_TOOLCHAIN_VERSION))
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 

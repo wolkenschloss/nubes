@@ -1,16 +1,10 @@
 plugins {
-    id 'java'
+    id 'mycloud.java-conventions'
 }
 
 dependencies {
     testImplementation platform("org.junit:junit-bom:${JUNIT_VERSION}")
     testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(JAVA_TOOLCHAIN_VERSION))
-    }
 }
 
 test {

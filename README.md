@@ -63,6 +63,15 @@ verbessert die Team-Zusammenarbeit.
 Aus den *konventionellen Commits* können automatisch verarbeitet werden und 
 sind von Menschen gut lesbar. 
 
+Mehr:
+
+- **[Keeping Git Commit Messages Consistent with a Custom Template ](https://dev.to/timmybytes/keeping-git-commit-messages-consistent-with-a-custom-template-1jkm)**
+- [Conventinal Commit Messages](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13)
+- [Using Git Commit Message Templates to Write Better Commit Messages](https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733)
+- [commitlint](https://github.com/conventional-changelog/commitlint)
+- [Conventional Commits](https://www.conventionalcommits.org/de/v1.0.0/)
+- [Git commit messages for the bold and the daring](https://backlog.com/blog/git-commit-messages-bold-daring/)
+
 ##### Semantic Versioning
 
 [Semantic Versioning] ist ein weit verbreitetes Verfahren wie Versionsnummern 
@@ -97,7 +106,7 @@ in beiden Fällen exakt die gleiche JDK Version verwendet wird.**
 
 Empfehlung ist: **Adopt OpenJDK 11 (HotSpot)** `(jdk-11.0.11+9)`
 
-## Kommandozeile
+### Kommandozeile
 
 Wenn der Build von der Kommandozeile gestartet wird, verwendet Gradle die 
 durch `$JAVA_HOME` spezifizierte JVM oder, falls diese vorhanden ist, oder 
@@ -109,7 +118,7 @@ Dazu ist folgendes Paket zu installieren:
 
     sudo apt install openjdk-11-jre
 
-## IntelliJ
+### IntelliJ
 
 Im Menü `File -> New Project Settings -> Structure for New Projects` den 
 Dialog `Platform Settings -> SDKs` öffenen. Falls das Ubuntu OpenJDK 11 
