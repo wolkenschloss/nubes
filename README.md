@@ -93,6 +93,16 @@ auf [opensource.org](https://opensource.org/licenses/Apache-2.0)
 - [Copyright notices for open source projects](https://ben.balter.com/2015/06/03/copyright-notices-for-websites-and-open-source-projects/)
 - [SPDX Tutorial](https://github.com/david-a-wheeler/spdx-tutorial#spdx-tutorial)
 
+##### Vue.js für Frontend
+
+Du brauchst:
+
+- nvm: Node Version Manager
+- npm: Node Package Manager
+- node.js: Node selbst
+- vue.js
+
+
 #### Offene Entscheidung
 
 - [x] Unter welcher Lizenz soll das Projekt veröffentlicht werden?
