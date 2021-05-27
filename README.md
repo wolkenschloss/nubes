@@ -53,6 +53,11 @@ der Regel beschränkt. Abhängigkeiten werden bei jedem Build aus den öffentlic
 Repositories geladen. Der Download von Drittkomponenten verlängert die Dauer 
 des Builds.
 
+##### Konventionen
+
+Die im Projekt verwendeten Konventionen sind in einem eigenen Dokument 
+beschrieben.
+
 ##### Konventionelle Commits
 
 [Konventionelle Commits] werden für Commit Messages verwendet.
@@ -79,10 +84,26 @@ gewählt und erhöht werden. Mit einer von Anfang an einheitlichen Vergabe der
 Versionsnummern wird das professionelle Arbeiten im Team unterstützt. Es 
 gibt keine Auseinandersetzung bezüglich der Versionsnummern.
 
+##### Lizenz
+
+Die Software wird unter der Apache 2.0 Lizenz bereitgestellt.
+
+- [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0) 
+auf [opensource.org](https://opensource.org/licenses/Apache-2.0)
+- [Copyright notices for open source projects](https://ben.balter.com/2015/06/03/copyright-notices-for-websites-and-open-source-projects/)
+- [SPDX Tutorial](https://github.com/david-a-wheeler/spdx-tutorial#spdx-tutorial)
+
 #### Offene Entscheidung
 
-- [ ] Unter welcher Lizenz soll das Projekt veröffentlicht werden?
+- [x] Unter welcher Lizenz soll das Projekt veröffentlicht werden?
 - [ ] Wie wird die CI/CD Pipeline realisiert?
+- [ ] Konventionen: 
+    - Semantic Versioning 
+    - Conventional Commits
+    - Copyright Hinweis
+    - Lizenz (SPDX)
+    - Git Naming Conventions -> [Pull Request Naming](https://namingconvention.org/git/pull-request-naming.html)
+    - weitere
 
 [Wolkenschloss]: https://github.com/wolkenschloss
 [GitHub]: https://github.com/
