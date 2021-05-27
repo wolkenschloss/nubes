@@ -1,8 +1,6 @@
 # MyCloud
 
-![GitHub](https://img.shields.io/github/license/wolkenschloss/mycloud)
-![Build Status](https://github.com/AxonFramework/AxonFramework/workflows/Axon%20Framework/badge.svg?branch=master)
-
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Example Workflow](https://github.com/wolkenschloss/mycloud/actions/workflows/gradle-build.yml/badge.svg)
 
 Irgendwann wird das vielleicht ein Nextcloud-Nachfolger.
