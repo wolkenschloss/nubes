@@ -34,15 +34,15 @@ Jetzt kann man nur Rezepte damit verwalten.
 
 Alternativen:
 
-- JetBrains [Space](https://www.jetbrains.com/space/)  
+- JetBrains [Space](https://www.jetbrains.com/space/)
   Keine Erfahrung. Relativ neues Produkt. Wahrscheinlich gute Alternative zu
   Github.
 - Selbst gehostet (z.B. Gitlab und Jenkins)
   Hoher Aufwand für Installation und Betrieb.
 
 Für die Zusammenarbeit ist die Organisation [Wolkenschloss]
-auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen Zugang (
-Free Plan). Für einen Vergleich der Organisationskonten siehe auch
+auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen Zugang 
+(Free Plan). Für einen Vergleich der Organisationskonten siehe auch
 [Compare Plans](https://github.com/organizations/wolkenschloss/billing/plans).
 
 Im [Wolkenschloss] können private Projekte angelegt werden, die nur für
@@ -74,7 +74,7 @@ sind von Menschen gut lesbar.
 Mehr:
 
 - **[Keeping Git Commit Messages Consistent with a Custom Template ](https://dev.to/timmybytes/keeping-git-commit-messages-consistent-with-a-custom-template-1jkm)**
-- [Conventinal Commit Messages](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13)
+- [Conventional Commit Messages](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13)
 - [Using Git Commit Message Templates to Write Better Commit Messages](https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733)
 - [commitlint](https://github.com/conventional-changelog/commitlint)
 - [Conventional Commits](https://www.conventionalcommits.org/de/v1.0.0/)
@@ -95,6 +95,16 @@ Die Software wird unter der Apache 2.0 Lizenz bereitgestellt.
 auf [opensource.org](https://opensource.org/licenses/Apache-2.0)
 - [Copyright notices for open source projects](https://ben.balter.com/2015/06/03/copyright-notices-for-websites-and-open-source-projects/)
 - [SPDX Tutorial](https://github.com/david-a-wheeler/spdx-tutorial#spdx-tutorial)
+
+##### Vue.js für Frontend
+
+Du brauchst:
+
+- nvm: Node Version Manager
+- npm: Node Package Manager
+- node.js: Node selbst
+- vue.js
+
 
 #### Offene Entscheidung
 
@@ -146,7 +156,7 @@ Dazu ist folgendes Paket zu installieren:
 ### IntelliJ
 
 Im Menü `File -> New Project Settings -> Structure for New Projects` den 
-Dialog `Platform Settings -> SDKs` öffenen. Falls das Ubuntu OpenJDK 11 
+Dialog `Platform Settings -> SDKs` öffnen. Falls das Ubuntu OpenJDK 11 
 nicht installiert ist, mit dem Button `(+) Add JDK ` den Pfad zum Ubuntu 
 OpenJDK 11 auswählen: `/usr/lib/jvm/java-11-openjdk-amd64` und einen 
 sprechenden Namen vergeben. 
@@ -154,7 +164,7 @@ sprechenden Namen vergeben.
 Alternativ kann im Dialog `Platform Settings -> SDKs` mit `[+] Download JDK` 
 das `AdoptOpenJDK (HotSpot) 11.0.11` heruntergeladen werden.
 
-Nachder Installation von Ubuntu OpenJDK 11 oder AdoptOpenJDK (HotSpot) 11.0.
+Nach der Installation von Ubuntu OpenJDK 11 oder AdoptOpenJDK (HotSpot) 11.0.
 11 kann im Dialog `Project Structure for New Projects` unter `Project 
 Settings -> Project` im Feld `Project SDK` eines der beiden JDKs ausgewählt 
 werden. Alle Projekte, die danach neu erstellt werden, erhalten dieses JDK 
