@@ -1,6 +1,6 @@
 SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
-PackageName: wolkenschloss/mycloud
+PackageName: family.haschka.wolkenschloss.mycloud
 PackageOriginator: Matthias Haschka
 PackageHomePage: https://github.com/wolkenschloss/mycloud
 PackageLicenseDeclared: Apache-2.0
