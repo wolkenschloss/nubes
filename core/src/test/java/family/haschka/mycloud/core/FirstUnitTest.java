@@ -12,6 +12,11 @@ public class FirstUnitTest {
 
     @Test
     void zweiterTest() {
-        Assertions.assertEquals(true, true);
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    void dritterTest() {
+        Assertions.assertEquals("Hello", "Hello");
     }
 }
