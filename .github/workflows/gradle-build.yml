@@ -29,6 +29,13 @@ jobs:
     - name: Build with Gradle
       run: gradle build
 
+    - name Publish Test Results
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: testresult
+        path: "**/build/reports"
+
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
     #- name: Publish to GitHub Packages
