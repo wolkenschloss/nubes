@@ -3,224 +3,65 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Gradle Build](https://github.com/wolkenschloss/mycloud/actions/workflows/gradle-build.yml/badge.svg)
 
-Irgendwann wird das vielleicht ein Nextcloud-Nachfolger.
-Jetzt kann man nur Rezepte damit verwalten.
+## Die Vision 
 
-## Architekturziele
+MyCloud ist eine Gruppe unabhängiger Diensten für eine private 
+Cloud, mit denen alltägliche Aufgaben des privaten Lebens unterstützt werden.
 
-- Erfahrung mit Microservice Technologie sammeln.
-- Erarbeitung einer CI/CD Pipeline mit einfachen Mitteln.
-- Lernen der Zusammenarbeit in einem Projekt.
+Mögliche Dienste wären zum Beispiel
 
-### Randbedingungen
+* **Blog**
+* To-do Liste
+* Kalender
+* Kontakte
+* Kochbuch mit Rezepten
+* Dateiverwaltung vergleichbar mit Google Drive, OneDrive, und Nextcloud für
+    - Dokumente
+    - Medien wie Filme, Fotos und Musik
+    - Workflows
 
-1. Das Projekt ist nicht gewinnorientiert
-2. Es ist ein Lernprojekt für
-    - Zusammenarbeit
-    - Beispiel für professionelle Softwareentwicklung
-    - Open Source Entwicklung
-3. Es darf kein Geld kosten, außer dem was eh schon vorhanden ist.
-    - Keine Lizenzgebühren
-    - Keine gemieteten Server
-    - ...
-4. Das Projekt ist zunächst nur für die teilnehmenden Mitglieder bestimmt.
-    - Keine öffentlich sichtbaren Code Repositories und Artefakte.
+Zentrale Dienste:
 
-### Architekturentscheidungen
+* Benutzerverwaltung
+    - Benutzerkonto mit Profil
+    - Benutzerrechte
+    - An- und Abmeldung
+    - Zentrale Anmeldung und Berechtigung auch für die Geräte im Heimnetz.
+* Backup und Restore
+* Logging
+* Monitoring
 
-#### Getroffene Entscheidungen
+## Installation
 
-##### Für die Quellcode- und Projektverwaltung wird [GitHub] verwendet
+*TBD*
 
-Alternativen:
+*MyCloud soll für möglichst viele zugänglich sein. Die Installation
+sollte daher auch für Laien möglichst einfach sein. Ideen sind:*
 
-- JetBrains [Space](https://www.jetbrains.com/space/)
-  Keine Erfahrung. Relativ neues Produkt. Wahrscheinlich gute Alternative zu
-  Github.
-- Selbst gehostet (z.B. Gitlab und Jenkins)
-  Hoher Aufwand für Installation und Betrieb.
+- Image für Raspberry PI
+- Docker-Compose Installation
+- Kubernetes Installation
+- Virtuelle Maschine
 
-Für die Zusammenarbeit ist die Organisation [Wolkenschloss]
-auf [GitHub] angelegt. Die Organisation verfügt über einen kostenlosen Zugang 
-(Free Plan). Für einen Vergleich der Organisationskonten siehe auch
-[Compare Plans](https://github.com/organizations/wolkenschloss/billing/plans).
+## Usage
 
-Im [Wolkenschloss] können private Projekte angelegt werden, die nur für
-Teammitgliedern sichtbar sind. Allerdings stehen nicht alle GitHub Funktionen
-im *Free Plan* zur Verfügung.
+*TBD*
 
-##### Die Anzahl der Abhängigkeiten ist so gering wie möglich zu halten
+## Contributing
 
-Die Zeit für Builds auf öffentlichen Servern ist für kostenlose Zugänge in 
-der Regel beschränkt. Abhängigkeiten werden bei jedem Build aus den öffentlichen 
-Repositories geladen. Der Download von Drittkomponenten verlängert die Dauer 
-des Builds.
+*TBD*
 
-##### Konventionen
+*Wolkenschloss/MyCloud ist derzeit ein privates Projekt. Mitarbeit
+erfolgt nur auf persönliche Einladung*
 
-Die im Projekt verwendeten Konventionen sind in einem eigenen Dokument 
-beschrieben.
+Hinweise zum Entwickeln befinden sich in der Projektdokumentation im
+`doc` Ordner.
 
-##### Konventionelle Commits
+## Credits
 
-[Konventionelle Commits] werden für Commit Messages verwendet.
+*TBD*
 
-Eine Systematik für Commit Messages gehört zum professionellen Arbeiten und
-verbessert die Team-Zusammenarbeit.
+## License
 
-Aus den *konventionellen Commits* können automatisch verarbeitet werden und 
-sind von Menschen gut lesbar. 
+Apache 2.0
 
-Mehr:
-
-- **[Keeping Git Commit Messages Consistent with a Custom Template ](https://dev.to/timmybytes/keeping-git-commit-messages-consistent-with-a-custom-template-1jkm)**
-- [Conventional Commit Messages](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13)
-- [Using Git Commit Message Templates to Write Better Commit Messages](https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733)
-- [commitlint](https://github.com/conventional-changelog/commitlint)
-- [Conventional Commits](https://www.conventionalcommits.org/de/v1.0.0/)
-- [Git commit messages for the bold and the daring](https://backlog.com/blog/git-commit-messages-bold-daring/)
-
-##### Semantic Versioning
-
-[Semantic Versioning] ist ein weit verbreitetes Verfahren wie Versionsnummern 
-gewählt und erhöht werden. Mit einer von Anfang an einheitlichen Vergabe der 
-Versionsnummern wird das professionelle Arbeiten im Team unterstützt. Es 
-gibt keine Auseinandersetzung bezüglich der Versionsnummern.
-
-##### Lizenz
-
-Die Software wird unter der Apache 2.0 Lizenz bereitgestellt.
-
-- [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0) 
-auf [opensource.org](https://opensource.org/licenses/Apache-2.0)
-- [Copyright notices for open source projects](https://ben.balter.com/2015/06/03/copyright-notices-for-websites-and-open-source-projects/)
-- [SPDX Tutorial](https://github.com/david-a-wheeler/spdx-tutorial#spdx-tutorial)
-
-##### Vue.js für Frontend
-
-Du brauchst:
-
-- nvm: Node Version Manager
-- npm: Node Package Manager
-- node.js: Node selbst
-- vue.js
-
-
-#### Offene Entscheidung
-
-- [x] Unter welcher Lizenz soll das Projekt veröffentlicht werden?
-- [ ] Wie wird die CI/CD Pipeline realisiert?
-- [ ] Konventionen: 
-    - Semantic Versioning 
-    - Conventional Commits
-    - Copyright Hinweis
-    - Lizenz (SPDX)
-    - Git Naming Conventions -> [Pull Request Naming](https://namingconvention.org/git/pull-request-naming.html)
-    - Git Branch Name [Branching](https://gist.github.com/digitaljhelms/4287848)
-    - weitere
-
-[Wolkenschloss]: https://github.com/wolkenschloss
-[GitHub]: https://github.com/
-[Konventionelle Commits]: https://www.conventionalcommits.org/de/v1.0.0/
-[Semantic Versioning]: https://semver.org/lang/de/
-
-## Quellcode Verwaltung
-
-- [Git] Mono-Repository
-- [GitHub] Remote Repository
-
-[Git]: https://git-scm.com/
-
-## Build Prozess
-
-- [Gradle] Multi-Projekt
-
-**Das Projekt muss gleichermaßen mit [Gradle] in der Kommandozeile und 
-[IntelliJ] gebaut und getestet werden können. Dazu ist es erforderlich, dass 
-in beiden Fällen exakt die gleiche JDK Version verwendet wird.**
-
-Empfehlung ist: **Adopt OpenJDK 11 (HotSpot)** `(jdk-11.0.11+9)`
-
-### Kommandozeile
-
-Wenn der Build von der Kommandozeile gestartet wird, verwendet Gradle die 
-durch `$JAVA_HOME` spezifizierte JVM oder, falls diese vorhanden ist, oder 
-die JVM die auf im aktuellen Pfad der Konsole gefunden werden kann (`which 
-java`). Gradle begnügt sich dabei mit einem JRE.
-
-Bei einer Standard-Ubuntu Installation muss das OpenJDK 11 installiert sein. 
-Dazu ist folgendes Paket zu installieren:
-
-    sudo apt install openjdk-11-jre
-
-### IntelliJ
-
-Im Menü `File -> New Project Settings -> Structure for New Projects` den 
-Dialog `Platform Settings -> SDKs` öffnen. Falls das Ubuntu OpenJDK 11 
-nicht installiert ist, mit dem Button `(+) Add JDK ` den Pfad zum Ubuntu 
-OpenJDK 11 auswählen: `/usr/lib/jvm/java-11-openjdk-amd64` und einen 
-sprechenden Namen vergeben. 
-
-Alternativ kann im Dialog `Platform Settings -> SDKs` mit `[+] Download JDK` 
-das `AdoptOpenJDK (HotSpot) 11.0.11` heruntergeladen werden.
-
-Nach der Installation von Ubuntu OpenJDK 11 oder AdoptOpenJDK (HotSpot) 11.0.
-11 kann im Dialog `Project Structure for New Projects` unter `Project 
-Settings -> Project` im Feld `Project SDK` eines der beiden JDKs ausgewählt 
-werden. Alle Projekte, die danach neu erstellt werden, erhalten dieses JDK 
-als Voreinstellung.
-
-Weil das Projekt `mycloud` ohne IntelliJ Projekteinstellungen in der 
-Quellcodeverwaltung abgelegt ist, verwendet IntelliJ künftig das zuvor 
-festgelegte JDK als Vorgabe.
-
-Bei der Erstellung mit Gradle ist zu berücksichtigen, dass das JDK, mit dem 
-Gradle gestartet wird und das JDK, mit dem Gradle den Build durchführt, 
-unterschiedlich sein können (und in der Regel auch sind)
-
-### Adopt OpenJ9-16
-Die Integration von Gradle mit IntelliJ scheint für adopt-openj9-16 **nicht 
-richtig zu funktionieren**. Bei der Ausführung der Tests erscheint die 
-Fehlermeldung:
-
-    Cause: cannot assign instance of java.util.Collections$EmptyList to field 
-    java.lang.StackTraceElement.moduleVersion of type java.lang.String in 
-    instance of java.lang.StackTraceElement
-
-### Gradle Daemons
-
-Bei der ganzen Umstellung der JDK, sollte man darauf achten, dass die von Gradle
-gestarteten Daemons auch mal getötet werden sollten:
-
-Den Status der Gradle Daemons gibt folgende Kommando aus:
-
-``sh administrator@upc14-bmws:~/.local/src/mycloud$ ./gradlew --status Initialized native services in: /home/administrator/.gradle/native PID STATUS   INFO 68566 IDLE     7.0.2 108768 IDLE     7.0.2 109081 IDLE     7.0.2 100651 STOPPED  (stop command received)
-``
-
-### gradle.properties
-
-Die Datei `/gradle.properties` wird von IntelliJ nur teilweise berücksichtigt.
-Alle Properties, die einen Punkt enthalten scheinen von IntelliJ ignoriert zu
-werden. Eigene Properties ohne Punkt im Bezeichner funktionieren.
-
-Um den Debug Level bei Builds durch IntelliJ zu beeinflussen, muss Gradle eine
-der Optionen `--quiet`, `--warn`, `--info` oder `--debug` als Argument in der
-Run Konfiguration übergeben werden.
-
-Die Einstellungen in der Datei `idea.properties` vorzunehmen zeigt ebenfalls
-keine Wirkung.
-
-Dazu gibt es
-bei [IDEs Support (IntelliJ Platform) | JetBrains](https://intellij-support.jetbrains.com/hc/en-us)
-einen
-Support-Eintrag [How to see debug logging when running gradle inside IntelliJ?](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360000420140-How-to-see-debug-logging-when-running-gradle-inside-IntelliJ-)
-
-### Badges
-
-Dokumentation zu den Build Badges in GitHub:
-https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge
-
-
-[Gradle]: https://gradle.org/
-
-[IntelliJ]: https://www.jetbrains.com/de-de/idea/
