@@ -1,6 +1,6 @@
 rootProject.name = 'mycloud'
+include 'services:blog:service', 'services:blog:core'
 
-include 'core', 'service'
 
 
 

@@ -8,5 +8,5 @@ dependencies {
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-resteasy'
 
-    implementation project(':core')
+    implementation project(':services:blog:core')
 }
