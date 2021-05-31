@@ -1,6 +1,5 @@
 rootProject.name = 'mycloud'
-include 'services:blog:service', 'services:blog:core'
-
+include 'services:blog:service', 'services:blog:core', 'services:cookbook:service'
 
 
 
