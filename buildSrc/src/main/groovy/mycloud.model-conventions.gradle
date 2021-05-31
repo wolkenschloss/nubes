@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id 'mycloud.java-conventions'
+    id 'java-library'
 }
 
 dependencies {
