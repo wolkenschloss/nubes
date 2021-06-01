@@ -1,12 +1,23 @@
 quarkus:
   http:
     port: 0
+  log:
+    level: INFO
+    console:
+      enable: true
+      format: "%d{HH:mm:ss} %-5p [%c] %s%e%n"
+      color: true
+    category:
+      "org.mongodb.driver":
+        level: WARN
+      "io.quarkus.deployment":
+        level: ERROR
+
 "%dev":
    quarkus:
      http:
        port: 8080
 "%test":
   quarkus:
-      mongodb:
-#        hosts:
-
+    log:
+      level: INFO

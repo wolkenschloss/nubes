@@ -2,7 +2,6 @@ package family.haschka.wolkenschloss.cookbook;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
-import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
@@ -67,7 +66,6 @@ public class RecipeTests {
         RestAssured.given().body(recipe).contentType(MediaType.APPLICATION_JSON)
                 .when().post(url)
                 .then()
-                .log().all()
                 .statusCode(HttpStatus.SC_CREATED)
                 .header("Location", URI::create, UriMatcher.matchesLocation(url, id));
 

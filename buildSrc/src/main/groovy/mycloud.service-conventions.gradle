@@ -1,9 +1,125 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id 'mycloud.java-conventions'
     id 'io.quarkus'
 }
 
+sourceSets {
+    integration {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationImplementation.extendsFrom implementation
+    integrationRuntimeOnly.extendsFrom runtimeOnly
+}
+
 dependencies {
     implementation enforcedPlatform("io.quarkus:quarkus-universe-bom:1.13.6.Final")
+
+    testImplementation platform("org.junit:junit-bom:5.7.2")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'io.quarkus:quarkus-junit5'
+
+    integrationImplementation platform("org.junit:junit-bom:5.7.2")
+    integrationImplementation platform("org.testcontainers:testcontainers-bom:1.15.3")
+
+    integrationImplementation 'org.junit.jupiter:junit-jupiter'
+    integrationImplementation 'io.quarkus:quarkus-junit5'
+
+    implementation 'org.jboss.slf4j:slf4j-jboss-logmanager'
+}
+
+tasks.register("integration", Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    useJUnitPlatform()
+
+    testLogging {
+        // options for log level LIFECYCLE.
+        // LIFECYCLE is gradle's default log level.
+        // Starting gradle with options -q or -w only
+        // the summarize is will be shown
+        events "PASSED", "SKIPPED", "FAILED"
+        showStandardStreams = false
+
+        info {
+            events "PASSED", "SKIPPED", "FAILED"
+            exceptionFormat TestExceptionFormat.FULL
+
+            // Durch diese Einstellung zeigt Gradle das Console Log von Quarkus
+            // und den Tests an.
+            showStandardStreams = true
+        }
+
+        warn {
+            events "PASSED", "SKIPPED", "FAILED"
+            exceptionFormat TestExceptionFormat.FULL
+            showStandardStreams = false
+        }
+    }
+
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+
+    systemProperty "build.output.directory", buildDir.absolutePath
+
+    // java.util.logging.manager nicht setzen! Wenn der Manager wie in der
+    // folgenden Zeile gesetzt wird, kommt es zu doppelten Log-Ausgabe.
+    // Einmal formatiert und ein zweites mal unformatiert.
+    // systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+
+    systemProperty 'org.jboss.logging.provider', 'slf4j'
+
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+    shouldRunAfter assemble
+}
+
+build.dependsOn integration
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        // options for log level LIFECYCLE.
+        // LIFECYCLE is gradle's default log level.
+        // Starting gradle with options -q or -w only
+        // the summarize is will be shown
+        events "PASSED", "SKIPPED", "FAILED"
+        showStandardStreams = false
+
+        info {
+            events "PASSED", "SKIPPED", "FAILED"
+            exceptionFormat TestExceptionFormat.FULL
+
+            // Durch diese Einstellung zeigt Gradle das Console Log von Quarkus
+            // und den Tests an.
+            showStandardStreams = true
+        }
+
+        warn {
+            events "PASSED", "SKIPPED", "FAILED"
+            exceptionFormat TestExceptionFormat.FULL
+            showStandardStreams = false
+        }
+    }
+
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+
+    // java.util.logging.manager nicht setzen! Wenn der Manager wie in der
+    // folgenden Zeile gesetzt wird, kommt es zu doppelten Log-Ausgabe.
+    // Einmal formatiert und ein zweites mal unformatiert.
+    // systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+
+    systemProperty 'org.jboss.logging.provider', 'slf4j'
 }

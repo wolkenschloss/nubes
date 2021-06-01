@@ -7,11 +7,14 @@ dependencies {
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-resteasy-jackson'
-    implementation ('io.quarkus:quarkus-mongodb-panache') {
-//        exclude group: 'org.mongodb', module: 'mongodb-driver-core'
-    }
+    implementation 'io.quarkus:quarkus-mongodb-panache'
 
-//    implementation 'org.mongodb:bson'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
+
+    integrationImplementation 'io.rest-assured:rest-assured'
+
+    integrationImplementation "org.testcontainers:testcontainers"
+    integrationImplementation "org.testcontainers:junit-jupiter"
+    integrationImplementation "org.testcontainers:mongodb"
 }

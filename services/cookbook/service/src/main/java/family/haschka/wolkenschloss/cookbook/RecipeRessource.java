@@ -1,14 +1,12 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -16,7 +14,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("/recipe")
 public class RecipeRessource {
 
-    private static final Logger logger = LoggerFactory.getLogger(RecipeRessource.class);
+    private static final Logger logger = Logger.getLogger(RecipeRessource.class);
+
     @Inject
     RecipeService service;
 
