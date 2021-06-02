@@ -24,7 +24,6 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
-@TestProfile(NoMongoDbClient.class)
 public class RecipeTests {
 
     @InjectMock

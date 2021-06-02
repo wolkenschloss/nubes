@@ -82,7 +82,7 @@ tasks.register("integration", Test) {
     shouldRunAfter assemble
 }
 
-build.dependsOn integration
+check.dependsOn integration
 
 test {
     useJUnitPlatform()
