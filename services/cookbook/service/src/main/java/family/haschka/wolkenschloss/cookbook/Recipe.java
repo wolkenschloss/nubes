@@ -9,7 +9,7 @@ public class Recipe {
     public String title;
     public String herstellung;
 
-    Recipe() {}
+    public Recipe() {}
 
     public Recipe(String title, String herstellung) {
 

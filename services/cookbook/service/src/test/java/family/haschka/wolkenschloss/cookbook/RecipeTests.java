@@ -3,7 +3,6 @@ package family.haschka.wolkenschloss.cookbook;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import org.apache.http.HttpStatus;

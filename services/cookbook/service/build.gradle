@@ -12,9 +12,8 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
 
-    integrationImplementation 'io.rest-assured:rest-assured'
-
-    integrationImplementation "org.testcontainers:testcontainers"
-    integrationImplementation "org.testcontainers:junit-jupiter"
-    integrationImplementation "org.testcontainers:mongodb"
+    integrationTestImplementation "org.testcontainers:testcontainers"
+    integrationTestImplementation "org.testcontainers:junit-jupiter"
+    integrationTestImplementation "org.testcontainers:mongodb"
+    integrationTestImplementation 'io.rest-assured:rest-assured'
 }

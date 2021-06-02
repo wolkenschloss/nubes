@@ -6,15 +6,15 @@ plugins {
 }
 
 sourceSets {
-    integration {
+    integrationTest {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
 }
 
 configurations {
-    integrationImplementation.extendsFrom implementation
-    integrationRuntimeOnly.extendsFrom runtimeOnly
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
 }
 
 dependencies {
@@ -24,16 +24,15 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'io.quarkus:quarkus-junit5'
 
-    integrationImplementation platform("org.junit:junit-bom:5.7.2")
-    integrationImplementation platform("org.testcontainers:testcontainers-bom:1.15.3")
-
-    integrationImplementation 'org.junit.jupiter:junit-jupiter'
-    integrationImplementation 'io.quarkus:quarkus-junit5'
+    integrationTestImplementation platform("org.testcontainers:testcontainers-bom:1.15.3")
+    integrationTestImplementation platform("org.junit:junit-bom:5.7.2")
+    integrationTestImplementation 'org.junit.jupiter:junit-jupiter'
+    integrationTestImplementation 'io.quarkus:quarkus-junit5'
 
     implementation 'org.jboss.slf4j:slf4j-jboss-logmanager'
 }
 
-tasks.register("integration", Test) {
+tasks.register("integrationTest", Test) {
     description = 'Runs integration tests.'
     group = 'verification'
 
@@ -77,12 +76,13 @@ tasks.register("integration", Test) {
 
     systemProperty 'org.jboss.logging.provider', 'slf4j'
 
-    testClassesDirs = sourceSets.integration.output.classesDirs
-    classpath = sourceSets.integration.runtimeClasspath
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
     shouldRunAfter assemble
 }
 
-check.dependsOn integration
+integrationTest.dependsOn(assemble)
+check.dependsOn(integrationTest)
 
 test {
     useJUnitPlatform()

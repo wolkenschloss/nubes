@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook.testing;
+package familie.haschka.wolkenschloss.cookbook;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.testcontainers.containers.MongoDBContainer;

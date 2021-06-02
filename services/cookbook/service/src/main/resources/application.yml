@@ -1,6 +1,8 @@
 quarkus:
   http:
-    port: 0
+    port: 8081
+  mongodb:
+    database: cookbook
   log:
     level: INFO
     console:
@@ -16,8 +18,10 @@ quarkus:
 "%dev":
    quarkus:
      http:
-       port: 8080
+       port: 0
 "%test":
   quarkus:
+    http:
+      port: 0
     log:
       level: INFO
