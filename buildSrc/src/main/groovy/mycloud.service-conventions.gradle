@@ -29,7 +29,14 @@ dependencies {
     integrationTestImplementation 'org.junit.jupiter:junit-jupiter'
     integrationTestImplementation 'io.quarkus:quarkus-junit5'
 
-    implementation 'org.jboss.slf4j:slf4j-jboss-logmanager'
+    // Logging: Wir benutzen JBoss Log Manager, weil Quarkus ihn benutzt.
+    // Das heißt aber nicht, dass wir den auch gleich als Abhängigkeit
+    // angeben müssen. Der steckt irgendwo in den transitiven Abhängigkeiten.
+    //
+    // Ein Log Manger = Heile Welt.
+    // Mehr als ein Log Manager = Hölle
+    // implementation 'org.jboss.slf4j:slf4j-jboss-logmanager'
+    // implementation 'org.jboss.logmanager:jboss-logmanager-embedded:1.0.9'
 }
 
 tasks.register("integrationTest", Test) {
@@ -43,9 +50,11 @@ tasks.register("integrationTest", Test) {
         // LIFECYCLE is gradle's default log level.
         // Starting gradle with options -q or -w only
         // the summarize is will be shown
-        events "PASSED", "SKIPPED", "FAILED"
-        showStandardStreams = false
+        // events "PASSED", "SKIPPED", "FAILED"
+        // showStandardStreams = false
 
+        // `./gradlew build --info`, um Details anzuzeigen.
+        // Testergebnisse und Protokoll der Anwendung
         info {
             events "PASSED", "SKIPPED", "FAILED"
             exceptionFormat TestExceptionFormat.FULL
@@ -53,12 +62,6 @@ tasks.register("integrationTest", Test) {
             // Durch diese Einstellung zeigt Gradle das Console Log von Quarkus
             // und den Tests an.
             showStandardStreams = true
-        }
-
-        warn {
-            events "PASSED", "SKIPPED", "FAILED"
-            exceptionFormat TestExceptionFormat.FULL
-            showStandardStreams = false
         }
     }
 
@@ -74,7 +77,14 @@ tasks.register("integrationTest", Test) {
     // Einmal formatiert und ein zweites mal unformatiert.
     // systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
 
+    // Wenn du das löschst oder änderst, bist du selbst schuld!
     systemProperty 'org.jboss.logging.provider', 'slf4j'
+
+    // JUL sollten wir nicht benutzen. Sicherheitshalber setzen
+    // wir hier mal das Ausgabeformat, falls doch mal eine Log
+    // Ausgabe durchkommt. Sollte diese Susgabe zu sehen sein,
+    // stimmt die Logging Konfiguration nicht.
+    systemProperty 'java.util.logging.SimpleFormatter.format', '[JUNIT] %3$s %4$s: %5$s%6$s%n'
 
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
@@ -92,9 +102,12 @@ test {
         // LIFECYCLE is gradle's default log level.
         // Starting gradle with options -q or -w only
         // the summarize is will be shown
-        events "PASSED", "SKIPPED", "FAILED"
-        showStandardStreams = false
+        // events "PASSED", "SKIPPED", "FAILED"
+        // showStandardStreams = false
+        exceptionFormat TestExceptionFormat.SHORT
 
+        // `./gradlew build --info`, um Details anzuzeigen.
+        // Testergebnisse und Protokoll der Anwendung
         info {
             events "PASSED", "SKIPPED", "FAILED"
             exceptionFormat TestExceptionFormat.FULL
@@ -102,12 +115,6 @@ test {
             // Durch diese Einstellung zeigt Gradle das Console Log von Quarkus
             // und den Tests an.
             showStandardStreams = true
-        }
-
-        warn {
-            events "PASSED", "SKIPPED", "FAILED"
-            exceptionFormat TestExceptionFormat.FULL
-            showStandardStreams = false
         }
     }
 
@@ -121,5 +128,12 @@ test {
     // Einmal formatiert und ein zweites mal unformatiert.
     // systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
 
+    // Wenn du das löschst oder änderst, bist du selbst schuld!
     systemProperty 'org.jboss.logging.provider', 'slf4j'
+
+    // JUL sollten wir nicht benutzen. Sicherheitshalber setzen
+    // wir hier mal das Ausgabeformat, falls doch mal eine Log
+    // Ausgabe durchkommt. Sollte diese Susgabe zu sehen sein,
+    // stimmt die Logging Konfiguration nicht.
+    systemProperty 'java.util.logging.SimpleFormatter.format', '[JUNIT] %3$s %4$s: %5$s%6$s%n'
 }
