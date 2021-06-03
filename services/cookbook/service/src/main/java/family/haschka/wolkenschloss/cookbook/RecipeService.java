@@ -1,6 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import org.bson.types.ObjectId;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,7 +22,12 @@ public class RecipeService {
         return recipeRepository.listAll();
     }
 
-    public Recipe get(ObjectId id) {
-        return recipeRepository.findById(id);
+    public Optional<Recipe> get(ObjectId id) {
+        var recipe = recipeRepository.findById(id);
+        return Optional.ofNullable(recipe);
+    }
+
+    public Boolean delete(ObjectId id) {
+        return recipeRepository.deleteById(id);
     }
 }

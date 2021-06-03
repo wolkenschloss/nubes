@@ -3,11 +3,13 @@ package familie.haschka.wolkenschloss.cookbook;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
+import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
 import org.bson.types.ObjectId;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -44,28 +46,36 @@ public class FirstIntegrationTest {
         Assertions.assertNotNull(host);
     }
 
-    @Test
-    @DisplayName("Read Recipe")
+    private ValidatableResponse response;
+
+    private String getPort() {
+        return System.getProperty("quarkus.http.port");
+    }
+
+    private String getUrl() {
+        return "http://localhost:" + getPort() + "/recipe";
+    }
+
+    @BeforeEach
     public void createRecipe() {
-        var port = System.getProperty("quarkus.http.port");
 
         var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"herstellung\": \"Bekannt.\"}";
 
-        var url = "http://localhost:" + port + "/recipe";
-
-        var location = RestAssured
+        response = RestAssured
                 .given()
-                    .body(recipe)
-                    .contentType(MediaType.APPLICATION_JSON)
+                .body(recipe)
+                .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                    .post(url)
+                .post(getUrl())
                 .then()
                 .   statusCode(HttpStatus.SC_CREATED)
-                .header("Location", response -> equalTo(url + "/" + response.path("id")))
-                .extract()
-                    .header("Location");
+                .header("Location", response -> equalTo(getUrl() + "/" + response.path("id")));
+    }
 
-        logger.warn("Location: {}", location);
+    @Test
+    @DisplayName("Read Recipe")
+    public void readRecipe() {
+        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"herstellung\": \"Bekannt.\"}";
 
         // TODO:
         // 1. Aus location die ID ermitteln
@@ -75,41 +85,23 @@ public class FirstIntegrationTest {
         RestAssured
                 .given()
                 .when()
-                    .get(location)
+                    .get(response.extract().header("Location"))
                 .then()
                     .statusCode(HttpStatus.SC_OK)
                     .body("title", equalTo("Schlammkrabbeneintopf"))
                     .body("herstellung", equalTo("Bekannt."));
-
-
     }
 
     @Test
     @DisplayName("Read all Recipes")
     public void listRecipes() {
 
-        var port = System.getProperty("quarkus.http.port");
-
-        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"herstellung\": \"Bekannt.\"}";
-
-        var url = "http://localhost:" + port + "/recipe";
-
-        String id = RestAssured
-                .given()
-                .body(recipe)
-                .contentType(MediaType.APPLICATION_JSON)
-                .when()
-                .post(url)
-                .then()
-                .statusCode(HttpStatus.SC_CREATED)
-                .header("Location", response -> equalTo(url + "/" + response.path("id")))
-                .extract()
-                .path("id");
+        String id = response.extract().path("id");
 
         RestAssured
                 .given()
                 .when()
-                .get(url)
+                .get(getUrl())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("size()", greaterThan(0))
@@ -119,7 +111,25 @@ public class FirstIntegrationTest {
     @Test
     @DisplayName("Delete Recipe")
     public void deleteRecipe() {
+        String location = response.extract().header("Location");
 
+        // TODO: Ein Rezept löschen, dass nicht vorhanden ist.
+        // Wenn ich ein Rezept lösche
+        RestAssured
+                .given()
+                .when()
+                .delete(location)
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
+
+        // Dann kann ich es nicht mehr lesen
+        RestAssured
+                .given()
+                .when()
+                .get(location)
+                .then()
+                .log().all()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test

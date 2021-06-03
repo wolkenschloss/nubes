@@ -45,6 +45,14 @@ public class RecipeRessource {
     @Produces(APPLICATION_JSON)
     @Path("{id}")
     public Recipe get(@PathParam("id") ObjectId id) {
-        return service.get(id);
+        return service.get(id).orElseThrow(NotFoundException::new);
+    }
+
+    @DELETE
+    @Path("{id}")
+    @Produces(APPLICATION_JSON)
+    public Response delete(@PathParam("id") ObjectId id) {
+        service.delete(id);
+        return Response.noContent().build();
     }
 }
