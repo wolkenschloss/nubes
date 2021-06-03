@@ -26,10 +26,10 @@
 
 Alternativen:
 
-- JetBrains [Space](https://www.jetbrains.com/space/)
+- JetBrains [Space](https://www.jetbrains.com/space/).
   Keine Erfahrung. Relativ neues Produkt. Wahrscheinlich gute Alternative zu
   Github.
-- Selbst gehostet (z.B. Gitlab und Jenkins)
+- Selbst gehostet (z. B. Gitlab und Jenkins).
   Hoher Aufwand für Installation und Betrieb.
 
 Für die Zusammenarbeit ist die Organisation [Wolkenschloss]
