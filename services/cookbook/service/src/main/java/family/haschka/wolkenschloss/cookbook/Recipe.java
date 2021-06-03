@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 
 @MongoEntity
 public class Recipe {
-    public ObjectId id;
+    public ObjectId _id;
     public String title;
     public String herstellung;
 

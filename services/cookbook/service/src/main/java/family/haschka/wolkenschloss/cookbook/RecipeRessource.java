@@ -32,7 +32,7 @@ public class RecipeRessource {
         service.save(recipe);
 
         var location = uriInfo.getAbsolutePathBuilder()
-                .path(recipe.id.toString())
+                .path(recipe._id.toString())
                 .build();
 
         return Response
@@ -54,5 +54,13 @@ public class RecipeRessource {
     public Response delete(@PathParam("id") ObjectId id) {
         service.delete(id);
         return Response.noContent().build();
+    }
+
+    @PUT
+    @Path("{id}")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Recipe put(@PathParam("id")ObjectId id, Recipe recipe) {
+        return service.update(recipe);
     }
 }

@@ -3,11 +3,9 @@ package familie.haschka.wolkenschloss.cookbook;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
-import org.bson.types.ObjectId;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,15 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import javax.json.Json;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-
 
 @QuarkusIntegrationTest
 @QuarkusTestResource(value = MongoDbResource.class, restrictToAnnotatedClass = true)
@@ -63,13 +56,13 @@ public class FirstIntegrationTest {
 
         response = RestAssured
                 .given()
-                .body(recipe)
-                .contentType(MediaType.APPLICATION_JSON)
+                    .body(recipe)
+                    .contentType(ContentType.JSON)
                 .when()
-                .post(getUrl())
+                    .post(getUrl())
                 .then()
-                .   statusCode(HttpStatus.SC_CREATED)
-                .header("Location", response -> equalTo(getUrl() + "/" + response.path("id")));
+                    .statusCode(HttpStatus.SC_CREATED)
+                    .header("Location", response -> equalTo(getUrl() + "/" + response.path("_id")));
     }
 
     @Test
@@ -96,16 +89,16 @@ public class FirstIntegrationTest {
     @DisplayName("Read all Recipes")
     public void listRecipes() {
 
-        String id = response.extract().path("id");
+        String id = response.extract().path("_id");
 
         RestAssured
                 .given()
                 .when()
-                .get(getUrl())
+                    .get(getUrl())
                 .then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("size()", greaterThan(0))
-                .body("find {it.id == \""+ id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
+                    .statusCode(HttpStatus.SC_OK)
+                    .body("size()", greaterThan(0))
+                    .body("find {it._id == \"" + id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
     }
 
     @Test
@@ -118,51 +111,40 @@ public class FirstIntegrationTest {
         RestAssured
                 .given()
                 .when()
-                .delete(location)
+                    .delete(location)
                 .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
+                    .statusCode(HttpStatus.SC_NO_CONTENT);
 
         // Dann kann ich es nicht mehr lesen
         RestAssured
                 .given()
                 .when()
-                .get(location)
+                    .get(location)
                 .then()
-                .log().all()
-                .statusCode(HttpStatus.SC_NOT_FOUND);
+                    .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test
     @DisplayName("Update Recipe")
     public void updateRecipe() {
+        String location = response.extract().header("Location");
+        var body = response.extract().body().asInputStream();
+        var reader = Json.createReader(body);
+        var recipe = reader.readObject();
+        var change = Json.createObjectBuilder(recipe);
+        change.remove("title");
+        change.add("title", "Schlachterfischsuppe");
 
-    }
+        var changed = change.build();
 
-    private static class UriMatcher extends TypeSafeMatcher<URI> {
-
-        private final URI expected;
-
-        public UriMatcher(URI expected) {
-            this.expected = expected;
-        }
-
-        public static UriMatcher matchesLocation(URL baseUri, ObjectId id) throws URISyntaxException {
-            var expected = UriBuilder
-                    .fromUri(baseUri.toURI())
-                    .path(id.toString())
-                    .build();
-
-            return new UriMatcher(expected);
-        }
-
-        @Override
-        protected boolean matchesSafely(URI item) {
-            return item.equals(expected);
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendValue(expected);
-        }
+        RestAssured
+                .given()
+                    .body(changed.toString())
+                    .contentType(ContentType.JSON)
+                .when()
+                    .put(location)
+                .then()
+                    .statusCode(HttpStatus.SC_OK)
+                    .body("title", equalTo("Schlachterfischsuppe"));
     }
 }

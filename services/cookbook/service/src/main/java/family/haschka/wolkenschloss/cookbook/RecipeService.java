@@ -30,4 +30,9 @@ public class RecipeService {
     public Boolean delete(ObjectId id) {
         return recipeRepository.deleteById(id);
     }
+
+    public Recipe update(Recipe recipe) {
+        recipeRepository.update(recipe);
+        return recipe;
+    }
 }

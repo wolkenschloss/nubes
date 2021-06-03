@@ -57,7 +57,7 @@ public class RecipeTests {
         var id = ObjectId.get();
 
         Mockito.doAnswer((x) -> {
-            x.getArgument(0, Recipe.class).id = id;
+            x.getArgument(0, Recipe.class)._id = id;
             return null;
         }).when(service).save(any(Recipe.class));
 
