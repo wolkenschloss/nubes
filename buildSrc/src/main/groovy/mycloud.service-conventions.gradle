@@ -82,7 +82,7 @@ tasks.register("integrationTest", Test) {
 
     // JUL sollten wir nicht benutzen. Sicherheitshalber setzen
     // wir hier mal das Ausgabeformat, falls doch mal eine Log
-    // Ausgabe durchkommt. Sollte diese Susgabe zu sehen sein,
+    // Ausgabe durchkommt. Sollte diese Ausgabe zu sehen sein,
     // stimmt die Logging Konfiguration nicht.
     systemProperty 'java.util.logging.SimpleFormatter.format', '[JUNIT] %3$s %4$s: %5$s%6$s%n'
 
@@ -133,7 +133,7 @@ test {
 
     // JUL sollten wir nicht benutzen. Sicherheitshalber setzen
     // wir hier mal das Ausgabeformat, falls doch mal eine Log
-    // Ausgabe durchkommt. Sollte diese Susgabe zu sehen sein,
+    // Ausgabe durchkommt. Sollte diese Ausgabe zu sehen sein,
     // stimmt die Logging Konfiguration nicht.
     systemProperty 'java.util.logging.SimpleFormatter.format', '[JUNIT] %3$s %4$s: %5$s%6$s%n'
 }

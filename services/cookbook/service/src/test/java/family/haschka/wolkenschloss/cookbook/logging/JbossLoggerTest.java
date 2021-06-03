@@ -13,7 +13,7 @@ import javax.inject.Inject;
  * Um die Konfiguration herzustellen. Es kann nur schlechter werden. Wenn du keine Ahnung
  * von JbossLogger, Slf4j und JUL hast, lass die Finger weg!
  *
- * Wenn der Test zusammen mit den anderen Tests ausgeführt wird, sehen die Logausgaben
+ * Wenn der Test zusammen mit den anderen Tests ausgeführt wird, sieht die Protokollausgabe
  * vernünftig aus.
  *
  * HINWEIS:
