@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.greaterThan;
 
 @QuarkusIntegrationTest
 @QuarkusTestResource(value = MongoDbResource.class, restrictToAnnotatedClass = true)
+@DisplayName("Recipe CRUD Operations")
 public class FirstIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(FirstIntegrationTest.class);
@@ -43,6 +45,7 @@ public class FirstIntegrationTest {
     }
 
     @Test
+    @DisplayName("Read Recipe")
     public void createRecipe() {
         var port = System.getProperty("quarkus.http.port");
 
@@ -79,26 +82,50 @@ public class FirstIntegrationTest {
                     .body("herstellung", equalTo("Bekannt."));
 
 
+    }
+
+    @Test
+    @DisplayName("Read all Recipes")
+    public void listRecipes() {
+
+        var port = System.getProperty("quarkus.http.port");
+
+        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"herstellung\": \"Bekannt.\"}";
+
+        var url = "http://localhost:" + port + "/recipe";
+
         String id = RestAssured
                 .given()
-                    .body(recipe)
-                    .contentType(MediaType.APPLICATION_JSON)
+                .body(recipe)
+                .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                    .post(url)
+                .post(url)
                 .then()
-                    .statusCode(HttpStatus.SC_CREATED)
-                    .header("Location", response -> equalTo(url + "/" + response.path("id")))
+                .statusCode(HttpStatus.SC_CREATED)
+                .header("Location", response -> equalTo(url + "/" + response.path("id")))
                 .extract()
-                    .path("id");
+                .path("id");
 
         RestAssured
                 .given()
                 .when()
-                    .get(url)
+                .get(url)
                 .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .body("size()", greaterThan(0))
-                    .body("find {it.id == \""+ id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
+                .statusCode(HttpStatus.SC_OK)
+                .body("size()", greaterThan(0))
+                .body("find {it.id == \""+ id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
+    }
+
+    @Test
+    @DisplayName("Delete Recipe")
+    public void deleteRecipe() {
+
+    }
+
+    @Test
+    @DisplayName("Update Recipe")
+    public void updateRecipe() {
+
     }
 
     private static class UriMatcher extends TypeSafeMatcher<URI> {
