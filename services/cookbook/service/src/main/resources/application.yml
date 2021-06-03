@@ -12,7 +12,7 @@ quarkus:
     category:
       "org.mongodb.driver":
         level: WARN
-      "io.quarkus.deployment":
+      "io.quarkus.deployment.**":
         level: ERROR
 
 "%dev":

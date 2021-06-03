@@ -1,15 +1,16 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.quarkus.mongodb.panache.MongoEntity;
+import io.quarkus.mongodb.panache.jackson.ObjectIdSerializer;
 import org.bson.types.ObjectId;
 
-@MongoEntity
 public class Recipe {
     public ObjectId _id;
     public String title;
     public String herstellung;
 
-    public Recipe() {}
+    protected Recipe() {}
 
     public Recipe(String title, String herstellung) {
 
