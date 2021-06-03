@@ -6,10 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +14,8 @@ import javax.json.Json;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @QuarkusIntegrationTest
 @QuarkusTestResource(value = MongoDbResource.class, restrictToAnnotatedClass = true)
@@ -35,10 +32,12 @@ public class FirstIntegrationTest {
     }
 
     @Test
-    public void checkMongoDbHostConfiguration() {
-        var host = System.getProperty("quarkus.mongodb.hosts");
+    @DisplayName("Verbindungszeichenfolge erfordert UUID Konfiguration")
+    public void checkMongoDbConnectionString() {
+        var host = System.getProperty("quarkus.mongodb.connection-string");
         logger.warn("quarkus.mongodb.hosts = {}", host);
         Assertions.assertNotNull(host);
+        assertThat(host, containsString("uuidRepresentation=STANDARD"));
     }
 
     private ValidatableResponse response;
@@ -60,11 +59,12 @@ public class FirstIntegrationTest {
                 .given()
                     .body(recipe)
                     .contentType(ContentType.JSON)
+                    .log().all()
                 .when()
                     .post(getUrl())
                 .then()
                     .statusCode(HttpStatus.SC_CREATED)
-                    .header("Location", response -> equalTo(getUrl() + "/" + response.path("_id")));
+                    .header("Location", response -> equalTo(getUrl() + "/" + response.path("recipeId")));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class FirstIntegrationTest {
     @DisplayName("Read all Recipes")
     public void listRecipes() {
 
-        String id = response.extract().path("_id");
+        String id = response.extract().path("recipeId");
 
         RestAssured
                 .given()
@@ -94,7 +94,7 @@ public class FirstIntegrationTest {
                 .then()
                     .statusCode(HttpStatus.SC_OK)
                     .body("size()", greaterThan(0))
-                    .body("find {it._id == \"" + id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
+                    .body("find {it.recipeId == \"" + id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
     }
 
     @Test

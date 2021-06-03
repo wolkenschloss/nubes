@@ -1,11 +1,13 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import com.mongodb.client.MongoClient;
 import org.bson.types.ObjectId;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class RecipeService {
@@ -14,6 +16,7 @@ public class RecipeService {
     RecipeRepository recipeRepository;
 
     public void save(Recipe recipe) {
+
         recipeRepository.persist(recipe);
     }
 
@@ -21,12 +24,12 @@ public class RecipeService {
         return recipeRepository.listAll();
     }
 
-    public Optional<Recipe> get(ObjectId id) {
+    public Optional<Recipe> get(UUID id) {
         var recipe = recipeRepository.findById(id);
         return Optional.ofNullable(recipe);
     }
 
-    public void delete(ObjectId id) {
+    public void delete(UUID id) {
         recipeRepository.deleteById(id);
     }
 

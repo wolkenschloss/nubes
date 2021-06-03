@@ -1,6 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import org.bson.types.ObjectId;
+
+import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -8,6 +9,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.UUID;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -16,6 +18,9 @@ public class RecipeRessource {
 
     @Inject
     RecipeService service;
+
+    @Inject
+    Logger logger;
 
     @GET
     @Produces(APPLICATION_JSON)
@@ -27,10 +32,11 @@ public class RecipeRessource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response post(Recipe recipe, @Context UriInfo uriInfo) {
+        recipe.recipeId = UUID.randomUUID();
         service.save(recipe);
 
         var location = uriInfo.getAbsolutePathBuilder()
-                .path(recipe._id.toString())
+                .path(recipe.recipeId.toString())
                 .build();
 
         return Response
@@ -42,14 +48,14 @@ public class RecipeRessource {
     @GET
     @Produces(APPLICATION_JSON)
     @Path("{id}")
-    public Recipe get(@PathParam("id") ObjectId id) {
+    public Recipe get(@PathParam("id") UUID id) {
         return service.get(id).orElseThrow(NotFoundException::new);
     }
 
     @DELETE
     @Path("{id}")
     @Produces(APPLICATION_JSON)
-    public Response delete(@PathParam("id") ObjectId id) {
+    public Response delete(@PathParam("id") UUID id) {
         service.delete(id);
         return Response.noContent().build();
     }
@@ -58,7 +64,7 @@ public class RecipeRessource {
     @Path("{id}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Recipe put(@PathParam("id")ObjectId id, Recipe recipe) {
+    public Recipe put(@PathParam("id")String id, Recipe recipe) {
         service.update(recipe);
         return recipe;
     }
@@ -67,7 +73,7 @@ public class RecipeRessource {
     @Path("{id}")
     @Consumes("application/json-patch+json;charset=utf-8")
     @Produces(APPLICATION_JSON)
-    public Recipe patch(@PathParam("id") ObjectId id, Recipe recipe) {
+    public Recipe patch(@PathParam("id") String id, Recipe recipe) {
         service.update(recipe);
         return recipe;
     }

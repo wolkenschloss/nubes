@@ -1,12 +1,15 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.quarkus.mongodb.panache.MongoEntity;
-import io.quarkus.mongodb.panache.jackson.ObjectIdSerializer;
-import org.bson.types.ObjectId;
+import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.util.UUID;
+
+@MongoEntity
 public class Recipe {
-    public ObjectId _id;
+    @BsonId
+    public UUID recipeId;
+
     public String title;
     public String herstellung;
 
