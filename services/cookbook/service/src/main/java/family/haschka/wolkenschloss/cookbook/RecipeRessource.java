@@ -1,5 +1,6 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import org.bson.types.ObjectId;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
@@ -8,13 +9,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/recipe")
 public class RecipeRessource {
-
-    private static final Logger logger = Logger.getLogger(RecipeRessource.class);
 
     @Inject
     RecipeService service;
@@ -39,5 +39,12 @@ public class RecipeRessource {
                 .created(location)
                 .entity(recipe)
                 .build();
+    }
+
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("{id}")
+    public Recipe get(@PathParam("id") ObjectId id) {
+        return service.get(id);
     }
 }

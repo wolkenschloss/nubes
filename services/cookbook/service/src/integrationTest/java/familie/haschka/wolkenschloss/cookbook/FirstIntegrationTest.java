@@ -7,7 +7,6 @@ import org.apache.http.HttpStatus;
 import org.bson.types.ObjectId;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,6 +17,9 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 
 @QuarkusIntegrationTest
@@ -52,12 +54,11 @@ public class FirstIntegrationTest {
                 .given()
                     .body(recipe)
                     .contentType(MediaType.APPLICATION_JSON)
-//                .log().all()
                 .when()
                     .post(url)
                 .then()
-//                .log().all()
                 .   statusCode(HttpStatus.SC_CREATED)
+                .header("Location", response -> equalTo(url + "/" + response.path("id")))
                 .extract()
                     .header("Location");
 
@@ -67,14 +68,37 @@ public class FirstIntegrationTest {
         // 1. Aus location die ID ermitteln
         // 2. GET /recipe liefert alle Recipes. Darin sollte ID enthalten sein.
         // 3. GET /recipe/ID liefert das gespeicherte Recipe zurück.
+        // GET /recipe/id
         RestAssured
                 .given()
-//                    .log().all()
+                .when()
+                    .get(location)
+                .then()
+                    .statusCode(HttpStatus.SC_OK)
+                    .body("title", equalTo("Schlammkrabbeneintopf"))
+                    .body("herstellung", equalTo("Bekannt."));
+
+
+        String id = RestAssured
+                .given()
+                    .body(recipe)
+                    .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                    .post(url)
+                .then()
+                    .statusCode(HttpStatus.SC_CREATED)
+                    .header("Location", response -> equalTo(url + "/" + response.path("id")))
+                .extract()
+                    .path("id");
+
+        RestAssured
+                .given()
                 .when()
                     .get(url)
                 .then()
-//                    .log().all()
-                    .statusCode(HttpStatus.SC_OK);
+                    .statusCode(HttpStatus.SC_OK)
+                    .body("size()", greaterThan(0))
+                    .body("find {it.id == \""+ id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
     }
 
     private static class UriMatcher extends TypeSafeMatcher<URI> {
