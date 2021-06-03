@@ -1,7 +1,6 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import org.bson.types.ObjectId;
-import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -9,7 +8,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -61,6 +59,16 @@ public class RecipeRessource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Recipe put(@PathParam("id")ObjectId id, Recipe recipe) {
-        return service.update(recipe);
+        service.update(recipe);
+        return recipe;
+    }
+
+    @PATCH
+    @Path("{id}")
+    @Consumes("application/json-patch+json;charset=utf-8")
+    @Produces(APPLICATION_JSON)
+    public Recipe patch(@PathParam("id") ObjectId id, Recipe recipe) {
+        service.update(recipe);
+        return recipe;
     }
 }

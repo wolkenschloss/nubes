@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
+import java.util.Collections;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -68,13 +70,7 @@ public class FirstIntegrationTest {
     @Test
     @DisplayName("Read Recipe")
     public void readRecipe() {
-        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"herstellung\": \"Bekannt.\"}";
 
-        // TODO:
-        // 1. Aus location die ID ermitteln
-        // 2. GET /recipe liefert alle Recipes. Darin sollte ID enthalten sein.
-        // 3. GET /recipe/ID liefert das gespeicherte Recipe zurück.
-        // GET /recipe/id
         RestAssured
                 .given()
                 .when()
@@ -146,5 +142,45 @@ public class FirstIntegrationTest {
                 .then()
                     .statusCode(HttpStatus.SC_OK)
                     .body("title", equalTo("Schlachterfischsuppe"));
+    }
+
+    @Test
+    @DisplayName("Patch Recipe")
+    public void patchRecipe() {
+
+        String location = response.extract().header("Location");
+
+        Map<String, ?> config = Collections.emptyMap();
+        var factory = Json.createBuilderFactory(config);
+
+        var patches = factory.createArrayBuilder()
+                .add(factory.createObjectBuilder()
+                        .add("op", "replace")
+                        .add("path", "/title")
+                        .add("value", "Schneebeeren-Crostata"))
+                .build();
+
+        // Wenn ich den Titel des Rezeptes ändere
+        RestAssured
+                .given()
+                    .contentType("application/json-patch+json;charset=utf-8")
+                    .body(patches.toString())
+                .when()
+                    .patch(location)
+                .then()
+                    .statusCode(HttpStatus.SC_OK)
+                    .body("title", equalTo("Schneebeeren-Crostata"));
+
+
+        // Dann werde ich den geänderten Titel beim nächsten Abrufen
+        // des Rezept erhalten.
+        RestAssured
+                .given()
+                    .accept(ContentType.JSON)
+                .when()
+                    .get(location)
+                .then()
+                    .statusCode(HttpStatus.SC_OK)
+                    .body("title", equalTo("Schneebeeren-Crostata"));
     }
 }
