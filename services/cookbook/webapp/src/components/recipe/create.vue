@@ -22,6 +22,7 @@
         <b-form-textarea id="preparation-input"
                          ref="preparation"
                          placeholder="Zubereitung des Rezepts beschreiben..."
+                         required
                          v-model="recipe.preparation" rows="6">
 
         </b-form-textarea>
@@ -48,6 +49,7 @@ export default {
       .then(result => {
         console.log("Rezept abgeschickt. Ergebnis ist")
         console.log(JSON.stringify(result))
+        this.recipe = {}
       })
       .catch(error => alert(error))
     }

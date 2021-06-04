@@ -17,11 +17,18 @@
       </b-collapse>
     </b-navbar>
     <b-container fluid="lg">
-    <div>
-      <h1>Kochbuch</h1>
-      <p>Rezepte für Alle und Keinen</p>
-    </div>
-      <create></create>
+      <div>
+        <h1>Kochbuch</h1>
+        <p>Rezepte für Alle und Keinen</p>
+      </div>
+      <b-row>
+        <b-col lg="8">
+          <list></list>
+        </b-col>
+        <b-col lg="4">
+          <create></create>
+        </b-col>
+      </b-row>
     </b-container>
   </div>
 </template>
@@ -29,10 +36,12 @@
 <script>
 
 import Create from "@/components/recipe/create";
+import List from "@/components/recipe/list";
+
 export default {
   name: 'App',
   components: {
-    Create
+    Create, List
 
   }
 }
