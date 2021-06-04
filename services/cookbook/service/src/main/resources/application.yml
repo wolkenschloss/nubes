@@ -3,6 +3,8 @@ quarkus:
     port: 8081
   mongodb:
     database: cookbook
+    # Das Funktioniert nicht
+    uuid-representation: standard
   log:
     level: INFO
     console:

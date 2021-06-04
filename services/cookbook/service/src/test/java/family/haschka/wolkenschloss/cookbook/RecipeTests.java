@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,10 +55,10 @@ public class RecipeTests {
     void postRecipeTest() throws URISyntaxException {
 
         var recipe = new Recipe("Schrankmuscheleintopf", "Das gibt es nicht");
-        var id = ObjectId.get();
+        var id = UUID.randomUUID();
 
         Mockito.doAnswer((x) -> {
-            x.getArgument(0, Recipe.class)._id = id;
+            x.getArgument(0, Recipe.class).recipeId = id;
             return null;
         }).when(service).save(any(Recipe.class));
 
@@ -65,7 +66,10 @@ public class RecipeTests {
                 .when().post(url)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED)
-                .header("Location", URI::create, UriMatcher.matchesLocation(url, id));
+                .header("Location", response -> {
+                            var expected = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
+                            return org.hamcrest.Matchers.equalTo(expected.toString());
+                        });
 
         Mockito.verify(service, Mockito.times(1)).save(Mockito.any(Recipe.class));
         Mockito.verifyNoMoreInteractions(service);

@@ -24,7 +24,7 @@ public class MongoDbResource implements QuarkusTestResourceLifecycleManager {
         container.start();
         var host = container.getHost();
         var port = container.getFirstMappedPort();
-        return Collections.singletonMap("quarkus.mongodb.hosts", host +":" + port.toString());
+        return Collections.singletonMap("quarkus.mongodb.connection-string", "mongodb://" + host + ":" + port.toString() + "/?uuidRepresentation=STANDARD");
     }
 
     @Override
