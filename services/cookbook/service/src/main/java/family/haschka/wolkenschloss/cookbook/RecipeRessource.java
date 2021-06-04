@@ -19,9 +19,6 @@ public class RecipeRessource {
     @Inject
     RecipeService service;
 
-    @Inject
-    Logger logger;
-
     @GET
     @Produces(APPLICATION_JSON)
     public List<Recipe> get() {
