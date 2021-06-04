@@ -1,39 +1,39 @@
 <template>
   <div id="app">
-    <b-container fluid="lg">
-      <b-navbar fixed="top" toggleable="lg" type="dark" variant="dark">
-        <b-navbar-brand href="#">MyCloud</b-navbar-brand>
-        <b-navbar-toggle target="nav-collaps"></b-navbar-toggle>
-        <b-collapse id="nav-collaps" is-nav>
+    <b-navbar toggleable="lg" type="dark" variant="dark">
+      <b-navbar-brand href="#">MyCloud</b-navbar-brand>
+      <b-navbar-toggle target="nav-collaps"></b-navbar-toggle>
+      <b-collapse id="nav-collaps" is-nav>
+        <b-navbar-nav>
           <b-nav-item href="#">Home</b-nav-item>
-        </b-collapse>
-      </b-navbar>
-      <div id="main">
-        <img alt="Vue logo" src="./assets/logo.png">
-        <HelloWorld msg="Welcome to Your Vue.js App"/>
-      </div>
+        </b-navbar-nav>
+        <b-navbar-nav class="ml-auto">
+          <b-nav-form>
+            <b-form-input class="mr-sm-2" placeholder="Suche" size="sm"></b-form-input>
+            <b-button class="my-2 my-sm-0" size="sm" type="submit">Suchen</b-button>
+          </b-nav-form>
+        </b-navbar-nav>
+
+      </b-collapse>
+    </b-navbar>
+    <b-container fluid="lg">
+    <div>
+      <h1>Kochbuch</h1>
+      <p>Rezepte für Alle und Keinen</p>
+    </div>
     </b-container>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
