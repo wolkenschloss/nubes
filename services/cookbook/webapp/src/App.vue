@@ -21,15 +21,18 @@
       <h1>Kochbuch</h1>
       <p>Rezepte für Alle und Keinen</p>
     </div>
+      <create></create>
     </b-container>
   </div>
 </template>
 
 <script>
 
+import Create from "@/components/recipe/create";
 export default {
   name: 'App',
   components: {
+    Create
 
   }
 }
