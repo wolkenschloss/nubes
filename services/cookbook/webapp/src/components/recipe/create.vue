@@ -16,22 +16,26 @@
                       type="text"/>
       </b-form-group>
       <b-form-group id="preparation-group"
-                    v-model="recipe.preparation"
                     description="Beschreibung, wie das Rezept zubereitet wird"
                     label="Zubereitung"
                     label-for="preparation-input">
         <b-form-textarea id="preparation-input"
                          ref="preparation"
                          placeholder="Zubereitung des Rezepts beschreiben..."
-                         rows="6"></b-form-textarea>
+                         v-model="recipe.preparation" rows="6">
+
+        </b-form-textarea>
       </b-form-group>
+      <b-button type="submit" variant="primary">OK</b-button>
     </b-form>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 
 export default {
+
   name: "create",
   data() {
     return {
@@ -40,7 +44,12 @@ export default {
   },
   methods: {
     onSubmit() {
-
+      axios.post('http://localhost:8080/recipe', this.recipe)
+      .then(result => {
+        console.log("Rezept abgeschickt. Ergebnis ist")
+        console.log(JSON.stringify(result))
+      })
+      .catch(error => alert(error))
     }
   }
 }

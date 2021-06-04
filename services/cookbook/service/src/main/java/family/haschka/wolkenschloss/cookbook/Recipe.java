@@ -11,13 +11,13 @@ public class Recipe {
     public UUID recipeId;
 
     public String title;
-    public String herstellung;
+    public String preparation;
 
     protected Recipe() {}
 
-    public Recipe(String title, String herstellung) {
+    public Recipe(String title, String preparation) {
 
         this.title = title;
-        this.herstellung = herstellung;
+        this.preparation = preparation;
     }
 }
