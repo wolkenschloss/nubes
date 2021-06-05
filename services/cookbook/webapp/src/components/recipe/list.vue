@@ -38,7 +38,6 @@ export default {
       axios.get(uri)
       .then(response => {
         this.rezepte = response.data
-        console.log(this.rezepte)
       })
       .catch(error => {
         alert(error)

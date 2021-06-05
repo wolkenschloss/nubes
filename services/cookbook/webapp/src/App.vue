@@ -21,14 +21,26 @@
         <h1>Kochbuch</h1>
         <p>Rezepte für Alle und Keinen</p>
       </div>
-      <router-view/>
-
+      <transition mode="out-in" name="fade">
+        <router-view class="view"/>
+      </transition>
     </b-container>
 
   </div>
 </template>
 
+<script>
+export default {
+}
+
+</script>
+
 <style lang="scss">
 
-
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .25s ease;
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0;
+}
 </style>
