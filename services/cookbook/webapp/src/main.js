@@ -5,10 +5,12 @@ import './plugins/axios'
 import './plugins/bootstrap-vue'
 import App from './App.vue'
 import {IconsPlugin} from "bootstrap-vue";
+import router from './router'
 
 Vue.config.productionTip = false
 Vue.use(IconsPlugin)
 
 new Vue({
-  render: h => h(App),
+  router,
+  render: h => h(App)
 }).$mount('#app')

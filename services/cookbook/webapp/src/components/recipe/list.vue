@@ -4,7 +4,7 @@
     <div>
       <b-card-group columns>
         <b-card v-for="rezept in rezepte"
-                v-bind:key="rezept._id"
+                v-bind:key="rezept.recipeId"
                 :title="rezept.title"
                 class="mb-2"
                 img-src="https://picsum.photos/600/300/?image=25"
@@ -12,6 +12,7 @@
           <b-card-text>
             {{ rezept.preparation }}
           </b-card-text>
+          <b-link :to="{name: 'details', params: {id: rezept.recipeId}}">Details</b-link>
         </b-card>
       </b-card-group>
     </div>
@@ -33,7 +34,7 @@ export default {
   },
   methods: {
     loadRecipes() {
-      let uri = "http://localhost:8080/recipe"
+      let uri = "/recipe"
       axios.get(uri)
       .then(response => {
         this.rezepte = response.data

@@ -5,7 +5,8 @@
       <b-navbar-toggle target="nav-collaps"></b-navbar-toggle>
       <b-collapse id="nav-collaps" is-nav>
         <b-navbar-nav>
-          <b-nav-item href="#">Home</b-nav-item>
+          <b-nav-item to="/">Home</b-nav-item>
+          <b-nav-item to="/about">About</b-nav-item>
         </b-navbar-nav>
         <b-navbar-nav class="ml-auto">
           <b-nav-form>
@@ -13,7 +14,6 @@
             <b-button class="my-2 my-sm-0" size="sm" type="submit">Suchen</b-button>
           </b-nav-form>
         </b-navbar-nav>
-
       </b-collapse>
     </b-navbar>
     <b-container fluid="lg">
@@ -21,31 +21,14 @@
         <h1>Kochbuch</h1>
         <p>Rezepte für Alle und Keinen</p>
       </div>
-      <b-row>
-        <b-col lg="8">
-          <list></list>
-        </b-col>
-        <b-col lg="4">
-          <create></create>
-        </b-col>
-      </b-row>
+      <router-view/>
+
     </b-container>
+
   </div>
 </template>
 
-<script>
+<style lang="scss">
 
-import Create from "@/components/recipe/create";
-import List from "@/components/recipe/list";
 
-export default {
-  name: 'App',
-  components: {
-    Create, List
-
-  }
-}
-</script>
-
-<style>
 </style>
