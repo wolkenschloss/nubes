@@ -3,8 +3,7 @@ quarkus:
     port: 8081
   mongodb:
     database: cookbook
-    # Das Funktioniert nicht
-    uuid-representation: standard
+    connection-string: mongodb://localhost:27017/?uuidRepresentation=STANDARD
   log:
     level: INFO
     console:
@@ -20,7 +19,10 @@ quarkus:
 "%dev":
    quarkus:
      http:
-       port: 0
+       port: 8181
+   mongodb:
+     database: cookbook
+     connection-string: mongodb:localhost:27017/?uuidRepresentation=STANDARD
 "%test":
   quarkus:
     http:

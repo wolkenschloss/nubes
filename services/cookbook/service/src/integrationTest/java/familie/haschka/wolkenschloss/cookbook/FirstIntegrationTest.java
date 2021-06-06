@@ -53,7 +53,7 @@ public class FirstIntegrationTest {
     @BeforeEach
     public void createRecipe() {
 
-        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"herstellung\": \"Bekannt.\"}";
+        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"preparation\": \"Bekannt.\"}";
 
         response = RestAssured
                 .given()
@@ -78,7 +78,7 @@ public class FirstIntegrationTest {
                 .then()
                     .statusCode(HttpStatus.SC_OK)
                     .body("title", equalTo("Schlammkrabbeneintopf"))
-                    .body("herstellung", equalTo("Bekannt."));
+                    .body("preparation", equalTo("Bekannt."));
     }
 
     @Test
