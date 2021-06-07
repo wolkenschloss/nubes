@@ -1,5 +1,43 @@
 # Develop
 
+## Konvention
+
+Jedes Teilprojekt besteht mindestens aus einem Backend und einem Frontend.
+Die Bezeichnungen sind jeweils:
+
+* Backend: service
+* Frontend: webapp
+* Business Core: core
+
+In der Entwicklungsumgebung werden manchmal mehrere Services und Frontends
+gestartet. Ein Service Discovery für die Entwicklungsumgebung ist nicht
+vorgesehen. Damit es nicht zu Kollisionen bei der Verwendung der Ports
+kommt, gibt es folgende Konvention:
+
+Alle Ports sind vierstellig: z. B. 8080
+
+Jedes Teilprojekt bekommt eine eigenes zweistelliges Projektpräfix. Z. B. 
+
+* blog: 80
+* cookbook: 81
+* dashboard: 82
+
+Frontend und Backend erhalten Standardports:
+
+* Frontend: 81
+* Backend: 80
+
+Den Standardports ist der Präfix voranzustellen:
+
+* blog/webapp: 8081
+* blog/service: 8080
+* cookbook/webapp: 8181
+* cookbook/service: 8180
+* dashboard/webapp: 8281
+* dashboard/service: 8280
+
+Erstmal schauen, ob das funktioniert :-)
+
 ## Frontend
 
 - [Node Version Manager (nvm)](https://github.com/nvm-sh/nvm)
