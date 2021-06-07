@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      axios.post('http://localhost:8080/recipe', this.recipe)
+      axios.post('/recipe', this.recipe)
       .then(result => {
         console.log("Rezept abgeschickt. Ergebnis ist")
         console.log(JSON.stringify(result))
