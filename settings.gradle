@@ -10,7 +10,11 @@ pluginManagement {
 }
 
 rootProject.name = 'mycloud'
-include 'services:blog:service', 'services:blog:core', 'services:cookbook:service', 'services:cookbook:webapp'
+include 'services:cookbook:service',
+        'services:cookbook:webapp'
+
+//'services:blog:service',
+//        'services:blog:core',
 
 
 
