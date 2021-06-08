@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="d-flex justify-content-between flex-column-reverse flex-md-row align-items-end mb-2">
+    <div class="d-flex justify-content-between flex-column-reverse flex-md-row align-items-end mb-3">
 
-      <div class="d-flex d-md-block justify-content-between highlight flex-grow-1 align-self-stretch" role="search">
+      <div class="d-flex d-md-block justify-content-between highlight flex-md-grow-1 align-self-stretch" role="search">
         <div class="mr-md-2 flex-grow-1">
           <b-form class="w-100">
             <b-input-group>
@@ -26,16 +26,15 @@
 
       <div class="d-flex justify-content-between highlight align-self-stretch mb-2 mb-md-0" role="navigation">
         <div class="">
-          <b-button-group class="d-flex float-left no-wrap">
+          <b-button-group>
             <b-button disabled variant="outline-secondary">Lorem</b-button>
             <b-button disabled variant="outline-secondary">Ipsum</b-button>
           </b-button-group>
         </div>
-        <div class="ml-2">
+        <div class="ml-md-2">
           <b-button to="/create" variant="primary">Neues Rezept</b-button>
         </div>
       </div>
-
     </div>
 
     <list></list>
@@ -55,10 +54,5 @@ export default {
 </script>
 
 <style>
-.highlight {
-  /*background-color: cornflowerblue;*/
-  /*border-style: dashed;*/
-  /*border-color: #2d2d2d;*/
-  /*border-width: 1px;*/
-}
+
 </style>
