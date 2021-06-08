@@ -1,18 +1,28 @@
 <template>
   <div>
-    <h2>{{recipe.title}} </h2>
-    <div>
-        {{ recipe.preparation }}
+    <div class="d-flex justify-content-between flex-md-row flex-column-reverse align-items-md-start mb-3">
+      <div >
+        <h2>{{ recipe.title }} </h2>
+      </div>
+
+      <b-button-toolbar class="d-flex mb-2 mb-md-0">
+        <b-button :to="{name: 'edit', params: {id: this.$route.params.id}}" variant="outline-primary">
+          <b-icon-pencil></b-icon-pencil> Bearbeiten</b-button>
+        <b-button variant="outline-danger" v-on:click="remove">
+          <b-icon-trash></b-icon-trash> Löschen</b-button>
+        <b-button to="/create" variant="link">
+          <b-icon-plus></b-icon-plus> Neues Rezept</b-button>
+      </b-button-toolbar>
     </div>
     <hr/>
-    <b-button :to="{name: 'edit', params: {id: this.$route.params.id}}" variant="primary">Edit</b-button>&nbsp;
-    <b-button variant="danger" v-on:click="remove">Delete</b-button>
+    <div>
+      {{ recipe.preparation }}
+    </div>
   </div>
 </template>
 
 <script>
-import axios
-  from "axios";
+import axios from "axios";
 
 export default {
   name: "details",

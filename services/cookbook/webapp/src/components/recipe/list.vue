@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <h2>Alle Rezepte</h2>
+
     <div>
       <b-card-group columns>
         <b-card v-for="rezept in rezepte"
@@ -16,7 +15,6 @@
         </b-card>
       </b-card-group>
     </div>
-  </div>
 </template>
 
 <script>

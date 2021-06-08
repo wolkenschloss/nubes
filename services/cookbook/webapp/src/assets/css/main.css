@@ -1,0 +1,4 @@
+.btn-toolbar > .btn:not(:first-child),
+.btn-toolbar > .btn-group:not(:first-child) {
+    margin-left: 0.75em;
+}
