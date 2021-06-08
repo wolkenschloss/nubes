@@ -27,43 +27,16 @@
 
         </b-form-textarea>
       </b-form-group>
-      <b-button type="submit" variant="primary">OK</b-button>
     </b-form>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
 
-  name: "create",
-  data() {
-    return {
-      recipe: {}
-    }
-  },
-  methods: {
-    onSubmit() {
-      axios.post('/recipe', this.recipe)
-      .then(result => {
-        console.log("Rezept abgeschickt. Ergebnis ist")
-        console.log(JSON.stringify(result))
-        this.makeToast('success')
-        this.recipe = {}
-      })
-      .catch(error => alert(error))
-    },
-    makeToast(variant = null) {
-      this.$bvToast.toast('Toast body content', {
-        title: `Variant ${variant || 'default'}`,
-        variant: variant,
-        solid: true,
-        toaster: 'b-toaster-bottom-full',
-        appendToast: true
-      })
-    }
-  }
+  name: "editor",
+  props: ['recipe']
 }
 </script>
 
