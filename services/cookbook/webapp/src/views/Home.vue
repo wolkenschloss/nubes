@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-content-between flex-column-reverse flex-md-row align-items-end mb-3">
 
-      <div class="d-flex d-md-block justify-content-between highlight flex-md-grow-1 align-self-stretch" role="search">
+      <div class="d-flex d-md-block justify-content-between flex-md-grow-1 align-self-stretch" role="search">
         <div class="mr-md-2 flex-grow-1">
           <b-form class="w-100">
             <b-input-group>
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <div class="d-flex justify-content-between highlight align-self-stretch mb-2 mb-md-0" role="navigation">
+      <div class="d-flex justify-content-between align-self-stretch mb-2 mb-md-0" role="navigation">
         <div class="">
           <b-button-group>
             <b-button disabled variant="outline-secondary">Lorem</b-button>

@@ -1,12 +1,18 @@
 <template>
   <div>
-    <h2>Create</h2>
+    <h2>Neues Rezept eingeben</h2>
     <b-form @submit.prevent="onSubmit">
       <editor v-bind:recipe="this.$data.recipe"></editor>
-      <b-button type="submit" variant="primary">OK</b-button>&nbsp;
-      <b-button to="/" type="button" variant="secondary">Cancel</b-button>
+      <hr/>
+      <b-button-toolbar>
+        <b-button-group>
+          <b-button type="submit" variant="primary">OK</b-button>
+        </b-button-group>
+        <b-button-group>
+          <b-button to="/" type="button" variant="secondary">Cancel</b-button>
+        </b-button-group>
+      </b-button-toolbar>
     </b-form>
-    <hr/>
   </div>
 </template>
 

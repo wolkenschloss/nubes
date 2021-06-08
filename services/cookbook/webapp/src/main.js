@@ -7,6 +7,8 @@ import App from './App.vue'
 import {IconsPlugin} from "bootstrap-vue";
 import router from './router'
 
+import '@/assets/css/main.css'
+
 Vue.config.productionTip = false
 Vue.use(IconsPlugin)
 

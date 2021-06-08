@@ -1,43 +1,27 @@
 <template>
 <div>
-  <h2>Edit</h2>
+  <h2>Rezept bearbeiten</h2>
   <b-form @submit.prevent="onSubmit">
-    <b-form-group id="title-group"
-                  v-model="recipe.title"
-                  description="Titel des Rezepts"
-                  label="Titel"
-                  label-for="title-input">
-      <b-form-input id="title-input"
-                    ref="title"
-                    v-model="recipe.title"
-                    autocomplete="off"
-                    placeholder="Titel"
-                    required
-                    type="text"/>
-    </b-form-group>
-    <b-form-group id="preparation-group"
-                  description="Beschreibung, wie das Rezept zubereitet wird"
-                  label="Zubereitung"
-                  label-for="preparation-input">
-      <b-form-textarea id="preparation-input"
-                       ref="preparation"
-                       v-model="recipe.preparation"
-                       placeholder="Zubereitung des Rezepts beschreiben..."
-                       required rows="6">
-
-      </b-form-textarea>
-    </b-form-group>
-    <b-button type="submit" variant="primary">OK</b-button>&nbsp;
-    <b-button :to="{name: 'details', params: {id: this.$props.id}}" variant="secondary">Cancel</b-button>
+    <editor v-bind:recipe="this.$data.recipe"></editor>
+    <hr/>
+    <b-button-toolbar aria-label="Edit Recipe Actions" key-nav>
+      <b-button-group>
+        <b-button type="submit" variant="primary">
+          <b-icon></b-icon>Änderungen speichern</b-button>&nbsp;
+        <b-button :to="{name: 'details', params: {id: this.$props.id}}" variant="secondary" >Cancel</b-button>
+      </b-button-group>
+    </b-button-toolbar>
   </b-form>
 </div>
 </template>
 
 <script>
 import axios from "axios";
+import Editor from "@/components/recipe/editor";
 
 export default {
   name: "Edit",
+  components: {Editor},
   props: {id: String},
   data() {
     return {
