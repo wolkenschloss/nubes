@@ -1,0 +1,28 @@
+{
+  "name": "testbed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "testbed.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "testbed": "./bin/testbed.mjs"
+  },
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "commander": "^7.2.0",
+    "default-gateway": "^6.0.3",
+    "express": "^4.17.1",
+    "fast-xml-parser": "^3.19.0",
+    "fastify": "^3.17.0",
+    "fastify-formbody": "^5.0.0",
+    "ip-address": "^7.1.0",
+    "minimist": "^1.2.5",
+    "mustache": "^4.2.0"
+  }
+}
