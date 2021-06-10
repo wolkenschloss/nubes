@@ -1,19 +1,15 @@
-const chalk = require('chalk')
-const os = require('os')
 const fs = require('fs')
 const path = require('path')
-const util = require('util')
-const childProcess = require('child_process');
+const { spawn } = require('child_process');
 const xmlParser = require('fast-xml-parser');
-const defaultGateway = require('default-gateway')
+const chalk = require('chalk');
 
-//# pool-dumpxml wolkenschloss
 
 class StoragePool {
 
     static load (poolname) {
         return new Promise((resolve, reject) => {
-            const virsh = childProcess.spawn('virsh', ['pool-dumpxml', poolname]);
+            const virsh = spawn('virsh', ['pool-dumpxml', poolname]);
             virsh.stdout.on('data', data => {
                 const json = xmlParser.parse(data.toString())
                 const instanz = new StoragePool()
@@ -21,8 +17,11 @@ class StoragePool {
                 resolve(instanz)
             })
 
+            virsh.stdout.pipe(process.stdout)
+
             virsh.stderr.on('data', data => {
-                reject(data)
+                console.error(data.toString())
+                reject(new Error("Unable to read Pool configuration 2"))
             })
 
             virsh.on('close', code => {
@@ -41,39 +40,6 @@ async function readPublicSshKey() {
     const data = await fs.readFileSync(keyPath, 'utf8')
     return data
 }
-
-// const config = {
-//
-//     // Das Verzeichnis, in des die Festplattenabbilder geschrieben werden
-//     get buildDir(){ return path.resolve('build') },
-//
-//     // Verzeichnis, in dem Betriebssystemabbilder zwischengespeichert sind.
-//     // Es eignen sich nur Betriebssysteme mit Cloud Init.
-//     // https://cloud-images.ubuntu.com/
-//     get cacheDir() {return path.resolve('.cache')},
-//
-//     // Das für den Bau des Testprüfstandes verwendete Abbild eines
-//     // Betriebssystems.
-//     get serverImage() {return path.join(this.cacheDir, "focal-server-cloudimg-amd64-disk-kvm.img")},
-//
-//     get generatedConfiguration() {return path.join(this.buildDir, "generated-config")},
-//
-//     get networkConfigFile() {return path.join(this.generatedConfiguration, "network-config")},
-//
-//     get userDataConfig() {return path.join(this.generatedConfiguration, "user-data")},
-//
-//     get cloudInitDataImage() {return path.join(this.buildDir, "cidata.img")},
-//
-//     get rootImage() {return path.join(this.buildDir, "root.qcow2")},
-//
-//     get gateway() { return defaultGateway.v4.sync().gateway },
-//
-//     ip: '192.168.122.153/24',
-//
-//     nameserver: '192.168.4.2',
-//
-//     instanz: "testbedvm",
-// }
 
 async function configs(pool$)  {
 
@@ -128,8 +94,6 @@ async function configs(pool$)  {
 
 // // Download Cloud Images from
 // // https://cloud-images.ubuntu.com/focal/current/
-//
-
 async function createUserTemplate(instanz, ssh_key$, user) {
     console.log("create user-data template")
     return `#cloud-config
@@ -169,7 +133,7 @@ snap:
   commands:
     01: snap install microk8s --classic
     02: microk8s status --wait-ready
-    03: microk8s enable dns storage
+    03: microk8s enable dns storage ingress dashboard
 `
 }
 
@@ -178,7 +142,6 @@ async function writeConfig(filename, content$) {
     await fs.promises.mkdir(path.dirname(filename) , {recursive: true})
     await fs.promises.writeFile(filename, await content$)
 }
-
 
 function createeNetworkConfig(config) {
     return `version: 2
@@ -197,7 +160,7 @@ async function createCloudLocalDataSource$(config) {
     await fs.promises.mkdir(path.dirname(config.cloudInitDataImage), {recursive: true})
 
     return new Promise((resolve, reject) => {
-        const cloud_localds = childProcess.spawn('cloud-localds', [
+        const cloud_localds = spawn('cloud-localds', [
             '--network-config',
             config.networkConfigFile,
             config.cloudInitDataImage,
@@ -222,7 +185,7 @@ async function createCloudLocalDataSource$(config) {
 
 function createRootImage$(config) {
     return new Promise((resolve, reject) => {
-        const qemu_img = childProcess.spawn('qemu-img', [
+        const qemu_img = spawn('qemu-img', [
             "create",
             "-f", "qcow2",
             "-F", "qcow2",
@@ -250,7 +213,7 @@ function createRootImage$(config) {
 
 function resizeRootImage(config) {
     return new Promise((resolve, reject) => {
-        const qemu_img = childProcess.spawn('qemu-img', ['resize', config.rootImage, "20G"])
+        const qemu_img = spawn('qemu-img', ['resize', config.rootImage, "20G"])
         qemu_img.stdout.on('data', data => {console.log(`qemu-img resize> ${data}`)})
         qemu_img.stderr.on('data', data => {console.error(`qemu-img resize> ${data}`)})
 
@@ -266,10 +229,10 @@ function resizeRootImage(config) {
 
 function installAndStartVirtualMachine(config) {
     return new Promise((resolve, reject) => {
-        const virt_install = childProcess.spawn('virt-install', [
+        const virt_install = spawn('virt-install', [
             '--connect', 'qemu:///system',
-            // '--unattended',
             '--noautoconsole',
+            '--wait', "0",
             '--virt-type', 'kvm',
             '--name', config.instanz,
             '--ram', '4096',
@@ -282,15 +245,6 @@ function installAndStartVirtualMachine(config) {
             '--network', 'network=default',
             '--graphics', 'none'
         ])
-
-            // <interface type="network">
-            // <mac address="52:54:00:a6:ba:fd"/>
-            // <source network="default" portid="1a4b5cb0-ae92-49c0-a52a-d7c227a61833" bridge="virbr0"/>
-            // <target dev="vnet0"/>
-            // <model type="virtio"/>
-            // <alias name="net0"/>
-            // <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
-            // </interface>
 
         virt_install.stdout.on('data', data => {console.log(`virt-install> ${data}`)})
         virt_install.stderr.on('data', data => {console.error(`virt-install> ${data}`)})
@@ -305,15 +259,10 @@ function installAndStartVirtualMachine(config) {
     })
 }
 
-// createImages$
-//     .then(resizeRootImage)
-//     .then(installAndStartVirtualMachine)
-//     .catch(error => {console.error(`Fehler: ${error}`)})
-//     .finally(() => console.log("Progammende"))
-
 StoragePool.load('wolkenschloss')
     .then(async pool => {
         console.log(`I've got the pool ${pool.target.path}`)
+        console.log(pool)
         return await configs(pool)
     })
     .then(async config => {
@@ -331,49 +280,6 @@ StoragePool.load('wolkenschloss')
     .then(createRootImage$)
     .then(resizeRootImage)
     .then(installAndStartVirtualMachine)
-    .then(() => {console.log("Geschafft.")})
-    .catch(console.error)
-    .finally(() => console.log("Done"))
-
-
-
-//     .then(()=> {
-//         const virt_install = childProcess.spawn('virt-install', [
-//             '--connect', 'qemu:///system',
-//             '--virt-type', 'kvm',
-//             '--name', instanz,
-//             '--ram', '4096',
-//             '--vcpus', '2',
-//             '--os-type', 'linux',
-//             '--os-variant', 'ubuntu20.04',
-//             '--disk', `${rootImage},device=disk,bus=virtio`,
-//             '--disk', `${cloudInitDataImage},format=raw`,
-//             '--import',
-//             '--network', 'network=default',
-//             '--graphics', 'none'
-//         ])
-//
-//         // virt_install.stdout.on('data', data => {console.log(`virt-install> ${data}`)})
-//         // virt_install.stderr.on('data', data => {console.error(`virt-install> ${data}`)})
-//         virt_install.on('close', code => {
-//             console.log(`virt-install exit with code ${code}`)
-//
-//         })
-//     })
-//     .catch(err => {
-//         console.error("Der Große Error Handler")
-//         console.error(err)
-//     })
-//     .finally(() => {
-//         console.log("Programende")
-//     })
-//
-//
-// // fs.writeFileSync(`${temp_dir}/user-data`, createUserTemplate(sshKey))
-// //
-// // console.log(createUserTemplate("testbedvm", sshKey))
-// // console.log(readPublicSshKey(process.env.USER))
-//
-// // create disk image for new vm => gradle build
-//
-// // start vm => gradle quarkusDev
+    .then(() => {console.log(chalk.gray("Geschafft."))})
+    .catch(error => {console.error(error);})
+    .finally(() => console.log(chalk.green("Done")))

@@ -13,6 +13,7 @@
   "dependencies": {
     "chalk": "^4.1.1",
     "default-gateway": "^6.0.3",
+    "fast-xml-parser": "^3.19.0",
     "minimist": "^1.2.5"
   }
 }

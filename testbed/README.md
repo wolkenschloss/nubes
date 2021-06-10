@@ -137,3 +137,14 @@ microk8s kubectl -n kube-system describe secret $token
 
 ### Image Registry
 
+### SSH Key aus known_hosts entfernen, falls bereits enthalten ist.
+
+### Troubleshooting
+
+Es gibt zwei Möglichkeiten auf die Schnautze zu fallen. Entweder 
+man verwendet den Verbindungstyp qemu:///system, dann die 
+Dateibereichtigungen der Builderzeugnisse für libvirt zugänglich
+gemacht werden, indem `chmod 777` auf die Festplattenabbilder
+angewendet werden oder sie in das /tmp Verzeichnis wandern; oder
+man verwendet den Verbindungstyp qemu:///session und hat dann 
+kein Netzwerk. Einen Tod muss man halt sterben.
