@@ -1,0 +1,28 @@
+#cloud-config
+
+preserve_hostname: False
+hostname: ${instanz}
+fqdn: ${instanz}.haschka.family
+manage_etc_hosts: True
+
+# chpasswd:
+#  expire: true
+#  list:
+#  - ubuntu:ubuntu
+#
+# password: ubuntu
+
+# ssh_pwauth: True
+ssh_pwauth: False
+
+users:
+    #  - default
+- name: dumbledore
+gecos: Albus Dumbledore
+shell: '/bin/bash'
+groups: sudo
+ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDM0xSQ6MaqakDOuxlbPm+2aWX6vHcnyQUxn5hUZjldCEeYJI7mZuzy0uSTp5DDb/Y1JxeoOeACn3M9Ll5daNtZB0nBxDc6ShQFL3WV3vt68TGhcsYAlo8w0BlMqpQRrrOl44Xj+V6704wcuZBt29aGOaeWWXN2X2CfgZaD++iESgo41e0ohwgoptNJU6O6lO3hzw24M1D2ou6bUb4xC+tpco/u0Pnj02adUx8e865bL//sJBpbACXUnGgpoXa4ECYsE18yxcbgwDj2ZiELTK0PbH6znUgEpIq8FkRLgEzAENE9R9GkB3V7KbqMLvaIttFR+DsprP2Zaa5IpUoOuCfV6ZRe7suiuUmVzWe5tKvXyQ0nadFMelSCzZMoKmf1XAfRQBW2ZQswTk3IQxpz/BMRns/EIifvirXQvUGVBALLjNHUSe8/C66eRZwpeKAQpAcHXt1w4S8rddkNPXC3kwf/IV0CSKmDUaU5V0usbYgYSV/p9ZeqT7NQ3rYh7CX15Gs= matthias@upc10-bmsc
+sudo: 'ALL=(ALL) NOPASSWD: ALL'
+
+locale: de_DE.UTF-8
