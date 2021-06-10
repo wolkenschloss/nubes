@@ -1,36 +1,46 @@
 const fs = require('fs')
 const path = require('path')
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const xmlParser = require('fast-xml-parser');
 const chalk = require('chalk');
 
+function ensureString(buffer) {
+    return buffer?.toString().trim()
+}
+
+function parseResult(data, callback) {
+    return Object.assign(
+        new StoragePool(),
+        xmlParser.parse(ensureString(data)).pool)
+
+}
+
+function onClose(resolve, reject, code) {
+    if (code !== 0) {
+        reject(Error(`process exited with code ${code}`))
+    }
+}
+
+function spawner(tool, onSuccess, onFailure) {
+
+    tool.on('exit', code => {
+        if(code === 0) {
+            tool.stdout.on('data', onSuccess)
+        } else {
+            tool.stdout.on('data', onFailure)
+        }
+    })
+}
 
 class StoragePool {
 
-    static load (poolname) {
+    static load(poolName) {
         return new Promise((resolve, reject) => {
-            const virsh = spawn('virsh', ['pool-dumpxml', poolname]);
-            virsh.stdout.on('data', data => {
-                const json = xmlParser.parse(data.toString())
-                const instanz = new StoragePool()
-                Object.assign(instanz, json.pool)
-                resolve(instanz)
-            })
-
-            virsh.stdout.pipe(process.stdout)
-
-            virsh.stderr.on('data', data => {
-                console.error(data.toString())
-                reject(new Error("Unable to read Pool configuration 2"))
-            })
-
-            virsh.on('close', code => {
-                console.log(`virsh exit ${code}`)
-            })
-
-            virsh.on('error', error => {
-                reject(error)
-            })
+            spawner(
+                spawn('virsh', ['pool-dumpxml', poolName]),
+                data => resolve(parseResult(data)),
+                data => reject(data.toString())
+            )
         })
     }
 }
