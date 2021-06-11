@@ -8,58 +8,77 @@ function ensureString(buffer) {
     return buffer?.toString().trim()
 }
 
+function curry(fn, head) {
+    return (...tail) => {
+        return fn(head, ...tail);
+    }
+}
+
 function parseResult(data) {
     return Object.assign(
         new StoragePool(),
         xmlParser.parse(ensureString(data)).pool)
 }
 
-function spawner(tool, onSuccess, onFailure) {
+function spawner(cmd, args, onSuccess, onFailure) {
+    const tool = spawn(cmd, args)
     console.log("Execute %s", tool.spawnargs.join(' '))
     return new Promise((resolve, reject) => {
         tool.on('exit', code => {
+            console.log(`1> ${tool.spawnfile} exit code ${code}`)
             if (code === 0) {
                 tool.stdout.on('data', data => {
+                    console.log(`2> ${tool.spawnfile} exit code ${code}`)
                     onSuccess?.({resolve, reject, data: data.toString(), code}) || resolve()
                 })
             } else {
                 tool.stderr.on('data', data => {
+                    console.log(`3> ${tool.spawnfile} exit code ${code}`)
                     onFailure?.({resolve, reject, data: data.toString(), code}) || reject(Error(data.toString()))
                 })
+            }
+        })
+        tool.on('error', error => {
+            reject(Error(error.toString()))
+        })
+        tool.on('close', code => {
+            console.log(`4> ${tool.spawnfile} exit code ${code}`)
+            if(code !== 0) {
+                reject(Error(`5> ${tool.spawnfile} exit with ${code}`))
+            } else {
+                console.log(`6> ${tool.spawnfile} exit code ${code}`)
+                resolve(code)
             }
         })
     });
 }
 
-function virsh(command, parameter, onSuccess, onFailure) {
-    return spawner(spawn('virsh', [command, ...parameter]),
-        context => onSuccess?.(context) || context.resolve(),
-        context => onFailure?.(context) || context.reject(Error(context.data)))
-}
+const virsh =  curry(spawner, 'virsh')
+const cloud_localds = curry(spawner, 'cloud-localds')
+const qemu_img = curry(spawner, 'qemu-img')
+const virt_install = curry(spawner, 'virt-install')
 
 class StoragePool {
     static load(poolName) {
-        return virsh('pool-dumpxml', [poolName],
+        return virsh(['pool-dumpxml', poolName],
             context => context.resolve(parseResult(context.data))
         )
     }
 }
 
-async function domainExists(domainname) {
-    return await virsh('list', ['--name', '--all'],
+function domainExists(domainname) {
+    return virsh(['list', '--name', '--all'],
         context => context.resolve(
             context.data.trim().split('\n').includes(domainname)
         ))
 }
 
 async function readPublicSshKey() {
-    console.log("Reading public ssh key")
     const keyPath = path.join(process.env.HOME, '.ssh', 'id_rsa.pub')
-    const data = await fs.readFileSync(keyPath, 'utf8')
-    return data
+    return fs.readFileSync(keyPath, 'utf8')
 }
 
-async function configs(pool) {
+function configs(pool) {
 
     return {
         // Das Verzeichnis, in des die Festplattenabbilder geschrieben werden
@@ -110,8 +129,7 @@ async function configs(pool) {
 
 // // Download Cloud Images from
 // // https://cloud-images.ubuntu.com/focal/current/
-async function createUserTemplate(instanz, ssh_key$, user) {
-    console.log("Creating user-data")
+function createUserTemplate(instanz, ssh_key, user) {
     return `#cloud-config
 
 preserve_hostname: False
@@ -131,7 +149,7 @@ users:
       - sudo
       - microk8s
     ssh_authorized_keys:
-      - ${await ssh_key$}
+      - ${ssh_key}
     sudo: 'ALL=(ALL) NOPASSWD: ALL'
 
 locale: ${process.env.LANG}
@@ -155,7 +173,6 @@ snap:
 }
 
 async function writeConfig(filename, content) {
-    await fs.promises.mkdir(path.dirname(filename), {recursive: true})
     await fs.promises.writeFile(filename, await content)
 }
 
@@ -173,52 +190,36 @@ ethernets:
 `
 }
 
-async function createCloudLocalDataSource$(config) {
-    await fs.promises.mkdir(path.dirname(config.cloudInitDataImage), {recursive: true})
+async function createCloudLocalDataSource(config) {
 
-    return new Promise((resolve, reject) => {
-        const cloud_localds = spawn('cloud-localds', [
+
+    return cloud_localds([
             '--network-config',
             config.networkConfigFile,
             config.cloudInitDataImage,
             config.userDataConfig,
             "--verbose"
-        ])
-        cloud_localds.stdout.on('data', data => {
-            console.log(`data`)
-        })
-        cloud_localds.stderr.on('data', data => {
-            console.log(data.toString())
-        })
-        cloud_localds.on('close', code => {
-            if (code === 0) {
-                resolve(config)
-            } else {
-                reject(code)
-            }
-        })
-    })
+        ]
+    )
 }
 
-function createRootImage$(config) {
-
-    return spawner(spawn('qemu-img', [
+async function createRootImage(config) {
+    return await qemu_img([
         "create",
         "-f", "qcow2",
         "-F", "qcow2",
         "-b", config.serverImage,
         config.rootImage
-    ]))
+    ])
 }
 
 function resizeRootImage(config) {
-    return spawner(spawn('qemu-img', ['resize', config.rootImage, '20G']))
-
+    return qemu_img( ['resize', config.rootImage, '20G'])
 }
 
 function installAndStartVirtualMachine(config) {
 
-    return spawner(spawn('virt-install', [
+    return virt_install( [
         '--connect', 'qemu:///system',
         '--description', "Wolkenschloss Testbed",
         '--noautoconsole',
@@ -234,27 +235,27 @@ function installAndStartVirtualMachine(config) {
         '--import',
         '--network', 'network=default',
         '--graphics', 'none'
-    ]))
+    ])
 }
 
 StoragePool.load('wolkenschloss')
-    .then(pool => {
-        console.log("Reading configuration")
-        return configs(pool)
-    })
-    .then(async config => {
-        console.log("Creating VM configuration files")
+    .then(async pool => {
+        const config = configs(pool)
 
         if (await domainExists(config.instanz)) {
             throw Error("Domain exists")
         }
 
+        await fs.promises.mkdir(config.buildDir, {recursive: true})
+        await fs.promises.mkdir(config.generatedConfiguration, {recursive: true})
+
         await writeConfig(config.networkConfigFile, createeNetworkConfig(config))
-        await writeConfig(config.userDataConfig, createUserTemplate(config.instanz, readPublicSshKey(), process.env.USER))
-        await createCloudLocalDataSource$(config)
-        await createRootImage$(config)
+        const sshKey = await readPublicSshKey()
+        await writeConfig(config.userDataConfig, createUserTemplate(config.instanz, sshKey, process.env.USER))
+        await createCloudLocalDataSource(config)
+        await createRootImage(config)
         await resizeRootImage(config)
-        await installAndStartVirtualMachine(config)
+        // await installAndStartVirtualMachine(config)
     })
     .then(() => {
         console.log(chalk.green("Geschafft."))
