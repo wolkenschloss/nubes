@@ -8,52 +8,58 @@ function ensureString(buffer) {
     return buffer?.toString().trim()
 }
 
-function parseResult(data, callback) {
+function parseResult(data) {
     return Object.assign(
         new StoragePool(),
         xmlParser.parse(ensureString(data)).pool)
-
-}
-
-function onClose(resolve, reject, code) {
-    if (code !== 0) {
-        reject(Error(`process exited with code ${code}`))
-    }
 }
 
 function spawner(tool, onSuccess, onFailure) {
+    console.log("Execute %s", tool.spawnargs.join(' '))
+    return new Promise((resolve, reject) => {
+        tool.on('exit', code => {
+            if (code === 0) {
+                tool.stdout.on('data', data => {
+                    onSuccess?.({resolve, reject, data: data.toString(), code}) || resolve()
+                })
+            } else {
+                tool.stderr.on('data', data => {
+                    onFailure?.({resolve, reject, data: data.toString(), code}) || reject(Error(data.toString()))
+                })
+            }
+        })
+    });
+}
 
-    tool.on('exit', code => {
-        if(code === 0) {
-            tool.stdout.on('data', onSuccess)
-        } else {
-            tool.stdout.on('data', onFailure)
-        }
-    })
+function virsh(command, parameter, onSuccess, onFailure) {
+    return spawner(spawn('virsh', [command, ...parameter]),
+        context => onSuccess?.(context) || context.resolve(),
+        context => onFailure?.(context) || context.reject(Error(context.data)))
 }
 
 class StoragePool {
-
     static load(poolName) {
-        return new Promise((resolve, reject) => {
-            spawner(
-                spawn('virsh', ['pool-dumpxml', poolName]),
-                data => resolve(parseResult(data)),
-                data => reject(data.toString())
-            )
-        })
+        return virsh('pool-dumpxml', [poolName],
+            context => context.resolve(parseResult(context.data))
+        )
     }
 }
 
+async function domainExists(domainname) {
+    return await virsh('list', ['--name', '--all'],
+        context => context.resolve(
+            context.data.trim().split('\n').includes(domainname)
+        ))
+}
+
 async function readPublicSshKey() {
+    console.log("Reading public ssh key")
     const keyPath = path.join(process.env.HOME, '.ssh', 'id_rsa.pub')
     const data = await fs.readFileSync(keyPath, 'utf8')
     return data
 }
 
-async function configs(pool$)  {
-
-    const pool = await pool$
+async function configs(pool) {
 
     return {
         // Das Verzeichnis, in des die Festplattenabbilder geschrieben werden
@@ -105,7 +111,7 @@ async function configs(pool$)  {
 // // Download Cloud Images from
 // // https://cloud-images.ubuntu.com/focal/current/
 async function createUserTemplate(instanz, ssh_key$, user) {
-    console.log("create user-data template")
+    console.log("Creating user-data")
     return `#cloud-config
 
 preserve_hostname: False
@@ -135,6 +141,7 @@ package_update: False
 package_upgrade: False
 
 packages:
+  - acpid
   - tzdata
   - openssh-server
   - curl
@@ -147,13 +154,13 @@ snap:
 `
 }
 
-async function writeConfig(filename, content$) {
-    console.log(`write config to ${filename}`)
-    await fs.promises.mkdir(path.dirname(filename) , {recursive: true})
-    await fs.promises.writeFile(filename, await content$)
+async function writeConfig(filename, content) {
+    await fs.promises.mkdir(path.dirname(filename), {recursive: true})
+    await fs.promises.writeFile(filename, await content)
 }
 
 function createeNetworkConfig(config) {
+    console.log("Creating network-config")
     return `version: 2
 ethernets:
   enp1s0:
@@ -194,102 +201,65 @@ async function createCloudLocalDataSource$(config) {
 }
 
 function createRootImage$(config) {
-    return new Promise((resolve, reject) => {
-        const qemu_img = spawn('qemu-img', [
-            "create",
-            "-f", "qcow2",
-            "-F", "qcow2",
-            "-b", config.serverImage,
-            config.rootImage
-        ])
 
-        qemu_img.stdout.on('data', (data) => {
-            console.log(`qemu-img create> ${data}`)
-        })
-        qemu_img.stderr.on('data', (data) => {
-            console.error(`qemu-img create> ${data}`)
-        })
-        qemu_img.on('close', code => {
-            if (code !== 0) {
-                reject(`qemu-img create: Exit with code ${code}`)
-            }
-            resolve(config)
-        })
-        qemu_img.on('error', error => {
-            reject(error)
-        })
-    })
+    return spawner(spawn('qemu-img', [
+        "create",
+        "-f", "qcow2",
+        "-F", "qcow2",
+        "-b", config.serverImage,
+        config.rootImage
+    ]))
 }
 
 function resizeRootImage(config) {
-    return new Promise((resolve, reject) => {
-        const qemu_img = spawn('qemu-img', ['resize', config.rootImage, "20G"])
-        qemu_img.stdout.on('data', data => {console.log(`qemu-img resize> ${data}`)})
-        qemu_img.stderr.on('data', data => {console.error(`qemu-img resize> ${data}`)})
+    return spawner(spawn('qemu-img', ['resize', config.rootImage, '20G']))
 
-        qemu_img.on('close', code => {
-            console.log(`qemu-img resize: Exit with code ${code}`);
-            if (code !== 0) {
-                reject(`qemu-img resize exited with code ${code}`)
-            }
-            resolve(config)
-        })
-    })
 }
 
 function installAndStartVirtualMachine(config) {
-    return new Promise((resolve, reject) => {
-        const virt_install = spawn('virt-install', [
-            '--connect', 'qemu:///system',
-            '--noautoconsole',
-            '--wait', "0",
-            '--virt-type', 'kvm',
-            '--name', config.instanz,
-            '--ram', '4096',
-            '--vcpus', '2',
-            '--os-type', 'linux',
-            '--os-variant', 'ubuntu20.04',
-            '--disk', `${config.rootImage},device=disk,bus=virtio`,
-            '--disk', `${config.cloudInitDataImage},format=raw`,
-            '--import',
-            '--network', 'network=default',
-            '--graphics', 'none'
-        ])
 
-        virt_install.stdout.on('data', data => {console.log(`virt-install> ${data}`)})
-        virt_install.stderr.on('data', data => {console.error(`virt-install> ${data}`)})
-        virt_install.on('close', code => {
-            console.log(`virt-install exit with code ${code}`)
-            if (code == 0) {
-                resolve()
-            } else {
-                reject(code)
-            }
-        })
-    })
+    return spawner(spawn('virt-install', [
+        '--connect', 'qemu:///system',
+        '--description', "Wolkenschloss Testbed",
+        '--noautoconsole',
+        '--wait', "0",
+        '--virt-type', 'kvm',
+        '--name', config.instanz,
+        '--ram', '4096',
+        '--vcpus', '2',
+        '--os-type', 'linux',
+        '--os-variant', 'ubuntu20.04',
+        '--disk', `${config.rootImage},device=disk,bus=virtio`,
+        '--disk', `${config.cloudInitDataImage},format=raw`,
+        '--import',
+        '--network', 'network=default',
+        '--graphics', 'none'
+    ]))
 }
 
 StoragePool.load('wolkenschloss')
-    .then(async pool => {
-        console.log(`I've got the pool ${pool.target.path}`)
-        console.log(pool)
-        return await configs(pool)
+    .then(pool => {
+        console.log("Reading configuration")
+        return configs(pool)
     })
     .then(async config => {
-        console.log(`Got Config: ${config}`)
-        console.log(config)
-        const networkConfig$ = await writeConfig(config.networkConfigFile, createeNetworkConfig(config))
-        const userData$ = await writeConfig(config.userDataConfig, createUserTemplate(config.instanz, readPublicSshKey(), process.env.USER))
-        return Promise.all([config, networkConfig$, userData$])
+        console.log("Creating VM configuration files")
+
+        if (await domainExists(config.instanz)) {
+            throw Error("Domain exists")
+        }
+
+        await writeConfig(config.networkConfigFile, createeNetworkConfig(config))
+        await writeConfig(config.userDataConfig, createUserTemplate(config.instanz, readPublicSshKey(), process.env.USER))
+        await createCloudLocalDataSource$(config)
+        await createRootImage$(config)
+        await resizeRootImage(config)
+        await installAndStartVirtualMachine(config)
     })
-    .then(([config, nix, da]) => {
-        console.log("Schritt 42")
-        console.log(config)
-        return createCloudLocalDataSource$(config)
+    .then(() => {
+        console.log(chalk.green("Geschafft."))
     })
-    .then(createRootImage$)
-    .then(resizeRootImage)
-    .then(installAndStartVirtualMachine)
-    .then(() => {console.log(chalk.gray("Geschafft."))})
-    .catch(error => {console.error(error);})
+    .catch(error => {
+        console.error(chalk.red(error));
+    })
     .finally(() => console.log(chalk.green("Done")))
