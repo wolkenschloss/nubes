@@ -17,7 +17,7 @@ function curry(fn, head) {
 function parseResult(data) {
     return Object.assign(
         new StoragePool(),
-        xmlParser.parse(ensureString(data)).pool)
+        xmlParser.parse(ensureString(data))['pool'])
 }
 
 function spawner(cmd, args, onSuccess, onFailure) {
@@ -84,13 +84,6 @@ function configs(pool) {
         // Das Verzeichnis, in des die Festplattenabbilder geschrieben werden
         get buildDir() {
             return path.resolve(pool.target.path)
-        },
-
-        // Verzeichnis, in dem Betriebssystemabbilder zwischengespeichert sind.
-        // Es eignen sich nur Betriebssysteme mit Cloud Init.
-        // https://cloud-images.ubuntu.com/
-        get cacheDir() {
-            return path.resolve('.cache')
         },
 
         // Das für den Bau des Testprüfstandes verwendete Abbild eines
@@ -176,7 +169,7 @@ async function writeConfig(filename, content) {
     await fs.promises.writeFile(filename, await content)
 }
 
-function createeNetworkConfig(config) {
+function createNetworkConfig(config) {
     console.log("Creating network-config")
     return `version: 2
 ethernets:
@@ -249,13 +242,13 @@ StoragePool.load('wolkenschloss')
         await fs.promises.mkdir(config.buildDir, {recursive: true})
         await fs.promises.mkdir(config.generatedConfiguration, {recursive: true})
 
-        await writeConfig(config.networkConfigFile, createeNetworkConfig(config))
+        await writeConfig(config.networkConfigFile, createNetworkConfig(config))
         const sshKey = await readPublicSshKey()
         await writeConfig(config.userDataConfig, createUserTemplate(config.instanz, sshKey, process.env.USER))
         await createCloudLocalDataSource(config)
         await createRootImage(config)
         await resizeRootImage(config)
-        // await installAndStartVirtualMachine(config)
+        await installAndStartVirtualMachine(config)
     })
     .then(() => {
         console.log(chalk.green("Geschafft."))
