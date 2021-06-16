@@ -5,6 +5,8 @@ import util from "util";
 const execp = util.promisify(exec)
 
 import winston from 'winston'
+import {Address4} from "ip-address";
+import config from "./config.js";
 
 const logger = winston.createLogger({
     level: 'debug',
@@ -74,4 +76,20 @@ class StoragePool {
     }
 }
 
-export {curry, spawner, virsh, cloud_localds, StoragePool, execp, logger}
+async function readKubernetesConfig() {
+    try {
+        logger.debug("testbed config")
+
+        const ip4 = new Address4(config.testbed.ip)
+        const cmd = `ssh ${ip4.addressMinusSuffix} 'microk8s config'`
+
+        const {stdout} = await execp(cmd)
+
+        return stdout.trim();
+    } catch (e) {
+        logger.error(e)
+        process.exitCode = 1
+    }
+}
+
+export {curry, spawner, virsh, cloud_localds, StoragePool, execp, logger, readKubernetesConfig}
