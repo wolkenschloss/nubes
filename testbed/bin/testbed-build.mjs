@@ -5,17 +5,9 @@ import * as path from 'path'
 import * as fs from 'fs'
 import config from './config.js'
 import build_config from './build-config.mjs'
-import {cloud_localds, execp, StoragePool, virsh} from "./tools.mjs";
+import {cloud_localds, execp, logger, StoragePool, virsh} from "./tools.mjs";
 import commander from "commander";
-import winston from 'winston'
 
-const logger = winston.createLogger({
-    level: 'debug',
-    format: winston.format.combine(winston.format.splat(), winston.format.cli()),
-    transports: [
-        new winston.transports.Console()
-    ]
-})
 
 Mustache.escape = text => text
 
@@ -35,13 +27,6 @@ async function createRootImage(buildconfig, config, image) {
     logger.info("creating root image '%s'", config.disks.root)
     const target = path.join(buildconfig.buildDir, "pool", config.disks.root)
     await execp(`qemu-img create -f qcow2 -F qcow2 -b ${image} ${target}`)
-    // return await qemu_img([
-    //     "create",
-    //     "-f", "qcow2",
-    //     "-F", "qcow2",
-    //     "-b", image,
-    //     path.join(buildconfig.buildDir, "pool", config.disks.root)
-    // ])
 }
 
 // Sucht ein Image in den Pools.
@@ -54,8 +39,8 @@ async function findImage(image) {
 
     const pools = await virsh(['pool-list', '--all', '--name'], async context => {
         context.resolve(context.data.split('\n')
-            .map(poolname => poolname.trim())
-            .filter(poolname => poolname !== ""))
+            .map(poolName => poolName.trim())
+            .filter(poolName => poolName !== ""))
     })
 
     const storage = await Promise.all(pools.map(pool => StoragePool.load(pool)))
@@ -97,8 +82,8 @@ async function getIpAddress(device) {
 //    Dabei alle Platzhalten mit den Werten aus testbedConfig
 //    ersetzen.
 //
-// 2. Erstellen des Cloud-Init Konfigurationsvolume cidata.img.
-//    In diesem Image befinden sich die Konfigurationsdatein
+// 2. Erstellen des Cloud-Init Konfigurationsvolumen cidata.img.
+//    In diesem Image befinden sich die Konfigurationsdateien
 //    user-data und network-config. Cloud-Init benutzt diese
 //    Dateien, um die virtuelle Maschine zu konfigurieren
 //

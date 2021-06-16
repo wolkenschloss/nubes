@@ -4,6 +4,16 @@ import util from "util";
 
 const execp = util.promisify(exec)
 
+import winston from 'winston'
+
+const logger = winston.createLogger({
+    level: 'debug',
+    format: winston.format.combine(winston.format.splat(), winston.format.cli()),
+    transports: [
+        new winston.transports.Console()
+    ]
+})
+
 function curry(fn, head) {
     return (...tail) => {
         return fn(head, ...tail);
@@ -45,7 +55,6 @@ function spawner(cmd, args, onSuccess, onFailure) {
 
 const virsh =  curry(spawner, 'virsh')
 const cloud_localds = curry(spawner, 'cloud-localds')
-const qemu_img = curry(spawner, 'qemu-img')
 
 function ensureString(buffer) {
     return buffer?.toString().trim()
@@ -65,4 +74,4 @@ class StoragePool {
     }
 }
 
-export {curry, spawner, virsh, cloud_localds, qemu_img, StoragePool, execp }
+export {curry, spawner, virsh, cloud_localds, StoragePool, execp, logger}

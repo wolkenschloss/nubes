@@ -4,11 +4,12 @@ import {execp} from "./tools.mjs";
 
 import config from "./config.js";
 import {Address4} from "ip-address";
-import chalk from "chalk";
+import {logger} from "./tools.mjs";
 
 async function readKubernetesConfig() {
     try {
-        console.log(chalk.yellow("readKubernetesConfig"))
+        logger.debug("testbed config")
+
         const ip4 = new Address4(config.testbed.ip)
         const cmd = `ssh ${ip4.addressMinusSuffix} 'microk8s config'`
 
@@ -16,10 +17,9 @@ async function readKubernetesConfig() {
 
         return stdout.trim();
     } catch (e) {
-        console.log(chalk.red(`Error: ${e.stderr.trim()}`))
+        logger.error(e)
         process.exitCode = 1
     }
-
 }
 
 async function main() {
@@ -32,6 +32,6 @@ async function main() {
     await program.parseAsync()
 }
 
-main().catch(console.error)
+main().then(() => {}).catch(() => {})
 
 export {readKubernetesConfig}

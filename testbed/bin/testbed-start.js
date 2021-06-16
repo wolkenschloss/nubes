@@ -11,11 +11,11 @@ import path from "path";
 import fs from "fs";
 import {readKubernetesConfig} from "./testbed-config.mjs";
 import {Address4} from "ip-address";
-import chalk from "chalk";
+
+import {logger} from "./tools.mjs";
 
 async function isInactive() {
     const {stdout} = await execp('virsh list --inactive --name')
-    console.log(stdout)
     return stdout.split('\n').map(line => line.trim()).includes(config.hostname)
 }
 
@@ -28,25 +28,29 @@ async function check() {
 }
 
 function backupKnownHosts() {
+
     const from = path.join(process.env.HOME, ".ssh", "known_hosts")
     const to = from + '.old'
 
-    console.log(`backup file '${from}' to '${to}'`)
+    logger.debug("Backup %s", from)
     return fs.promises.copyFile(from, to)
 }
 
 async function appendTestbedToKnownHosts(ip, server_key) {
+
     const known_hosts = path.join(process.env.HOME, ".ssh", "known_hosts")
+    logger.debug("Appending server '%s' to %s", ip.addressMinusSuffix, known_hosts)
+
     return fs.promises.appendFile(known_hosts, `${ip.addressMinusSuffix} ${server_key}`)
 }
 
 async function deleteTestbedFromKnownHosts(ip) {
-    console.log(chalk.yellow("deleteTestbedFromKnownHosts"))
+    logger.info("Deleting server '%s' from known_hosts", ip.addressMinusSuffix)
     return execp(`ssh-keygen -R ${ip.addressMinusSuffix}`)
 }
 
 function applyConfig(ip, name) {
-    console.log(chalk.yellow("applyConfig()"))
+    logger.debug("Apply manifest %s to kubernetes", name)
     const filename = path.join(build.buildDir, name)
     return execp(`ssh ${ip.addressMinusSuffix} microk8s kubectl apply -f- < ${filename}`)
 }
@@ -56,15 +60,18 @@ async function run() {
     const pWaitForCallback = util.promisify(waitForPhoneHome)
 
     try {
+        logger.info("testbed start")
         await check()
 
         if (await isInactive()) {
             await start()
 
             const result = await pWaitForCallback(config.callback.port, config.callback.timeout)
-            console.log("Result from Callback: %s, %o", result, result)
+            logger.debug("Got signal from testbed vm")
+
             const server_key = result['pub_key_ecdsa']
-            console.log(`Server public ecdsa key: ${server_key}`)
+            logger.debug("Got public key from Server")
+
             await backupKnownHosts()
 
             const testbed_ip = new Address4(config.testbed.ip)
@@ -81,12 +88,10 @@ async function run() {
 
             await fs.promises.writeFile(config_file, kubernetes_config)
         } else {
-            console.log("Already running")
-            console.log(build)
-
+            logger.info("Testbed already running. Try 'testbed destroy && testbed start' to create a new one")
         }
     } catch (err) {
-        console.error(err.stderr || err)
+        logger.error(err)
         process.exitCode = 1
     }
 }
@@ -102,4 +107,4 @@ async function main() {
     await program.parseAsync()
 }
 
-main().then(() => {}).catch(console.error)
+main().then(() => {}).catch(() => {})
