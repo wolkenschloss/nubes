@@ -13,6 +13,14 @@ import {Address4} from "ip-address";
 
 import {logger} from "./tools.mjs";
 
+function dry(options, real, fake) {
+    if (!options.dryRun) {
+        return real()
+    } else {
+        return fake()
+    }
+}
+
 async function isInactive() {
     const {stdout} = await execp('virsh list --inactive --name')
     return stdout.split('\n').map(line => line.trim()).includes(config.hostname)
@@ -65,31 +73,41 @@ async function saveKubernetesConfiguration() {
     await fs.promises.writeFile(config_file, kubernetes_config)
 }
 
-async function run() {
+async function updateKnownHosts(testbed_ip, server_key) {
+    await backupKnownHosts()
+    await deleteTestbedFromKnownHosts(testbed_ip)
+    await appendTestbedToKnownHosts(testbed_ip, server_key)
+}
+
+async function run(options) {
 
     const pWaitForCallback = util.promisify(waitForPhoneHome)
 
+    const dried = (real, fake) => dry(options, real, fake)
+
     try {
         logger.info("testbed start")
-        await check()
+        logger.info("options: %o", options)
 
-        if (await isInactive()) {
-            await start()
 
-            const result = await pWaitForCallback(config.callback.port, config.callback.timeout)
+        await dried(check, () => {})
+
+        if (await dried(isInactive, () => true)) {
+            await dried(start, () => {})
+            //
+            const result = await dried(() => pWaitForCallback(config.callback.port, config.callback.timeout), () => {
+                return {pub_key_ecdsa: 'any value'}
+            })
+
             logger.debug("Got signal from testbed vm")
 
-            const server_key = result['pub_key_ecdsa']
+             const server_key = result['pub_key_ecdsa']
             logger.debug("Got public key from Server")
 
-            await backupKnownHosts()
-
             const testbed_ip = new Address4(config.testbed.ip)
-            await deleteTestbedFromKnownHosts(testbed_ip)
-            await appendTestbedToKnownHosts(testbed_ip, server_key)
-            await applyConfig(testbed_ip, "dashboard-ingress.yaml")
-
-            await saveKubernetesConfiguration()
+            await dried(() => updateKnownHosts(testbed_ip, server_key), () => {})
+            await dried(() => applyConfig(testbed_ip, "dashboard-ingress.yaml"), () => {})
+            await dried(saveKubernetesConfiguration, () => {})
         } else {
             logger.info("Testbed already running. Try 'testbed destroy && testbed start' to create a new one")
         }
@@ -103,8 +121,9 @@ async function main() {
     const program = new commander.Command()
 
     program.description("start testbed vm")
-        .action(() => {
-            run()
+        .option('--dry-run', "The start of the testbed is simulated. No virtual machine is started in the process.")
+        .action(options => {
+            run(options)
         })
 
     await program.parseAsync()
