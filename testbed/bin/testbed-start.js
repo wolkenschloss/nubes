@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import commander from "commander";
-import {execp} from "./tools.mjs";
+import {execp, readKubernetesConfig} from "./tools.mjs";
 import config from "./config.js";
 import build from "./build-config.mjs"
 
@@ -9,7 +9,6 @@ import {waitForPhoneHome} from "./phone-home.mjs";
 import util from "util";
 import path from "path";
 import fs from "fs";
-import {readKubernetesConfig} from "./testbed-config.mjs";
 import {Address4} from "ip-address";
 
 import {logger} from "./tools.mjs";
@@ -55,6 +54,17 @@ function applyConfig(ip, name) {
     return execp(`ssh ${ip.addressMinusSuffix} microk8s kubectl apply -f- < ${filename}`)
 }
 
+async function saveKubernetesConfiguration() {
+    const kubernetes_config = await readKubernetesConfig()
+    const run_dir = path.join(build.buildDir, "run")
+
+    await fs.promises.mkdir(run_dir, {recursive: true})
+
+    const config_file = path.join(run_dir, "config")
+
+    await fs.promises.writeFile(config_file, kubernetes_config)
+}
+
 async function run() {
 
     const pWaitForCallback = util.promisify(waitForPhoneHome)
@@ -79,14 +89,7 @@ async function run() {
             await appendTestbedToKnownHosts(testbed_ip, server_key)
             await applyConfig(testbed_ip, "dashboard-ingress.yaml")
 
-            const kubernetes_config = await readKubernetesConfig()
-            const run_dir = path.join(build.buildDir, "run")
-
-            await fs.promises.mkdir(run_dir, {recursive: true})
-
-            const config_file = path.join(run_dir, "config")
-
-            await fs.promises.writeFile(config_file, kubernetes_config)
+            await saveKubernetesConfiguration()
         } else {
             logger.info("Testbed already running. Try 'testbed destroy && testbed start' to create a new one")
         }
