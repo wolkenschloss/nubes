@@ -1,0 +1,48 @@
+#cloud-config
+
+preserve_hostname: False
+hostname: {{hostname}}
+fqdn: {{domain}}
+manage_etc_hosts: True
+
+ssh_pwauth: False
+
+groups:
+  - microk8s
+
+users:
+  - name: {{user}}
+    shell: '/bin/bash'
+    groups:
+      - sudo
+      - microk8s
+    ssh_authorized_keys:
+      - {{ getSshKey }}
+    sudo: 'ALL=(ALL) NOPASSWD: ALL'
+
+locale: {{process.env.LANG}}
+
+# Just for now
+package_update: False
+package_upgrade: False
+
+packages:
+  - acpid
+  - tzdata
+  - openssh-server
+  - curl
+
+snap:
+  commands:
+    01: snap install microk8s --classic
+    02: microk8s status --wait-ready
+    03: microk8s enable dns storage ingress dashboard registry
+
+phone_home:
+  url: http://{{callback.ip}}:{{callback.port}}/{{hostname}}
+  post:
+    - pub_key_ecdsa
+    - instance_id
+    - hostname
+    - fqdn
+  tries: 10

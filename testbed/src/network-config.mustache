@@ -1,0 +1,9 @@
+version: 2
+ethernets:
+  enp1s0:
+    addresses: [{{ testbed.ip }}]
+    dhcp4: no
+    dhcp6: no
+    gateway4: {{ testbed.gateway }}
+    nameservers:
+      addresses: [{{ testbed.nameserver }}]
