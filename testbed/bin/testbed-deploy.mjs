@@ -2,8 +2,8 @@
 
 import buildconfig from './build-config.mjs'
 import config from './config.js'
-
-import {virsh} from "./tools.mjs";
+import commander from "commander";
+import {execp, logger} from "./tools.mjs";
 import fs from "fs";
 import path from "path";
 
@@ -13,58 +13,70 @@ import path from "path";
 //
 // Wenn die Domain existiert und eingeschaltet ist, wird sie heruntergefahren
 // Wenn der Pool existiert, wird er angehalten.
-// Wenn das Verzeichnis des Pools nicht exisistiert, wird es erzeugt
+// Wenn das Verzeichnis des Pools nicht existiert, wird es erzeugt
 // Das cidata Image wird im Pool Verzeichnis erzeugt.
 // Das root Image wird im Pool Verzeichnis erzeugt und vergrößert.
 // Wenn der Pool nicht existiert, wird er angelegt.
 // Wenn die Domain nicht existiert, wird sie angelegt.
 //
 // Pool und Domain werden nicht gestartet!
+async function poolExists(poolName) {
 
-function poolExists(poolname) {
-    return virsh(['pool-list', '--name', '--all'], context => {
-        context.resolve(context.data.trim().split('\n').map(pool => pool.trim())
-            .reduce((a, b) => a || b === poolname, false))
-    })
+    const {stdout} = await execp(`virsh pool-list --name --all`)
+
+    return stdout.trim()
+        .split('\n')
+        .map(pool => pool.trim())
+        .reduce((a, b) => a || b === poolName, false)
 }
 
-function domainExists(domainname) {
-    return virsh(['list', '--name', '--all'],
-        context => context.resolve(
-            context.data.trim().split('\n').includes(domainname)
-        ))
+async function domainExists(domainname) {
+
+    const { stdout } = await execp('virsh list --name --all')
+
+    return stdout.trim().split('\n').includes(domainname)
 }
 
-async function run(buildConfig) {
-    await fs.promises.mkdir(config.pool.directory, {recursive: true})
-    // ...
-
+async function copyImages() {
     // Disk Images in das Pool-Verzeichnis kopieren
     const files = await fs.promises.readdir(path.join(buildconfig.buildDir, "pool"), {withFileTypes: true})
 
     await Promise.all(files.filter(f => f.isFile())
-        .map(f => {
+        .map(async f => {
             const source = path.join(buildconfig.buildDir, "pool", f.name)
             const target = path.join(config.pool.directory, f.name)
-            console.log(`copy ${f.name} to ${path.join(config.pool.directory, f.name)}`)
-            fs.promises.copyFile(source, target)
+
+            logger.debug("copy %s to %s", source, target)
+
+            await fs.promises.copyFile(source, target)
         }))
-
-    // Pool in libvirt anlegen, nicht starten!
-    if (! await poolExists(config.pool.name)) {
-        await virsh(['pool-define', path.join(buildconfig.buildDir, 'pool.xml')])
-    }
-
-    if (! await domainExists(config.image)) {
-        await virsh(['define', path.join(buildconfig.buildDir, "testbed.xml")])
-    }
 }
 
-// main(buildconfig).then(() => console.log("Fertig")).catch(console.error)
+async function run(buildConfig) {
+    try {
+        logger.info("testbed deploy")
 
-import commander from "commander";
+        logger.debug("Creating pool directory '%s'", config.pool.directory)
+        await fs.promises.mkdir(config.pool.directory, {recursive: true})
 
+        await copyImages();
 
+        // Pool in libvirt anlegen, nicht starten!
+        if (!await poolExists(config.pool.name)) {
+            logger.debug("Creating pool '%s'", config.pool.name)
+            await execp(`virsh pool-define ${path.join(buildConfig.buildDir, 'pool.xml')}`)
+        }
+
+        if (!await domainExists(config.hostname)) {
+            logger.debug("Defining domain '%s'", config.hostname)
+            await execp(`virsh define ${path.join(buildConfig.buildDir, "testbed.xml")}`)
+        }
+
+    } catch (error) {
+        logger.error(error)
+        process.exitCode = 1
+    }
+}
 
 async function main() {
     const program = new commander.Command()
@@ -75,4 +87,4 @@ async function main() {
     await program.parseAsync()
 }
 
-main().then(() => {}).catch(console.error)
+main().then(() => {}).catch(() => {})

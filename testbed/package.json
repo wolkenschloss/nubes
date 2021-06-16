@@ -23,6 +23,7 @@
     "fastify-formbody": "^5.0.0",
     "ip-address": "^7.1.0",
     "minimist": "^1.2.5",
-    "mustache": "^4.2.0"
+    "mustache": "^4.2.0",
+    "winston": "^3.3.3"
   }
 }
