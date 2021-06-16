@@ -27,5 +27,5 @@ export default {
         // timeout: 60000 // 1m
     },
 
-    image: "/tmp/wolkenschloss/focal-server-cloudimg-amd64-disk-kvm.img"
+    image: "/tmp/wolkenschloss/focal-server-cloudimg-amd64-disk-kvm.img2"
 }
