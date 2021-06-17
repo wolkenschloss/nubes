@@ -1,0 +1,49 @@
+plugins {
+    id "com.github.node-gradle.node" version "3.1.0"
+    id "wolkenschloss.testbed"
+}
+
+node {
+    version = "14.17.1"
+    download = true
+}
+
+testbed {
+    view {
+        hostname = "testbed"
+        user = "$System.env.USER"
+    }
+}
+task build(type: NodeTask) {
+    inputs.files fileTree("src")
+
+    script = file('bin/testbed.mjs')
+    args = ['build']
+
+    outputs.dir "build/pool"
+}
+
+task deploy(type: NodeTask) {
+    inputs.files fileTree('build/pool')
+
+    script = file('bin/testbed.mjs')
+    args = ['deploy']
+
+    outputs.dir "/tmp/wolkenschloss"
+}
+
+deploy.dependsOn build
+
+task start(type: NodeTask) {
+    inputs.files fileTree('build/pool')
+    script = file('bin/testbed.mjs')
+    args = ['start']
+
+    outputs.dir "build/run"
+}
+
+tasks.named('hello') {
+    templates =  fileTree(dir: 'src', includes: ['**/*mustache', '**/*🧔'])
+}
+
+start.dependsOn deploy
