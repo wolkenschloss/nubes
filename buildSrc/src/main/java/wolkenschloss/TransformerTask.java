@@ -7,6 +7,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileSystemLocation;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
@@ -15,6 +16,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
+// Verarbeitet eine Vorlage
 public abstract class TransformerTask extends DefaultTask {
 
     @Input
@@ -27,14 +29,14 @@ public abstract class TransformerTask extends DefaultTask {
     @InputFiles
     @SkipWhenEmpty
     @PathSensitive(PathSensitivity.RELATIVE)
-    abstract public Property<FileCollection> getTemplates();
+    abstract public RegularFileProperty getTemplate();
 
-    @OutputDirectory
-    public abstract Property<FileSystemLocation> getOutputDir();
+    @OutputFile
+    public abstract RegularFileProperty getOutputFile();
 
     @TaskAction
     public void machMal() {
-        getLogger().info("Running 'hello' with:");
+        getLogger().info("Running '{}' with:", this.getName());
 
         MustacheFactory factory = new DefaultMustacheFactory();
         var scopes = new HashMap<String, Object>();
@@ -42,34 +44,21 @@ public abstract class TransformerTask extends DefaultTask {
         scopes.put("getSshKey", getView().get().getSshKey().get());
         scopes.put("hostname", getView().get().getHostname().get());
 
-        getTemplates().get().forEach(file -> {
-            getLogger().info("Processing {}", file.getPath());
+        RegularFile file = getTemplate().get();
+        getLogger().info("Processing {}", file.getAsFile());
 
-            getOutputDir().get().getAsFile().mkdirs();
+        getLogger().info("Create Directory for Output File: {}",
+        getOutputFile().get().getAsFile().getParentFile().mkdirs());
 
             try {
-                var reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
-                Mustache mustache = factory.compile(reader, file.getName());
+                var reader = new InputStreamReader(new FileInputStream(file.getAsFile()), StandardCharsets.UTF_8);
+                Mustache mustache = factory.compile(reader, file.getAsFile().getName());
                 StringWriter writer = new StringWriter();
                 mustache.execute(writer, scopes);
                 writer.flush();
 
 
-                var src = getProject().file("src").getAbsolutePath();
-                var rel = new File(src).toURI().relativize(file.toURI()).getPath();
-                rel = stripExtension(rel);
-                getLogger().info("Write file to {}", rel);
-
-
-                var dest = getProject().getLayout().getBuildDirectory().dir(rel);
-
-                getLogger().info("Destination {}", dest);
-                getLogger().info("REL: {}", rel);
-
-
-                dest.get().getAsFile().getParentFile().mkdirs();
-
-                var write = new FileWriter(dest.get().getAsFile());
+                var write = new FileWriter(getOutputFile().get().getAsFile());
                 write.write(writer.toString());
                 write.close();
 
@@ -77,8 +66,6 @@ public abstract class TransformerTask extends DefaultTask {
                 e.printStackTrace();
                 throw new GradleScriptException("Can not process template", e);
             }
-
-        });
     }
 
     private String stripExtension(String rel) {

@@ -41,9 +41,9 @@ task start(type: NodeTask) {
 
     outputs.dir "build/run"
 }
-
-tasks.named('hello') {
-    templates =  fileTree(dir: 'src', includes: ['**/*mustache', '**/*🧔'])
-}
+//
+//tasks.named('hello') {
+//    templates =  fileTree(dir: 'src', includes: ['**/*mustache', '**/*🧔'])
+//}
 
 start.dependsOn deploy

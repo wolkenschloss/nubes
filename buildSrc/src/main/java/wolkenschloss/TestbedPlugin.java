@@ -5,6 +5,9 @@ import org.gradle.api.GradleScriptException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.*;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.Delete;
+import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.TaskProvider;
 
 import java.io.IOException;
@@ -27,37 +30,68 @@ public class TestbedPlugin implements Plugin<Project> {
             task.setDescription("Transforms all templates");
         });
 
-        project.getTasks().register("hello", TransformerTask.class, task -> {
-            task.getView().set(extension.getView());
-            task.getSshKeyFile().set(extension.getSshKeyFile());
-            task.getOutputDir().set(project.getLayout().getBuildDirectory().dir("config"));
+//        project.getTasks().register("hello", TransformerTask.class, task -> {
+//            task.getView().set(extension.getView());
+//            task.getSshKeyFile().set(extension.getSshKeyFile());
+//            task.getOutputDir().set(project.getLayout().getBuildDirectory().dir("config"));
+//
+//        });
 
+        project.getTasks().register("clean", Delete.class, task -> {
+            task.getDelete().add(task.getProject().getLayout().getBuildDirectory());
         });
 
 
         var partialPathBuilder = new PartialPathBuilder(project.getLayout());
 
-        var cloudInitPath = partialPathBuilder.dir("cloud-init");
-        var poolPath = partialPathBuilder.file("virsh/pool/pool.xml.mustache");
-        var domainPath = partialPathBuilder.file("virsh/domain.xml");
-        var dashboardIngressPath = partialPathBuilder.file("kubernetes/dashboard.xml");
+        var src = project.getLayout().getProjectDirectory().dir("src");
+        var cloudInitDir = project.getLayout().getBuildDirectory().dir("cloud-init").get();
+        var poolDir = project.getLayout().getBuildDirectory().dir("pool");
 
-        var cloudinit = createTransformationTask(project,extension, "CloudInit", cloudInitPath);
+        var networkConfig = createTransformationTask(project,extension, "CloudInit",
+                src.file("network-config.mustache"),
+                cloudInitDir.file("network-config"));
 
-        var pool = createTransformationTask(project, extension, "Pool", poolPath);
-        transform.configure(t -> t.dependsOn(cloudinit.get(), pool.get()));
+        var userData = createTransformationTask(project,extension, "UserData",
+                src.file("user-data.mustache"),
+                cloudInitDir.file("user-data"));
+
+        transform.configure(t -> t.dependsOn(networkConfig.get(), userData.get()));
+
+        project.getTasks().register("cidata", CloudLocalDs.class, task -> {
+            task.getCidata().convention(poolDir.get().file("cidata.img"));
+            task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
+            task.getUserData().convention(userData.get().getOutputFile());
+        });
+
+        project.getTasks().register("root", RootImageTask.class, task -> {
+
+            task.getRootImage().convention(poolDir.get().file("root.qcow2"));
+            // Provisorisch
+            task.getBaseImage().set(project.getLayout()
+                    .getProjectDirectory()
+                    .dir(".cache")
+                    .file("focal-server-cloudimg-amd64-disk-kvm.img"));
+        });
+
+        //        var pool = createTransformationTask(project, extension, "Pool", poolPath);
+//        var domain = createTransformationTask(project, extension, "Domain", domainPath);
+
+
     }
 
     private <T extends FileSystemLocation> TaskProvider<TransformerTask> createTransformationTask(
             Project project,
             TestbedExtension extension,
-            String cloudInit, PartialPath<T> cloudInitPath) {
-        return project.getTasks().register("transform" + cloudInit, TransformerTask.class, task -> {
+            String name,
+            RegularFile template,
+            RegularFile output) {
+        return project.getTasks().register("transform" + name, TransformerTask.class, task -> {
             task.getView().set(extension.getView());
             task.getSshKeyFile().set(extension.getSshKeyFile());
 
-            task.getTemplates().set(cloudInitPath.source());
-            task.getOutputDir().set(cloudInitPath.build());
+            task.getTemplate().set(template);
+            task.getOutputFile().set(output);
         });
     }
 
