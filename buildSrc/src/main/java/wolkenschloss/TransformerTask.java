@@ -22,9 +22,8 @@ public abstract class TransformerTask extends DefaultTask {
     @Input
     abstract public Property<TestbedView> getView();
 
-    @InputFile
-    @PathSensitive(PathSensitivity.ABSOLUTE)
-    abstract public RegularFileProperty getSshKeyFile();
+    @Input
+    abstract public Property<TestbedPool> getPool();
 
     @InputFiles
     @SkipWhenEmpty
@@ -43,6 +42,18 @@ public abstract class TransformerTask extends DefaultTask {
         scopes.put("user", getView().get().getUser().get());
         scopes.put("getSshKey", getView().get().getSshKey().get());
         scopes.put("hostname", getView().get().getHostname().get());
+
+        var callback = new HashMap<String, Object>();
+        callback.put("ip", getView().get().getHostAddress().get());
+        callback.put("port", getView().get().getCallbackPort().get());
+
+        var pool = new HashMap<String, Object>();
+
+//        pool.put("directory", getPool().get().getDir().get());
+        pool.put("name", getPool().get().getName().get());
+
+        scopes.put("callback", callback);
+        scopes.put("pool", pool);
 
         RegularFile file = getTemplate().get();
         getLogger().info("Processing {}", file.getAsFile());

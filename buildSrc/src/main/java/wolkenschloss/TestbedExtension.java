@@ -15,4 +15,12 @@ abstract public class TestbedExtension {
     public void view(Action<? super TestbedView> action) {
         action.execute(getView());
     }
+
+    @Nested
+    abstract public TestbedDomain getDomain();
+    public void domain(Action<? super TestbedDomain> action) {action.execute(getDomain());}
+
+    @Nested
+    abstract public TestbedPool getPool();
+    public void pool(Action<? super TestbedPool> action) {action.execute(getPool());}
 }

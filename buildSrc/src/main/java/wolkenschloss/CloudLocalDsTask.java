@@ -6,9 +6,9 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
-abstract public class CloudLocalDs extends Exec {
+abstract public class CloudLocalDsTask extends Exec {
 
-    public CloudLocalDs() {
+    public CloudLocalDsTask() {
         commandLine("cloud-localds");
     }
 

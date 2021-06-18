@@ -5,6 +5,8 @@ import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.work.Incremental;
+import org.gradle.work.InputChanges;
 
 abstract public class RootImageTask extends Exec {
 
@@ -13,6 +15,7 @@ abstract public class RootImageTask extends Exec {
     }
 
     @InputFile
+    @Incremental
     abstract public RegularFileProperty getBaseImage();
 
     @OutputFile
@@ -21,6 +24,7 @@ abstract public class RootImageTask extends Exec {
     @TaskAction
     @Override
     public void exec() {
+
 
         args("create", "-f" , "qcow2", "-F", "qcow2", "-b",
                 getBaseImage().get(),
