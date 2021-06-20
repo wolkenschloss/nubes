@@ -6,7 +6,6 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.work.Incremental;
-import org.gradle.work.InputChanges;
 
 abstract public class RootImageTask extends Exec {
 
@@ -25,7 +24,9 @@ abstract public class RootImageTask extends Exec {
     @Override
     public void exec() {
 
-
+        // Wenn es mal wieder Probleme mit Permission Denied gibt, wenn die
+        // VM startet soll: Einfach mal appamor für diese VM ausschalten:
+        // https://github.com/milkey-mouse/backup-vm/issues/17#issuecomment-527239052
         args("create", "-f" , "qcow2", "-F", "qcow2", "-b",
                 getBaseImage().get(),
                 getRootImage().get());

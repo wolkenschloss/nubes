@@ -7,7 +7,6 @@ import org.gradle.api.Project;
 import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.internal.provider.Providers;
-import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.TaskProvider;
 
 import java.io.IOException;
@@ -31,14 +30,14 @@ public class TestbedPlugin implements Plugin<Project> {
         var poolDir = project.getLayout().getBuildDirectory().dir("pool");
         var virshConfigDir = project.getLayout().getBuildDirectory().dir("config");
 
-        extension.getPoolDirectory().set(project.getLayout().getBuildDirectory().dir("pool"));
+        extension.getPoolDirectory().set(poolDir);
 
         extension.getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getView().getUser().convention(System.getenv("USER"));
         extension.getView().getHostname().convention("testbed");
         extension.getView().getSshKey().convention(extension.getSshKeyFile().map(this::readSshKey));
         extension.getView().getLocale().convention(System.getenv("LANG"));
-        extension.getPoolDirectory().set(poolDir);
+
         extension.getCloudInitDirectory().set(cloudInitDir);
         extension.getConfigDirectory().set(virshConfigDir);
         extension.getRootImageName().convention("root.qcow2");
@@ -46,7 +45,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
 
         extension.getPool().getName().convention("testbed");
-        extension.getPool().getPath().convention(project.getLayout().getBuildDirectory().dir("xppoollx").get().getAsFile().getAbsolutePath());
+        extension.getPool().getPath().convention(poolDir.get().getAsFile().getAbsolutePath());
 
 
         try {
@@ -105,6 +104,8 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var resize = project.getTasks().register("resize", ResizeTask.class, task-> {
             task.getSize().convention("20G");
+
+            // Global definieren; wird an mehreren Stellen benötigt.
             task.getImage().set(poolDir.get().file("root.qcow2"));
             task.dependsOn(root);
         });
@@ -116,6 +117,16 @@ public class TestbedPlugin implements Plugin<Project> {
         var domainConfig = createTransformationTask(project, extension, "Domain",
                 src.file("domain.xml.mustache"),
                 virshConfigDir.get().file("domain.xml"));
+
+        var definePool = project.getTasks().register("definePool", DefinePoolTask.class, task -> {
+            task.getXmlDescription().set(poolConfig.get().getOutputFile());
+            task.dependsOn(resize, cidata);
+        });
+
+        var defineDomain = project.getTasks().register("defineDomain", DefineDomainTask.class, task -> {
+            task.getXmlDescription().set(domainConfig.get().getOutputFile());
+            task.dependsOn(definePool);
+        });
 
         transform.configure(t -> t.dependsOn(
                 networkConfig.get(),

@@ -10,10 +10,5 @@ testbed {
     }
     pool {
         name = "wolkenschloss"
-        path = "$buildDir/wolkenschloss"
     }
-
-    poolDirectory = file "$buildDir/hallelulia"
 }
-
-//project.buildDir = project.dir "xcd"
