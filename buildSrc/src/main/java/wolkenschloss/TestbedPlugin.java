@@ -128,6 +128,9 @@ public class TestbedPlugin implements Plugin<Project> {
             task.dependsOn(definePool);
         });
 
+        var startDomain = project.getTasks().register("startDomain", StartDomainTask.class, task -> {
+
+        });
         transform.configure(t -> t.dependsOn(
                 networkConfig.get(),
                 userData.get(),

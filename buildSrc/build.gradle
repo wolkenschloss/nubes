@@ -4,6 +4,8 @@ buildscript {
     }
     dependencies {
         classpath "com.github.spullara.mustache.java:compiler:0.9.10"
+        classpath "org.libvirt:libvirt:0.5.2"
+        classpath "net.java.dev.jna:jna:5.8.0"
     }
 }
 
@@ -29,4 +31,6 @@ repositories {
 dependencies {
     implementation("gradle.plugin.io.quarkus:quarkus-gradle-plugin:1.13.6.Final")
     implementation "com.github.spullara.mustache.java:compiler:0.9.10"
+    implementation "org.libvirt:libvirt:0.5.2"
+    implementation "net.java.dev.jna:jna:5.8.0"
 }
