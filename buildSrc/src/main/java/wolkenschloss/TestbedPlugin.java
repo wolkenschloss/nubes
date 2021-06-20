@@ -129,7 +129,8 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var startDomain = project.getTasks().register("startDomain", StartDomainTask.class, task -> {
-
+            // TODO: Refactor. testbed darf nur ein einziges mal erscheinen.
+            task.getDomain().set("testbed");
         });
         transform.configure(t -> t.dependsOn(
                 networkConfig.get(),
