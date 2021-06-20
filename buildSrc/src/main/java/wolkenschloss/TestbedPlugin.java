@@ -22,27 +22,31 @@ public class TestbedPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        var extension = project.getExtensions()
-                .create("testbed", TestbedExtension.class);
+
+        var extension = project.getObjects().newInstance(TestbedExtension.class);
+        project.getExtensions().add("testbed", extension);
 
         var src = project.getLayout().getProjectDirectory().dir("src");
         var cloudInitDir = project.getLayout().getBuildDirectory().dir("cloud-init").get();
         var poolDir = project.getLayout().getBuildDirectory().dir("pool");
         var virshConfigDir = project.getLayout().getBuildDirectory().dir("config");
 
+        extension.getPoolDirectory().set(project.getLayout().getBuildDirectory().dir("pool"));
+
         extension.getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getView().getUser().convention(System.getenv("USER"));
         extension.getView().getHostname().convention("testbed");
         extension.getView().getSshKey().convention(extension.getSshKeyFile().map(this::readSshKey));
-//        extension.getView().getPoolDirectory().convention(poolDir.get().getAsFile().getAbsolutePath());
-//        extension.getView().getPoolName().convention("wolkenschloss");
+        extension.getView().getLocale().convention(System.getenv("LANG"));
+        extension.getPoolDirectory().set(poolDir);
+        extension.getCloudInitDirectory().set(cloudInitDir);
+        extension.getConfigDirectory().set(virshConfigDir);
+        extension.getRootImageName().convention("root.qcow2");
+        extension.getCidataImageName().convention("cidata.img");
+
 
         extension.getPool().getName().convention("testbed");
-//        extension.getPool().getDir().convention(poolDir);
-//        extension.pool(pool -> {
-//            pool.getName().convention("testbed");
-//            pool.getDir().convention(poolDir);
-//        });
+        extension.getPool().getPath().convention(project.getLayout().getBuildDirectory().dir("xppoollx").get().getAsFile().getAbsolutePath());
 
 
         try {
@@ -58,8 +62,11 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.getView().getCallbackPort().set(9191);
 
-        project.getTasks().register("clean", Delete.class, task -> {
-            task.getDelete().add(task.getProject().getLayout().getBuildDirectory());
+//        project.getTasks().register("clean", Delete.class, task -> {
+//            task.getDelete().add(task.getProject().getLayout().getBuildDirectory());
+//        });
+
+        project.getTasks().register("clean", TestbedCleanTask.class, task -> {
         });
 
         var networkConfig = createTransformationTask(project,extension, "CloudInit",
@@ -71,7 +78,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 cloudInitDir.file("user-data"));
 
         var cidata = project.getTasks().register("cidata", CloudLocalDsTask.class, task -> {
-            task.getCidata().convention(poolDir.get().file("cidata.img"));
+            task.getCidata().convention(poolDir.get().file(extension.getCidataImageName()));
             task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
             task.getUserData().convention(userData.get().getOutputFile());
         });
@@ -92,8 +99,14 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var root = project.getTasks().register("root", RootImageTask.class, task -> {
-            task.getRootImage().convention(poolDir.get().file("root.qcow2"));
+            task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
             task.getBaseImage().convention(download.get().getBaseImage());
+        });
+
+        var resize = project.getTasks().register("resize", ResizeTask.class, task-> {
+            task.getSize().convention("20G");
+            task.getImage().set(poolDir.get().file("root.qcow2"));
+            task.dependsOn(root);
         });
 
         var poolConfig = createTransformationTask(project, extension, "Pool",
@@ -112,7 +125,7 @@ public class TestbedPlugin implements Plugin<Project> {
         ));
 
         project.getTasks().register("start", DefaultTask.class, task -> {
-            task.dependsOn(transform, cidata, root);
+            task.dependsOn(transform, cidata, resize);
         });
 
 
@@ -120,11 +133,13 @@ public class TestbedPlugin implements Plugin<Project> {
 
     private <T extends FileSystemLocation> TaskProvider<TransformerTask> createTransformationTask(
             Project project,
-            TestbedExtension extension,
+            BaseTestbedExtension extension,
             String name,
             RegularFile template,
             RegularFile output) {
         return project.getTasks().register("transform" + name, TransformerTask.class, task -> {
+            task.getRootImageName().set(extension.getRootImageName());
+            task.getCidataImageName().set(extension.getCidataImageName());
             task.getView().set(extension.getView());
             task.getPool().set(extension.getPool());
             task.getTemplate().set(template);

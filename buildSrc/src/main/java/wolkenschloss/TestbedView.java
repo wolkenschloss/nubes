@@ -14,4 +14,5 @@ abstract public class TestbedView {
 
     public abstract Property<String> getHostAddress();
     public abstract Property<Integer> getCallbackPort();
+    public abstract Property<String> getLocale();
 }

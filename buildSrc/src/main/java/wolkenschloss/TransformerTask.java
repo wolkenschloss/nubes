@@ -20,6 +20,12 @@ import java.util.HashMap;
 public abstract class TransformerTask extends DefaultTask {
 
     @Input
+    abstract public Property<String> getRootImageName();
+
+    @Input
+    abstract public Property<String> getCidataImageName();
+
+    @Input
     abstract public Property<TestbedView> getView();
 
     @Input
@@ -42,6 +48,7 @@ public abstract class TransformerTask extends DefaultTask {
         scopes.put("user", getView().get().getUser().get());
         scopes.put("getSshKey", getView().get().getSshKey().get());
         scopes.put("hostname", getView().get().getHostname().get());
+        scopes.put("locale", getView().get().getLocale().get());
 
         var callback = new HashMap<String, Object>();
         callback.put("ip", getView().get().getHostAddress().get());
@@ -49,11 +56,19 @@ public abstract class TransformerTask extends DefaultTask {
 
         var pool = new HashMap<String, Object>();
 
-//        pool.put("directory", getPool().get().getDir().get());
-        pool.put("name", getPool().get().getName().get());
+        var poolname = getPool().get().getName().get();
+        var pooldir = getPool().get().getPath().get();
+        pool.put("name", poolname);
+        pool.put("directory", pooldir);
+
+        var disks = new HashMap<String, Object>();
+        disks.put("root", getRootImageName().get());
+        disks.put("cidata", getCidataImageName().get());
+
 
         scopes.put("callback", callback);
         scopes.put("pool", pool);
+        scopes.put("disks", disks);
 
         RegularFile file = getTemplate().get();
         getLogger().info("Processing {}", file.getAsFile());
