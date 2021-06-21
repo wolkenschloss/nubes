@@ -19,6 +19,7 @@ public class TestbedExtension implements BaseTestbedExtension {
     private final TestbedDomain domain;
     private final TestbedPool pool;
     private final TestbedView view;
+    private final BaseImage baseImage;
     private final Property<String> rootImageName;
     private final Property<String> cidataImageName;
 
@@ -36,6 +37,7 @@ public class TestbedExtension implements BaseTestbedExtension {
         this.view = objects.newInstance(TestbedView.class);
         this.rootImageName = objects.property(String.class);
         this.cidataImageName = objects.property(String.class);
+        this.baseImage = objects.newInstance(BaseImage.class);
     }
 
     @Override
@@ -68,6 +70,14 @@ public class TestbedExtension implements BaseTestbedExtension {
 
     @Override
     public void pool(Action<? super TestbedPool> action) {action.execute(getPool());}
+
+    @Override
+    public BaseImage getBaseImage() {return this.baseImage;}
+
+    @Override
+    public void base(Action<? super BaseImage> action) {
+        action.execute(getBaseImage());
+    }
 
     public DirectoryProperty getConfigDirectory() {
         return configDirectory;

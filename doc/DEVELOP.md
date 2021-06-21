@@ -148,7 +148,8 @@ gestarteten Daemons auch mal getötet werden sollten:
 
 Den Status der Gradle Daemons gibt folgende Kommando aus:
 
-``sh administrator@upc14-bmws:~/.local/src/mycloud$ ./gradlew --status Initialized native services in: /home/administrator/.gradle/native PID STATUS   INFO 68566 IDLE     7.0.2 108768 IDLE     7.0.2 109081 IDLE     7.0.2 100651 STOPPED  (stop command received)
+``sh 
+./gradlew --status 
 ``
 
 ### gradle.properties

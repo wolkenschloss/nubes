@@ -39,16 +39,30 @@ Softwarepakete installiert sein (Ubuntu 20.04).
 
 *TBD*
 
+## Wichtiger Hinweis
+
+Um die Tests auszuführen, muss das Verzeichnis des
+Projektes ausdrücklich mit der Option `-p` angegeben 
+werden. Das gilt auch für die *Run Configuration* von
+IntelliJ. Das Verzeichnis wird nicht automatisch 
+angefügt.
+
+```shell
+./gradlew ':test -p buildSrc
+```
+
+
 ## Zu Erledigen
 
   * Die IP-Adresse des Prüfstandes ermitteln. Die virtuelle Maschine 
-    bezieht ihre IP-Adresse vom libvirt DHCP Server.
+    bezieht ihre IP-Adresse vom libvirt DHCP Server. (erledigt)
   * Auf den Phone-Home Rückruf der virtuellen Maschine warten. Dazu muss ein 
     Webserver gestartet werden. Die Prüfstand VM sendet den Server-Key
     an den Webserver. (Ein Gradle Task startet einen Webserver? Das ist ein 
-    Hack!) https://stackoverflow.com/a/3732328/168944
+    Hack!) https://stackoverflow.com/a/3732328/168944 (erledigt)
   * Den Server-Key in die known_hosts Datei eintragen und ggf. einen bereits 
-    vorhandenen Server-Key von einer vorangegangenen Instanz entfernen.
+    vorhandenen Server-Key von einer vorangegangenen Instanz entfernen. 
+    (erledigt)
   * Die Kubernetes Konfiguration aus dem Prüfstand auslesen und in das 
     Verzeichnis build/run kopieren.
   * Bessere Gruppierung der Aufgaben. Derzeit ist noch alles in der Gruppe 

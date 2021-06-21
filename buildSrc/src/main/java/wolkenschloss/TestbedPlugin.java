@@ -6,14 +6,9 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.internal.provider.Providers;
 import org.gradle.api.tasks.TaskProvider;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -26,6 +21,7 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getExtensions().add("testbed", extension);
 
         var src = project.getLayout().getProjectDirectory().dir("src");
+        var runDir = project.getLayout().getBuildDirectory().dir("run");
         var cloudInitDir = project.getLayout().getBuildDirectory().dir("cloud-init").get();
         var poolDir = project.getLayout().getBuildDirectory().dir("pool");
         var virshConfigDir = project.getLayout().getBuildDirectory().dir("config");
@@ -35,8 +31,10 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getView().getUser().convention(System.getenv("USER"));
         extension.getView().getHostname().convention("testbed");
+        extension.getView().getFqdn().convention("testbed.wolkenschloss.local");
         extension.getView().getSshKey().convention(extension.getSshKeyFile().map(this::readSshKey));
         extension.getView().getLocale().convention(System.getenv("LANG"));
+        extension.getView().getHostAddress().convention(IpUtil.getHostAddress());
 
         extension.getCloudInitDirectory().set(cloudInitDir);
         extension.getConfigDirectory().set(virshConfigDir);
@@ -47,23 +45,11 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getPool().getName().convention("testbed");
         extension.getPool().getPath().convention(poolDir.get().getAsFile().getAbsolutePath());
 
-
-        try {
-            InetAddress host = InetAddress.getLocalHost();
-            extension.getView().getHostAddress().set(host.getHostName());
-        } catch (UnknownHostException e) {
-            throw new GradleScriptException("Can not get host Address", e);
-        }
-
         var transform = project.getTasks().register("transform", DefaultTask.class, task -> {
             task.setDescription("Transforms all templates");
         });
 
         extension.getView().getCallbackPort().set(9191);
-
-//        project.getTasks().register("clean", Delete.class, task -> {
-//            task.getDelete().add(task.getProject().getLayout().getBuildDirectory());
-//        });
 
         project.getTasks().register("clean", TestbedCleanTask.class, task -> {
         });
@@ -83,17 +69,8 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var download = project.getTasks().register("download", DownloadTask.class, task -> {
-            try {
-//            URL location = new URL("file:///home/administrator/.local/src/mycloud/testbed/.cache/focal-server-cloudimg-amd64-disk-kvm.img");
-//            URL location = new URL("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-
-                var location = new URL("file:///home/administrator/.local/src/mycloud/testbed/.cache/focal-server-cloudimg-amd64-disk-kvm.img");
-                task.getBaseImageUrl().convention(new Providers.FixedValueWithChangingContentProvider<>(location));
-            } catch (MalformedURLException e) {
-                throw new GradleScriptException("Die URL ist kaputt.", e);
-            }
-
-            task.getSha256Sum().set("73e8c576d0ad02f1cf393c664856bce4146d91affa0062e0d4fedaca55163e44");
+            task.getBaseImageUrl().convention(extension.getBaseImage().getUrl());
+            task.getSha256Sum().set(extension.getBaseImage().getSha256Sum());
             task.getBaseImage().set(poolDir.get().file("base.img"));
         });
 
@@ -119,6 +96,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 virshConfigDir.get().file("domain.xml"));
 
         var definePool = project.getTasks().register("definePool", DefinePoolTask.class, task -> {
+            task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
             task.dependsOn(resize, cidata);
         });
@@ -130,7 +108,25 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var startDomain = project.getTasks().register("startDomain", StartDomainTask.class, task -> {
             // TODO: Refactor. testbed darf nur ein einziges mal erscheinen.
+            task.dependsOn(defineDomain);
             task.getDomain().set("testbed");
+        });
+
+        var waitForCall = project.getTasks().register("waitForCall", WaitForCallTask.class, task -> {
+            task.getPort().set(extension.getView().getCallbackPort());
+            task.getHostname().set(extension.getView().getHostname());
+            task.getServerKey().set(runDir.get().file("server_key"));
+            task.dependsOn(startDomain);
+        });
+
+        var updateKnownHosts = project.getTasks().register("updateKnownHosts", UpdateKnownHostsTask.class, task -> {
+            task.dependsOn(waitForCall);
+            task.getServerKey().set(waitForCall.get().getServerKey());
+            task.getOriginalKnownHostsFile()
+                    .convention(() -> Path.of(System.getenv("HOME"), ".ssh", "known_hosts").toFile());
+           task.getCopyOfKnownHostsDir().set(runDir.get());
+           task.getDomain().set(extension.getView().getHostname());
+
         });
         transform.configure(t -> t.dependsOn(
                 networkConfig.get(),

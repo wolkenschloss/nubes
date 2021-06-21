@@ -5,8 +5,6 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleScriptException;
-import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
@@ -48,6 +46,7 @@ public abstract class TransformerTask extends DefaultTask {
         scopes.put("user", getView().get().getUser().get());
         scopes.put("getSshKey", getView().get().getSshKey().get());
         scopes.put("hostname", getView().get().getHostname().get());
+        scopes.put("fqdn", getView().get().getFqdn().get());
         scopes.put("locale", getView().get().getLocale().get());
 
         var callback = new HashMap<String, Object>();
@@ -83,7 +82,6 @@ public abstract class TransformerTask extends DefaultTask {
                 mustache.execute(writer, scopes);
                 writer.flush();
 
-
                 var write = new FileWriter(getOutputFile().get().getAsFile());
                 write.write(writer.toString());
                 write.close();
@@ -92,14 +90,5 @@ public abstract class TransformerTask extends DefaultTask {
                 e.printStackTrace();
                 throw new GradleScriptException("Can not process template", e);
             }
-    }
-
-    private String stripExtension(String rel) {
-        var last = rel.lastIndexOf('.');
-        if (last > 0) {
-            return rel.substring(0, last);
-        } else {
-            return rel;
-        }
     }
 }

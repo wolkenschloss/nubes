@@ -26,4 +26,9 @@ public interface BaseTestbedExtension {
     Property<String> getRootImageName();
 
     Property<String> getCidataImageName();
+
+    @Nested
+    BaseImage getBaseImage();
+
+    void base(Action<? super BaseImage> action);
 }

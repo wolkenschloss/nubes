@@ -2,7 +2,7 @@
 
 preserve_hostname: False
 hostname: {{{hostname}}}
-fqdn: {{{domain}}}
+fqdn: {{{fqdn}}}
 manage_etc_hosts: True
 
 ssh_pwauth: False
@@ -31,12 +31,16 @@ packages:
   - tzdata
   - openssh-server
   - curl
+  - qemu-guest-agent
 
 snap:
   commands:
     01: snap install microk8s --classic
     02: microk8s status --wait-ready
     03: microk8s enable dns storage ingress dashboard registry
+
+runcmd:
+  - systemctl start qemu-guest-agent
 
 phone_home:
   url: http://{{{callback.ip}}}:{{{callback.port}}}/{{{hostname}}}
