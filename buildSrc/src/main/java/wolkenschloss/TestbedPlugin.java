@@ -17,7 +17,7 @@ public class TestbedPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
 
-        var extension = project.getObjects().newInstance(TestbedExtension.class);
+        BaseTestbedExtension extension = project.getObjects().newInstance(TestbedExtension.class);
         project.getExtensions().add("testbed", extension);
 
         var src = project.getLayout().getProjectDirectory().dir("src");

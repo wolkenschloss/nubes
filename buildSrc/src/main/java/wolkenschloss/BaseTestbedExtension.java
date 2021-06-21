@@ -1,6 +1,7 @@
 package wolkenschloss;
 
 import org.gradle.api.Action;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Nested;
@@ -31,4 +32,10 @@ public interface BaseTestbedExtension {
     BaseImage getBaseImage();
 
     void base(Action<? super BaseImage> action);
+
+    DirectoryProperty getPoolDirectory();
+
+    DirectoryProperty getCloudInitDirectory();
+
+    DirectoryProperty getConfigDirectory();
 }
