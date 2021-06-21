@@ -136,7 +136,7 @@ public class TestbedPlugin implements Plugin<Project> {
         ));
 
         project.getTasks().register("start", DefaultTask.class, task -> {
-            task.dependsOn(transform, cidata, resize);
+            task.dependsOn(transform, updateKnownHosts);
         });
 
 

@@ -11,7 +11,6 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.process.ExecOperations;
-import org.gradle.work.InputChanges;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -53,13 +52,12 @@ abstract public class DownloadTask extends DefaultTask {
             OutputStream output = new FileOutputStream(getBaseImage().get().getAsFile());
 
             byte[] buffer = new byte[1444];
-            int byteread = 0;
-            int bytesum = 0;
-            while((byteread = input.read(buffer)) != -1) {
-
-                bytesum += byteread;
-                output.write(buffer, 0, byteread);
-                progressLogger.progress(String.format("%d MB", bytesum / (1024 * 1024)));
+            int byteRead;
+            int byteSum = 0;
+            while((byteRead = input.read(buffer)) != -1) {
+                byteSum += byteRead;
+                output.write(buffer, 0, byteRead);
+                progressLogger.progress(String.format("%d MB", byteSum / (1024 * 1024)));
             }
 
             input.close();
@@ -86,7 +84,7 @@ abstract public class DownloadTask extends DefaultTask {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GradleScriptException("Kann das Basis Image nicht herunterlagen", e);
+            throw new GradleScriptException("Kann das Basis Image nicht herunterladen", e);
         }
     }
 }

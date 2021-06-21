@@ -42,7 +42,7 @@ public abstract class WaitForCallTask extends DefaultTask {
     @OutputFile
     abstract public RegularFileProperty getServerKey();
 
-    BlockingQueue<String> serverKeyResult;
+    final BlockingQueue<String> serverKeyResult;
 
     public WaitForCallTask() {
         this.serverKeyResult = new SynchronousQueue<>();
@@ -65,7 +65,9 @@ public abstract class WaitForCallTask extends DefaultTask {
 
                 if (serverKey != null) {
                     var keyFile = getServerKey().get().getAsFile();
-                    keyFile.getParentFile().mkdirs();
+                    if(keyFile.getParentFile().mkdirs()) {
+                        getLogger().info("Directory {} created", keyFile.getParentFile().getAbsolutePath());
+                    }
                     Files.writeString(keyFile.toPath(), serverKey);
                 } else {
                     throw new GradleException("Did not receive call from testbed");
@@ -85,8 +87,8 @@ public abstract class WaitForCallTask extends DefaultTask {
     }
 
     static class TestbedCallbackHandler implements HttpHandler {
-        private BlockingQueue<String> server;
-        private Logger logger;
+        private final BlockingQueue<String> server;
+        private final Logger logger;
 
         public TestbedCallbackHandler(BlockingQueue<String> server, Logger logger) {
             this.server = server;

@@ -113,9 +113,7 @@ public abstract class UpdateKnownHostsTask extends DefaultTask {
                             ipAddresses.size()));
         }
 
-        ipAddresses.forEach(address -> {
-            getLogger().info("Got IP-Address {}", address);
-        });
+        ipAddresses.forEach(address -> getLogger().info("Got IP-Address {}", address));
 
         return ipAddresses.stream()
                 .findFirst()

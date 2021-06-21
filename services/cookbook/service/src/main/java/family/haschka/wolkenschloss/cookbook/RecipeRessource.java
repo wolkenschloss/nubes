@@ -1,8 +1,6 @@
 package family.haschka.wolkenschloss.cookbook;
 
 
-import org.jboss.logging.Logger;
-
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;

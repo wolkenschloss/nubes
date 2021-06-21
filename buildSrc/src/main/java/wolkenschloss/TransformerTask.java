@@ -55,10 +55,10 @@ public abstract class TransformerTask extends DefaultTask {
 
         var pool = new HashMap<String, Object>();
 
-        var poolname = getPool().get().getName().get();
-        var pooldir = getPool().get().getPath().get();
-        pool.put("name", poolname);
-        pool.put("directory", pooldir);
+        var poolName = getPool().get().getName().get();
+        var poolDir = getPool().get().getPath().get();
+        pool.put("name", poolName);
+        pool.put("directory", poolDir);
 
         var disks = new HashMap<String, Object>();
         disks.put("root", getRootImageName().get());

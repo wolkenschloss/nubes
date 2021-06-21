@@ -56,7 +56,7 @@ angefügt.
 
   * Die IP-Adresse des Prüfstandes ermitteln. Die virtuelle Maschine 
     bezieht ihre IP-Adresse vom libvirt DHCP Server. (erledigt)
-  * Auf den Phone-Home Rückruf der virtuellen Maschine warten. Dazu muss ein 
+  * Auf den Rückruf der virtuellen Maschine warten. Dazu muss ein 
     Webserver gestartet werden. Die Prüfstand VM sendet den Server-Key
     an den Webserver. (Ein Gradle Task startet einen Webserver? Das ist ein 
     Hack!) https://stackoverflow.com/a/3732328/168944 (erledigt)
@@ -67,7 +67,7 @@ angefügt.
     Verzeichnis build/run kopieren.
   * Bessere Gruppierung der Aufgaben. Derzeit ist noch alles in der Gruppe 
     *other*.
-  * Die Aufgaben `defineDomain` und `definePool` umstellen, so dass die 
+  * Die Aufgaben `defineDomain` und `definePool` umstellen, sodass die 
     libvirt API verwendet wird statt virsh.#
   * Abhängigkeiten und Inkrementellen Build prüfen. Es sollte nur das gebaut 
     werden, dass sich auch geändert hat. Nach dem ersten Start des 
