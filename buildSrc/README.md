@@ -73,3 +73,7 @@ angefügt.
     werden, dass sich auch geändert hat. Nach dem ersten Start des 
     Prüfstandes dürfen keine Änderungen mehr vorgenommen werden. Der 
     Prüfstand muss zunächst zerstört werden.
+  * Vielleicht eine eigene known_hosts Datei in build/run verwalten und die 
+    im .ssh Verzeichnis des Users in Ruhe lassen. (erledigt)
+  * Eine Aufgabe *status* zur Ausgabe des Betriebszustandes des 
+    Prüfstandes.

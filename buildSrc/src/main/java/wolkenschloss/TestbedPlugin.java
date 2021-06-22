@@ -120,14 +120,21 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var updateKnownHosts = project.getTasks().register("updateKnownHosts", UpdateKnownHostsTask.class, task -> {
-            task.dependsOn(waitForCall);
+//            task.dependsOn(waitForCall);
             task.getServerKey().set(waitForCall.get().getServerKey());
-            task.getOriginalKnownHostsFile()
-                    .convention(() -> Path.of(System.getenv("HOME"), ".ssh", "known_hosts").toFile());
-           task.getCopyOfKnownHostsDir().set(runDir.get());
+           task.getKnownHostsFile().set(runDir.get().file("known_hosts"));
            task.getDomain().set(extension.getView().getHostname());
-
         });
+
+        var readKubeConfig = project.getTasks().register("readKubeConfig", ReadKubeConfigTask.class, task -> {
+            // benötigt funktionierenden ssh Zugang. Deswegen muss updateKnownHosts
+            // vorher ausgeführt sein.
+//            task.dependsOn(updateKnownHosts);
+            task.getDomainName().set(extension.getView().getHostname());
+            task.getKubeConfigFile().convention(runDir.get().file("kubeconfig"));
+            task.getKnownHostsFile().set(updateKnownHosts.get().getKnownHostsFile());
+        });
+
         transform.configure(t -> t.dependsOn(
                 networkConfig.get(),
                 userData.get(),
@@ -136,7 +143,7 @@ public class TestbedPlugin implements Plugin<Project> {
         ));
 
         project.getTasks().register("start", DefaultTask.class, task -> {
-            task.dependsOn(transform, updateKnownHosts);
+            task.dependsOn(transform, readKubeConfig);
         });
 
 
