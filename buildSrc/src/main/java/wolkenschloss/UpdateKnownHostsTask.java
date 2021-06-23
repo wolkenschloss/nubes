@@ -53,7 +53,7 @@ public abstract class UpdateKnownHostsTask extends DefaultTask {
     @TaskAction
     public void update() {
         try {
-            var domain = new Domain(getDomain().get());
+            var domain = new Domain(getDomain().get(), 10);
 
             var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
             var attributes = PosixFilePermissions.asFileAttribute(permissions);

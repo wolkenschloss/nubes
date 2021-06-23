@@ -36,7 +36,7 @@ public abstract class ReadKubeConfigTask extends DefaultTask {
     @TaskAction
     public void read() throws IOException, LibvirtException, InterruptedException {
 
-        var domain = new Domain(getDomainName().get());
+        var domain = new Domain(getDomainName().get(), 10);
         var ip = domain.getTestbedHostAddress();
 
         try (var stdout = new ByteArrayOutputStream()) {

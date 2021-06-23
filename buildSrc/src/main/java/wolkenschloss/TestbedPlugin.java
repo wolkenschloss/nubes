@@ -135,6 +135,14 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getKnownHostsFile().set(updateKnownHosts.get().getKnownHostsFile());
         });
 
+        var status = project.getTasks().register("status", StatusTask.class, task -> {
+            task.getDomainName().set(extension.getView().getHostname());
+            task.getServerKeyFile().set(waitForCall.get().getServerKey());
+            task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
+            task.getKnownHostsFile().set(updateKnownHosts.get().getKnownHostsFile());
+            task.getPoolName().set(extension.getPool().getName());
+        });
+
         transform.configure(t -> t.dependsOn(
                 networkConfig.get(),
                 userData.get(),

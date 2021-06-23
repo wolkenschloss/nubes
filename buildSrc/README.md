@@ -64,7 +64,7 @@ angefügt.
     vorhandenen Server-Key von einer vorangegangenen Instanz entfernen. 
     (erledigt)
   * Die Kubernetes Konfiguration aus dem Prüfstand auslesen und in das 
-    Verzeichnis build/run kopieren.
+    Verzeichnis build/run kopieren. (erledigt)
   * Bessere Gruppierung der Aufgaben. Derzeit ist noch alles in der Gruppe 
     *other*.
   * Die Aufgaben `defineDomain` und `definePool` umstellen, sodass die 
@@ -77,3 +77,8 @@ angefügt.
     im .ssh Verzeichnis des Users in Ruhe lassen. (erledigt)
   * Eine Aufgabe *status* zur Ausgabe des Betriebszustandes des 
     Prüfstandes.
+    
+## Warum nicht anders?
+
+
+[libguestfs doesn't work on Ubuntu without root permissions](https://bugs.launchpad.net/fuel/+bug/1467579) 
