@@ -91,6 +91,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var definePool = project.getTasks().register("definePool", DefinePoolTask.class, task -> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
+            task.getPoolRunFile().set(runDir.get().file("pool.run"));
             task.dependsOn(root, cidata);
         });
 
