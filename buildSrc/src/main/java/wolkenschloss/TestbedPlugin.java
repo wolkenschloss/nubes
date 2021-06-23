@@ -88,7 +88,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 src.file("domain.xml.mustache"),
                 virshConfigDir.get().file("domain.xml"));
 
-        var definePool = project.getTasks().register("definePool", DefinePoolTask.class, task -> {
+        var createPool = project.getTasks().register("createPool", CreatePoolTask.class, task -> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
             task.getPoolRunFile().set(runDir.get().file("pool.run"));
@@ -97,7 +97,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var defineDomain = project.getTasks().register("defineDomain", DefineDomainTask.class, task -> {
             task.getXmlDescription().set(domainConfig.get().getOutputFile());
-            task.dependsOn(definePool);
+            task.dependsOn(createPool);
         });
 
         var startDomain = project.getTasks().register("startDomain", StartDomainTask.class, task -> {

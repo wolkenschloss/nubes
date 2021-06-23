@@ -85,7 +85,6 @@ abstract public class DownloadTask extends DefaultTask {
                 throw new GradleException("Unexpected checksum");
             }
         } catch (IOException e) {
-            e.printStackTrace();
             throw new GradleScriptException("Kann das Basis Image nicht herunterladen", e);
         }
     }

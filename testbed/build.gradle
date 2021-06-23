@@ -15,6 +15,6 @@ testbed {
         name = "testbed"
     }
     pool {
-        name = "wolkenschloss"
+        name = "testbed"
     }
 }
