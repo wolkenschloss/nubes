@@ -6,9 +6,9 @@ import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-
+import org.libvirt.Connect;
+import org.libvirt.LibvirtException;
 
 public class GetIpAddressTest {
 
@@ -32,4 +32,11 @@ public class GetIpAddressTest {
         logger.info(() -> String.format("IP: %s%n", other.getHostAddress()));
 
     }
+
+//    @Test
+//    public void getClientIp() throws LibvirtException {
+//       var connection = new  Connect("qemu:///system");
+//       var network = connection.networkLookupByName("default");
+//       var domain = connection.domainLookupByName("testbed");
+//    }
 }

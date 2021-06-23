@@ -1,11 +1,9 @@
 package wolkenschloss;
 
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.tasks.Exec;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 
+@CacheableTask
 abstract public class CloudLocalDsTask extends Exec {
 
     public CloudLocalDsTask() {
@@ -13,9 +11,11 @@ abstract public class CloudLocalDsTask extends Exec {
     }
 
     @InputFile
+    @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getNetworkConfig();
 
     @InputFile
+    @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getUserData();
 
     @OutputFile

@@ -6,8 +6,8 @@ defaultTasks 'start'
 
 testbed {
     base {
-        url = new URL("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img")
-        sha256Sum = "3ba3abf3c1cb86c49961994c387f20a6b24ee97eb11141973ebf8145dac30369"
+        url = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img"
+        sha256Sum = "0b0c092467ee0d27169aabf2ad82b5c1a3b6bbb3854a05a638f179937bbc1879"
     }
 
     domain {

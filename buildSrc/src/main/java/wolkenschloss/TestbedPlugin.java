@@ -75,16 +75,9 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var root = project.getTasks().register("root", RootImageTask.class, task -> {
+            task.getSize().convention("20G");
             task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
             task.getBaseImage().convention(download.get().getBaseImage());
-        });
-
-        var resize = project.getTasks().register("resize", ResizeTask.class, task-> {
-            task.getSize().convention("20G");
-
-            // Global definieren; wird an mehreren Stellen benötigt.
-            task.getImage().set(poolDir.get().file("root.qcow2"));
-            task.dependsOn(root);
         });
 
         var poolConfig = createTransformationTask(project, extension, "Pool",
@@ -98,7 +91,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var definePool = project.getTasks().register("definePool", DefinePoolTask.class, task -> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
-            task.dependsOn(resize, cidata);
+            task.dependsOn(root, cidata);
         });
 
         var defineDomain = project.getTasks().register("defineDomain", DefineDomainTask.class, task -> {

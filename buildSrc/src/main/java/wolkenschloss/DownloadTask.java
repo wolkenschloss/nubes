@@ -6,6 +6,7 @@ import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
 import java.io.*;
 import java.net.URL;
 
+@CacheableTask
 abstract public class DownloadTask extends DefaultTask {
 
     public DownloadTask() {
@@ -29,7 +31,7 @@ abstract public class DownloadTask extends DefaultTask {
     protected abstract ExecOperations getExecOperations();
 
     @Input
-    abstract public Property<URL> getBaseImageUrl();
+    abstract public Property<String> getBaseImageUrl();
 
     @Input
     abstract public Property<String> getSha256Sum();
@@ -47,7 +49,7 @@ abstract public class DownloadTask extends DefaultTask {
         progressLogger.start("Download base Image", getName());
 
         try {
-            URL location = getBaseImageUrl().get();
+            URL location = new URL(getBaseImageUrl().get());
             InputStream input = location.openStream();
             OutputStream output = new FileOutputStream(getBaseImage().get().getAsFile());
 
