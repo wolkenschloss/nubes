@@ -27,7 +27,7 @@ test {
     }
 
     reports {
-        junitXml.enabled = true
-        html.enabled = true
+        junitXml.required = true
+        html.required = true
     }
 }

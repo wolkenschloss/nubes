@@ -77,6 +77,12 @@ angefügt.
     im .ssh Verzeichnis des Users in Ruhe lassen. (erledigt)
   * Eine Aufgabe *status* zur Ausgabe des Betriebszustandes des 
     Prüfstandes.
+    * Ausgabe der Host Informationen
+        * Betriebssystem
+        * Kernel
+        * Memory
+        * Disk
+    
     
 ## Warum nicht anders?
 

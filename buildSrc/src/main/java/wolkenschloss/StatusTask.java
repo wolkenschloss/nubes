@@ -27,10 +27,6 @@ public abstract class StatusTask extends DefaultTask {
     public abstract Property<String> getPoolName();
 
     @Internal
-    abstract public RegularFileProperty getServerKeyFile();
-
-
-    @Internal
     abstract public RegularFileProperty getKnownHostsFile();
 
     @Internal
@@ -193,12 +189,6 @@ public abstract class StatusTask extends DefaultTask {
             evaluate("Memory (MB)", info.memory / 1024, m -> m >= 4096);
             evaluate("Virtual CPU's", info.nrVirtCpu, n -> n > 1);
         });
-
-        evaluate2("Server Key", () -> getServerKeyFile().getAsFile().get().toPath(),
-                status -> status.check(Files::exists)
-                        .ok(Path::toString)
-                        .error("missing")
-        );
 
         evaluate2("Kubeconfig", () -> getKubeConfigFile().getAsFile().get().toPath(),
                 status -> status.check(Files::exists)

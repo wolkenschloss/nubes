@@ -66,8 +66,8 @@ tasks.register("integrationTest", Test) {
     }
 
     reports {
-        junitXml.enabled = true
-        html.enabled = true
+        junitXml.required = true
+        html.required = true
     }
 
     systemProperty "build.output.directory", buildDir.absolutePath
@@ -119,8 +119,8 @@ test {
     }
 
     reports {
-        junitXml.enabled = true
-        html.enabled = true
+        junitXml.required = true
+        html.required = true
     }
 
     // java.util.logging.manager nicht setzen! Wenn der Manager wie in der

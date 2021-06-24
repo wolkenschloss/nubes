@@ -78,6 +78,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getSize().convention("20G");
             task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
             task.getBaseImage().convention(download.get().getBaseImage());
+            task.getRootImageMd5File().set(runDir.get().file("root.md5"));
         });
 
         var poolConfig = createTransformationTask(project, extension, "Pool",
@@ -95,29 +96,15 @@ public class TestbedPlugin implements Plugin<Project> {
             task.dependsOn(root, cidata);
         });
 
-        var defineDomain = project.getTasks().register("defineDomain", DefineDomainTask.class, task -> {
-            task.getXmlDescription().set(domainConfig.get().getOutputFile());
-            task.dependsOn(createPool);
-        });
-
         var startDomain = project.getTasks().register("startDomain", StartDomainTask.class, task -> {
             // TODO: Refactor. testbed darf nur ein einziges mal erscheinen.
-            task.dependsOn(defineDomain);
-            task.getDomain().set("testbed");
-        });
-
-        var waitForCall = project.getTasks().register("waitForCall", WaitForCallTask.class, task -> {
-            task.getPort().set(extension.getView().getCallbackPort());
+            task.dependsOn(createPool);
+            task.getDomain().set(extension.getView().getHostname());
             task.getHostname().set(extension.getView().getHostname());
-            task.getServerKey().set(runDir.get().file("server_key"));
-            task.dependsOn(startDomain);
-        });
-
-        var updateKnownHosts = project.getTasks().register("updateKnownHosts", UpdateKnownHostsTask.class, task -> {
-//            task.dependsOn(waitForCall);
-            task.getServerKey().set(waitForCall.get().getServerKey());
-           task.getKnownHostsFile().set(runDir.get().file("known_hosts"));
-           task.getDomain().set(extension.getView().getHostname());
+            task.getPort().set(extension.getView().getCallbackPort());
+            task.getXmlDescription().set(domainConfig.get().getOutputFile());
+            task.getPoolRunFile().set(createPool.get().getPoolRunFile());
+            task.getKnownHostsFile().set(runDir.get().file("known_hosts"));
         });
 
         var readKubeConfig = project.getTasks().register("readKubeConfig", ReadKubeConfigTask.class, task -> {
@@ -126,14 +113,13 @@ public class TestbedPlugin implements Plugin<Project> {
 //            task.dependsOn(updateKnownHosts);
             task.getDomainName().set(extension.getView().getHostname());
             task.getKubeConfigFile().convention(runDir.get().file("kubeconfig"));
-            task.getKnownHostsFile().set(updateKnownHosts.get().getKnownHostsFile());
+            task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
         });
 
         var status = project.getTasks().register("status", StatusTask.class, task -> {
             task.getDomainName().set(extension.getView().getHostname());
-            task.getServerKeyFile().set(waitForCall.get().getServerKey());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
-            task.getKnownHostsFile().set(updateKnownHosts.get().getKnownHostsFile());
+            task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
             task.getPoolName().set(extension.getPool().getName());
         });
 
