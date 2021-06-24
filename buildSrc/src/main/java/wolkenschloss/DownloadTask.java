@@ -51,7 +51,14 @@ abstract public class DownloadTask extends DefaultTask {
         try {
             URL location = new URL(getBaseImageUrl().get());
             InputStream input = location.openStream();
-            OutputStream output = new FileOutputStream(getBaseImage().get().getAsFile());
+
+
+            OutputStream output;
+            try {
+                output = new FileOutputStream(getBaseImage().get().getAsFile());
+            } catch (FileNotFoundException e) {
+                throw new GradleScriptException("Das Basis Image kann nicht geschrieben werden", e);
+            }
 
             byte[] buffer = new byte[1444];
             int byteRead;
@@ -64,8 +71,16 @@ abstract public class DownloadTask extends DefaultTask {
 
             input.close();
             output.close();
-
             progressLogger.completed();
+
+            var file = new File(getBaseImage().getAsFile().get().toPath().toString());
+            var success = file.setWritable(false, false)
+            && file.setReadable(true, true)
+            && file.setExecutable(false, false);
+
+            if (!success)  {
+                throw new GradleException("Die Dateiberechtigungen konnten nicht geändert werden.");
+            }
 
             var stdout = new ByteArrayOutputStream();
             var result = getExecOperations().exec(exec -> {

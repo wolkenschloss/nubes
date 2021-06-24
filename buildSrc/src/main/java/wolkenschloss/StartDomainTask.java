@@ -20,34 +20,41 @@ abstract public class StartDomainTask extends DefaultTask {
 
             var connection = new org.libvirt.Connect("qemu:///system");
 
+            try {
+                // A. Domain ist definiert
+                var domain = connection.domainLookupByName(getDomain().get());
+                var info = domain.getInfo();
+                var state = info.state;
 
-            var domain = connection.domainLookupByName(getDomain().get());
-            var info = domain.getInfo();
-            var state = info.state;
-
-            // 1. Fall Domäne existiert, ist aber ausgeschaltet.
-            if (state == DomainInfo.DomainState.VIR_DOMAIN_SHUTOFF) {
-                getLogger().info("Domäne ist vorhanden, aber ausgeschaltet.");
-                getLogger().info("Domäne wird wieder eingeschaltet");
-                if (execute) {
-                    domain.create();
+                // 1. Fall Domäne existiert, ist aber ausgeschaltet.
+                if (state == DomainInfo.DomainState.VIR_DOMAIN_SHUTOFF) {
+                    getLogger().info("Domäne ist vorhanden, aber ausgeschaltet.");
+                    getLogger().info("Domäne wird wieder eingeschaltet");
+                    if (execute) {
+                        domain.create();
+                    }
                 }
-            }
 
-            // 2. Fall Domäne existiert und läuft gerade.
-            if (state == DomainInfo.DomainState.VIR_DOMAIN_RUNNING) {
-                getLogger().info("Domäne ist vorhanden und läuft gerade.");
-                getLogger().info("Es wird keine Änderung durchgeführt");
-            }
-
-            // 3. Fall Domäne existiert und ist pausiert.
-            if (state == DomainInfo.DomainState.VIR_DOMAIN_PAUSED) {
-                getLogger().info("Domäne ist vorhanden und pausiert.");
-                getLogger().info("Domäne wird wiederaufgenommen");
-
-                if (execute) {
-                    domain.resume();
+                // 2. Fall Domäne existiert und läuft gerade.
+                if (state == DomainInfo.DomainState.VIR_DOMAIN_RUNNING) {
+                    getLogger().info("Domäne ist vorhanden und läuft gerade.");
+                    getLogger().info("Es wird keine Änderung durchgeführt");
                 }
+
+                // 3. Fall Domäne existiert und ist pausiert.
+                if (state == DomainInfo.DomainState.VIR_DOMAIN_PAUSED) {
+                    getLogger().info("Domäne ist vorhanden und pausiert.");
+                    getLogger().info("Domäne wird wiederaufgenommen");
+
+                    if (execute) {
+                        domain.resume();
+                    }
+                }
+
+                // B. Domain
+
+            } finally {
+                connection.close();
             }
         } catch (LibvirtException e) {
             e.printStackTrace();
