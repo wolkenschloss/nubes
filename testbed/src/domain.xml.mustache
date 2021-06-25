@@ -26,7 +26,6 @@
     <vendor>Intel</vendor>
     <feature policy='require' name='ss'/>
     <feature policy='require' name='vmx'/>
-    <feature policy='require' name='pdcm'/>
     <feature policy='require' name='pcid'/>
     <feature policy='require' name='hypervisor'/>
     <feature policy='require' name='arat'/>
@@ -60,13 +59,13 @@
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='{{pool.directory}}/{{disks.root}}'/>
+      <source file='{{{pool.directory}}}/{{disks.root}}'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </disk>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source file='{{pool.directory}}/{{disks.cidata}}'/>
+      <source file='{{{pool.directory}}}/{{disks.cidata}}'/>
       <backingStore/>
       <target dev='vdb' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
@@ -155,6 +154,6 @@
       <address type='pci' domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
     </rng>
   </devices>
-  <seclabel type='dynamic' model='apparmor' relabel='yes'/>
+  <seclabel type="none"/>
 </domain>
 

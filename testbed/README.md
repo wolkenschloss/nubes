@@ -10,9 +10,6 @@ Der Prüfstand besteht aus einer virtuellen Maschine mit der [microk8s]
 [microk8s] Variante von [Kubernetes](https://kubernetes.io/de/) und kann bei
 Bedarf automatisch gestartet werden.
 
-Der Prüfstand wird mit dem Werkzeug `testbed` verwaltet, das in den 
-Erstellungsprozess eingebettet ist, aber auch einzeln ausgeführt werden kann. 
-
 ## Voraussetzungen
 
 Um den Prüfstand nutzen zu können, müssen folgende Softwarepakete installiert 
@@ -24,67 +21,14 @@ sein:
   * Rootless Docker
   * Weis der Henker, was noch
 
-### Installation des Werkzeugs testbed
-
-In einer Kommandozeile im Verzeichnis mycloud/testbed sind folgende Befehle
-auszuführen:
-
-```shell
-npm install
-npm link
-```
-
-Dies installiert das `testbed` Werkzeug im Ausführungspfad des Anwenders. 
-Solltest Du `mycloud` in mehreren Verzeichnissen ausgecheckt haben, 
-überschreibst Du mit `npm link` ggf. eine bereits durchgeführt Installation 
-eines anderen Verzeichnisses.
-
-## Anwendung Standalone
-
-Die Festplatten-Abbilder, die für den Start der virtuellen Maschine erforderlich
-sind, können mit dem Befehl
-
-```
-testbed build
-```
-
-erstellt werden. 
-
-Nachdem Erstellen der Festplatten Abbilder, kann die virtuelle Maschine
-erstellt werden. Der folgende Befehl erstellt die virtuelle Maschine, aber
-sie wird noch nicht gestartet:
-
-```
-testbed deploy
-```
-
-
-Wenn die virtuelle Maschine erstellt wurde, kann sie mit folgendem Befehl 
-gestartet werden. Der erste Starte der Maschine dauer ein paar Minuten. 
-
-```
-testbed start
-```
-
-Wenn der Startvorgang unterbrochen wird, zum Beispiel durch das Drücken von 
-`Strg+C`, bleibt die Testumgebung in einem nicht definiert Zustand. Der Abbruch
-des Startvorgangs führt nicht dazu, dass eine bereits gestartete virtuelle 
-Maschine angehalten oder gelöscht wird, unabhängig vom Zustand der Maschine.
-
-Nach dem Start der virtuellen Maschine ist das Kubernetes Dashboard erreichbar
-mit der Adresse `https://192.168.122.152/dashboard`.
-
-Zur Anmeldung am Dashboard kann entweder die Kubernetes Konfigurationsdatei 
-oder ein Token verwendet werden. Die Konfigurationsdatei befindet sich nach der
-Installation in der Datei `build/run/config`. Das Token wird mit dem Befehl 
-`testbed token` auf der Kommandozeile ausgegeben.
-
-## Anwendung im Erstellungsprozess mit `gradle` [TBD]
+## Anwendung im Erstellungsprozess mit `gradle`
 
 ```shell
 cd mycloud
 ./gradlew :testbed:start
 ```
+
+Das kann je nach Internetverbindung ziemlich lange dauern.
 
 ## Nutzung des Prüfstandes 
 
@@ -216,16 +160,3 @@ SSH Fingerprint der VM ermitteln und installieren:
 ```shell
 ssh-keyscan -H $TESTBED_IP >> ~/.ssh/known_hosts
 ```
-
-
-### Troubleshooting
-
-*Diesen Absatz nochmal überarbeiten!*
-
-Es gibt zwei Möglichkeiten auf die Schnauze zu fallen. Entweder 
-man verwendet den Verbindungstyp `qemu:///system`, dann sind die 
-Dateiberechtigungen der Builderzeugnisse für libvirt zugänglich
-gemacht werden, indem `chmod 777` auf die Festplattenabbilder
-angewendet werden oder sie in das /tmp Verzeichnis wandern; oder
-man verwendet den Verbindungstyp qemu:///session und hat dann 
-kein Netzwerk. Einen Tod muss man halt sterben.

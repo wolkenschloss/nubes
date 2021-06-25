@@ -1,8 +1,8 @@
 #cloud-config
 
 preserve_hostname: False
-hostname: {{hostname}}
-fqdn: {{domain}}
+hostname: {{{hostname}}}
+fqdn: {{{fqdn}}}
 manage_etc_hosts: True
 
 ssh_pwauth: False
@@ -11,16 +11,16 @@ groups:
   - microk8s
 
 users:
-  - name: {{user}}
+  - name: {{{user}}}
     shell: '/bin/bash'
     groups:
       - sudo
       - microk8s
     ssh_authorized_keys:
-      - {{ getSshKey }}
+      - {{{ getSshKey }}}
     sudo: 'ALL=(ALL) NOPASSWD: ALL'
 
-locale: {{process.env.LANG}}
+locale: {{{ locale }}}
 
 # Just for now
 package_update: False
@@ -31,6 +31,7 @@ packages:
   - tzdata
   - openssh-server
   - curl
+  - qemu-guest-agent
 
 snap:
   commands:
@@ -38,8 +39,11 @@ snap:
     02: microk8s status --wait-ready
     03: microk8s enable dns storage ingress dashboard registry
 
+runcmd:
+  - systemctl start qemu-guest-agent
+
 phone_home:
-  url: http://{{callback.ip}}:{{callback.port}}/{{hostname}}
+  url: http://{{{callback.ip}}}:{{{callback.port}}}/{{{hostname}}}
   post:
     - pub_key_ecdsa
     - instance_id

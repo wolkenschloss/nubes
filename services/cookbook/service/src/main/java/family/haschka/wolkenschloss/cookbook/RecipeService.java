@@ -1,8 +1,5 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import com.mongodb.client.MongoClient;
-import org.bson.types.ObjectId;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
