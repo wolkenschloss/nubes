@@ -135,6 +135,21 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
 
+        project.getTasks().register("destroy", DestroyTask.class, task -> {
+            task.getDomain().set(extension.getView().getHostname());
+            task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
+            task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
+            task.getDomainXmlConfig().set(domainConfig.get().getOutputFile());
+
+            task.getPoolRunFile().set(createPool.get().getPoolRunFile());
+            task.getPoolXmlConfig().set(poolConfig.get().getOutputFile());
+            task.getRootImageFile().set(root.get().getRootImage());
+            task.getRootImageMd5File().set(root.get().getRootImageMd5File());
+            task.getBaseImageFile().set(download.get().getBaseImage());
+            task.getCiDataImageFile().set(cidata.get().getCidata());
+            task.getNetworkConfig().set(networkConfig.get().getOutputFile());
+            task.getUserData().set(userData.get().getOutputFile());
+        });
     }
 
     private <T extends FileSystemLocation> TaskProvider<TransformerTask> createTransformationTask(
