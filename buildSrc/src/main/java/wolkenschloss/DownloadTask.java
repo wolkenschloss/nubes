@@ -52,7 +52,6 @@ abstract public class DownloadTask extends DefaultTask {
             URL location = new URL(getBaseImageUrl().get());
             InputStream input = location.openStream();
 
-
             OutputStream output;
             try {
                 output = new FileOutputStream(getBaseImage().get().getAsFile());
@@ -73,15 +72,6 @@ abstract public class DownloadTask extends DefaultTask {
             output.close();
             progressLogger.completed();
 
-            var file = new File(getBaseImage().getAsFile().get().toPath().toString());
-            var success = file.setWritable(false, false)
-            && file.setReadable(true, true)
-            && file.setExecutable(false, false);
-
-            if (!success)  {
-                throw new GradleException("Die Dateiberechtigungen konnten nicht geändert werden.");
-            }
-
             var stdout = new ByteArrayOutputStream();
             var result = getExecOperations().exec(exec -> {
                 exec.commandLine("sha256sum");
@@ -101,6 +91,19 @@ abstract public class DownloadTask extends DefaultTask {
             }
         } catch (IOException e) {
             throw new GradleScriptException("Kann das Basis Image nicht herunterladen", e);
+        }
+
+        setBaseImageReadOnly();
+    }
+
+    private void setBaseImageReadOnly() {
+        var file = new File(getBaseImage().getAsFile().get().toPath().toString());
+        var success = file.setWritable(false, false)
+        && file.setReadable(true, true)
+        && file.setExecutable(false, false);
+
+        if (!success)  {
+            throw new GradleException("Die Dateiberechtigungen konnten nicht geändert werden.");
         }
     }
 }
