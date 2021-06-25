@@ -27,9 +27,30 @@ dockerd-rootless-setuptool.sh install
 systemctl --user start docker
 systemctl --user enable docker
 
+# Installation des Ubuntu GPG Schlüssels zur Überprüfung der Prüfsummen-Datei
+gpg --keyid-format long --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0x1A5D6C4C7DB87C81
+
 git clone https://github.com/wolkenschloss/mycloud.git
 ./gradlew build
 ```
+
+Überprüfung des Schlüssels ist möglich auf der Seite
+[FAQ des Ubuntu Security Team](https://wiki.ubuntu.com/SecurityTeam/FAQ#GPG_Keys_used_by_Ubuntu)
+
+## GPG Bug
+
+Bei einigen Ubuntu Versionen kommt es zu einem Fehler, wenn man einen
+GPG Schlüssel zu seinem Schlüsselbund hinzufügen möchte:
+
+```bash
+sudo chown -R $(id -u):$(id -g) $HOME/.gnupg/crls.d
+```
+
+Links:
+
+* [GnuPrivacyGuardHowto](https://help.ubuntu.com/community/GnuPrivacyGuardHowto)
+* [How to verify your Ubuntu download](https://ubuntu.com/tutorials/how-to-verify-ubuntu#1-overview)
+* [The GNU Privacy Handbook](https://www.gnupg.org/gph/en/manual.html)
 
 Testbed zum Laufen kriegen:
 

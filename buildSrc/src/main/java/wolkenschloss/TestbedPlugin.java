@@ -69,16 +69,15 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var download = project.getTasks().register("download", DownloadTask.class, task -> {
-            task.getBaseImageUrl().convention(extension.getBaseImage().getUrl());
-            task.getSha256Sum().set(extension.getBaseImage().getSha256Sum());
-            task.getBaseImage().set(poolDir.get().file("base.img"));
+            task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
+            task.getDownloads().convention(project.getLayout().getBuildDirectory().dir("downloads"));
         });
 
         var root = project.getTasks().register("root", RootImageTask.class, task -> {
             task.getSize().convention("20G");
-            task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
-            task.getBaseImage().convention(download.get().getBaseImage());
-            task.getRootImageMd5File().set(runDir.get().file("root.md5"));
+//            task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
+//            task.getBaseImage().convention(download.get().getBaseImage());
+//            task.getRootImageMd5File().set(runDir.get().file("root.md5"));
         });
 
         var poolConfig = createTransformationTask(project, extension, "Pool",
@@ -145,7 +144,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getPoolXmlConfig().set(poolConfig.get().getOutputFile());
             task.getRootImageFile().set(root.get().getRootImage());
             task.getRootImageMd5File().set(root.get().getRootImageMd5File());
-            task.getBaseImageFile().set(download.get().getBaseImage());
+//            task.getBaseImageFile().set(download.get().getBaseImage());
             task.getCiDataImageFile().set(cidata.get().getCidata());
             task.getNetworkConfig().set(networkConfig.get().getOutputFile());
             task.getUserData().set(userData.get().getOutputFile());
