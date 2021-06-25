@@ -36,6 +36,7 @@ public abstract class ReadKubeConfigTask extends DefaultTask {
     @TaskAction
     public void read() throws IOException, LibvirtException, InterruptedException {
 
+        // TODO Kandidat für Testbed Klasse
         var domain = new Domain(getDomainName().get(), 10);
         var ip = domain.getTestbedHostAddress();
 

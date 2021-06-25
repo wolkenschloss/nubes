@@ -1,12 +1,15 @@
 package wolkenschloss;
 
+import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
+import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.MessageDigest;
@@ -40,23 +43,30 @@ abstract public class RootImageTask extends DefaultTask {
     @TaskAction
     public void exec() throws NoSuchAlgorithmException, IOException {
 
+        exec(spec -> spec.commandLine("qemu-img")
+                .args("create", "-f", "qcow2", "-F", "qcow2", "-b",
+                        getBaseImage().get(),
+                        getRootImage().get()));
+
+        exec(spec -> spec.commandLine("qemu-img")
+                    .args("resize", getRootImage().get(), getSize().get()));
+
         var hash = getBaseImage().get().getAsFile().getAbsolutePath() + getSize().get();
-
         var md = MessageDigest.getInstance("MD5");
+
         md.update(hash.getBytes());
-
         Files.write(getRootImageMd5File().getAsFile().get().toPath(), md.digest());
+    }
 
-        getExecOperations().exec(spec -> {
-            spec.commandLine("qemu-img")
-                    .args("create", "-f", "qcow2", "-F", "qcow2", "-b",
-                            getBaseImage().get(),
-                            getRootImage().get());
-        }).assertNormalExitValue();
-
-        getExecOperations().exec(exec -> {
-            exec.commandLine("qemu-img")
-                    .args("resize", getRootImage().get(), getSize().get());
-        }).assertNormalExitValue();
+    private void exec(Action<? super ExecSpec> spec) throws IOException {
+        try (var stdout = new ByteArrayOutputStream()) {
+            var result = getExecOperations().exec(s -> {
+                spec.execute(s);
+                s.setStandardOutput(stdout);
+            });
+            getLogger().info(stdout.toString());
+            result.assertNormalExitValue();
+        }
     }
 }
+

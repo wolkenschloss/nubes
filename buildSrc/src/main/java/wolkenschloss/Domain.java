@@ -9,6 +9,7 @@ import org.libvirt.StoragePool;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+// TODO Kandidat für Testbed Klasse
 public class Domain {
     private final String name;
     private final int retries;

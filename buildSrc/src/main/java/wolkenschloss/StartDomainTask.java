@@ -54,6 +54,7 @@ abstract public class StartDomainTask extends DefaultTask {
         try {
 //            var execute = getProject().findProperty("dry-run") == null;
 
+            // TODO Kandidat für Testbed Klasse
             var connection = new org.libvirt.Connect("qemu:///system");
 
             try {
