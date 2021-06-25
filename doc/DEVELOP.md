@@ -1,5 +1,48 @@
 # Develop
 
+Install (Ubuntu 20.04):
+
+Eine Entwicklungsumgebung erstellen:
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install qemu-guest-agent
+sudo apt install openjdk-11-jdk
+sudo apt remove docker docker.io containerd runc
+sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+// Docker Rootless
+sudo apt install uidmap
+sudo systemctl disable --now docker.service docker.socket
+dockerd-rootless-setuptool.sh install
+
+systemctl --user start docker
+systemctl --user enable docker
+
+git clone https://github.com/wolkenschloss/mycloud.git
+./gradlew build
+```
+
+Testbed zum Laufen kriegen:
+
+```bash
+ssh-keygen
+sudo apt install cloud-image-utils
+sudo apt install cpu-checker
+kvm-ok
+sudo apt install qemu-kvm libvirt-daemon-system
+sudo adduser $USER libvirt
+(relogin)
+```
+
 ## Konvention
 
 Jedes Teilprojekt besteht mindestens aus einem Backend und einem Frontend.
