@@ -43,6 +43,11 @@ abstract public class RootImageTask extends DefaultTask {
     @TaskAction
     public void exec() throws NoSuchAlgorithmException, IOException {
 
+        boolean created = getRootImage().get().getAsFile().getParentFile().mkdirs();
+        if (created) {
+            getLogger().info("Directory created");
+        }
+
         exec(spec -> spec.commandLine("qemu-img")
                 .args("create", "-f", "qcow2", "-F", "qcow2", "-b",
                         getBaseImage().get(),

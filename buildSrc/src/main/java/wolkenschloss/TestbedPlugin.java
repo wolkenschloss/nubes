@@ -8,6 +8,7 @@ import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskProvider;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var cloudInitDir = project.getLayout().getBuildDirectory().dir("cloud-init").get();
         var poolDir = project.getLayout().getBuildDirectory().dir("pool");
         var virshConfigDir = project.getLayout().getBuildDirectory().dir("config");
+        var downloads = project.getLayout().getBuildDirectory().dir("downloads");
 
         extension.getPoolDirectory().set(poolDir);
 
@@ -45,9 +47,8 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getPool().getName().convention("testbed");
         extension.getPool().getPath().convention(poolDir.get().getAsFile().getAbsolutePath());
 
-        var transform = project.getTasks().register("transform", DefaultTask.class, task -> {
-            task.setDescription("Transforms all templates");
-        });
+        var transform = project.getTasks().register("transform", DefaultTask.class,
+                task -> task.setDescription("Transforms all templates"));
 
         extension.getView().getCallbackPort().set(9191);
 
@@ -69,15 +70,17 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var download = project.getTasks().register("download", DownloadTask.class, task -> {
-            task.getBaseImageUrl().convention(extension.getBaseImage().getUrl());
-            task.getSha256Sum().set(extension.getBaseImage().getSha256Sum());
-            task.getBaseImage().set(poolDir.get().file("base.img"));
+            task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
+            var parts = extension.getBaseImage().getUrl().get().split("/");
+            var basename = parts[parts.length - 1];
+            task.getBaseImage().convention(downloads.get().file(basename));
+            task.getDownloads().convention(project.getLayout().getBuildDirectory().dir("downloads"));
         });
 
         var root = project.getTasks().register("root", RootImageTask.class, task -> {
             task.getSize().convention("20G");
-            task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
             task.getBaseImage().convention(download.get().getBaseImage());
+            task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
             task.getRootImageMd5File().set(runDir.get().file("root.md5"));
         });
 
@@ -130,22 +133,19 @@ public class TestbedPlugin implements Plugin<Project> {
                 domainConfig.get()
         ));
 
-        project.getTasks().register("start", DefaultTask.class, task -> {
-            task.dependsOn(readKubeConfig);
-        });
-
+        project.getTasks().register("start", DefaultTask.class,
+                task -> task.dependsOn(readKubeConfig));
 
         project.getTasks().register("destroy", DestroyTask.class, task -> {
             task.getDomain().set(extension.getView().getHostname());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
             task.getDomainXmlConfig().set(domainConfig.get().getOutputFile());
-
             task.getPoolRunFile().set(createPool.get().getPoolRunFile());
             task.getPoolXmlConfig().set(poolConfig.get().getOutputFile());
             task.getRootImageFile().set(root.get().getRootImage());
             task.getRootImageMd5File().set(root.get().getRootImageMd5File());
-            task.getBaseImageFile().set(download.get().getBaseImage());
+            task.getDownloads().set(downloads.get());
             task.getCiDataImageFile().set(cidata.get().getCidata());
             task.getNetworkConfig().set(networkConfig.get().getOutputFile());
             task.getUserData().set(userData.get().getOutputFile());
@@ -168,6 +168,8 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
+
+    @Nonnull
     private String readSshKey(RegularFile sshKeyFile) {
 
         var file = sshKeyFile.getAsFile();
