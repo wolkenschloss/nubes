@@ -71,6 +71,8 @@ openjdk-11-jdk` installiert wurde.
 org.gradle.java.home=/usr/lib/jvm/java-11-openjdk-amd64/
 ```
 
+Siehe auch [Gradle JVM selection](https://www.jetbrains.com/help/idea/2021.1/gradle-jvm-selection.html)
+
 ## Konvention
 
 Jedes Teilprojekt besteht mindestens aus einem Backend und einem Frontend.
