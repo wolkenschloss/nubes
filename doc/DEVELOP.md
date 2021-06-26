@@ -43,36 +43,6 @@ sudo adduser $USER libvirt
 (relogin)
 ```
 
-## Arbeiten mit der IDE
-
-Beim Bau des Projektes mit Gradle wird das JDK 11 sowohl für den 
-Übersetzungsvorgang durch Gradle als auch für die Übersetzung und Ausführung 
-der Projekte vorausgesetzt.
-
-IntelliJ passt seine Konfiguration an die Gradle Build Scripte automatisch 
-an. Beim ersten Import des Projekts in IntelliJ kann das JDK, mit dem Gradle 
-laufen muss, von IntelliJ nicht ohne Hilfe bestimmt werden, da Gradle keine 
-Annahmen über die auf dem Entwicklungsrechner verfügbaren JDKs treffen kann.
-
-Es gibt zwei Möglichkeiten IntelliJ und Gradle bei der Auswahl des JDK zu 
-unterstützen:
-
-1. Nach dem Öffnen des Projekts in IntelliJ das JDK unter `File -> Project 
-   Structure` auswählen.
-2. In der Datei `$HOME/.gradle/gradle.properties` den Wert der Eigenschaft 
-   `org.gradle.java.home` auf den Pfad eines auf dem Entwicklungsrechner 
-   installierten JDK 11 setzen.
-   
-Bei Ubuntu 20.04 könnter die Datei `$HOME/.gradle/gradle.properties` zum 
-Beispiel so aussehen, wenn das JDK 11 zuvor über `sudo apt install 
-openjdk-11-jdk` installiert wurde.
-
-```
-org.gradle.java.home=/usr/lib/jvm/java-11-openjdk-amd64/
-```
-
-Siehe auch [Gradle JVM selection](https://www.jetbrains.com/help/idea/2021.1/gradle-jvm-selection.html)
-
 ## Konvention
 
 Jedes Teilprojekt besteht mindestens aus einem Backend und einem Frontend.
