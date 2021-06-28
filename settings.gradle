@@ -1,14 +1,3 @@
-pluginManagement {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    plugins {
-        id 'io.quarkus' version "1.13.6.Final"
-    }
-}
-
 rootProject.name = 'mycloud'
 include 'services:cookbook:service',
         'services:cookbook:webapp',

@@ -34,7 +34,7 @@ repositories {
 
 dependencies {
     implementation gradleApi()
-    implementation("gradle.plugin.io.quarkus:quarkus-gradle-plugin:1.13.6.Final")
+    implementation "gradle.plugin.io.quarkus:quarkus-gradle-plugin:1.13.7.Final"
     implementation "com.github.spullara.mustache.java:compiler:0.9.10"
     implementation "org.libvirt:libvirt:0.5.2"
     implementation "net.java.dev.jna:jna:5.8.0"
