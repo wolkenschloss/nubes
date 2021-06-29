@@ -5,7 +5,6 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Destroys;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 
@@ -60,7 +59,7 @@ public abstract class DestroyTask extends DefaultTask {
         // StartDomainTask
         Files.deleteIfExists(getKnownHostsFile().getAsFile().get().toPath());
 
-        try (var testbed = new Testbed()) {
+        try (var testbed = new Testbed(getDomain().get())) {
             var deleted = testbed.deleteDomainIfExists(getDomain());
             if (deleted) {
                 getLogger().info("Domain deleted.");
@@ -70,7 +69,7 @@ public abstract class DestroyTask extends DefaultTask {
         Files.deleteIfExists(getDomainXmlConfig().getAsFile().get().toPath());
 
         // CreatePoolTask
-        try (var testbed = new Testbed()) {
+        try (var testbed = new Testbed(getDomain().get())) {
             testbed.deletePoolIfExists(getPoolRunFile());
         }
 

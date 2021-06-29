@@ -2,9 +2,11 @@ package wolkenschloss;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.process.ExecOperations;
 import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
+import wolkenschloss.task.CheckedConsumer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Testbed implements AutoCloseable {
+
+    private final String name;
 
     public void destroyPool(RegularFileProperty poolRunFile) throws IOException, LibvirtException {
         var uuid = UUID.fromString(Files.readString(poolRunFile.getAsFile().get().toPath()));
@@ -87,7 +91,9 @@ public class Testbed implements AutoCloseable {
 
     private final Connect connection;
 
-    public Testbed() throws LibvirtException {
+    @SuppressWarnings("CdiInjectionPointsInspection")
+    public Testbed(String name) throws LibvirtException {
+        this.name = name;
         connection = new Connect("qemu:///system");
     }
 
@@ -121,5 +127,24 @@ public class Testbed implements AutoCloseable {
     // TODO Kandidat für Testbed Klasse
     public boolean poolExistiert(Property<String> poolName) throws LibvirtException {
         return allPools().contains(poolName.get());
+    }
+
+    public <T> T withDomain(CheckedFunction<Domain, T> consumer) throws Throwable {
+
+        try(var domain = new Domain(this, this.name)) {
+            return consumer.apply(domain);
+        }
+    }
+
+    public <T> void withDomain(CheckedConsumer<Domain> method) throws Throwable {
+        try(var domain = new Domain(this, this.name)) {
+            method.accept(domain);
+        }
+    }
+
+
+
+    public SecureShell getExec(ExecOperations operations, RegularFileProperty knownHosts){
+        return new SecureShell(this, operations, knownHosts);
     }
 }

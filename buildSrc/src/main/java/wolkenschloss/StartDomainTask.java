@@ -50,7 +50,7 @@ abstract public class StartDomainTask extends DefaultTask {
     abstract public RegularFileProperty getKnownHostsFile();
 
     @TaskAction
-    public void exec() throws IOException {
+    public void exec() throws Throwable {
         try {
 //            var execute = getProject().findProperty("dry-run") == null;
 
@@ -107,20 +107,21 @@ abstract public class StartDomainTask extends DefaultTask {
         }
     }
 
-    public void updateKnownHosts(String serverKey) {
+    public void updateKnownHosts(String serverKey) throws Throwable {
         try {
-            var domain = new Domain(getDomain().get(), 10);
+            try (var testbed = new Testbed(getDomain().get())) {
+                var ip = testbed.withDomain(Domain::getTestbedHostAddress);
 
-            var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
-            var attributes = PosixFilePermissions.asFileAttribute(permissions);
-            var path = getKnownHostsFile().get().getAsFile().toPath();
-            var file = Files.createFile(path, attributes);
+                var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+                var attributes = PosixFilePermissions.asFileAttribute(permissions);
+                var path = getKnownHostsFile().get().getAsFile().toPath();
+                var file = Files.createFile(path, attributes);
 
-            Files.writeString(
-                    file.toAbsolutePath(),
-                    String.format("%s %s", domain.getTestbedHostAddress(), serverKey),
-                    StandardOpenOption.WRITE);
-
+                Files.writeString(
+                        file.toAbsolutePath(),
+                        String.format("%s %s", ip, serverKey),
+                        StandardOpenOption.WRITE);
+            }
         } catch (LibvirtException | IOException | InterruptedException e) {
             throw new GradleScriptException("Die Datei known_hosts konnte nicht vollständig aktualisiert werden.", e);
         }

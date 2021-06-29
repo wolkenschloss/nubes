@@ -34,19 +34,23 @@ public abstract class ReadKubeConfigTask extends DefaultTask {
     abstract public ExecOperations getExecOperations();
 
     @TaskAction
-    public void read() throws IOException, LibvirtException, InterruptedException {
+    public void read() throws Throwable {
+        try (var testbed = new Testbed(getDomainName().get())) {
+            var config = testbed.withDomain(domain -> {
+                // TODO Kandidat für Testbed Klasse
+                var ip = domain.getTestbedHostAddress();
 
-        // TODO Kandidat für Testbed Klasse
-        var domain = new Domain(getDomainName().get(), 10);
-        var ip = domain.getTestbedHostAddress();
+                try (var stdout = new ByteArrayOutputStream()) {
+                    getExecOperations().exec(e -> {
+                        e.commandLine("ssh");
+                        e.args("-o", String.format("UserKnownHostsFile=%s", getKnownHostsFile().get().getAsFile().getAbsolutePath()),
+                                ip, "microk8s", "config");
+                        e.setStandardOutput(stdout);
+                    }).assertNormalExitValue();
 
-        try (var stdout = new ByteArrayOutputStream()) {
-            getExecOperations().exec(e -> {
-                e.commandLine("ssh");
-                e.args("-o", String.format("UserKnownHostsFile=%s", getKnownHostsFile().get().getAsFile().getAbsolutePath()),
-                        ip, "microk8s", "config");
-                e.setStandardOutput(stdout);
-            }).assertNormalExitValue();
+                    return stdout.toString();
+                }
+            });
 
             var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
             var attributes = PosixFilePermissions.asFileAttribute(permissions);
@@ -55,7 +59,7 @@ public abstract class ReadKubeConfigTask extends DefaultTask {
 
             Files.writeString(
                     file.toAbsolutePath(),
-                    stdout.toString(),
+                    config,
                     StandardOpenOption.WRITE);
         }
     }
