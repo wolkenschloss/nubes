@@ -8,6 +8,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 import wolkenschloss.Domain;
+import wolkenschloss.SecureShell;
 import wolkenschloss.Testbed;
 
 import javax.inject.Inject;
@@ -88,8 +89,11 @@ public abstract class StatusTask extends DefaultTask {
         try (var testbed = new Testbed(getDomainName().get())) {
 
             check("Testbed", testbed::withDomain, (CheckedConsumer<Domain>) domain -> {
-                check("SSH", testbed.getExec(getExecOperations(), getKnownHostsFile()).ssh("uname"), result -> {
-                    evaluate("stdout", result.getExitValue(), val -> val == 0);
+
+                SecureShell shell = testbed.getExec(getExecOperations(), getKnownHostsFile());
+                check("SSH", shell.execute("uname"), result -> {
+                    info("stdout", result::getStdout);
+                    info("exit code", result::getExitValue);
                 });
 
                 checkResult("IP Address", domain::getTestbedHostAddress, ip -> {

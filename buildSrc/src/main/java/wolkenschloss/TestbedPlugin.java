@@ -98,6 +98,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
             task.getPoolRunFile().set(runDir.get().file("pool.run"));
+            task.getDomainName().set(extension.getView().getHostname());
             task.dependsOn(root, cidata);
         });
 
