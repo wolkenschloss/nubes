@@ -15,6 +15,8 @@ abstract public class CreatePoolTask extends DefaultTask {
     @Input
     public abstract Property<String> getPoolName();
 
+    @Input abstract Property<String> getDomainName();
+
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getXmlDescription();
@@ -25,7 +27,7 @@ abstract public class CreatePoolTask extends DefaultTask {
     @TaskAction
     public void exec() {
 
-        try (var testbed = new Testbed()) {
+        try (var testbed = new Testbed(getDomainName().get())) {
 
             if (getPoolRunFile().get().getAsFile().exists()) {
                 testbed.destroyPool(getPoolRunFile());

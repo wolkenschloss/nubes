@@ -4,51 +4,69 @@ import com.jayway.jsonpath.JsonPath;
 import org.gradle.api.GradleException;
 import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
-import org.libvirt.StoragePool;
+import wolkenschloss.task.CheckedConsumer;
+import wolkenschloss.task.Registry;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 // TODO Kandidat für Testbed Klasse
-public class Domain {
-    private final String name;
-    private final int retries;
+public class Domain implements AutoCloseable {
 
-    public Domain(String name, int retries){
-        this.name = name;
-        this.retries = retries;
+//    private final String name;
+//    private final int retries;
+
+    private final org.libvirt.Domain domain;
+
+//    public Domain(@SuppressWarnings("CdiInjectionPointsInspection") String name, int retries){
+//        this.name = name;
+//        this.retries = retries;
+//    }
+
+    public Domain(Testbed testbed, String name) throws LibvirtException {
+        this.domain = testbed.getConnection().domainLookupByName(name);
     }
 
-    public String getTestbedHostAddress() throws LibvirtException, InterruptedException {
+    public Registry getRegistry() throws Throwable {
+        var testbed = getTestbedHostAddress();
+        var registry = new Registry(String.format("%s:32000", testbed));
 
-        var connection = new org.libvirt.Connect("qemu:///system");
-        var domain = connection.domainLookupByName(name);
+        return registry.connect();
+    }
 
-        String result = getInterfaces(domain);
+    public void withRegistry(CheckedConsumer<Registry> consumer) throws Throwable {
+        consumer.accept(getRegistry());
+    }
 
-        // Parse Result
-        var interfaceName = "enp1s0";
+    public String getTestbedHostAddress() throws Throwable {
 
-        var path = String.format("$.return[?(@.name==\"%s\")].ip-addresses[?(@.ip-address-type==\"ipv4\")].ip-address", interfaceName);
+                String result = getInterfaces(10);
 
-        ArrayList<String> ipAddresses = JsonPath.parse(result).read(path);
+                // Parse Result
+                var interfaceName = "enp1s0";
 
-        if (ipAddresses.size() != 1) {
-            throw new GradleException(
-                    String.format("Interface %s has %d IP-Addresses. I do not know what to do now.",
-                            interfaceName,
-                            ipAddresses.size()));
+                var path = String.format("$.return[?(@.name==\"%s\")].ip-addresses[?(@.ip-address-type==\"ipv4\")].ip-address", interfaceName);
+
+                ArrayList<String> ipAddresses = JsonPath.parse(result).read(path);
+
+                if (ipAddresses.size() != 1) {
+                    throw new GradleException(
+                            String.format("Interface %s has %d IP-Addresses. I do not know what to do now.",
+                                    interfaceName,
+                                    ipAddresses.size()));
+                }
+
+                return ipAddresses.stream()
+                        .findFirst()
+                        .orElseThrow(() -> new GradleException("IP Adresse des Prüfstandes kann nicht ermittelt werden."));
+
         }
 
-        return ipAddresses.stream()
-                .findFirst()
-                .orElseThrow(() -> new GradleException("IP Adresse des Prüfstandes kann nicht ermittelt werden."));
-    }
 
     // Erfordert die Installation des Paketes qemu-guest-agent in der VM.
     // Gebe 30 Sekunden Timeout. Der erste Start könnte etwas länger dauern.
-    private String getInterfaces(org.libvirt.Domain domain) throws LibvirtException, InterruptedException {
-        int retry = this.retries;
+    private String getInterfaces(int retries) throws LibvirtException, InterruptedException {
+        int retry = retries;
         while (true) {
             try {
                 return domain.qemuAgentCommand("{\"execute\": \"guest-network-get-interfaces\"}", 30, 0);
@@ -61,18 +79,19 @@ public class Domain {
         }
     }
 
-    public DomainInfo getInfo() throws LibvirtException {
-        var connection = new org.libvirt.Connect("qemu:///system");
-        var domain = connection.domainLookupByName(name);
+    public void withInfo(CheckedConsumer<DomainInfo> consumer) throws Throwable {
         var info = domain.getInfo();
-        connection.close();
-        return info;
+        consumer.accept(info);
     }
 
-    public void withPool(String name, Consumer<StoragePool> consumer) throws LibvirtException {
-        var connection = new org.libvirt.Connect("qemu:///system");
-        var pool = connection.storagePoolLookupByName(name);
-        consumer.accept(pool);
-        connection.close();
+    public Pool getPool(String name) {
+        return new Pool(name);
+    }
+
+
+
+    @Override
+    public void close() throws Exception {
+        this.domain.free();
     }
 }

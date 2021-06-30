@@ -7,6 +7,7 @@ import org.gradle.api.Project;
 import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskProvider;
+import wolkenschloss.task.StatusTask;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
