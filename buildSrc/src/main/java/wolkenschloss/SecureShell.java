@@ -49,36 +49,32 @@ public class SecureShell {
         }
     }
 
-    public CheckedConsumer<CheckedConsumer<Result>> execute(Object... args) throws Throwable {
-//        e.args("-o", String.format("UserKnownHostsFile=%s", getKnownHostsFile().get().getAsFile().getAbsolutePath()),
-//                ip, "uname", "-nrom");
+    public CheckedConsumer<CheckedConsumer<Result>> execute(Object... args) {
 
-        return (CheckedConsumer<Result> consumer) -> {
-            testbed.withDomain(domain -> {
-                var ip = domain.getTestbedHostAddress();
+        return (CheckedConsumer<Result> consumer) -> testbed.withDomain(domain -> {
+            var ip = domain.getTestbedHostAddress();
 
-                var arguments = new Vector<>();
-                arguments.addAll(Arrays.asList("-o",
-                        String.format("UserKnownHostsFile=%s", this.knownHostFile.get().getAsFile().getPath()),
-                        ip));
-                arguments.addAll(Arrays.asList(args));
+            var arguments = new Vector<>();
+            arguments.addAll(Arrays.asList("-o",
+                    String.format("UserKnownHostsFile=%s", this.knownHostFile.get().getAsFile().getPath()),
+                    ip));
+            arguments.addAll(Arrays.asList(args));
 
-                try (var stdout = new ByteArrayOutputStream()) {
-                    try (var stderr = new ByteArrayOutputStream()) {
-                        var result = operations.exec(spec -> {
-                            spec.commandLine("ssh")
-                                    .args(arguments)
-                                    .setStandardOutput(stdout)
-                                    .setErrorOutput(stderr);
-                        }).assertNormalExitValue();
+            try (var stdout = new ByteArrayOutputStream()) {
+                try (var stderr = new ByteArrayOutputStream()) {
+                    var result = operations.exec(spec -> {
+                        spec.commandLine("ssh")
+                                .args(arguments)
+                                .setStandardOutput(stdout)
+                                .setErrorOutput(stderr);
+                    }).assertNormalExitValue();
 
-                        consumer.accept(new Result(
-                                stdout.toString().trim(),
-                                stderr.toString().trim(),
-                                result.getExitValue()));
-                    }
+                    consumer.accept(new Result(
+                            stdout.toString().trim(),
+                            stderr.toString().trim(),
+                            result.getExitValue()));
                 }
-            });
-        };
+            }
+        });
     }
 }

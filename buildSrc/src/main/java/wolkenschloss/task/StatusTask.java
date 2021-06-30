@@ -102,7 +102,7 @@ public abstract class StatusTask extends DefaultTask {
                     info("Pool Autostart", p::getAutostart);
                     info("Pool isActive", p::isActive);
                     evaluate2("Pool Volumes", p::listVolumes,
-                            status -> status.check(vols -> Arrays.stream(vols).count() == 3)
+                            status -> status.check(vols -> Arrays.asList(vols).contains("root.qcow2") && Arrays.asList(vols).contains("cidata.img"))
                                     .ok(vols -> String.join(", ", vols))
                                     .error("Nicht genau drei Volumes")
                     );
