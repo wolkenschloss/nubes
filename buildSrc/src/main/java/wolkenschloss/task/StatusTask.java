@@ -12,12 +12,9 @@ import wolkenschloss.SecureShell;
 import wolkenschloss.Testbed;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -38,7 +35,7 @@ public abstract class StatusTask extends DefaultTask {
     @Inject
     abstract public ExecOperations getExecOperations();
 
-    private <T> void evaluate(String label, T value, Predicate<T> requiredCondition) {
+    private <T> void check(String label, T value, Predicate<T> requiredCondition) {
 
         if (requiredCondition.test(value)) {
             getLogger().quiet(String.format("✓ %-15s: %s", label, value));
@@ -63,16 +60,6 @@ public abstract class StatusTask extends DefaultTask {
         }
     }
 
-    private <T> void checkResult(String label, CheckedSupplier<T> fn, Consumer<T> with) {
-        try {
-            T result = fn.apply();
-            getLogger().quiet(String.format("✓ %-15s: %s", label, result));
-            with.accept(result);
-        } catch (Throwable e) {
-            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
-        }
-    }
-
     private <T> void check(String label, CheckedConsumer<CheckedConsumer<T>> fn, CheckedConsumer<T> with) {
         try {
             fn.accept(with);
@@ -90,34 +77,21 @@ public abstract class StatusTask extends DefaultTask {
 
             check("Testbed", testbed::withDomain, (CheckedConsumer<Domain>) domain -> {
 
+                info("IP Address", domain::getTestbedHostAddress);
+
                 SecureShell shell = testbed.getExec(getExecOperations(), getKnownHostsFile());
-                check("SSH", shell.execute("uname"), result -> {
+                check("ssh uname", shell.execute("uname", "-norm"), result -> {
                     info("stdout", result::getStdout);
                     info("exit code", result::getExitValue);
                 });
 
-                checkResult("IP Address", domain::getTestbedHostAddress, ip -> {
-                    try (var stdout = new ByteArrayOutputStream()) {
-                        var result = getExecOperations().exec(e -> {
-                            e.commandLine("ssh");
-                            e.args("-o", String.format("UserKnownHostsFile=%s", getKnownHostsFile().get().getAsFile().getAbsolutePath()),
-                                    ip, "uname", "-nrom");
-                            e.setStandardOutput(stdout);
-                        });
-                        evaluate("SSH Connection", result.getExitValue(), exitCode -> exitCode == 0);
-                        info("uname", () -> stdout.toString().trim());
-                    } catch (IOException e) {
-                        getLogger().error("Something went wrong", e);
-                    }
-                });
-
                 check("Connect", domain::withInfo, info -> {
-                    evaluate("State", info.state, s -> s == DomainInfo.DomainState.VIR_DOMAIN_RUNNING);
-                    evaluate("Memory (MB)", info.memory / 1024, m -> m >= 4096);
-                    evaluate("Virtual CPU's", info.nrVirtCpu, n -> n > 1);
+                    check("State", info.state, s -> s == DomainInfo.DomainState.VIR_DOMAIN_RUNNING);
+                    check("Memory (MB)", info.memory / 1024, m -> m >= 4096);
+                    check("Virtual CPU's", info.nrVirtCpu, n -> n > 1);
                 });
 
-                evaluate2("K8s configuration", () -> getKubeConfigFile().getAsFile().get().toPath(),
+                evaluate2("K8s config", () -> getKubeConfigFile().getAsFile().get().toPath(),
                         status -> status.check(Files::exists)
                                 .ok(Path::toString)
                                 .error("missing"));
