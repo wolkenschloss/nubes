@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -51,7 +51,7 @@ abstract public class DownloadTask extends DefaultTask {
     }
 
     @Internal
-    abstract protected DirectoryProperty getDownloads();
+    public abstract DirectoryProperty getDownloads();
 
     @OutputFile
     abstract public RegularFileProperty getBaseImage();

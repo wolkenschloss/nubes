@@ -7,7 +7,6 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
-import org.libvirt.LibvirtException;
 import wolkenschloss.Domain;
 import wolkenschloss.Testbed;
 
@@ -87,8 +86,8 @@ public abstract class StatusTask extends DefaultTask {
         getLogger().quiet("Status of {}", getDomainName().get());
 
         try (var testbed = new Testbed(getDomainName().get())) {
-            testbed.withDomain(domain -> {
 
+            check("Testbed", testbed::withDomain, (CheckedConsumer<Domain>) domain -> {
                 check("SSH", testbed.getExec(getExecOperations(), getKnownHostsFile()).ssh("uname"), result -> {
                     evaluate("stdout", result.getExitValue(), val -> val == 0);
                 });
@@ -120,7 +119,6 @@ public abstract class StatusTask extends DefaultTask {
                                 .error("missing"));
 
                 var pool = domain.getPool(getPoolName().get());
-
                 check("Pool", pool::run, p -> {
                     info("Pool Name", p::getName);
                     info("Pool Autostart", p::getAutostart);
