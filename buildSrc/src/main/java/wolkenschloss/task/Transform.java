@@ -27,7 +27,7 @@ public abstract class Transform extends DefaultTask {
      * Platzhalter Werte, mit denen die Vorlage gefüllt wird.
      * @return Werte, mit denen die Platzhalter einer Vorlage gefüllt werden.
      */
-    @Input
+    @Internal
     abstract public MapProperty<String, Object> getScope();
 
     /**

@@ -7,5 +7,5 @@ import java.io.Serializable;
 public interface TestbedPool extends Serializable {
 
     Property<String> getName();
-    Property<String> getPath();
+//    Property<String> getPath();
 }

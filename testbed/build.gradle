@@ -14,6 +14,6 @@ testbed {
         name = "testbed"
     }
     pool {
-        name = "testbed"
+        name = "mycloud"
     }
 }

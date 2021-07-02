@@ -1,10 +1,9 @@
 package wolkenschloss;
 
-import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleScriptException;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.gradle.api.*;
 import org.gradle.api.file.RegularFile;
+import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.task.*;
 import wolkenschloss.task.status.StatusTask;
@@ -19,18 +18,19 @@ public class TestbedPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
 
-        BaseTestbedExtension extension = project.getObjects().newInstance(TestbedExtension.class);
-        project.getExtensions().add("testbed", extension);
-
-        var src = project.getLayout().getProjectDirectory().dir("src");
-        var runDir = project.getLayout().getBuildDirectory().dir("run");
-        var cloudInitDir = project.getLayout().getBuildDirectory().dir("cloud-init").get();
-        var poolDir = project.getLayout().getBuildDirectory().dir("pool");
-        var virshConfigDir = project.getLayout().getBuildDirectory().dir("config");
+        BaseTestbedExtension extension = project.getExtensions()
+                .create("testbed", BaseTestbedExtension.class);
 
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
-        extension.getPoolDirectory().set(poolDir);
+        // Set build directories
+        var buildDirectory = project.getLayout().getBuildDirectory();
+        extension.getPoolDirectory().set(buildDirectory.dir("pool"));
+        extension.getRunDirectory().set(buildDirectory.dir("run"));
+        extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
+        extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
+
+        extension.getSourceDirectory().set(project.getLayout().getProjectDirectory().dir("src"));
 
         extension.getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getView().getUser().convention(System.getenv("USER"));
@@ -40,32 +40,29 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getView().getLocale().convention(System.getenv("LANG"));
         extension.getView().getHostAddress().convention(IpUtil.getHostAddress());
 
-        extension.getCloudInitDirectory().set(cloudInitDir);
-        extension.getConfigDirectory().set(virshConfigDir);
         extension.getRootImageName().convention("root.qcow2");
         extension.getCidataImageName().convention("cidata.img");
 
 
         extension.getPool().getName().convention("testbed");
-        extension.getPool().getPath().convention(poolDir.get().getAsFile().getAbsolutePath());
 
         extension.getView().getCallbackPort().set(9191);
 
-        project.getTasks().register("clean", Clean.class, task -> {
-        });
-
         var networkConfig = createTransformationTask(project, "CloudInit",
-                src.file("network-config.mustache"),
-                cloudInitDir.file("network-config"));
+                extension.getSourceDirectory().file("network-config.mustache"),
+                extension.getGeneratedCloudInitDirectory().file("network-config"));
 
         var userData = createTransformationTask(project, "UserData",
-                src.file("user-data.mustache"),
-                cloudInitDir.file("user-data"));
+                extension.getSourceDirectory().file("user-data.mustache"),
+                extension.getGeneratedCloudInitDirectory().file("user-data"));
 
         var cidata = project.getTasks().register("cidata", CreateDataSource.class, task -> {
-            task.getCidata().convention(poolDir.get().file(extension.getCidataImageName()));
+            // InputFiles
             task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
             task.getUserData().convention(userData.get().getOutputFile());
+
+            // OutputFile
+            task.getCidata().convention(extension.getPoolDirectory().file(extension.getCidataImageName()));
         });
 
         var download = project.getTasks().register("download", Download.class, task -> {
@@ -79,22 +76,22 @@ public class TestbedPlugin implements Plugin<Project> {
         var root = project.getTasks().register("root", CreateRootImage.class, task -> {
             task.getSize().convention("20G");
             task.getBaseImage().convention(download.get().getBaseImage());
-            task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
-            task.getRootImageMd5File().set(runDir.get().file("root.md5"));
+            task.getRootImage().convention(extension.getPoolDirectory().file(extension.getRootImageName()));
+            task.getRootImageMd5File().set(extension.getRunDirectory().file("root.md5"));
         });
 
         var poolConfig = createTransformationTask(project, "Pool",
-                src.file("pool.xml.mustache"),
-                virshConfigDir.get().file("pool.xml"));
+                extension.getSourceDirectory().file("pool.xml.mustache"),
+                extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
 
         var domainConfig = createTransformationTask(project, "Domain",
-                src.file("domain.xml.mustache"),
-                virshConfigDir.get().file("domain.xml"));
+                extension.getSourceDirectory().file("domain.xml.mustache"),
+                extension.getGeneratedVirshConfigDirectory().file("domain.xml"));
 
         var createPool = project.getTasks().register("createPool", CreatePool.class, task -> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
-            task.getPoolRunFile().set(runDir.get().file("pool.run"));
+            task.getPoolRunFile().set(extension.getRunDirectory().file("pool.run"));
             task.getDomainName().set(extension.getView().getHostname());
             task.dependsOn(root, cidata);
         });
@@ -107,7 +104,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getPort().set(extension.getView().getCallbackPort());
             task.getXmlDescription().set(domainConfig.get().getOutputFile());
             task.getPoolRunFile().set(createPool.get().getPoolRunFile());
-            task.getKnownHostsFile().set(runDir.get().file("known_hosts"));
+            task.getKnownHostsFile().set(extension.getRunDirectory().file("known_hosts"));
         });
 
         var readKubeConfig = project.getTasks().register("readKubeConfig", CopyKubeConfig.class, task -> {
@@ -115,7 +112,7 @@ public class TestbedPlugin implements Plugin<Project> {
             // vorher ausgeführt sein.
 //            task.dependsOn(updateKnownHosts);
             task.getDomainName().set(extension.getView().getHostname());
-            task.getKubeConfigFile().convention(runDir.get().file("kubeconfig"));
+            task.getKubeConfigFile().convention(extension.getRunDirectory().file("kubeconfig"));
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
         });
 
@@ -127,9 +124,8 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getDistributionName().set(extension.getBaseImage().getName());
         });
 
-        project.getTasks().withType(Transform.class).configureEach(t -> {
-            t.getScope().convention(extension.asPropertyMap(project.getObjects()));
-        });
+        project.getTasks().withType(Transform.class).configureEach(
+                configureTransformTask(extension, project.getObjects()));
 
         project.getTasks().register("start", DefaultTask.class,
                 task -> task.dependsOn(readKubeConfig));
@@ -149,11 +145,17 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
+    private Action<Transform> configureTransformTask(BaseTestbedExtension extension, ObjectFactory objects) {
+        return (Transform task) -> {
+            task.getScope().convention(extension.asPropertyMap(objects));
+        };
+    }
+
     private TaskProvider<Transform> createTransformationTask(
             Project project,
             String name,
-            RegularFile template,
-            RegularFile output) {
+            Provider<RegularFile> template,
+            Provider<RegularFile> output) {
         return project.getTasks().register("transform" + name, Transform.class, task -> {
             task.getTemplate().set(template);
             task.getOutputFile().set(output);
