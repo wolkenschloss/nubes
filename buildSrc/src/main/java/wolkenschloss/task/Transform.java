@@ -78,20 +78,18 @@ public abstract class Transform extends DefaultTask {
         getLogger().info("Create Directory for Output File: {}",
         getOutputFile().get().getAsFile().getParentFile().mkdirs());
 
-            try {
-                var reader = new InputStreamReader(new FileInputStream(file.getAsFile()), StandardCharsets.UTF_8);
-                Mustache mustache = factory.compile(reader, file.getAsFile().getName());
-                StringWriter writer = new StringWriter();
-                mustache.execute(writer, scopes);
-                writer.flush();
+        try(var input = new FileInputStream(file.getAsFile())) {
+            try (var reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
 
-                var write = new FileWriter(getOutputFile().get().getAsFile());
-                write.write(writer.toString());
-                write.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new GradleScriptException("Can not process template", e);
+                final Mustache mustache = factory.compile(reader, file.getAsFile().getName());
+                try (var writer = new FileWriter(getOutputFile().get().getAsFile()))
+                {
+                    mustache.execute(writer, scopes);
+                    writer.flush();
+                }
             }
+        } catch (IOException e) {
+            throw new GradleScriptException("Can not process template", e);
+        }
     }
 }
