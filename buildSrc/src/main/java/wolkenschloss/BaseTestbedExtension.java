@@ -3,8 +3,12 @@ package wolkenschloss;
 import org.gradle.api.Action;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
+
+import java.util.Map;
 
 public interface BaseTestbedExtension {
     RegularFileProperty getSshKeyFile();
@@ -38,4 +42,11 @@ public interface BaseTestbedExtension {
     DirectoryProperty getCloudInitDirectory();
 
     DirectoryProperty getConfigDirectory();
+
+    /**
+     * Liefert die Beschreibung des Prüfstandes als Map
+     * @param objects Tja
+     * @return
+     */
+    Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects);
 }

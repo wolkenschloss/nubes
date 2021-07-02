@@ -4,7 +4,6 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleScriptException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.task.*;
@@ -50,19 +49,16 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getPool().getName().convention("testbed");
         extension.getPool().getPath().convention(poolDir.get().getAsFile().getAbsolutePath());
 
-        var transform = project.getTasks().register("transform", DefaultTask.class,
-                task -> task.setDescription("Transforms all templates"));
-
         extension.getView().getCallbackPort().set(9191);
 
         project.getTasks().register("clean", Clean.class, task -> {
         });
 
-        var networkConfig = createTransformationTask(project,extension, "CloudInit",
+        var networkConfig = createTransformationTask(project, "CloudInit",
                 src.file("network-config.mustache"),
                 cloudInitDir.file("network-config"));
 
-        var userData = createTransformationTask(project,extension, "UserData",
+        var userData = createTransformationTask(project, "UserData",
                 src.file("user-data.mustache"),
                 cloudInitDir.file("user-data"));
 
@@ -87,11 +83,11 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getRootImageMd5File().set(runDir.get().file("root.md5"));
         });
 
-        var poolConfig = createTransformationTask(project, extension, "Pool",
+        var poolConfig = createTransformationTask(project, "Pool",
                 src.file("pool.xml.mustache"),
                 virshConfigDir.get().file("pool.xml"));
 
-        var domainConfig = createTransformationTask(project, extension, "Domain",
+        var domainConfig = createTransformationTask(project, "Domain",
                 src.file("domain.xml.mustache"),
                 virshConfigDir.get().file("domain.xml"));
 
@@ -131,12 +127,9 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getDistributionName().set(extension.getBaseImage().getName());
         });
 
-        transform.configure(t -> t.dependsOn(
-                networkConfig.get(),
-                userData.get(),
-                poolConfig.get(),
-                domainConfig.get()
-        ));
+        project.getTasks().withType(Transform.class).configureEach(t -> {
+            t.getScope().convention(extension.asPropertyMap(project.getObjects()));
+        });
 
         project.getTasks().register("start", DefaultTask.class,
                 task -> task.dependsOn(readKubeConfig));
@@ -156,17 +149,12 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
-    private <T extends FileSystemLocation> TaskProvider<Transform> createTransformationTask(
+    private TaskProvider<Transform> createTransformationTask(
             Project project,
-            BaseTestbedExtension extension,
             String name,
             RegularFile template,
             RegularFile output) {
         return project.getTasks().register("transform" + name, Transform.class, task -> {
-            task.getRootImageName().set(extension.getRootImageName());
-            task.getCidataImageName().set(extension.getCidataImageName());
-            task.getView().set(extension.getView());
-            task.getPool().set(extension.getPool());
             task.getTemplate().set(template);
             task.getOutputFile().set(output);
         });
@@ -179,7 +167,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var file = sshKeyFile.getAsFile();
 
         try {
-            return Files.readString(file.toPath());
+            return Files.readString(file.toPath()).trim();
         } catch (IOException e) {
             throw new GradleScriptException("Can not read public ssh key", e);
         }

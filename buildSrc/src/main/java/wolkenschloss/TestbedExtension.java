@@ -5,8 +5,10 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 public class TestbedExtension implements BaseTestbedExtension {
 
@@ -82,6 +84,34 @@ public class TestbedExtension implements BaseTestbedExtension {
     public DirectoryProperty getConfigDirectory() {
         return configDirectory;
     }
+
+    @Override
+    public Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
+        var property = objects.mapProperty(String.class, Object.class);
+        property.put("user", getView().getUser());
+        property.put("getSshKey", getView().getSshKey());
+        property.put("hostname", getView().getHostname());
+        property.put("fqdn", getView().getFqdn());
+        property.put("locale", getView().getLocale());
+
+        var callback = objects.mapProperty(String.class, Object.class);
+        callback.put("ip", getView().getHostAddress());
+        callback.put("port", getView().getCallbackPort());
+        property.put("callback", callback);
+
+        var disks = objects.mapProperty(String.class, Object.class);
+        disks.put("root", getRootImageName());
+        disks.put("cidata", getCidataImageName());
+        property.put("disks", disks);
+
+        var pool = objects.mapProperty(String.class, Object.class);
+        pool.put("name", getPool().getName());
+        pool.put("directory", getPool().getPath());
+        property.put("pool", pool);
+
+        return property;
+    }
+
 
     public DirectoryProperty getCloudInitDirectory() {
         return cloudInitDirectory;

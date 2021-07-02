@@ -7,30 +7,21 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.provider.Property;
+import org.gradle.api.provider.MapProperty;
 import org.gradle.api.tasks.*;
-import wolkenschloss.TestbedPool;
-import wolkenschloss.TestbedView;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 // Verarbeitet eine Vorlage
 @CacheableTask
 public abstract class Transform extends DefaultTask {
 
     @Input
-    abstract public Property<String> getRootImageName();
-
-    @Input
-    abstract public Property<String> getCidataImageName();
-
-    @Input
-    abstract public Property<TestbedView> getView();
-
-    @Input
-    abstract public Property<TestbedPool> getPool();
+    abstract public MapProperty<String, Object> getScope();
 
     @InputFiles
     @SkipWhenEmpty
@@ -43,25 +34,6 @@ public abstract class Transform extends DefaultTask {
     @TaskAction
     public void machMal() {
         getLogger().info("Running '{}' with:", this.getName());
-
-        var scopes = new HashMap<String, Object>();
-        scopes.put("user", getView().get().getUser().get());
-        scopes.put("getSshKey", getView().get().getSshKey().get());
-        scopes.put("hostname", getView().get().getHostname().get());
-        scopes.put("fqdn", getView().get().getFqdn().get());
-        scopes.put("locale", getView().get().getLocale().get());
-
-        var callback = new HashMap<String, Object>();
-        callback.put("ip", getView().get().getHostAddress().get());
-        callback.put("port", getView().get().getCallbackPort().get());
-
-        var disks = new HashMap<String, Object>();
-        disks.put("root", getRootImageName().get());
-        disks.put("cidata", getCidataImageName().get());
-
-        scopes.put("callback", callback);
-        scopes.put("pool", getPool().get().toTemplateScope());
-        scopes.put("disks", disks);
 
         RegularFile file = getTemplate().get();
         getLogger().info("Processing {}", file.getAsFile());
@@ -77,7 +49,7 @@ public abstract class Transform extends DefaultTask {
 
                 try (var writer = new FileWriter(getOutputFile().get().getAsFile()))
                 {
-                    mustache.execute(writer, scopes);
+                    mustache.execute(writer, getScope().get());
                     writer.flush();
                 }
             }
