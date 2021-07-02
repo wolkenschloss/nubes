@@ -16,30 +16,41 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-// Verarbeitet eine Vorlage
+/**
+ * Füllt die Platzhalter einer Vorlage mit Werten und gibt
+ * das Ergebnis in einer Datei aus.
+ */
 @CacheableTask
 public abstract class Transform extends DefaultTask {
 
+    /**
+     * Platzhalter Werte, mit denen die Vorlage gefüllt wird.
+     * @return Werte, mit denen die Platzhalter einer Vorlage gefüllt werden.
+     */
     @Input
     abstract public MapProperty<String, Object> getScope();
 
-    @InputFiles
+    /**
+     * @return Eine Datei, die die Vorlage enthält
+     */
+    @InputFile
     @SkipWhenEmpty
     @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getTemplate();
 
+    /**
+     * @return Eine Datei, in welche die Ausgabe geschrieben wird.
+     */
     @OutputFile
     public abstract RegularFileProperty getOutputFile();
 
     @TaskAction
-    public void machMal() {
-        getLogger().info("Running '{}' with:", this.getName());
-
+    public void transform() {
         RegularFile file = getTemplate().get();
-        getLogger().info("Processing {}", file.getAsFile());
+        getLogger().info("Transforming {}", file.getAsFile());
 
-        getLogger().info("Create Directory for Output File: {}",
-        getOutputFile().get().getAsFile().getParentFile().mkdirs());
+        //noinspection ResultOfMethodCallIgnored
+        getOutputFile().get().getAsFile().getParentFile().mkdirs();
 
         try(var input = new FileInputStream(file.getAsFile())) {
             try (var reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
