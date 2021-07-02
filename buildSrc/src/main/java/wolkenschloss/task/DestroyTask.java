@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
@@ -7,6 +7,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Destroys;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
+import wolkenschloss.Testbed;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,9 +32,6 @@ public abstract class DestroyTask extends DefaultTask {
 
     @Destroys
     abstract public RegularFileProperty getRootImageFile();
-
-    @Destroys
-    abstract public DirectoryProperty getDownloads();
 
     @Destroys
     abstract public RegularFileProperty getCiDataImageFile();
@@ -78,13 +76,6 @@ public abstract class DestroyTask extends DefaultTask {
         // RootImageTask
         Files.deleteIfExists(getRootImageMd5File().getAsFile().get().toPath());
         Files.deleteIfExists(getRootImageFile().getAsFile().get().toPath());
-
-        // Download
-        for (Path path : Files.list(getDownloads().getAsFile().get().toPath()).collect(Collectors.toList())) {
-            Files.deleteIfExists(path);
-        }
-
-        Files.deleteIfExists(getDownloads().getAsFile().get().toPath());
 
         // CiDataTask
         Files.deleteIfExists(getCiDataImageFile().getAsFile().get().toPath());

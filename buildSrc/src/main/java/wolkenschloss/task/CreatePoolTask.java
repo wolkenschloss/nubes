@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -6,6 +6,7 @@ import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
+import wolkenschloss.Testbed;
 
 import java.nio.file.Files;
 
@@ -15,7 +16,8 @@ abstract public class CreatePoolTask extends DefaultTask {
     @Input
     public abstract Property<String> getPoolName();
 
-    @Input abstract Property<String> getDomainName();
+    @Input
+    public abstract Property<String> getDomainName();
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)

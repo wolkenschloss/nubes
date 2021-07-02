@@ -1,15 +1,18 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.GradleScriptException;
-import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.process.ExecOperations;
+import wolkenschloss.Distribution;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -18,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 @CacheableTask
 abstract public class DownloadTask extends DefaultTask {
@@ -33,6 +37,9 @@ abstract public class DownloadTask extends DefaultTask {
 
     @Input
     abstract public Property<String> getBaseImageLocation();
+
+    @Input
+    abstract public Property<String> getDistributionName();
 
     private URL getBaseImageUrl() throws MalformedURLException {
         return new URL(getBaseImageLocation().get());
@@ -51,9 +58,6 @@ abstract public class DownloadTask extends DefaultTask {
     }
 
     @Internal
-    abstract protected DirectoryProperty getDownloads();
-
-    @OutputFile
     abstract public RegularFileProperty getBaseImage();
 
     @Inject
@@ -75,17 +79,22 @@ abstract public class DownloadTask extends DefaultTask {
     private void changePermissions() {
 
         var file = new File(getBaseImage().getAsFile().get().toPath().toString());
+        var dir = file.getParentFile();
 
-        var success = file.setWritable(false, false)
-                && file.setReadable(true, true)
-                && file.setExecutable(false, false);
-        if (!success)  {
-            throw new GradleException("Die Dateiberechtigungen konnten nicht geändert werden.");
-        }
+
+        Arrays.stream(dir.listFiles()).forEach(f -> {
+            var success = f.setWritable(false, false)
+                    && f.setReadable(true, true)
+                    && f.setExecutable(false, false);
+            if (!success)  {
+                var message = String.format("Can not change file permissions: %s", file.getPath());
+                throw new GradleException(message);
+            }
+        });
     }
 
     private Path downloadPath(String filename) {
-        return getDownloads().get().file(filename).getAsFile().toPath();
+        return new Distribution(getProject().getObjects(), getDistributionName()).getDistributionDir().resolve(filename);
     }
 
     private void verifyChecksum() {
@@ -93,10 +102,9 @@ abstract public class DownloadTask extends DefaultTask {
                 .args("--ignore-missing",
                         "--check",
                         downloadPath("SHA256SUMS"))
-                .workingDir(getDownloads().get()))
+                .workingDir(new Distribution(getProject().getObjects(), getDistributionName()).getDistributionDir()))
                 .assertNormalExitValue();
     }
-
 
     private void verifySignature() {
         getExecOperations().exec(spec -> spec.commandLine("gpg")
@@ -115,24 +123,30 @@ abstract public class DownloadTask extends DefaultTask {
 
             OutputStream output;
             var filename = Path.of(src.getFile()).getFileName();
-            var dst = getDownloads().get().file(filename.toString());
 
-            try {
-                output = new FileOutputStream(dst.getAsFile());
-            } catch (FileNotFoundException e) {
-                throw new GradleScriptException("Datei nicht geschrieben werden", e);
+            var distribution = new Distribution(getProject().getObjects(), getDistributionName());
+            var dst = distribution.getDistributionDir().resolve(filename.toString()).toFile();
+
+            dst.getParentFile().mkdirs();
+
+            if (!dst.exists()) {
+                try {
+                    output = new FileOutputStream(dst);
+                } catch (FileNotFoundException e) {
+                    throw new GradleScriptException("Datei nicht geschrieben werden", e);
+                }
+
+                byte[] buffer = new byte[1444];
+                int byteRead;
+                int byteSum = 0;
+                while ((byteRead = input.read(buffer)) != -1) {
+                    byteSum += byteRead;
+                    output.write(buffer, 0, byteRead);
+                    progressLogger.progress(String.format("%d MB", byteSum / (1024 * 1024)));
+                }
+
+                output.close();
             }
-
-            byte[] buffer = new byte[1444];
-            int byteRead;
-            int byteSum = 0;
-            while ((byteRead = input.read(buffer)) != -1) {
-                byteSum += byteRead;
-                output.write(buffer, 0, byteRead);
-                progressLogger.progress(String.format("%d MB", byteSum / (1024 * 1024)));
-            }
-
-            output.close();
         }
 
         progressLogger.completed();

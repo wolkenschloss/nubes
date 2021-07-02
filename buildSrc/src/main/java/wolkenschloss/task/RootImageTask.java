@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;

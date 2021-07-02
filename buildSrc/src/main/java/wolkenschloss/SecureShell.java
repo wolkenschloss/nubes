@@ -1,14 +1,11 @@
 package wolkenschloss;
 
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.internal.impldep.com.google.common.collect.Lists;
 import org.gradle.process.ExecOperations;
-import org.gradle.process.ExecResult;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Vector;
 
 public class SecureShell {
@@ -25,29 +22,59 @@ public class SecureShell {
         this.knownHostFile = knownHostFile;
     }
 
-    public CheckedConsumer<CheckedConsumer<ExecResult>> ssh(Object... args) throws Throwable {
-//        e.args("-o", String.format("UserKnownHostsFile=%s", getKnownHostsFile().get().getAsFile().getAbsolutePath()),
-//                ip, "uname", "-nrom");
+    public static class Result {
 
-        return (CheckedConsumer<ExecResult> consumer) -> {
-            testbed.withDomain(domain -> {
-                var ip = domain.getTestbedHostAddress();
+        private final String stdout;
+        private final String stderr;
+        private final int exitValue;
 
-                var arguments = new Vector<Object>();
-                arguments.addAll(Arrays.asList("-o",
-                        String.format("UserKnownHostsFile=%s", this.knownHostFile.get().getAsFile().getPath()),
-                        ip));
-                arguments.addAll(Arrays.asList(args));
+        @SuppressWarnings("CdiInjectionPointsInspection")
+        public Result(String stdout, String stderr, int exitValue) {
 
-                try (var stdout = new ByteArrayOutputStream()) {
+            this.stdout = stdout;
+            this.stderr = stderr;
+            this.exitValue = exitValue;
+        }
+
+        public String getStdout() {
+            return stdout;
+        }
+
+        public String getStderr() {
+            return stderr;
+        }
+
+        public int getExitValue() {
+            return exitValue;
+        }
+    }
+
+    public CheckedConsumer<CheckedConsumer<Result>> execute(Object... args) {
+
+        return (CheckedConsumer<Result> consumer) -> testbed.withDomain(domain -> {
+            var ip = domain.getTestbedHostAddress();
+
+            var arguments = new Vector<>();
+            arguments.addAll(Arrays.asList("-o",
+                    String.format("UserKnownHostsFile=%s", this.knownHostFile.get().getAsFile().getPath()),
+                    ip));
+            arguments.addAll(Arrays.asList(args));
+
+            try (var stdout = new ByteArrayOutputStream()) {
+                try (var stderr = new ByteArrayOutputStream()) {
                     var result = operations.exec(spec -> {
                         spec.commandLine("ssh")
                                 .args(arguments)
-                                .setStandardOutput(stdout);
+                                .setStandardOutput(stdout)
+                                .setErrorOutput(stderr);
                     }).assertNormalExitValue();
-                    consumer.accept(result);
+
+                    consumer.accept(new Result(
+                            stdout.toString().trim(),
+                            stderr.toString().trim(),
+                            result.getExitValue()));
                 }
-            });
-        };
+            }
+        });
     }
 }

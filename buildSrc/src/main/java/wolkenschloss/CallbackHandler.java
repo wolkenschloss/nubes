@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 
-class CallbackHandler implements HttpHandler {
+public class CallbackHandler implements HttpHandler {
     private final BlockingQueue<String> server;
     private final Logger logger;
 
