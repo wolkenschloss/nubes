@@ -11,7 +11,7 @@ import wolkenschloss.Testbed;
 import java.nio.file.Files;
 
 @CacheableTask
-abstract public class CreatePoolTask extends DefaultTask {
+abstract public class CreatePool extends DefaultTask {
 
     @Input
     public abstract Property<String> getPoolName();

@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 // Verarbeitet eine Vorlage
 @CacheableTask
-public abstract class TransformerTask extends DefaultTask {
+public abstract class Transform extends DefaultTask {
 
     @Input
     abstract public Property<String> getRootImageName();

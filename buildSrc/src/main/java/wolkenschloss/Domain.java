@@ -5,9 +5,7 @@ import org.gradle.api.GradleException;
 import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
 import wolkenschloss.task.CheckedConsumer;
-import wolkenschloss.task.Registry;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 // TODO Kandidat für Testbed Klasse

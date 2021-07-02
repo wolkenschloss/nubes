@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 // Wenn es mal wieder Probleme mit Permission Denied gibt, wenn die
 // VM startet soll: Einfach mal appamor für diese VM ausschalten:
 @CacheableTask
-abstract public class RootImageTask extends DefaultTask {
+abstract public class CreateRootImage extends DefaultTask {
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)

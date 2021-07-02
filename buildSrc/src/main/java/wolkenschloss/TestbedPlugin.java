@@ -8,6 +8,7 @@ import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.task.*;
+import wolkenschloss.task.status.StatusTask;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.getView().getCallbackPort().set(9191);
 
-        project.getTasks().register("clean", TestbedCleanTask.class, task -> {
+        project.getTasks().register("clean", Clean.class, task -> {
         });
 
         var networkConfig = createTransformationTask(project,extension, "CloudInit",
@@ -65,13 +66,13 @@ public class TestbedPlugin implements Plugin<Project> {
                 src.file("user-data.mustache"),
                 cloudInitDir.file("user-data"));
 
-        var cidata = project.getTasks().register("cidata", CloudLocalDsTask.class, task -> {
+        var cidata = project.getTasks().register("cidata", CreateDataSource.class, task -> {
             task.getCidata().convention(poolDir.get().file(extension.getCidataImageName()));
             task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
             task.getUserData().convention(userData.get().getOutputFile());
         });
 
-        var download = project.getTasks().register("download", DownloadTask.class, task -> {
+        var download = project.getTasks().register("download", Download.class, task -> {
             task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
             task.getDistributionName().convention(extension.getBaseImage().getName());
             var parts = extension.getBaseImage().getUrl().get().split("/");
@@ -79,7 +80,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getBaseImage().convention(distribution.file(basename));
         });
 
-        var root = project.getTasks().register("root", RootImageTask.class, task -> {
+        var root = project.getTasks().register("root", CreateRootImage.class, task -> {
             task.getSize().convention("20G");
             task.getBaseImage().convention(download.get().getBaseImage());
             task.getRootImage().convention(poolDir.get().file(extension.getRootImageName()));
@@ -94,7 +95,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 src.file("domain.xml.mustache"),
                 virshConfigDir.get().file("domain.xml"));
 
-        var createPool = project.getTasks().register("createPool", CreatePoolTask.class, task -> {
+        var createPool = project.getTasks().register("createPool", CreatePool.class, task -> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
             task.getPoolRunFile().set(runDir.get().file("pool.run"));
@@ -102,7 +103,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.dependsOn(root, cidata);
         });
 
-        var startDomain = project.getTasks().register("startDomain", StartDomainTask.class, task -> {
+        var startDomain = project.getTasks().register("startDomain", Start.class, task -> {
             // TODO: Refactor. testbed darf nur ein einziges mal erscheinen.
             task.dependsOn(createPool);
             task.getDomain().set(extension.getView().getHostname());
@@ -113,7 +114,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getKnownHostsFile().set(runDir.get().file("known_hosts"));
         });
 
-        var readKubeConfig = project.getTasks().register("readKubeConfig", ReadKubeConfigTask.class, task -> {
+        var readKubeConfig = project.getTasks().register("readKubeConfig", CopyKubeConfig.class, task -> {
             // benötigt funktionierenden ssh Zugang. Deswegen muss updateKnownHosts
             // vorher ausgeführt sein.
 //            task.dependsOn(updateKnownHosts);
@@ -140,7 +141,7 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register("start", DefaultTask.class,
                 task -> task.dependsOn(readKubeConfig));
 
-        project.getTasks().register("destroy", DestroyTask.class, task -> {
+        project.getTasks().register("destroy", Destroy.class, task -> {
             task.getDomain().set(extension.getView().getHostname());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
@@ -155,13 +156,13 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
-    private <T extends FileSystemLocation> TaskProvider<TransformerTask> createTransformationTask(
+    private <T extends FileSystemLocation> TaskProvider<Transform> createTransformationTask(
             Project project,
             BaseTestbedExtension extension,
             String name,
             RegularFile template,
             RegularFile output) {
-        return project.getTasks().register("transform" + name, TransformerTask.class, task -> {
+        return project.getTasks().register("transform" + name, Transform.class, task -> {
             task.getRootImageName().set(extension.getRootImageName());
             task.getCidataImageName().set(extension.getCidataImageName());
             task.getView().set(extension.getView());

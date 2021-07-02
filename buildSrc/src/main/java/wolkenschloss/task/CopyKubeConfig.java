@@ -20,7 +20,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
-public abstract class ReadKubeConfigTask extends DefaultTask {
+public abstract class CopyKubeConfig extends DefaultTask {
 
     @Input
     abstract public Property<String> getDomainName();

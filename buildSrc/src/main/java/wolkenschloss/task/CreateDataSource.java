@@ -4,9 +4,9 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.*;
 
 @CacheableTask
-abstract public class CloudLocalDsTask extends Exec {
+abstract public class CreateDataSource extends Exec {
 
-    public CloudLocalDsTask() {
+    public CreateDataSource() {
         commandLine("cloud-localds");
     }
 

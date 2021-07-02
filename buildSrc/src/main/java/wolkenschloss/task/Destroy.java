@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-public abstract class DestroyTask extends DefaultTask {
+public abstract class Destroy extends DefaultTask {
 
     @Destroys
     abstract public RegularFileProperty getKubeConfigFile();

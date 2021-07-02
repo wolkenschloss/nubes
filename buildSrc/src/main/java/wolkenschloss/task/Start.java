@@ -27,7 +27,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 @CacheableTask
-abstract public class StartDomainTask extends DefaultTask {
+abstract public class Start extends DefaultTask {
 
     @Input
     abstract public Property<String> getDomain();
