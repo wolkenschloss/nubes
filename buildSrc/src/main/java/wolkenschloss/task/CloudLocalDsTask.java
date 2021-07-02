@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.*;

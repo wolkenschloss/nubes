@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.task;
 
 import com.sun.net.httpserver.HttpServer;
 import org.gradle.api.DefaultTask;
@@ -9,6 +9,9 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
+import wolkenschloss.CallbackHandler;
+import wolkenschloss.Domain;
+import wolkenschloss.Testbed;
 
 import javax.inject.Inject;
 import java.io.IOException;

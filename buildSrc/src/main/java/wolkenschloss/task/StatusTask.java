@@ -90,7 +90,7 @@ public abstract class StatusTask extends DefaultTask {
 
                 var distribution = new Distribution(getProject().getObjects(), getDistributionName());
                 info("XDG_DATA_HOME", () -> distribution.getDownloadDir());
-                info("Distribution", () -> distribution.getName());
+                info("Distribution", () -> distribution.getName().get());
             });
         }
     }
