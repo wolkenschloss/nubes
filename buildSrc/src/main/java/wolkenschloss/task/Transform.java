@@ -44,7 +44,6 @@ public abstract class Transform extends DefaultTask {
     public void machMal() {
         getLogger().info("Running '{}' with:", this.getName());
 
-        MustacheFactory factory = new DefaultMustacheFactory();
         var scopes = new HashMap<String, Object>();
         scopes.put("user", getView().get().getUser().get());
         scopes.put("getSshKey", getView().get().getSshKey().get());
@@ -56,20 +55,12 @@ public abstract class Transform extends DefaultTask {
         callback.put("ip", getView().get().getHostAddress().get());
         callback.put("port", getView().get().getCallbackPort().get());
 
-        var pool = new HashMap<String, Object>();
-
-        var poolName = getPool().get().getName().get();
-        var poolDir = getPool().get().getPath().get();
-        pool.put("name", poolName);
-        pool.put("directory", poolDir);
-
         var disks = new HashMap<String, Object>();
         disks.put("root", getRootImageName().get());
         disks.put("cidata", getCidataImageName().get());
 
-
         scopes.put("callback", callback);
-        scopes.put("pool", pool);
+        scopes.put("pool", getPool().get().toTemplateScope());
         scopes.put("disks", disks);
 
         RegularFile file = getTemplate().get();
@@ -81,7 +72,9 @@ public abstract class Transform extends DefaultTask {
         try(var input = new FileInputStream(file.getAsFile())) {
             try (var reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
 
+                final MustacheFactory factory = new DefaultMustacheFactory();
                 final Mustache mustache = factory.compile(reader, file.getAsFile().getName());
+
                 try (var writer = new FileWriter(getOutputFile().get().getAsFile()))
                 {
                     mustache.execute(writer, scopes);
