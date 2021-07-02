@@ -33,9 +33,6 @@ public abstract class DestroyTask extends DefaultTask {
     abstract public RegularFileProperty getRootImageFile();
 
     @Destroys
-    abstract public DirectoryProperty getDownloads();
-
-    @Destroys
     abstract public RegularFileProperty getCiDataImageFile();
 
     @Destroys
@@ -78,13 +75,6 @@ public abstract class DestroyTask extends DefaultTask {
         // RootImageTask
         Files.deleteIfExists(getRootImageMd5File().getAsFile().get().toPath());
         Files.deleteIfExists(getRootImageFile().getAsFile().get().toPath());
-
-        // Download
-        for (Path path : Files.list(getDownloads().getAsFile().get().toPath()).collect(Collectors.toList())) {
-            Files.deleteIfExists(path);
-        }
-
-        Files.deleteIfExists(getDownloads().getAsFile().get().toPath());
 
         // CiDataTask
         Files.deleteIfExists(getCiDataImageFile().getAsFile().get().toPath());

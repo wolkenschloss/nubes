@@ -7,6 +7,7 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
+import wolkenschloss.Distribution;
 import wolkenschloss.Domain;
 import wolkenschloss.SecureShell;
 import wolkenschloss.Testbed;
@@ -32,42 +33,11 @@ public abstract class StatusTask extends DefaultTask {
     @Internal
     abstract public RegularFileProperty getKubeConfigFile();
 
+    @Internal
+    abstract public Property<String> getDistributionName();
+
     @Inject
     abstract public ExecOperations getExecOperations();
-
-    private <T> void check(String label, T value, Predicate<T> requiredCondition) {
-
-        if (requiredCondition.test(value)) {
-            getLogger().quiet(String.format("✓ %-15s: %s", label, value));
-        } else {
-            getLogger().error(String.format("✗ %-15s: %s", label, value));
-        }
-    }
-
-    private <T> void evaluate2(String label, CheckedSupplier<T> fn, Function<Check<T>, StatusChecker<T>> check) {
-        try {
-            check.apply(new StatusBuilder<>(this, fn)).run(label);
-        } catch (Throwable e) {
-            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
-        }
-    }
-
-    private <T> void info(String label, CheckedSupplier<T> fn) {
-        try {
-            getLogger().quiet(String.format("✓ %-15s: %s", label, fn.apply()));
-        } catch (Throwable e) {
-            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
-        }
-    }
-
-    private <T> void check(String label, CheckedConsumer<CheckedConsumer<T>> fn, CheckedConsumer<T> with) {
-        try {
-            fn.accept(with);
-            getLogger().quiet(String.format("✓ %-15s: %s", label, "OK"));
-        } catch (Throwable e) {
-            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
-        }
-    }
 
     @TaskAction
     public void printStatus() throws Throwable {
@@ -117,7 +87,47 @@ public abstract class StatusTask extends DefaultTask {
                                     .error("missing catalog hello-world")
                     );
                 });
+
+                var distribution = new Distribution(getProject().getObjects(), getDistributionName());
+                info("XDG_DATA_HOME", () -> distribution.getDownloadDir());
+                info("Distribution", () -> distribution.getName());
             });
         }
     }
+
+    private <T> void check(String label, T value, Predicate<T> requiredCondition) {
+
+        if (requiredCondition.test(value)) {
+            getLogger().quiet(String.format("✓ %-15s: %s", label, value));
+        } else {
+            getLogger().error(String.format("✗ %-15s: %s", label, value));
+        }
+    }
+
+    private <T> void evaluate2(String label, CheckedSupplier<T> fn, Function<Check<T>, StatusChecker<T>> check) {
+        try {
+            check.apply(new StatusBuilder<>(this, fn)).run(label);
+        } catch (Throwable e) {
+            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
+        }
+    }
+
+    private <T> void info(String label, CheckedSupplier<T> fn) {
+        try {
+            getLogger().quiet(String.format("✓ %-15s: %s", label, fn.apply()));
+        } catch (Throwable e) {
+            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
+        }
+    }
+
+    private <T> void check(String label, CheckedConsumer<CheckedConsumer<T>> fn, CheckedConsumer<T> with) {
+        try {
+            fn.accept(with);
+            getLogger().quiet(String.format("✓ %-15s: %s", label, "OK"));
+        } catch (Throwable e) {
+            getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
+        }
+    }
+
+
 }

@@ -28,7 +28,8 @@ public class TestbedPlugin implements Plugin<Project> {
         var cloudInitDir = project.getLayout().getBuildDirectory().dir("cloud-init").get();
         var poolDir = project.getLayout().getBuildDirectory().dir("pool");
         var virshConfigDir = project.getLayout().getBuildDirectory().dir("config");
-        var downloads = project.getLayout().getBuildDirectory().dir("downloads");
+
+        var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
         extension.getPoolDirectory().set(poolDir);
 
@@ -73,10 +74,10 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var download = project.getTasks().register("download", DownloadTask.class, task -> {
             task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
+            task.getDistributionName().convention(extension.getBaseImage().getName());
             var parts = extension.getBaseImage().getUrl().get().split("/");
             var basename = parts[parts.length - 1];
-            task.getBaseImage().convention(downloads.get().file(basename));
-            task.getDownloads().convention(project.getLayout().getBuildDirectory().dir("downloads"));
+            task.getBaseImage().convention(distribution.file(basename));
         });
 
         var root = project.getTasks().register("root", RootImageTask.class, task -> {
@@ -127,6 +128,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
             task.getPoolName().set(extension.getPool().getName());
+            task.getDistributionName().set(extension.getBaseImage().getName());
         });
 
         transform.configure(t -> t.dependsOn(
@@ -148,7 +150,6 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getPoolXmlConfig().set(poolConfig.get().getOutputFile());
             task.getRootImageFile().set(root.get().getRootImage());
             task.getRootImageMd5File().set(root.get().getRootImageMd5File());
-            task.getDownloads().set(downloads.get());
             task.getCiDataImageFile().set(cidata.get().getCidata());
             task.getNetworkConfig().set(networkConfig.get().getOutputFile());
             task.getUserData().set(userData.get().getOutputFile());
