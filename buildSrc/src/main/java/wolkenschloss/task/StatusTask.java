@@ -11,6 +11,8 @@ import wolkenschloss.Distribution;
 import wolkenschloss.Domain;
 import wolkenschloss.SecureShell;
 import wolkenschloss.Testbed;
+import wolkenschloss.task.status.Check;
+import wolkenschloss.task.status.StatusChecker;
 
 import javax.inject.Inject;
 import java.nio.file.Files;

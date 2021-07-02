@@ -1,5 +1,10 @@
 package wolkenschloss.task;
 
+import wolkenschloss.task.status.Check;
+import wolkenschloss.task.status.ErrorMessage;
+import wolkenschloss.task.status.OkMessage;
+import wolkenschloss.task.status.StatusChecker;
+
 import java.util.function.Function;
 import java.util.function.Predicate;
 
