@@ -2,7 +2,7 @@ plugins {
     id("wolkenschloss.testbed")
 }
 
-defaultTasks "start"
+defaultTasks("start")
 
 testbed {
     base {
