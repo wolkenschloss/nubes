@@ -2,18 +2,18 @@ plugins {
     id "wolkenschloss.testbed"
 }
 
-defaultTasks 'start'
-
-testbed {
-    base {
-        name = "ubuntu-20.04"
-        url = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img"
-    }
-
-    domain {
-        name = "testbed"
-    }
-    pool {
-        name = "mycloud"
-    }
-}
+//defaultTasks 'start'
+//
+//testbed {
+//    base {
+//        name = "ubuntu-20.04"
+//        url = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img"
+//    }
+//
+//    domain {
+//        name = "testbed"
+//    }
+//    pool {
+//        name = "mycloud"
+//    }
+//}

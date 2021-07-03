@@ -1,7 +1,7 @@
 rootProject.name = 'mycloud'
-include 'services:cookbook:service',
+include('services:cookbook:service',
         'services:cookbook:webapp',
-        'testbed'
+        'testbed')
 
 //'services:blog:service',
 //        'services:blog:core',

@@ -43,10 +43,12 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getRootImageName().convention("root.qcow2");
         extension.getCidataImageName().convention("cidata.img");
 
-
         extension.getPool().getName().convention("testbed");
 
         extension.getView().getCallbackPort().set(9191);
+
+        extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
+        extension.getBaseImage().getName().convention("ubuntu-20.04");
 
         var networkConfig = createTransformationTask(project, "CloudInit",
                 extension.getSourceDirectory().file("network-config.mustache"),

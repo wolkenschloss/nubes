@@ -55,15 +55,6 @@ task generateVueApp(type: NpxTask) {
     inputs.dir('src')
     inputs.dir(fileTree('node_modules').exclude('.cache'))
     outputs.dir(destination)
-
-    doFirst {
-        println "doFirst generateVueApp"
-        println "PATH = $System.env.PATH"
-    }
-
-    doLast {
-        println "doLast generateVueApp"
-    }
 }
 
 task generateViaNpm(type: NpmTask) {
