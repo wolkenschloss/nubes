@@ -21,8 +21,8 @@ plugins {
 // Entwicklungsserver erste neu gebaut werden. Im
 // Entwicklungsmodus berücksichtigt Quarkus die Jars der
 // abhängigen Projekte nicht, sondern legt die Ausgabe des
-// Buildverzeichnisses direkt in den Classpath. Mit diesem
-// Hack wird das Buildergebnis des Frontendprojekts auf den
+// Build Verzeichnisses direkt in den Classpath. Mit diesem
+// Hack wird das Build Ergebnis des Frontendprojekts auf den
 // Classpath kopiert.
 //
 // Die Alternative besteht darin, das Frontend mit
