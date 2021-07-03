@@ -1,6 +1,9 @@
+import com.github.gradle.node.npm.task.NpxTask
+import com.github.gradle.node.npm.task.NpmInstallTask
+
 plugins {
-    id 'mycloud.java-conventions'
-    id "com.github.node-gradle.node" version "3.1.0"
+    id("mycloud.java-conventions")
+    id("com.github.node-gradle.node") version "3.1.0"
 }
 
 // Dieser Hack erlaubt es, im Quarkus Development Mode das
@@ -34,41 +37,39 @@ plugins {
 
 // quarkusDev funktioniert nicht mit diesem Verzeichnis. Muss in classes/java/main liegen.
 // def destination = "$buildDir/generated-resources/META-INF/resources/webapp"
-def destination = "build/classes/java/main/META-INF/resources"
+var destination = "build/classes/java/main/META-INF/resources"
 sourceSets {
     main {
-        output.dir(destination, builtBy: 'generateVueApp')
+        output.dir(destination, "builtBy" to listOf("generateVueApp"))
     }
 }
 
 node {
     // Bug: Version 14.17.0 funktioniert nicht. npm kann nicht gefunden werden.
-    version = "14.11.0"
-    download = true
+    version.set("14.11.0")
+    download.set(true)
 }
 
-task generateVueApp(type: NpxTask) {
-    dependsOn npmInstall
-    command = 'vue-cli-service'
-    args = ['build', '--dest', destination]
-    inputs.files('package.json', 'package-lock.json', 'vue.config.js', 'babel.config.js')
-    inputs.dir('src')
-    inputs.dir(fileTree('node_modules').exclude('.cache'))
+tasks.register<NpxTask>("generateVueApp") {
+
+    val npmInstall = tasks.named(NpmInstallTask.NAME)
+    dependsOn(npmInstall)
+
+    command.set("vue-cli-service")
+    args.set(listOf("build", "--dest", destination))
+    inputs.files("package.json", "package-lock.json", "vue.config.js", "babel.config.js")
+    inputs.dir("src")
+    inputs.dir(fileTree("node_modules").exclude(".cache"))
     outputs.dir(destination)
 
     doFirst {
-        println "doFirst generateVueApp"
-        println "PATH = $System.env.PATH"
+        println("doFirst generateVueApp")
+        val path = System.getenv("PATH")
+        println("PATH = $path")
     }
 
     doLast {
-        println "doLast generateVueApp"
+        println("doLast generateVueApp")
     }
 }
 
-task generateViaNpm(type: NpmTask) {
-    args = ['--version']
-    doFirst {
-
-    }
-}
