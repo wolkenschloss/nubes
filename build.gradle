@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "io.quarkus:io.quarkus.gradle.plugin:1.13.6.Final"
+        classpath "io.quarkus:io.quarkus.gradle.plugin:1.13.7.Final"
     }
 }
 
