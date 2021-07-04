@@ -13,13 +13,17 @@ import java.util.Map;
 
 public abstract class TestbedExtension {
 
-    // Host? User?
-    abstract public RegularFileProperty getSshKeyFile();
-
     @Nested
     abstract public HostExtension getHost();
+    public void host(Action<? super HostExtension> action) {
+        action.execute(getHost());
+    }
 
-    public void host(Action<? super HostExtension> action) { action.execute(getHost());}
+    @Nested
+    abstract public UserExtension getUser();
+    public void user(Action<? super UserExtension> action) {
+        action.execute(getUser());
+    }
 
     // ???
     @Nested

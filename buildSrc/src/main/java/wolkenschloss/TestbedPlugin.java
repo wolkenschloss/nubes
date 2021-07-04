@@ -35,11 +35,11 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.getSourceDirectory().set(project.getLayout().getProjectDirectory().dir("src"));
 
-        extension.getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
+        extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getView().getUser().convention(System.getenv("USER"));
         extension.getDomain().getName().convention("testbed");
         extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
-        extension.getView().getSshKey().convention(extension.getSshKeyFile().map(this::readSshKey));
+        extension.getView().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
         extension.getDomain().getLocale().convention(System.getenv("LANG"));
         extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
 
