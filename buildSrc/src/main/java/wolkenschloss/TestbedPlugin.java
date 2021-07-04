@@ -63,7 +63,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getSize().convention("20G");
             task.getBaseImage().convention(download.get().getBaseImage());
             task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
-            task.getRootImageMd5File().set(extension.getRunDirectory().file("root.md5"));
+            task.getRootImageMd5File().convention(extension.getRunDirectory().file("root.md5"));
         });
 
         var poolConfig = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
@@ -75,38 +75,38 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getGeneratedVirshConfigDirectory().file("domain.xml"));
 
         var createPool = project.getTasks().register(CREATE_POOL_TASK_NAME, CreatePool.class, task -> {
-            task.getPoolName().set(extension.getPool().getName());
-            task.getXmlDescription().set(poolConfig.get().getOutputFile());
-            task.getPoolRunFile().set(extension.getRunDirectory().file("pool.run"));
-            task.getDomainName().set(extension.getDomain().getName());
+            task.getPoolName().convention(extension.getPool().getName());
+            task.getXmlDescription().convention(poolConfig.get().getOutputFile());
+            task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
+            task.getDomainName().convention(extension.getDomain().getName());
             task.dependsOn(root, cidata);
         });
 
         var startDomain = project.getTasks().register(START_DOMAIN_TASK_NAME, Start.class, task -> {
             task.dependsOn(createPool);
-            task.getDomain().set(extension.getDomain().getName());
-            task.getHostname().set(extension.getDomain().getName());
-            task.getPort().set(extension.getHost().getCallbackPort());
-            task.getXmlDescription().set(domainConfig.get().getOutputFile());
-            task.getPoolRunFile().set(createPool.get().getPoolRunFile());
-            task.getKnownHostsFile().set(extension.getRunDirectory().file("known_hosts"));
+            task.getDomain().convention(extension.getDomain().getName());
+            task.getHostname().convention(extension.getDomain().getName());
+            task.getPort().convention(extension.getHost().getCallbackPort());
+            task.getXmlDescription().convention(domainConfig.get().getOutputFile());
+            task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
+            task.getKnownHostsFile().convention(extension.getRunDirectory().file("known_hosts"));
         });
 
         var readKubeConfig = project.getTasks().register(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class, task -> {
             // benötigt funktionierenden ssh Zugang. Deswegen muss updateKnownHosts
             // vorher ausgeführt sein.
 //            task.dependsOn(updateKnownHosts);
-            task.getDomainName().set(extension.getDomain().getName());
+            task.getDomainName().convention(extension.getDomain().getName());
             task.getKubeConfigFile().convention(extension.getRunDirectory().file("kubeconfig"));
-            task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
+            task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
         });
 
         var status = project.getTasks().register(STATUS_TASK_NAME, StatusTask.class, task -> {
-            task.getDomainName().set(extension.getDomain().getName());
-            task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
-            task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
-            task.getPoolName().set(extension.getPool().getName());
-            task.getDistributionName().set(extension.getBaseImage().getName());
+            task.getDomainName().convention(extension.getDomain().getName());
+            task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
+            task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+            task.getPoolName().convention(extension.getPool().getName());
+            task.getDistributionName().convention(extension.getBaseImage().getName());
         });
 
         project.getTasks().withType(Transform.class).configureEach(
@@ -116,17 +116,17 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> task.dependsOn(readKubeConfig));
 
         project.getTasks().register(DESTROY_TASK_NAME, Destroy.class, task -> {
-            task.getDomain().set(extension.getDomain().getName());
-            task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
-            task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
-            task.getDomainXmlConfig().set(domainConfig.get().getOutputFile());
-            task.getPoolRunFile().set(createPool.get().getPoolRunFile());
-            task.getPoolXmlConfig().set(poolConfig.get().getOutputFile());
-            task.getRootImageFile().set(root.get().getRootImage());
-            task.getRootImageMd5File().set(root.get().getRootImageMd5File());
-            task.getCiDataImageFile().set(cidata.get().getCidata());
-            task.getNetworkConfig().set(networkConfig.get().getOutputFile());
-            task.getUserData().set(userData.get().getOutputFile());
+            task.getDomain().convention(extension.getDomain().getName());
+            task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
+            task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+            task.getDomainXmlConfig().convention(domainConfig.get().getOutputFile());
+            task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
+            task.getPoolXmlConfig().convention(poolConfig.get().getOutputFile());
+            task.getRootImageFile().convention(root.get().getRootImage());
+            task.getRootImageMd5File().convention(root.get().getRootImageMd5File());
+            task.getCiDataImageFile().convention(cidata.get().getCidata());
+            task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
+            task.getUserData().convention(userData.get().getOutputFile());
         });
     }
 
@@ -142,10 +142,8 @@ public class TestbedPlugin implements Plugin<Project> {
             Provider<RegularFile> template,
             Provider<RegularFile> output) {
         return project.getTasks().register("transform" + name, Transform.class, task -> {
-            task.getTemplate().set(template);
-            task.getOutputFile().set(output);
+            task.getTemplate().convention(template);
+            task.getOutputFile().convention(output);
         });
     }
-
-
 }
