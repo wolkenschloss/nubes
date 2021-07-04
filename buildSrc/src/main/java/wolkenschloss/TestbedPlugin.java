@@ -15,6 +15,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "UserData";
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
+    public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
 
     @Override
     public void apply(Project project) {
@@ -51,7 +52,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getBaseImage().convention(distribution.file(basename));
         });
 
-        var root = project.getTasks().register("root", CreateRootImage.class, task -> {
+        var root = project.getTasks().register(CREATE_ROOT_IMAGE_TASK_NAME, CreateRootImage.class, task -> {
             task.getSize().convention("20G");
             task.getBaseImage().convention(download.get().getBaseImage());
             task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
