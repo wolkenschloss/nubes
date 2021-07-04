@@ -16,6 +16,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
+    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "Pool";
 
     @Override
     public void apply(Project project) {
@@ -59,7 +60,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getRootImageMd5File().set(extension.getRunDirectory().file("root.md5"));
         });
 
-        var poolConfig = createTransformationTask(project, "Pool",
+        var poolConfig = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file("pool.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
 
