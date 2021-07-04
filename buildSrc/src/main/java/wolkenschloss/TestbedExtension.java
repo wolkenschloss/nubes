@@ -12,10 +12,14 @@ import org.libvirt.LibvirtException;
 import java.util.Map;
 
 public abstract class TestbedExtension {
+
+    // Host
     abstract public RegularFileProperty getSshKeyFile();
 
+    // Domain
     abstract public Property<String> getName();
 
+    // ???
     @Nested
     abstract public TestbedView getView();
 
@@ -33,10 +37,13 @@ public abstract class TestbedExtension {
 
     public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
 
+    // Pool
     abstract public Property<String> getRootImageName();
 
+    // Pool
     abstract public Property<String> getCidataImageName();
 
+    // Pool
     @Nested
     abstract public BaseImageExtension getBaseImage();
 
@@ -80,13 +87,17 @@ public abstract class TestbedExtension {
         return new Testbed(getDomain().getName().get());
     }
 
+    // Host? Pool?
     abstract public DirectoryProperty getPoolDirectory();
 
+    // Host?
     abstract public DirectoryProperty getRunDirectory();
 
     abstract public DirectoryProperty getSourceDirectory();
 
+    // Pool?
     abstract public DirectoryProperty getGeneratedCloudInitDirectory();
 
+    // Domain? Pool?
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 }

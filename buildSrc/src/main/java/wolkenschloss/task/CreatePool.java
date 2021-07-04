@@ -49,7 +49,7 @@ abstract public class CreatePool extends DefaultTask {
                 throw new GradleException(message);
             }
 
-            var uuid = testbed.createPool(getXmlDescription(), getPoolRunFile());
+            var uuid = testbed.createPool(getXmlDescription());
             Files.writeString(getPoolRunFile().getAsFile().get().toPath(), uuid.toString());
 
         } catch (Exception e) {

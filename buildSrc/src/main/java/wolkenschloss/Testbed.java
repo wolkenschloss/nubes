@@ -10,7 +10,6 @@ import wolkenschloss.task.CheckedConsumer;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +31,7 @@ public class Testbed implements AutoCloseable {
         Files.delete(poolRunFile.getAsFile().get().toPath());
     }
 
-    public UUID createPool(RegularFileProperty xmlDescription, RegularFileProperty poolRunFile) throws IOException, LibvirtException {
+    public UUID createPool(RegularFileProperty xmlDescription) throws IOException, LibvirtException {
         var file = xmlDescription.get().getAsFile().getAbsoluteFile().toPath();
         var xml = Files.readString(file);
 
@@ -143,8 +142,6 @@ public class Testbed implements AutoCloseable {
             method.accept(domain);
         }
     }
-
-
 
     public SecureShell getExec(ExecOperations operations, RegularFileProperty knownHosts){
         return new SecureShell(this, operations, knownHosts);
