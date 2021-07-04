@@ -35,8 +35,7 @@ public abstract class TestbedExtension {
     public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
 
 
-    // Pool
-    abstract public Property<String> getCidataImageName();
+
 
     // Pool
     @Nested
@@ -67,7 +66,7 @@ public abstract class TestbedExtension {
 
         var disks = objects.mapProperty(String.class, Object.class);
         disks.put("root", getPool().getRootImageName());
-        disks.put("cidata", getCidataImageName());
+        disks.put("cidata", getPool().getCidataImageName());
         property.put("disks", disks);
 
         var pool = objects.mapProperty(String.class, Object.class);

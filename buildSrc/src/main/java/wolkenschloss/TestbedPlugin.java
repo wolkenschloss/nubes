@@ -42,7 +42,7 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getView().getHostAddress().convention(IpUtil.getHostAddress());
 
         extension.getPool().getRootImageName().convention("root.qcow2");
-        extension.getCidataImageName().convention("cidata.img");
+        extension.getPool().getCidataImageName().convention("cidata.img");
 
         extension.getPool().getName().convention("testbed");
 
@@ -65,7 +65,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getUserData().convention(userData.get().getOutputFile());
 
             // OutputFile
-            task.getCidata().convention(extension.getPoolDirectory().file(extension.getCidataImageName()));
+            task.getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
         });
 
         var download = project.getTasks().register("download", Download.class, task -> {
