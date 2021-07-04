@@ -13,6 +13,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "UserData";
+    public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
 
     @Override
     public void apply(Project project) {
@@ -32,7 +33,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file("user-data.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("user-data"));
 
-        var cidata = project.getTasks().register("cidata", CreateDataSource.class, task -> {
+        var cidata = project.getTasks().register(CREATE_DATA_SOURCE_IMAGE_TASK_NAME, CreateDataSource.class, task -> {
             // InputFiles
             task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
             task.getUserData().convention(userData.get().getOutputFile());
