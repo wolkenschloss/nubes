@@ -1,5 +1,5 @@
 package wolkenschloss.task.status;
 
-public interface StatusChecker<T> {
-    public void run(String label);
+public interface StatusChecker {
+    void run(String label);
 }

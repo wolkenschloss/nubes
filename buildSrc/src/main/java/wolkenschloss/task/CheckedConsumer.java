@@ -1,7 +1,5 @@
 package wolkenschloss.task;
 
-import org.libvirt.LibvirtException;
-
 @FunctionalInterface
 public interface CheckedConsumer<T> {
 

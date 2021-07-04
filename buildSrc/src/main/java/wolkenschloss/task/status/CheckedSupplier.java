@@ -1,4 +1,4 @@
-package wolkenschloss.task;
+package wolkenschloss.task.status;
 
 @FunctionalInterface
 public interface CheckedSupplier<T> {

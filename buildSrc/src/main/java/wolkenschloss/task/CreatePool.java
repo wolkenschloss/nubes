@@ -6,12 +6,13 @@ import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
-import wolkenschloss.Testbed;
+import wolkenschloss.BaseTestbedExtension;
 
+import javax.inject.Inject;
 import java.nio.file.Files;
 
 @CacheableTask
-abstract public class CreatePoolTask extends DefaultTask {
+abstract public class CreatePool extends DefaultTask {
 
     @Input
     public abstract Property<String> getPoolName();
@@ -29,7 +30,8 @@ abstract public class CreatePoolTask extends DefaultTask {
     @TaskAction
     public void exec() {
 
-        try (var testbed = new Testbed(getDomainName().get())) {
+        var tbe = this.getProject().getExtensions().getByType(BaseTestbedExtension.class);
+        try (var testbed = tbe.create()) {
 
             if (getPoolRunFile().get().getAsFile().exists()) {
                 testbed.destroyPool(getPoolRunFile());

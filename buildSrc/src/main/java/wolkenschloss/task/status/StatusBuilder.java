@@ -1,14 +1,9 @@
-package wolkenschloss.task;
-
-import wolkenschloss.task.status.Check;
-import wolkenschloss.task.status.ErrorMessage;
-import wolkenschloss.task.status.OkMessage;
-import wolkenschloss.task.status.StatusChecker;
+package wolkenschloss.task.status;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-class StatusBuilder<T> implements Check<T>, OkMessage<T>, ErrorMessage<T>, StatusChecker<T> {
+public class StatusBuilder<T> implements Check<T>, OkMessage<T>, ErrorMessage<T>, StatusChecker {
 
     private final StatusTask statusTask;
     private final CheckedSupplier<T> fn;
@@ -36,7 +31,7 @@ class StatusBuilder<T> implements Check<T>, OkMessage<T>, ErrorMessage<T>, Statu
         return this;
     }
 
-    public StatusChecker<T> error(String message) {
+    public StatusChecker error(String message) {
         this.errorMessage = message;
         return this;
     }

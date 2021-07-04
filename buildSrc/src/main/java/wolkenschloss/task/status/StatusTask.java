@@ -1,4 +1,4 @@
-package wolkenschloss.task;
+package wolkenschloss.task.status;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
@@ -11,8 +11,7 @@ import wolkenschloss.Distribution;
 import wolkenschloss.Domain;
 import wolkenschloss.SecureShell;
 import wolkenschloss.Testbed;
-import wolkenschloss.task.status.Check;
-import wolkenschloss.task.status.StatusChecker;
+import wolkenschloss.task.CheckedConsumer;
 
 import javax.inject.Inject;
 import java.nio.file.Files;
@@ -106,7 +105,7 @@ public abstract class StatusTask extends DefaultTask {
         }
     }
 
-    private <T> void evaluate2(String label, CheckedSupplier<T> fn, Function<Check<T>, StatusChecker<T>> check) {
+    private <T> void evaluate2(String label, CheckedSupplier<T> fn, Function<Check<T>, StatusChecker> check) {
         try {
             check.apply(new StatusBuilder<>(this, fn)).run(label);
         } catch (Throwable e) {
