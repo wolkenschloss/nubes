@@ -10,7 +10,7 @@ abstract public class TestbedView {
 //    abstract public Property<String> getHostname();
 
     // User
-    abstract public Property<String> getUser();
+
 
 
 

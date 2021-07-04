@@ -7,4 +7,6 @@ public interface UserExtension {
     RegularFileProperty getSshKeyFile();
 
     Property<String> getSshKey();
+
+    Property<String> getUser();
 }

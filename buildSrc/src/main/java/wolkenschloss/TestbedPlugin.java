@@ -36,19 +36,19 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getSourceDirectory().set(project.getLayout().getProjectDirectory().dir("src"));
 
         extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
-        extension.getView().getUser().convention(System.getenv("USER"));
+        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
+        extension.getUser().getUser().convention(System.getenv("USER"));
+
         extension.getDomain().getName().convention("testbed");
         extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
-        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
         extension.getDomain().getLocale().convention(System.getenv("LANG"));
+
         extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
+        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
 
         extension.getPool().getRootImageName().convention("root.qcow2");
         extension.getPool().getCidataImageName().convention("cidata.img");
-
         extension.getPool().getName().convention("testbed");
-
-        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
 
         extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
         extension.getBaseImage().getName().convention("ubuntu-20.04");

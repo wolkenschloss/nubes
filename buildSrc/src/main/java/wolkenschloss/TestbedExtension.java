@@ -59,7 +59,7 @@ public abstract class TestbedExtension {
     public Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
         var property = objects.mapProperty(String.class, Object.class);
 
-        property.put("user", getView().getUser());
+        property.put("user", getUser().getUser());
         property.put("getSshKey", getUser().getSshKey());
         property.put("hostname", getDomain().getName());
         property.put("fqdn", getDomain().getFqdn());
