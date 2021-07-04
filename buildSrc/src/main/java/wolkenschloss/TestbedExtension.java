@@ -11,36 +11,36 @@ import org.libvirt.LibvirtException;
 
 import java.util.Map;
 
-public interface TestbedExtension {
-    RegularFileProperty getSshKeyFile();
+public abstract class TestbedExtension {
+    abstract public RegularFileProperty getSshKeyFile();
 
-    Property<String> getName();
+    abstract public Property<String> getName();
 
     @Nested
-    TestbedView getView();
+    abstract public TestbedView getView();
 
-    default void view(Action<? super TestbedView> action) {
+    public void view(Action<? super TestbedView> action) {
         action.execute(getView());
     }
 
     @Nested
-    DomainExtension getDomain();
+    abstract public DomainExtension getDomain();
 
-    default void domain(Action<? super DomainExtension> action) {action.execute(getDomain());}
-
-    @Nested
-    PoolExtension getPool();
-
-    default void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
-
-    Property<String> getRootImageName();
-
-    Property<String> getCidataImageName();
+    public void domain(Action<? super DomainExtension> action) {action.execute(getDomain());}
 
     @Nested
-    BaseImageExtension getBaseImage();
+    abstract public PoolExtension getPool();
 
-    default void base(Action<? super BaseImageExtension> action) {
+    public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
+
+    abstract public Property<String> getRootImageName();
+
+    abstract public Property<String> getCidataImageName();
+
+    @Nested
+    abstract public BaseImageExtension getBaseImage();
+
+    public void base(Action<? super BaseImageExtension> action) {
         action.execute(getBaseImage());
     }
 
@@ -49,7 +49,7 @@ public interface TestbedExtension {
      * @param objects Tja
      * @return
      */
-    default Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
+    public Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
         var property = objects.mapProperty(String.class, Object.class);
 
         property.put("user", getView().getUser());
@@ -76,18 +76,17 @@ public interface TestbedExtension {
         return property;
     }
 
-    default Testbed create() throws LibvirtException {
+    public Testbed create() throws LibvirtException {
         return new Testbed(getDomain().getName().get());
     }
 
-    DirectoryProperty getPoolDirectory();
+    abstract public DirectoryProperty getPoolDirectory();
 
-    DirectoryProperty getRunDirectory();
+    abstract public DirectoryProperty getRunDirectory();
 
-    DirectoryProperty getSourceDirectory();
+    abstract public DirectoryProperty getSourceDirectory();
 
-    DirectoryProperty getGeneratedCloudInitDirectory();
+    abstract public DirectoryProperty getGeneratedCloudInitDirectory();
 
-    DirectoryProperty getGeneratedVirshConfigDirectory();
-
+    abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 }
