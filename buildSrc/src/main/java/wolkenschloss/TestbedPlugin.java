@@ -20,6 +20,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String CREATE_POOL_TASK_NAME = "createPool";
     public static final String START_DOMAIN_TASK_NAME = "startDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
+    public static final String STATUS_TASK_NAME = "status";
 
     @Override
     public void apply(Project project) {
@@ -98,7 +99,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
         });
 
-        var status = project.getTasks().register("status", StatusTask.class, task -> {
+        var status = project.getTasks().register(STATUS_TASK_NAME, StatusTask.class, task -> {
             task.getDomainName().set(extension.getDomain().getName());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
