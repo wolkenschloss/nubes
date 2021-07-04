@@ -1,15 +1,65 @@
 package wolkenschloss;
 
 import org.gradle.api.Action;
+import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
 
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 public abstract class TestbedExtension {
+
+    public static final int DEFAULT_CALLBACK_PORT = 9191;
+
+    public static void configure(TestbedExtension extension, ProjectLayout layout) {
+        // Set build directories
+        var buildDirectory = layout.getBuildDirectory();
+        extension.getPoolDirectory().set(buildDirectory.dir("pool"));
+        extension.getRunDirectory().set(buildDirectory.dir("run"));
+        extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
+        extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
+
+        extension.getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
+
+        extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
+        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(TestbedExtension::readSshKey));
+        extension.getUser().getName().convention(System.getenv("USER"));
+
+        extension.getDomain().getName().convention("testbed");
+        extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
+        extension.getDomain().getLocale().convention(System.getenv("LANG"));
+
+        extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
+        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
+
+        extension.getPool().getRootImageName().convention("root.qcow2");
+        extension.getPool().getCidataImageName().convention("cidata.img");
+        extension.getPool().getName().convention("testbed");
+
+        extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
+        extension.getBaseImage().getName().convention("ubuntu-20.04");
+    }
+
+    @Nonnull
+    public static String readSshKey(RegularFile sshKeyFile) {
+
+        var file = sshKeyFile.getAsFile();
+
+        try {
+            return Files.readString(file.toPath()).trim();
+        } catch (IOException e) {
+            throw new GradleScriptException("Can not read public ssh key", e);
+        }
+    }
 
     @Nested
     abstract public HostExtension getHost();

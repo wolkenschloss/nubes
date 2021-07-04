@@ -1,7 +1,6 @@
 package wolkenschloss;
 
 import org.gradle.api.*;
-import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
@@ -10,14 +9,7 @@ import wolkenschloss.task.*;
 import wolkenschloss.task.status.StatusTask;
 import wolkenschloss.task.start.Start;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public class TestbedPlugin implements Plugin<Project> {
-
-    public static final int DEFAULT_CALLBACK_PORT = 9191;
 
     @Override
     public void apply(Project project) {
@@ -27,7 +19,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
-        configure(extension, project.getLayout());
+        TestbedExtension.configure(extension, project.getLayout());
 
         var networkConfig = createTransformationTask(project, "CloudInit",
                 extension.getSourceDirectory().file("network-config.mustache"),
@@ -125,35 +117,6 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
-    private static void configure(TestbedExtension extension, ProjectLayout layout) {
-        // Set build directories
-        var buildDirectory = layout.getBuildDirectory();
-        extension.getPoolDirectory().set(buildDirectory.dir("pool"));
-        extension.getRunDirectory().set(buildDirectory.dir("run"));
-        extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
-        extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
-
-        extension.getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
-
-        extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
-        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(TestbedPlugin::readSshKey));
-        extension.getUser().getName().convention(System.getenv("USER"));
-
-        extension.getDomain().getName().convention("testbed");
-        extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
-        extension.getDomain().getLocale().convention(System.getenv("LANG"));
-
-        extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
-        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
-
-        extension.getPool().getRootImageName().convention("root.qcow2");
-        extension.getPool().getCidataImageName().convention("cidata.img");
-        extension.getPool().getName().convention("testbed");
-
-        extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-        extension.getBaseImage().getName().convention("ubuntu-20.04");
-    }
-
     private Action<Transform> configureTransformTask(TestbedExtension extension, ObjectFactory objects) {
         return (Transform task) -> {
             task.getScope().convention(extension.asPropertyMap(objects));
@@ -172,15 +135,4 @@ public class TestbedPlugin implements Plugin<Project> {
     }
 
 
-    @Nonnull
-    public static String readSshKey(RegularFile sshKeyFile) {
-
-        var file = sshKeyFile.getAsFile();
-
-        try {
-            return Files.readString(file.toPath()).trim();
-        } catch (IOException e) {
-            throw new GradleScriptException("Can not read public ssh key", e);
-        }
-    }
 }
