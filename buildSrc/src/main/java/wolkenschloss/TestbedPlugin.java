@@ -125,7 +125,7 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
-    private void configure(TestbedExtension extension, ProjectLayout layout) {
+    private static void configure(TestbedExtension extension, ProjectLayout layout) {
         // Set build directories
         var buildDirectory = layout.getBuildDirectory();
         extension.getPoolDirectory().set(buildDirectory.dir("pool"));
@@ -136,7 +136,7 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
 
         extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
-        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
+        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(TestbedPlugin::readSshKey));
         extension.getUser().getName().convention(System.getenv("USER"));
 
         extension.getDomain().getName().convention("testbed");
@@ -173,7 +173,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
 
     @Nonnull
-    private String readSshKey(RegularFile sshKeyFile) {
+    public static String readSshKey(RegularFile sshKeyFile) {
 
         var file = sshKeyFile.getAsFile();
 
