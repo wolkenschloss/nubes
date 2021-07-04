@@ -1,4 +1,0 @@
-allprojects {
-    group 'family.haschka.mycloud'
-    version '0.0.1-SNAPSHOT'
-}
