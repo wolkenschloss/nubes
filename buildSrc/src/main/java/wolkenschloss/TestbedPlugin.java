@@ -19,7 +19,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
-        TestbedExtension.configure(extension, project.getLayout());
+        extension.configure(project.getLayout());
 
         var networkConfig = createTransformationTask(project, "CloudInit",
                 extension.getSourceDirectory().file("network-config.mustache"),

@@ -20,35 +20,6 @@ public abstract class TestbedExtension {
 
     public static final int DEFAULT_CALLBACK_PORT = 9191;
 
-    public static void configure(TestbedExtension extension, ProjectLayout layout) {
-        // Set build directories
-        var buildDirectory = layout.getBuildDirectory();
-        extension.getPoolDirectory().set(buildDirectory.dir("pool"));
-        extension.getRunDirectory().set(buildDirectory.dir("run"));
-        extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
-        extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
-
-        extension.getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
-
-        extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
-        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(TestbedExtension::readSshKey));
-        extension.getUser().getName().convention(System.getenv("USER"));
-
-        extension.getDomain().getName().convention("testbed");
-        extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
-        extension.getDomain().getLocale().convention(System.getenv("LANG"));
-
-        extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
-        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
-
-        extension.getPool().getRootImageName().convention("root.qcow2");
-        extension.getPool().getCidataImageName().convention("cidata.img");
-        extension.getPool().getName().convention("testbed");
-
-        extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-        extension.getBaseImage().getName().convention("ubuntu-20.04");
-    }
-
     @Nonnull
     public static String readSshKey(RegularFile sshKeyFile) {
 
@@ -59,6 +30,35 @@ public abstract class TestbedExtension {
         } catch (IOException e) {
             throw new GradleScriptException("Can not read public ssh key", e);
         }
+    }
+
+    public void configure(ProjectLayout layout) {
+        // Set build directories
+        var buildDirectory = layout.getBuildDirectory();
+        getPoolDirectory().set(buildDirectory.dir("pool"));
+        getRunDirectory().set(buildDirectory.dir("run"));
+        getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
+        getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
+
+        getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
+
+        getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
+        getUser().getSshKey().convention(getUser().getSshKeyFile().map(TestbedExtension::readSshKey));
+        getUser().getName().convention(System.getenv("USER"));
+
+        getDomain().getName().convention("testbed");
+        getDomain().getFqdn().convention("testbed.wolkenschloss.local");
+        getDomain().getLocale().convention(System.getenv("LANG"));
+
+        getHost().getHostAddress().convention(IpUtil.getHostAddress());
+        getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
+
+        getPool().getRootImageName().convention("root.qcow2");
+        getPool().getCidataImageName().convention("cidata.img");
+        getPool().getName().convention("testbed");
+
+        getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
+        getBaseImage().getName().convention("ubuntu-20.04");
     }
 
     @Nested
