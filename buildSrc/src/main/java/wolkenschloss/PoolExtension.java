@@ -8,4 +8,7 @@ public interface PoolExtension extends Serializable {
 
     Property<String> getName();
 //    Property<String> getPath();
+
+    // Pool
+    abstract public Property<String> getRootImageName();
 }

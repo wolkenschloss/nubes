@@ -34,8 +34,6 @@ public abstract class TestbedExtension {
 
     public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
 
-    // Pool
-    abstract public Property<String> getRootImageName();
 
     // Pool
     abstract public Property<String> getCidataImageName();
@@ -68,7 +66,7 @@ public abstract class TestbedExtension {
         property.put("callback", callback);
 
         var disks = objects.mapProperty(String.class, Object.class);
-        disks.put("root", getRootImageName());
+        disks.put("root", getPool().getRootImageName());
         disks.put("cidata", getCidataImageName());
         property.put("disks", disks);
 

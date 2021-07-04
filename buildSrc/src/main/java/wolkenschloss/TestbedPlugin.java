@@ -41,7 +41,7 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getDomain().getLocale().convention(System.getenv("LANG"));
         extension.getView().getHostAddress().convention(IpUtil.getHostAddress());
 
-        extension.getRootImageName().convention("root.qcow2");
+        extension.getPool().getRootImageName().convention("root.qcow2");
         extension.getCidataImageName().convention("cidata.img");
 
         extension.getPool().getName().convention("testbed");
@@ -79,7 +79,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var root = project.getTasks().register("root", CreateRootImage.class, task -> {
             task.getSize().convention("20G");
             task.getBaseImage().convention(download.get().getBaseImage());
-            task.getRootImage().convention(extension.getPoolDirectory().file(extension.getRootImageName()));
+            task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
             task.getRootImageMd5File().set(extension.getRunDirectory().file("root.md5"));
         });
 
