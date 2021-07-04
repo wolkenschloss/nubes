@@ -6,9 +6,10 @@ import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
-import wolkenschloss.BaseTestbedExtension;
 
-import javax.inject.Inject;
+// TODO: wolkenschloss.task darf nicht auf wolkenschloss zugreifen.
+import wolkenschloss.TestbedExtension;
+
 import java.nio.file.Files;
 
 @CacheableTask
@@ -30,7 +31,7 @@ abstract public class CreatePool extends DefaultTask {
     @TaskAction
     public void exec() {
 
-        var tbe = this.getProject().getExtensions().getByType(BaseTestbedExtension.class);
+        var tbe = this.getProject().getExtensions().getByType(TestbedExtension.class);
         try (var testbed = tbe.create()) {
 
             if (getPoolRunFile().get().getAsFile().exists()) {

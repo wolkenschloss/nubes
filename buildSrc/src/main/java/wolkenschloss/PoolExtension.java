@@ -4,7 +4,7 @@ import org.gradle.api.provider.Property;
 
 import java.io.Serializable;
 
-public interface TestbedPool extends Serializable {
+public interface PoolExtension extends Serializable {
 
     Property<String> getName();
 //    Property<String> getPath();

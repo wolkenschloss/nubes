@@ -7,6 +7,7 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.task.*;
 import wolkenschloss.task.status.StatusTask;
+import wolkenschloss.task.start.Start;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -18,8 +19,8 @@ public class TestbedPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
 
-        BaseTestbedExtension extension = project.getExtensions()
-                .create("testbed", BaseTestbedExtension.class);
+        TestbedExtension extension = project.getExtensions()
+                .create("testbed", TestbedExtension.class);
 
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
@@ -147,7 +148,7 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
-    private Action<Transform> configureTransformTask(BaseTestbedExtension extension, ObjectFactory objects) {
+    private Action<Transform> configureTransformTask(TestbedExtension extension, ObjectFactory objects) {
         return (Transform task) -> {
             task.getScope().convention(extension.asPropertyMap(objects));
         };

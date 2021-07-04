@@ -9,10 +9,9 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
 
-import java.util.List;
 import java.util.Map;
 
-public interface BaseTestbedExtension {
+public interface TestbedExtension {
     RegularFileProperty getSshKeyFile();
 
     Property<String> getName();
@@ -25,23 +24,23 @@ public interface BaseTestbedExtension {
     }
 
     @Nested
-    TestbedDomain getDomain();
+    DomainExtension getDomain();
 
-    default void domain(Action<? super TestbedDomain> action) {action.execute(getDomain());}
+    default void domain(Action<? super DomainExtension> action) {action.execute(getDomain());}
 
     @Nested
-    TestbedPool getPool();
+    PoolExtension getPool();
 
-    default void pool(Action<? super TestbedPool> action) {action.execute(getPool());}
+    default void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
 
     Property<String> getRootImageName();
 
     Property<String> getCidataImageName();
 
     @Nested
-    BaseImage getBaseImage();
+    BaseImageExtension getBaseImage();
 
-    default void base(Action<? super BaseImage> action) {
+    default void base(Action<? super BaseImageExtension> action) {
         action.execute(getBaseImage());
     }
 
