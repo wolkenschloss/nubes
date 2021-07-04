@@ -16,6 +16,8 @@ import java.nio.file.Path;
 
 public class TestbedPlugin implements Plugin<Project> {
 
+    public static final int DEFAULT_CALLBACK_PORT = 9191;
+
     @Override
     public void apply(Project project) {
 
@@ -46,7 +48,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.getPool().getName().convention("testbed");
 
-        extension.getView().getCallbackPort().set(9191);
+        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
 
         extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
         extension.getBaseImage().getName().convention("ubuntu-20.04");
@@ -104,7 +106,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.dependsOn(createPool);
             task.getDomain().set(extension.getDomain().getName());
             task.getHostname().set(extension.getDomain().getName());
-            task.getPort().set(extension.getView().getCallbackPort());
+            task.getPort().set(extension.getHost().getCallbackPort());
             task.getXmlDescription().set(domainConfig.get().getOutputFile());
             task.getPoolRunFile().set(createPool.get().getPoolRunFile());
             task.getKnownHostsFile().set(extension.getRunDirectory().file("known_hosts"));

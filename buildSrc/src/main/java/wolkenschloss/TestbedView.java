@@ -15,8 +15,7 @@ abstract public class TestbedView {
 
 
 
-    // Host
-    public abstract Property<Integer> getCallbackPort();
+
 
 
 }

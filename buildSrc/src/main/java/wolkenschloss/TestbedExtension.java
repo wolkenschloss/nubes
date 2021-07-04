@@ -63,7 +63,7 @@ public abstract class TestbedExtension {
 
         var callback = objects.mapProperty(String.class, Object.class);
         callback.put("ip", getHost().getHostAddress());
-        callback.put("port", getView().getCallbackPort());
+        callback.put("port", getHost().getCallbackPort());
         property.put("callback", callback);
 
         var disks = objects.mapProperty(String.class, Object.class);
