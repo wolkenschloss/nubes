@@ -19,6 +19,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "Pool";
     public static final String CREATE_POOL_TASK_NAME = "createPool";
     public static final String START_DOMAIN_TASK_NAME = "startDomain";
+    public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
 
     @Override
     public void apply(Project project) {
@@ -88,7 +89,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getKnownHostsFile().set(extension.getRunDirectory().file("known_hosts"));
         });
 
-        var readKubeConfig = project.getTasks().register("readKubeConfig", CopyKubeConfig.class, task -> {
+        var readKubeConfig = project.getTasks().register(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class, task -> {
             // benötigt funktionierenden ssh Zugang. Deswegen muss updateKnownHosts
             // vorher ausgeführt sein.
 //            task.dependsOn(updateKnownHosts);
