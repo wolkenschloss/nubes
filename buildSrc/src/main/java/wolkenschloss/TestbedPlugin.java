@@ -11,6 +11,8 @@ import wolkenschloss.task.start.Start;
 
 public class TestbedPlugin implements Plugin<Project> {
 
+    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
+
     @Override
     public void apply(Project project) {
 
@@ -21,7 +23,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.configure(project.getLayout());
 
-        var networkConfig = createTransformationTask(project, "CloudInit",
+        var networkConfig = createTransformationTask(project, TRANSFORM_NETWORK_CONFIG_TASK_NAME,
                 extension.getSourceDirectory().file("network-config.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("network-config"));
 
