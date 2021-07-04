@@ -7,8 +7,8 @@ abstract public class TestbedView {
     // user?
     abstract public Property<String> getSshKey();
 
-    // Host?
-    abstract public Property<String> getHostname();
+//    // Host? Domain?
+//    abstract public Property<String> getHostname();
 
     // User
     abstract public Property<String> getUser();
@@ -19,9 +19,5 @@ abstract public class TestbedView {
     // Host
     public abstract Property<Integer> getCallbackPort();
 
-    // Domain
-    public abstract Property<String> getLocale();
 
-    // Domain
-    public abstract Property<String> getFqdn();
 }

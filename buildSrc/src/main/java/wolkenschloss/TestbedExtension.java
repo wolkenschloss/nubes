@@ -13,11 +13,8 @@ import java.util.Map;
 
 public abstract class TestbedExtension {
 
-    // Host
+    // Host? User?
     abstract public RegularFileProperty getSshKeyFile();
-
-    // Domain
-    abstract public Property<String> getName();
 
     // ???
     @Nested
@@ -61,9 +58,9 @@ public abstract class TestbedExtension {
 
         property.put("user", getView().getUser());
         property.put("getSshKey", getView().getSshKey());
-        property.put("hostname", getView().getHostname());
-        property.put("fqdn", getView().getFqdn());
-        property.put("locale", getView().getLocale());
+        property.put("hostname", getDomain().getName());
+        property.put("fqdn", getDomain().getFqdn());
+        property.put("locale", getDomain().getLocale());
 
         var callback = objects.mapProperty(String.class, Object.class);
         callback.put("ip", getView().getHostAddress());

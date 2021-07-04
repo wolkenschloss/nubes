@@ -35,10 +35,10 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getView().getUser().convention(System.getenv("USER"));
-        extension.getView().getHostname().convention("testbed");
-        extension.getView().getFqdn().convention("testbed.wolkenschloss.local");
+        extension.getDomain().getName().convention("testbed");
+        extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
         extension.getView().getSshKey().convention(extension.getSshKeyFile().map(this::readSshKey));
-        extension.getView().getLocale().convention(System.getenv("LANG"));
+        extension.getDomain().getLocale().convention(System.getenv("LANG"));
         extension.getView().getHostAddress().convention(IpUtil.getHostAddress());
 
         extension.getRootImageName().convention("root.qcow2");
@@ -95,15 +95,15 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getPoolName().set(extension.getPool().getName());
             task.getXmlDescription().set(poolConfig.get().getOutputFile());
             task.getPoolRunFile().set(extension.getRunDirectory().file("pool.run"));
-            task.getDomainName().set(extension.getView().getHostname());
+            task.getDomainName().set(extension.getDomain().getName());
             task.dependsOn(root, cidata);
         });
 
         var startDomain = project.getTasks().register("startDomain", Start.class, task -> {
             // TODO: Refactor. testbed darf nur ein einziges mal erscheinen.
             task.dependsOn(createPool);
-            task.getDomain().set(extension.getView().getHostname());
-            task.getHostname().set(extension.getView().getHostname());
+            task.getDomain().set(extension.getDomain().getName());
+            task.getHostname().set(extension.getDomain().getName());
             task.getPort().set(extension.getView().getCallbackPort());
             task.getXmlDescription().set(domainConfig.get().getOutputFile());
             task.getPoolRunFile().set(createPool.get().getPoolRunFile());
@@ -114,13 +114,13 @@ public class TestbedPlugin implements Plugin<Project> {
             // benötigt funktionierenden ssh Zugang. Deswegen muss updateKnownHosts
             // vorher ausgeführt sein.
 //            task.dependsOn(updateKnownHosts);
-            task.getDomainName().set(extension.getView().getHostname());
+            task.getDomainName().set(extension.getDomain().getName());
             task.getKubeConfigFile().convention(extension.getRunDirectory().file("kubeconfig"));
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
         });
 
         var status = project.getTasks().register("status", StatusTask.class, task -> {
-            task.getDomainName().set(extension.getView().getHostname());
+            task.getDomainName().set(extension.getDomain().getName());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
             task.getPoolName().set(extension.getPool().getName());
@@ -134,7 +134,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> task.dependsOn(readKubeConfig));
 
         project.getTasks().register("destroy", Destroy.class, task -> {
-            task.getDomain().set(extension.getView().getHostname());
+            task.getDomain().set(extension.getDomain().getName());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
             task.getDomainXmlConfig().set(domainConfig.get().getOutputFile());
