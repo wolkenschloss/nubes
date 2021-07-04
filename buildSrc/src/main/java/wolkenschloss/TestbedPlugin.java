@@ -1,6 +1,7 @@
 package wolkenschloss;
 
 import org.gradle.api.*;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
@@ -26,7 +27,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
-        configure(project, extension);
+        configure(extension, project.getLayout());
 
         var networkConfig = createTransformationTask(project, "CloudInit",
                 extension.getSourceDirectory().file("network-config.mustache"),
@@ -124,15 +125,15 @@ public class TestbedPlugin implements Plugin<Project> {
         });
     }
 
-    private void configure(Project project, TestbedExtension extension) {
+    private void configure(TestbedExtension extension, ProjectLayout layout) {
         // Set build directories
-        var buildDirectory = project.getLayout().getBuildDirectory();
+        var buildDirectory = layout.getBuildDirectory();
         extension.getPoolDirectory().set(buildDirectory.dir("pool"));
         extension.getRunDirectory().set(buildDirectory.dir("run"));
         extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
         extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
 
-        extension.getSourceDirectory().set(project.getLayout().getProjectDirectory().dir("src"));
+        extension.getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
 
         extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
