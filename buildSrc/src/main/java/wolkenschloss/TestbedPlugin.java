@@ -18,6 +18,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
     public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "Pool";
     public static final String CREATE_POOL_TASK_NAME = "createPool";
+    public static final String START_DOMAIN_TASK_NAME = "startDomain";
 
     @Override
     public void apply(Project project) {
@@ -77,7 +78,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.dependsOn(root, cidata);
         });
 
-        var startDomain = project.getTasks().register("startDomain", Start.class, task -> {
+        var startDomain = project.getTasks().register(START_DOMAIN_TASK_NAME, Start.class, task -> {
             task.dependsOn(createPool);
             task.getDomain().set(extension.getDomain().getName());
             task.getHostname().set(extension.getDomain().getName());
