@@ -11,7 +11,7 @@ import wolkenschloss.task.start.Start;
 
 public class TestbedPlugin implements Plugin<Project> {
 
-    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
+     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "UserData";
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
@@ -34,24 +34,24 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.configure(project.getLayout());
 
-        var networkConfig = createTransformationTask(project, TRANSFORM_NETWORK_CONFIG_TASK_NAME,
+        var transformNetworkConfig = createTransformationTask(project, TRANSFORM_NETWORK_CONFIG_TASK_NAME,
                 extension.getSourceDirectory().file("network-config.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("network-config"));
 
-        var userData = createTransformationTask(project, TRANSFORM_USER_DATA_TASK_NAME,
+        var transformUserData = createTransformationTask(project, TRANSFORM_USER_DATA_TASK_NAME,
                 extension.getSourceDirectory().file("user-data.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("user-data"));
 
-        var cidata = project.getTasks().register(CREATE_DATA_SOURCE_IMAGE_TASK_NAME, CreateDataSource.class, task -> {
+        var createDataSourceImage = project.getTasks().register(CREATE_DATA_SOURCE_IMAGE_TASK_NAME, CreateDataSource.class, task -> {
             // InputFiles
-            task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
-            task.getUserData().convention(userData.get().getOutputFile());
+            task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
+            task.getUserData().convention(transformUserData.get().getOutputFile());
 
             // OutputFile
             task.getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
         });
 
-        var download = project.getTasks().register(DOWNLOAD_DISTRIBUTION_TASK_NAME, Download.class, task -> {
+        var downloadDistribution = project.getTasks().register(DOWNLOAD_DISTRIBUTION_TASK_NAME, Download.class, task -> {
             task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
             task.getDistributionName().convention(extension.getBaseImage().getName());
             var parts = extension.getBaseImage().getUrl().get().split("/");
@@ -59,14 +59,14 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getBaseImage().convention(distribution.file(basename));
         });
 
-        var root = project.getTasks().register(CREATE_ROOT_IMAGE_TASK_NAME, CreateRootImage.class, task -> {
+        var createRootImage = project.getTasks().register(CREATE_ROOT_IMAGE_TASK_NAME, CreateRootImage.class, task -> {
             task.getSize().convention("20G");
-            task.getBaseImage().convention(download.get().getBaseImage());
+            task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
             task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
             task.getRootImageMd5File().convention(extension.getRunDirectory().file("root.md5"));
         });
 
-        var poolConfig = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
+        var transformPoolDescription = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file("pool.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
 
@@ -76,10 +76,10 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var createPool = project.getTasks().register(CREATE_POOL_TASK_NAME, CreatePool.class, task -> {
             task.getPoolName().convention(extension.getPool().getName());
-            task.getXmlDescription().convention(poolConfig.get().getOutputFile());
+            task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
             task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
             task.getDomainName().convention(extension.getDomain().getName());
-            task.dependsOn(root, cidata);
+            task.dependsOn(createRootImage, createDataSourceImage);
         });
 
         var startDomain = project.getTasks().register(START_DOMAIN_TASK_NAME, Start.class, task -> {
@@ -121,12 +121,12 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
             task.getDomainXmlConfig().convention(domainConfig.get().getOutputFile());
             task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
-            task.getPoolXmlConfig().convention(poolConfig.get().getOutputFile());
-            task.getRootImageFile().convention(root.get().getRootImage());
-            task.getRootImageMd5File().convention(root.get().getRootImageMd5File());
-            task.getCiDataImageFile().convention(cidata.get().getCidata());
-            task.getNetworkConfig().convention(networkConfig.get().getOutputFile());
-            task.getUserData().convention(userData.get().getOutputFile());
+            task.getPoolXmlConfig().convention(transformPoolDescription.get().getOutputFile());
+            task.getRootImageFile().convention(createRootImage.get().getRootImage());
+            task.getRootImageMd5File().convention(createRootImage.get().getRootImageMd5File());
+            task.getCiDataImageFile().convention(createDataSourceImage.get().getCidata());
+            task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
+            task.getUserData().convention(transformUserData.get().getOutputFile());
         });
     }
 
