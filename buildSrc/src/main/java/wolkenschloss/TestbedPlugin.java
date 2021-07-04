@@ -14,6 +14,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "UserData";
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
+    public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
 
     @Override
     public void apply(Project project) {
@@ -42,7 +43,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
         });
 
-        var download = project.getTasks().register("download", Download.class, task -> {
+        var download = project.getTasks().register(DOWNLOAD_DISTRIBUTION_TASK_NAME, Download.class, task -> {
             task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
             task.getDistributionName().convention(extension.getBaseImage().getName());
             var parts = extension.getBaseImage().getUrl().get().split("/");
