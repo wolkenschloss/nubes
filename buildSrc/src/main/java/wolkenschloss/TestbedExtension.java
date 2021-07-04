@@ -2,9 +2,7 @@ package wolkenschloss;
 
 import org.gradle.api.Action;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
@@ -59,7 +57,7 @@ public abstract class TestbedExtension {
     public Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
         var property = objects.mapProperty(String.class, Object.class);
 
-        property.put("user", getUser().getUser());
+        property.put("user", getUser().getName());
         property.put("getSshKey", getUser().getSshKey());
         property.put("hostname", getDomain().getName());
         property.put("fqdn", getDomain().getFqdn());

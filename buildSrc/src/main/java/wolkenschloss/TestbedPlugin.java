@@ -37,7 +37,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
         extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
-        extension.getUser().getUser().convention(System.getenv("USER"));
+        extension.getUser().getName().convention(System.getenv("USER"));
 
         extension.getDomain().getName().convention("testbed");
         extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
@@ -102,7 +102,6 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var startDomain = project.getTasks().register("startDomain", Start.class, task -> {
-            // TODO: Refactor. testbed darf nur ein einziges mal erscheinen.
             task.dependsOn(createPool);
             task.getDomain().set(extension.getDomain().getName());
             task.getHostname().set(extension.getDomain().getName());

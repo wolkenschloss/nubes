@@ -8,5 +8,5 @@ public interface UserExtension {
 
     Property<String> getSshKey();
 
-    Property<String> getUser();
+    Property<String> getName();
 }
