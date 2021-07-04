@@ -26,32 +26,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
-        // Set build directories
-        var buildDirectory = project.getLayout().getBuildDirectory();
-        extension.getPoolDirectory().set(buildDirectory.dir("pool"));
-        extension.getRunDirectory().set(buildDirectory.dir("run"));
-        extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
-        extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
-
-        extension.getSourceDirectory().set(project.getLayout().getProjectDirectory().dir("src"));
-
-        extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
-        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
-        extension.getUser().getName().convention(System.getenv("USER"));
-
-        extension.getDomain().getName().convention("testbed");
-        extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
-        extension.getDomain().getLocale().convention(System.getenv("LANG"));
-
-        extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
-        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
-
-        extension.getPool().getRootImageName().convention("root.qcow2");
-        extension.getPool().getCidataImageName().convention("cidata.img");
-        extension.getPool().getName().convention("testbed");
-
-        extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-        extension.getBaseImage().getName().convention("ubuntu-20.04");
+        configure(project, extension);
 
         var networkConfig = createTransformationTask(project, "CloudInit",
                 extension.getSourceDirectory().file("network-config.mustache"),
@@ -147,6 +122,35 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getNetworkConfig().set(networkConfig.get().getOutputFile());
             task.getUserData().set(userData.get().getOutputFile());
         });
+    }
+
+    private void configure(Project project, TestbedExtension extension) {
+        // Set build directories
+        var buildDirectory = project.getLayout().getBuildDirectory();
+        extension.getPoolDirectory().set(buildDirectory.dir("pool"));
+        extension.getRunDirectory().set(buildDirectory.dir("run"));
+        extension.getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
+        extension.getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
+
+        extension.getSourceDirectory().set(project.getLayout().getProjectDirectory().dir("src"));
+
+        extension.getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
+        extension.getUser().getSshKey().convention(extension.getUser().getSshKeyFile().map(this::readSshKey));
+        extension.getUser().getName().convention(System.getenv("USER"));
+
+        extension.getDomain().getName().convention("testbed");
+        extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
+        extension.getDomain().getLocale().convention(System.getenv("LANG"));
+
+        extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
+        extension.getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
+
+        extension.getPool().getRootImageName().convention("root.qcow2");
+        extension.getPool().getCidataImageName().convention("cidata.img");
+        extension.getPool().getName().convention("testbed");
+
+        extension.getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
+        extension.getBaseImage().getName().convention("ubuntu-20.04");
     }
 
     private Action<Transform> configureTransformTask(TestbedExtension extension, ObjectFactory objects) {
