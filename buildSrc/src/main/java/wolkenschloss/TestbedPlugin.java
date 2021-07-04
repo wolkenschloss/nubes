@@ -22,6 +22,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
+    public static final String DESTROY_TASK_NAME = "destroy";
 
     @Override
     public void apply(Project project) {
@@ -114,7 +115,7 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register(START_TASK_NAME, DefaultTask.class,
                 task -> task.dependsOn(readKubeConfig));
 
-        project.getTasks().register("destroy", Destroy.class, task -> {
+        project.getTasks().register(DESTROY_TASK_NAME, Destroy.class, task -> {
             task.getDomain().set(extension.getDomain().getName());
             task.getKubeConfigFile().set(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().set(startDomain.get().getKnownHostsFile());
