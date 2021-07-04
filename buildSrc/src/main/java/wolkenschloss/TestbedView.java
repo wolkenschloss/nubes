@@ -13,8 +13,7 @@ abstract public class TestbedView {
     // User
     abstract public Property<String> getUser();
 
-    // Host
-    public abstract Property<String> getHostAddress();
+
 
     // Host
     public abstract Property<Integer> getCallbackPort();

@@ -16,6 +16,11 @@ public abstract class TestbedExtension {
     // Host? User?
     abstract public RegularFileProperty getSshKeyFile();
 
+    @Nested
+    abstract public HostExtension getHost();
+
+    public void host(Action<? super HostExtension> action) { action.execute(getHost());}
+
     // ???
     @Nested
     abstract public TestbedView getView();
@@ -33,9 +38,6 @@ public abstract class TestbedExtension {
     abstract public PoolExtension getPool();
 
     public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
-
-
-
 
     // Pool
     @Nested
@@ -60,7 +62,7 @@ public abstract class TestbedExtension {
         property.put("locale", getDomain().getLocale());
 
         var callback = objects.mapProperty(String.class, Object.class);
-        callback.put("ip", getView().getHostAddress());
+        callback.put("ip", getHost().getHostAddress());
         callback.put("port", getView().getCallbackPort());
         property.put("callback", callback);
 

@@ -39,7 +39,7 @@ public class TestbedPlugin implements Plugin<Project> {
         extension.getDomain().getFqdn().convention("testbed.wolkenschloss.local");
         extension.getView().getSshKey().convention(extension.getSshKeyFile().map(this::readSshKey));
         extension.getDomain().getLocale().convention(System.getenv("LANG"));
-        extension.getView().getHostAddress().convention(IpUtil.getHostAddress());
+        extension.getHost().getHostAddress().convention(IpUtil.getHostAddress());
 
         extension.getPool().getRootImageName().convention("root.qcow2");
         extension.getPool().getCidataImageName().convention("cidata.img");
