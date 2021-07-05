@@ -23,6 +23,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
     public static final String DESTROY_TASK_NAME = "destroy";
+    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "Domain";
 
     @Override
     public void apply(Project project) {
@@ -61,7 +62,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file("pool.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
 
-        var transformDomainDescription = createTransformationTask(project, "Domain",
+        var transformDomainDescription = createTransformationTask(project, TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file("domain.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("domain.xml"));
 
