@@ -93,14 +93,9 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> task.dependsOn(readKubeConfig));
 
         project.getTasks().register(DESTROY_TASK_NAME, Destroy.class, task -> {
-            task.getDomain().convention(extension.getDomain().getName());
-            task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
-            task.getBuildDir().convention(project.getLayout().getBuildDirectory());
+            task.initialize(project, extension, createPool);
         });
     }
-
-
-
 
     private Action<Transform> configureTransformTask(TestbedExtension extension, ObjectFactory objects) {
         return (Transform task) -> {
