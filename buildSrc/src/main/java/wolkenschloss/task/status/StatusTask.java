@@ -5,13 +5,13 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
-import wolkenschloss.Distribution;
-import wolkenschloss.Domain;
-import wolkenschloss.SecureShell;
-import wolkenschloss.Testbed;
+import wolkenschloss.*;
 import wolkenschloss.task.CheckedConsumer;
+import wolkenschloss.task.CopyKubeConfig;
+import wolkenschloss.task.start.Start;
 
 import javax.inject.Inject;
 import java.nio.file.Files;
@@ -39,6 +39,14 @@ public abstract class StatusTask extends DefaultTask {
 
     @Inject
     abstract public ExecOperations getExecOperations();
+
+    public void initialize(TestbedExtension extension, TaskProvider<Start> startDomain, TaskProvider<CopyKubeConfig> readKubeConfig) {
+        getDomainName().convention(extension.getDomain().getName());
+        getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
+        getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+        getPoolName().convention(extension.getPool().getName());
+        getDistributionName().convention(extension.getBaseImage().getName());
+    }
 
     @TaskAction
     public void printStatus() throws Throwable {

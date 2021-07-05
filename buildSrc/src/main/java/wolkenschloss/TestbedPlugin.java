@@ -81,13 +81,10 @@ public class TestbedPlugin implements Plugin<Project> {
                 CopyKubeConfig.class,
                 task -> task.initialize(extension, startDomain));
 
-        var status = project.getTasks().register(STATUS_TASK_NAME, StatusTask.class, task -> {
-            task.getDomainName().convention(extension.getDomain().getName());
-            task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
-            task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-            task.getPoolName().convention(extension.getPool().getName());
-            task.getDistributionName().convention(extension.getBaseImage().getName());
-        });
+        var status = project.getTasks().register(
+                STATUS_TASK_NAME,
+                StatusTask.class,
+                task -> task.initialize(extension, startDomain, readKubeConfig));
 
         project.getTasks().withType(Transform.class).configureEach(
                 configureTransformTask(extension, project.getObjects()));
