@@ -47,13 +47,10 @@ public class TestbedPlugin implements Plugin<Project> {
                 CreateDataSource.class,
                 task -> task.initialize(extension, transformNetworkConfig, transformUserData));
 
-        var downloadDistribution = project.getTasks().register(DOWNLOAD_DISTRIBUTION_TASK_NAME, Download.class, task -> {
-            task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
-            task.getDistributionName().convention(extension.getBaseImage().getName());
-            var parts = extension.getBaseImage().getUrl().get().split("/");
-            var basename = parts[parts.length - 1];
-            task.getBaseImage().convention(distribution.file(basename));
-        });
+        var downloadDistribution = project.getTasks().register(
+                DOWNLOAD_DISTRIBUTION_TASK_NAME,
+                Download.class,
+                task -> task.initialize(extension, distribution));
 
         var createRootImage = project.getTasks().register(
                 CREATE_ROOT_IMAGE_TASK_NAME,
@@ -123,6 +120,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getUserData().convention(transformUserData.get().getOutputFile());
         });
     }
+
 
 
 

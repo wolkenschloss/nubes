@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.process.ExecOperations;
 import wolkenschloss.Distribution;
+import wolkenschloss.TestbedExtension;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -40,6 +41,14 @@ abstract public class Download extends DefaultTask {
 
     @Input
     abstract public Property<String> getDistributionName();
+
+    public void initialize(TestbedExtension extension, Distribution distribution) {
+        getBaseImageLocation().convention(extension.getBaseImage().getUrl());
+        getDistributionName().convention(extension.getBaseImage().getName());
+        var parts = extension.getBaseImage().getUrl().get().split("/");
+        var basename = parts[parts.length - 1];
+        getBaseImage().convention(distribution.file(basename));
+    }
 
     private URL getBaseImageUrl() throws MalformedURLException {
         return new URL(getBaseImageLocation().get());
