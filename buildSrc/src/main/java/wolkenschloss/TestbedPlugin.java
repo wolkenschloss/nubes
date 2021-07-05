@@ -59,9 +59,10 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getBaseImage().convention(distribution.file(basename));
         });
 
-        var createRootImage = project.getTasks().register(CREATE_ROOT_IMAGE_TASK_NAME, CreateRootImage.class, task -> {
-            task.initialize(extension, downloadDistribution);
-        });
+        var createRootImage = project.getTasks().register(
+                CREATE_ROOT_IMAGE_TASK_NAME,
+                CreateRootImage.class,
+                task -> task.initialize(extension, downloadDistribution));
 
         var transformPoolDescription = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file("pool.xml.mustache"),

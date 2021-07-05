@@ -25,6 +25,9 @@ import java.security.NoSuchAlgorithmException;
 @CacheableTask
 abstract public class CreateRootImage extends DefaultTask {
 
+    public static final String DEFAULT_IMAGE_SIZE = "20G";
+    public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getBaseImage();
@@ -42,10 +45,10 @@ abstract public class CreateRootImage extends DefaultTask {
     abstract public ExecOperations getExecOperations();
 
     public void initialize(TestbedExtension extension, TaskProvider<Download> downloadDistribution) {
-        getSize().convention("20G");
+        getSize().convention(DEFAULT_IMAGE_SIZE);
         getBaseImage().convention(downloadDistribution.get().getBaseImage());
         getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
-        getRootImageMd5File().convention(extension.getRunDirectory().file("root.md5"));
+        getRootImageMd5File().convention(extension.getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
     }
 
     @TaskAction
