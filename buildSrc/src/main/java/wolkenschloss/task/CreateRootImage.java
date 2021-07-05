@@ -44,7 +44,7 @@ abstract public class CreateRootImage extends DefaultTask {
     @Inject
     abstract public ExecOperations getExecOperations();
 
-    public void initialize(TestbedExtension extension, TaskProvider<Download> downloadDistribution) {
+    public void initialize(TestbedExtension extension, TaskProvider<DownloadDistribution> downloadDistribution) {
         getSize().convention(DEFAULT_IMAGE_SIZE);
         getBaseImage().convention(downloadDistribution.get().getBaseImage());
         getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));

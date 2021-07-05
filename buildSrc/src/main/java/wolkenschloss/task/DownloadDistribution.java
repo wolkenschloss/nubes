@@ -25,9 +25,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 @CacheableTask
-abstract public class Download extends DefaultTask {
+abstract public class DownloadDistribution extends DefaultTask {
 
-    public Download() {
+    public DownloadDistribution() {
     }
 
     @Inject
@@ -124,7 +124,7 @@ abstract public class Download extends DefaultTask {
     }
 
     private void downloadFile(URL src) throws IOException {
-        var progressLogger = getProgressLoggerFactory().newOperation(Download.class);
+        var progressLogger = getProgressLoggerFactory().newOperation(DownloadDistribution.class);
 
         progressLogger.start("Download base Image", src.getFile());
 

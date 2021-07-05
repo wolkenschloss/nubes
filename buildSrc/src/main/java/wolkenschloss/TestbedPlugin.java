@@ -49,7 +49,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var downloadDistribution = project.getTasks().register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
-                Download.class,
+                DownloadDistribution.class,
                 task -> task.initialize(extension, distribution));
 
         var createRootImage = project.getTasks().register(
