@@ -76,14 +76,10 @@ public class TestbedPlugin implements Plugin<Project> {
                 Start.class,
                 task -> task.initialize(extension, transformDomainDescription, createPool));
 
-        var readKubeConfig = project.getTasks().register(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class, task -> {
-            // benötigt funktionierenden ssh Zugang. Deswegen muss updateKnownHosts
-            // vorher ausgeführt sein.
-//            task.dependsOn(updateKnownHosts);
-            task.getDomainName().convention(extension.getDomain().getName());
-            task.getKubeConfigFile().convention(extension.getRunDirectory().file("kubeconfig"));
-            task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-        });
+        var readKubeConfig = project.getTasks().register(
+                READ_KUBE_CONFIG_TASK_NAME,
+                CopyKubeConfig.class,
+                task -> task.initialize(extension, startDomain));
 
         var status = project.getTasks().register(STATUS_TASK_NAME, StatusTask.class, task -> {
             task.getDomainName().convention(extension.getDomain().getName());
