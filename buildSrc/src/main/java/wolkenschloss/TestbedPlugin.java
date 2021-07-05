@@ -72,13 +72,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> task.initialize(extension, createDataSourceImage, createRootImage, transformPoolDescription));
 
         var startDomain = project.getTasks().register(START_DOMAIN_TASK_NAME, Start.class, task -> {
-            task.dependsOn(createPool);
-            task.getDomain().convention(extension.getDomain().getName());
-            task.getHostname().convention(extension.getDomain().getName());
-            task.getPort().convention(extension.getHost().getCallbackPort());
-            task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
-            task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
-            task.getKnownHostsFile().convention(extension.getRunDirectory().file("known_hosts"));
+            task.initialize(extension, transformDomainDescription, createPool);
         });
 
         var readKubeConfig = project.getTasks().register(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class, task -> {

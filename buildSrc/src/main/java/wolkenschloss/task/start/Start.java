@@ -11,6 +11,9 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
 import wolkenschloss.Domain;
 import wolkenschloss.Testbed;
+import wolkenschloss.TestbedExtension;
+import wolkenschloss.task.CreatePool;
+import wolkenschloss.task.Transform;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -50,6 +53,16 @@ abstract public class Start extends DefaultTask {
 
     @OutputFile
     abstract public RegularFileProperty getKnownHostsFile();
+
+    public void initialize(TestbedExtension extension, TaskProvider<Transform> transformDomainDescription, TaskProvider<CreatePool> createPool) {
+        dependsOn(createPool);
+        getDomain().convention(extension.getDomain().getName());
+        getHostname().convention(extension.getDomain().getName());
+        getPort().convention(extension.getHost().getCallbackPort());
+        getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
+        getPoolRunFile().convention(createPool.get().getPoolRunFile());
+        getKnownHostsFile().convention(extension.getRunDirectory().file("known_hosts"));
+    }
 
     @TaskAction
     public void exec() throws Throwable {
