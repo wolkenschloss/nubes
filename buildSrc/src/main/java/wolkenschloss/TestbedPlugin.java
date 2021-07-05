@@ -61,13 +61,13 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file("pool.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
 
-        var domainConfig = createTransformationTask(project, "Domain",
+        var transformDomainDescription = createTransformationTask(project, "Domain",
                 extension.getSourceDirectory().file("domain.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("domain.xml"));
 
         var createPool = project.getTasks().register(
                 CREATE_POOL_TASK_NAME,
-                CreatePool.class, 
+                CreatePool.class,
                 task -> task.initialize(extension, createDataSourceImage, createRootImage, transformPoolDescription));
 
         var startDomain = project.getTasks().register(START_DOMAIN_TASK_NAME, Start.class, task -> {
@@ -75,7 +75,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getDomain().convention(extension.getDomain().getName());
             task.getHostname().convention(extension.getDomain().getName());
             task.getPort().convention(extension.getHost().getCallbackPort());
-            task.getXmlDescription().convention(domainConfig.get().getOutputFile());
+            task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
             task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
             task.getKnownHostsFile().convention(extension.getRunDirectory().file("known_hosts"));
         });
@@ -107,7 +107,7 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getDomain().convention(extension.getDomain().getName());
             task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
             task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-            task.getDomainXmlConfig().convention(domainConfig.get().getOutputFile());
+            task.getDomainXmlConfig().convention(transformDomainDescription.get().getOutputFile());
             task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
             task.getPoolXmlConfig().convention(transformPoolDescription.get().getOutputFile());
             task.getRootImageFile().convention(createRootImage.get().getRootImage());
