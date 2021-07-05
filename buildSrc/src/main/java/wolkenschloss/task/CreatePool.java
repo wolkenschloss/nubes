@@ -28,6 +28,14 @@ abstract public class CreatePool extends DefaultTask {
     @OutputFile
     abstract public RegularFileProperty getPoolRunFile();
 
+    public void initialize(TestbedExtension extension, TaskProvider<CreateDataSource> createDataSourceImage, TaskProvider<CreateRootImage> createRootImage, TaskProvider<Transform> transformPoolDescription) {
+        getPoolName().convention(extension.getPool().getName());
+        getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
+        getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
+        getDomainName().convention(extension.getDomain().getName());
+        dependsOn(createRootImage, createDataSourceImage);
+    }
+
     @TaskAction
     public void exec() {
 
