@@ -68,80 +68,28 @@ abstract public class Start extends DefaultTask {
 
     @TaskAction
     public void exec() throws Throwable {
-        try {
-//            var execute = getProject().findProperty("dry-run") == null;
-
-            // TODO Kandidat für Testbed Klasse
-            var connection = new org.libvirt.Connect("qemu:///system");
-
-            try {
-
-                getLogger().info("Executing 'virsh define {}'", getXmlDescription().get());
-
-                var xml = Files.readString(getXmlDescription().get().getAsFile().toPath());
-                connection.domainCreateXML(xml, 0);
-                var serverKey = waitForCallback();
-                updateKnownHosts(serverKey);
-
-//                // A. Domain ist definiert
-//                var domain = connection.domainLookupByName(getDomain().get());
-//                var info = domain.getInfo();
-//                var state = info.state;
-//
-//                // 1. Fall Domäne existiert, ist aber ausgeschaltet.
-//                if (state == DomainInfo.DomainState.VIR_DOMAIN_SHUTOFF) {
-//                    getLogger().info("Domäne ist vorhanden, aber ausgeschaltet.");
-//                    getLogger().info("Domäne wird wieder eingeschaltet");
-//                    if (execute) {
-//                        domain.create();
-//                    }
-//                }
-//
-//                // 2. Fall Domäne existiert und läuft gerade.
-//                if (state == DomainInfo.DomainState.VIR_DOMAIN_RUNNING) {
-//                    getLogger().info("Domäne ist vorhanden und läuft gerade.");
-//                    getLogger().info("Es wird keine Änderung durchgeführt");
-//                }
-//
-//                // 3. Fall Domäne existiert und ist pausiert.
-//                if (state == DomainInfo.DomainState.VIR_DOMAIN_PAUSED) {
-//                    getLogger().info("Domäne ist vorhanden und pausiert.");
-//                    getLogger().info("Domäne wird wiederaufgenommen");
-//
-//                    if (execute) {
-//                        domain.resume();
-//                    }
-//                }
-//
-//                // B. Domain
-
-            } finally {
-                connection.close();
-            }
+        try (var testbed = new Testbed(getHostname().get())) {
+            var xml = Files.readString(getXmlDescription().get().getAsFile().toPath());
+            testbed.getConnection().domainCreateXML(xml, 0);
+            var serverKey = waitForCallback();
+            updateKnownHosts(testbed, serverKey);
         } catch (LibvirtException e) {
-            e.printStackTrace();
             throw new GradleScriptException("Fehler beim Zugriff auf libvirt", e);
         }
     }
 
-    public void updateKnownHosts(String serverKey) throws Throwable {
-        try {
-            try (var testbed = new Testbed(getDomain().get())) {
-                var ip = testbed.withDomain(Domain::getTestbedHostAddress);
+    public void updateKnownHosts(Testbed testbed, String serverKey) throws Throwable {
+        var ip = testbed.withDomain(Domain::getTestbedHostAddress);
 
-                var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
-                var attributes = PosixFilePermissions.asFileAttribute(permissions);
-                var path = getKnownHostsFile().get().getAsFile().toPath();
-                var file = Files.createFile(path, attributes);
+        var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+        var attributes = PosixFilePermissions.asFileAttribute(permissions);
+        var path = getKnownHostsFile().get().getAsFile().toPath();
+        var file = Files.createFile(path, attributes);
 
-                Files.writeString(
-                        file.toAbsolutePath(),
-                        String.format("%s %s", ip, serverKey),
-                        StandardOpenOption.WRITE);
-            }
-        } catch (LibvirtException | IOException | InterruptedException e) {
-            throw new GradleScriptException("Die Datei known_hosts konnte nicht vollständig aktualisiert werden.", e);
-        }
+        Files.writeString(
+                file.toAbsolutePath(),
+                String.format("%s %s", ip, serverKey),
+                StandardOpenOption.WRITE);
     }
 
     public String waitForCallback() {
