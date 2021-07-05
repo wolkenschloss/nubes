@@ -7,6 +7,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
+import wolkenschloss.TestbedExtension;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +40,13 @@ abstract public class CreateRootImage extends DefaultTask {
 
     @Inject
     abstract public ExecOperations getExecOperations();
+
+    public void initialize(TestbedExtension extension, TaskProvider<Download> downloadDistribution) {
+        getSize().convention("20G");
+        getBaseImage().convention(downloadDistribution.get().getBaseImage());
+        getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
+        getRootImageMd5File().convention(extension.getRunDirectory().file("root.md5"));
+    }
 
     @TaskAction
     public void exec() throws NoSuchAlgorithmException, IOException {

@@ -60,10 +60,7 @@ public class TestbedPlugin implements Plugin<Project> {
         });
 
         var createRootImage = project.getTasks().register(CREATE_ROOT_IMAGE_TASK_NAME, CreateRootImage.class, task -> {
-            task.getSize().convention("20G");
-            task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
-            task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
-            task.getRootImageMd5File().convention(extension.getRunDirectory().file("root.md5"));
+            task.initialize(extension, downloadDistribution);
         });
 
         var transformPoolDescription = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
