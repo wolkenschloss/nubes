@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 @CacheableTask
 abstract public class Start extends DefaultTask {
 
+    public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
+
     @Input
     abstract public Property<String> getDomain();
 
@@ -61,7 +63,7 @@ abstract public class Start extends DefaultTask {
         getPort().convention(extension.getHost().getCallbackPort());
         getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
         getPoolRunFile().convention(createPool.get().getPoolRunFile());
-        getKnownHostsFile().convention(extension.getRunDirectory().file("known_hosts"));
+        getKnownHostsFile().convention(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
     }
 
     @TaskAction
