@@ -5,9 +5,9 @@ import org.gradle.api.tasks.*;
 import wolkenschloss.TestbedExtension;
 
 @CacheableTask
-abstract public class CreateDataSource extends Exec {
+abstract public class CreateDataSourceImage extends Exec {
 
-    public CreateDataSource() {
+    public CreateDataSourceImage() {
         commandLine("cloud-localds");
     }
 

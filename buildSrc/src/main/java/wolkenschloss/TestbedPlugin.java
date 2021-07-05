@@ -45,7 +45,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var createDataSourceImage = project.getTasks().register(
                 CREATE_DATA_SOURCE_IMAGE_TASK_NAME,
-                CreateDataSource.class,
+                CreateDataSourceImage.class,
                 task -> task.initialize(extension, transformNetworkConfig, transformUserData));
 
         var downloadDistribution = project.getTasks().register(
