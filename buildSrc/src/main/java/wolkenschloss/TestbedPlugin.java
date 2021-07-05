@@ -94,16 +94,8 @@ public class TestbedPlugin implements Plugin<Project> {
 
         project.getTasks().register(DESTROY_TASK_NAME, Destroy.class, task -> {
             task.getDomain().convention(extension.getDomain().getName());
-            task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
-            task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-            task.getDomainXmlConfig().convention(transformDomainDescription.get().getOutputFile());
             task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
-            task.getPoolXmlConfig().convention(transformPoolDescription.get().getOutputFile());
-            task.getRootImageFile().convention(createRootImage.get().getRootImage());
-            task.getRootImageMd5File().convention(createRootImage.get().getRootImageMd5File());
-            task.getCiDataImageFile().convention(createDataSourceImage.get().getCidata());
-            task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
-            task.getUserData().convention(transformUserData.get().getOutputFile());
+            task.getBuildDir().convention(project.getLayout().getBuildDirectory());
         });
     }
 
