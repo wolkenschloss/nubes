@@ -42,14 +42,10 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file("user-data.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("user-data"));
 
-        var createDataSourceImage = project.getTasks().register(CREATE_DATA_SOURCE_IMAGE_TASK_NAME, CreateDataSource.class, task -> {
-            // InputFiles
-            task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
-            task.getUserData().convention(transformUserData.get().getOutputFile());
-
-            // OutputFile
-            task.getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
-        });
+        var createDataSourceImage = project.getTasks().register(
+                CREATE_DATA_SOURCE_IMAGE_TASK_NAME,
+                CreateDataSource.class,
+                task -> task.initialize(extension, transformNetworkConfig, transformUserData));
 
         var downloadDistribution = project.getTasks().register(DOWNLOAD_DISTRIBUTION_TASK_NAME, Download.class, task -> {
             task.getBaseImageLocation().convention(extension.getBaseImage().getUrl());
@@ -127,6 +123,8 @@ public class TestbedPlugin implements Plugin<Project> {
             task.getUserData().convention(transformUserData.get().getOutputFile());
         });
     }
+
+
 
     private Action<Transform> configureTransformTask(TestbedExtension extension, ObjectFactory objects) {
         return (Transform task) -> {
