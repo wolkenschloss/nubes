@@ -70,7 +70,14 @@ abstract public class Start extends DefaultTask {
     public void exec() throws Throwable {
         try (var testbed = new Testbed(getHostname().get())) {
             var xml = Files.readString(getXmlDescription().get().getAsFile().toPath());
-            testbed.getConnection().domainCreateXML(xml, 0);
+            var domain = testbed.getConnection().domainDefineXML(xml);
+
+            try {
+                testbed.getConnection().domainCreateXML(xml, 0);
+            } finally {
+                domain.free();
+            }
+
             var serverKey = waitForCallback();
             updateKnownHosts(testbed, serverKey);
         } catch (LibvirtException e) {

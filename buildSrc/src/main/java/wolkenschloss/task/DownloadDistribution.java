@@ -128,7 +128,8 @@ abstract public class DownloadDistribution extends DefaultTask {
     }
 
     private void downloadFile(URL src) throws IOException {
-        var progressLogger = getProgressLoggerFactory().newOperation(DownloadDistribution.class);
+        var progressLogger = getProgressLoggerFactory()
+                .newOperation(DownloadDistribution.class);
 
         progressLogger.start("Download base Image", src.getFile());
 
