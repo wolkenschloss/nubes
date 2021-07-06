@@ -58,8 +58,6 @@ public abstract class TestbedExtension {
         getPool().getName().convention("testbed");
 
         getBaseImage().initialize();
-//        getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-//        getBaseImage().getName().convention("ubuntu-20.04");
     }
 
     @Nested
@@ -84,7 +82,6 @@ public abstract class TestbedExtension {
 
     public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
 
-    // Pool
     @Nested
     abstract public BaseImageExtension getBaseImage();
 
@@ -128,17 +125,13 @@ public abstract class TestbedExtension {
         return new Testbed(getDomain().getName().get());
     }
 
-    // Host? Pool?
     abstract public DirectoryProperty getPoolDirectory();
 
-    // Host?
     abstract public DirectoryProperty getRunDirectory();
 
     abstract public DirectoryProperty getSourceDirectory();
 
-    // Pool?
     abstract public DirectoryProperty getGeneratedCloudInitDirectory();
 
-    // Domain? Pool?
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 }

@@ -15,6 +15,7 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.process.ExecOperations;
+import wolkenschloss.BaseImageExtension;
 import wolkenschloss.TestbedExtension;
 
 import javax.inject.Inject;
@@ -50,11 +51,11 @@ abstract public class DownloadDistribution extends DefaultTask {
     @Internal
     abstract public DirectoryProperty getDistributionDir();
 
-    public void initialize(TestbedExtension extension) {
-        getBaseImageLocation().convention(extension.getBaseImage().getUrl());
-        getDistributionName().convention(extension.getBaseImage().getName());
-        getBaseImage().convention(extension.getBaseImage().getBaseImageFile());
-        getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
+    public void initialize(BaseImageExtension baseImage) {
+        getBaseImageLocation().convention(baseImage.getUrl());
+        getDistributionName().convention(baseImage.getName());
+        getBaseImage().convention(baseImage.getBaseImageFile());
+        getDistributionDir().convention(baseImage.getDistributionDir());
     }
 
     private URL getBaseImageUrl() throws MalformedURLException {
