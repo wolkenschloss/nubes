@@ -3,28 +3,25 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.RegularFile;
-import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.task.*;
 import wolkenschloss.task.start.Start;
 import wolkenschloss.task.status.StatusTask;
 
 public class TestbedPlugin implements Plugin<Project> {
 
-    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
-    public static final String TRANSFORM_USER_DATA_TASK_NAME = "UserData";
+    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformCloudInit";
+    public static final String TRANSFORM_USER_DATA_TASK_NAME = "transformUserData";
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
-    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "Pool";
+    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPool";
     public static final String CREATE_POOL_TASK_NAME = "createPool";
     public static final String START_DOMAIN_TASK_NAME = "startDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
     public static final String DESTROY_TASK_NAME = "destroy";
-    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "Domain";
+    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "transformDomain";
 
     @Override
     public void apply(Project project) {
@@ -35,12 +32,15 @@ public class TestbedPlugin implements Plugin<Project> {
         var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
 
         extension.configure(project.getLayout());
+        var registrar = new TransformationTaskRegistrar(project);
 
-        var transformNetworkConfig = createTransformationTask(project, TRANSFORM_NETWORK_CONFIG_TASK_NAME,
+        var transformNetworkConfig = registrar.register(
+                TRANSFORM_NETWORK_CONFIG_TASK_NAME,
                 extension.getSourceDirectory().file("network-config.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("network-config"));
 
-        var transformUserData = createTransformationTask(project, TRANSFORM_USER_DATA_TASK_NAME,
+        var transformUserData = registrar.register(
+                TRANSFORM_USER_DATA_TASK_NAME,
                 extension.getSourceDirectory().file("user-data.mustache"),
                 extension.getGeneratedCloudInitDirectory().file("user-data"));
 
@@ -59,11 +59,13 @@ public class TestbedPlugin implements Plugin<Project> {
                 CreateRootImage.class,
                 task -> task.initialize(extension, downloadDistribution));
 
-        var transformPoolDescription = createTransformationTask(project, TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
+        var transformPoolDescription = registrar.register(
+                TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file("pool.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
 
-        var transformDomainDescription = createTransformationTask(project, TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
+        var transformDomainDescription = registrar.register(
+                TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file("domain.xml.mustache"),
                 extension.getGeneratedVirshConfigDirectory().file("domain.xml"));
 
@@ -99,16 +101,5 @@ public class TestbedPlugin implements Plugin<Project> {
                 DESTROY_TASK_NAME,
                 Destroy.class,
                 task -> task.initialize(project, extension, createPool));
-    }
-
-    private TaskProvider<Transform> createTransformationTask(
-            Project project,
-            String name,
-            Provider<RegularFile> template,
-            Provider<RegularFile> output) {
-        return project.getTasks().register("transform" + name, Transform.class, task -> {
-            task.getTemplate().convention(template);
-            task.getOutputFile().convention(output);
-        });
     }
 }
