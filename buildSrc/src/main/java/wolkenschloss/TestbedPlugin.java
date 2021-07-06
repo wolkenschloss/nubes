@@ -90,12 +90,15 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(extension.asPropertyMap(project.getObjects())));
 
-        project.getTasks().register(START_TASK_NAME, DefaultTask.class,
+        project.getTasks().register(
+                START_TASK_NAME,
+                DefaultTask.class,
                 task -> task.dependsOn(readKubeConfig));
 
-        project.getTasks().register(DESTROY_TASK_NAME, Destroy.class, task -> {
-            task.initialize(project, extension, createPool);
-        });
+        project.getTasks().register(
+                DESTROY_TASK_NAME,
+                Destroy.class,
+                task -> task.initialize(project, extension, createPool));
     }
 
     private TaskProvider<Transform> createTransformationTask(
