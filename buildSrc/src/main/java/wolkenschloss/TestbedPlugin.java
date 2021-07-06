@@ -9,38 +9,49 @@ import wolkenschloss.task.status.StatusTask;
 
 public class TestbedPlugin implements Plugin<Project> {
 
-    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformCloudInit";
+    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformNetworkConfig";
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "transformUserData";
+    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "transformDomainDescription";
+    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
+    public static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
+
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
-    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPool";
     public static final String CREATE_POOL_TASK_NAME = "createPool";
     public static final String START_DOMAIN_TASK_NAME = "startDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
     public static final String DESTROY_TASK_NAME = "destroy";
-    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "transformDomain";
+    public static final String NETWORK_CONFIG_FILE_NAME = "network-config";
+    public static final String USER_DATA_FILE_NAME = "user-data";
+    public static final String POOL_DESCRIPTION_FILE_NAME = "pool.xml";
+    public static final String DOMAIN_DESCRIPTION_FILE_NAME = "domain.xml";
+    public static final String TESTBED_EXTENSION_NAME = "testbed";
+
+    private static String templateFilename(String filename) {
+        return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
+    }
 
     @Override
     public void apply(Project project) {
 
         TestbedExtension extension = project.getExtensions()
-                .create("testbed", TestbedExtension.class);
+                .create(TESTBED_EXTENSION_NAME, TestbedExtension.class);
 
         extension.configure(project.getLayout());
         var registrar = new TransformationTaskRegistrar(project);
 
         var transformNetworkConfig = registrar.register(
                 TRANSFORM_NETWORK_CONFIG_TASK_NAME,
-                extension.getSourceDirectory().file("network-config.mustache"),
-                extension.getGeneratedCloudInitDirectory().file("network-config"));
+                extension.getSourceDirectory().file(templateFilename(NETWORK_CONFIG_FILE_NAME)),
+                extension.getGeneratedCloudInitDirectory().file(NETWORK_CONFIG_FILE_NAME));
 
         var transformUserData = registrar.register(
                 TRANSFORM_USER_DATA_TASK_NAME,
-                extension.getSourceDirectory().file("user-data.mustache"),
-                extension.getGeneratedCloudInitDirectory().file("user-data"));
+                extension.getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)),
+                extension.getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME));
 
         var createDataSourceImage = project.getTasks().register(
                 CREATE_DATA_SOURCE_IMAGE_TASK_NAME,
@@ -59,13 +70,13 @@ public class TestbedPlugin implements Plugin<Project> {
 
         var transformPoolDescription = registrar.register(
                 TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
-                extension.getSourceDirectory().file("pool.xml.mustache"),
-                extension.getGeneratedVirshConfigDirectory().file("pool.xml"));
+                extension.getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)),
+                extension.getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME));
 
         var transformDomainDescription = registrar.register(
                 TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
-                extension.getSourceDirectory().file("domain.xml.mustache"),
-                extension.getGeneratedVirshConfigDirectory().file("domain.xml"));
+                extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)),
+                extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME));
 
         var createPool = project.getTasks().register(
                 CREATE_POOL_TASK_NAME,

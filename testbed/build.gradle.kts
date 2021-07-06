@@ -13,7 +13,12 @@ testbed {
     domain {
         name.set("testbed")
     }
+
     pool {
         name.set("testbed")
+    }
+
+    host {
+        callbackPort.set(9292)
     }
 }
