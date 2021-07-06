@@ -1,17 +1,18 @@
 package wolkenschloss;
 
-import org.gradle.api.*;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.task.*;
-import wolkenschloss.task.status.StatusTask;
 import wolkenschloss.task.start.Start;
+import wolkenschloss.task.status.StatusTask;
 
 public class TestbedPlugin implements Plugin<Project> {
 
-     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
+    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "CloudInit";
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "UserData";
     public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
@@ -81,13 +82,13 @@ public class TestbedPlugin implements Plugin<Project> {
                 CopyKubeConfig.class,
                 task -> task.initialize(extension, startDomain));
 
-        var status = project.getTasks().register(
+        project.getTasks().register(
                 STATUS_TASK_NAME,
                 StatusTask.class,
                 task -> task.initialize(extension, startDomain, readKubeConfig));
 
         project.getTasks().withType(Transform.class).configureEach(
-                configureTransformTask(extension, project.getObjects()));
+                task -> task.getScope().convention(extension.asPropertyMap(project.getObjects())));
 
         project.getTasks().register(START_TASK_NAME, DefaultTask.class,
                 task -> task.dependsOn(readKubeConfig));
@@ -95,12 +96,6 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register(DESTROY_TASK_NAME, Destroy.class, task -> {
             task.initialize(project, extension, createPool);
         });
-    }
-
-    private Action<Transform> configureTransformTask(TestbedExtension extension, ObjectFactory objects) {
-        return (Transform task) -> {
-            task.getScope().convention(extension.asPropertyMap(objects));
-        };
     }
 
     private TaskProvider<Transform> createTransformationTask(
