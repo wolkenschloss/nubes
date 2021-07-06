@@ -3,16 +3,18 @@ package wolkenschloss.task;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.GradleScriptException;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.FileSystemOperations;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.process.ExecOperations;
-import wolkenschloss.Distribution;
 import wolkenschloss.TestbedExtension;
 
 import javax.inject.Inject;
@@ -42,12 +44,17 @@ abstract public class DownloadDistribution extends DefaultTask {
     @Input
     abstract public Property<String> getDistributionName();
 
-    public void initialize(TestbedExtension extension, Distribution distribution) {
+    @Internal
+    abstract public RegularFileProperty getBaseImage();
+
+    @Internal
+    abstract public DirectoryProperty getDistributionDir();
+
+    public void initialize(TestbedExtension extension) {
         getBaseImageLocation().convention(extension.getBaseImage().getUrl());
         getDistributionName().convention(extension.getBaseImage().getName());
-        var parts = extension.getBaseImage().getUrl().get().split("/");
-        var basename = parts[parts.length - 1];
-        getBaseImage().convention(distribution.file(basename));
+        getBaseImage().convention(extension.getBaseImage().getBaseImageFile());
+        getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
     }
 
     private URL getBaseImageUrl() throws MalformedURLException {
@@ -65,9 +72,6 @@ abstract public class DownloadDistribution extends DefaultTask {
         URI parent = location.getPath().endsWith("/") ? location.resolve("..") : location.resolve(".");
         return parent.resolve("SHA256SUMS.gpg").toURL();
     }
-
-    @Internal
-    abstract public RegularFileProperty getBaseImage();
 
     @Inject
     protected abstract ProgressLoggerFactory getProgressLoggerFactory();
@@ -90,7 +94,6 @@ abstract public class DownloadDistribution extends DefaultTask {
         var file = new File(getBaseImage().getAsFile().get().toPath().toString());
         var dir = file.getParentFile();
 
-
         Arrays.stream(dir.listFiles()).forEach(f -> {
             var success = f.setWritable(false, false)
                     && f.setReadable(true, true)
@@ -102,24 +105,24 @@ abstract public class DownloadDistribution extends DefaultTask {
         });
     }
 
-    private Path downloadPath(String filename) {
-        return new Distribution(getProject().getObjects(), getDistributionName()).getDistributionDir().resolve(filename);
+    private Provider<RegularFile> downloadPath(String filename) {
+        return getDistributionDir().file(filename);
     }
 
     private void verifyChecksum() {
         getExecOperations().exec(spec -> spec.commandLine("sha256sum")
                 .args("--ignore-missing",
                         "--check",
-                        downloadPath("SHA256SUMS"))
-                .workingDir(new Distribution(getProject().getObjects(), getDistributionName()).getDistributionDir()))
+                        "SHA256SUMS")
+                .workingDir(getDistributionDir().get()))
                 .assertNormalExitValue();
     }
 
     private void verifySignature() {
         getExecOperations().exec(spec -> spec.commandLine("gpg")
                 .args("--keyid-format", "long", "--verify",
-                        downloadPath("SHA256SUMS.gpg"),
-                        downloadPath("SHA256SUMS")))
+                        downloadPath("SHA256SUMS.gpg").get(),
+                        downloadPath("SHA256SUMS").get()))
                 .assertNormalExitValue();
     }
 
@@ -133,8 +136,8 @@ abstract public class DownloadDistribution extends DefaultTask {
             OutputStream output;
             var filename = Path.of(src.getFile()).getFileName();
 
-            var distribution = new Distribution(getProject().getObjects(), getDistributionName());
-            var dst = distribution.getDistributionDir().resolve(filename.toString()).toFile();
+            var dst = getDistributionDir().file(filename.toString()).get().getAsFile();
+            getLogger().info("Downloading {}", dst.getAbsolutePath());
 
             dst.getParentFile().mkdirs();
 

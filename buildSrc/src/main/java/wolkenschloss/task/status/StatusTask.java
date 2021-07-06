@@ -1,6 +1,7 @@
 package wolkenschloss.task.status;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Internal;
@@ -37,6 +38,15 @@ public abstract class StatusTask extends DefaultTask {
     @Internal
     abstract public Property<String> getDistributionName();
 
+    @Internal
+    abstract public DirectoryProperty getDownloadDir();
+
+    @Internal
+    abstract public DirectoryProperty getDistributionDir();
+
+    @Internal
+    abstract public RegularFileProperty getBaseImageFile();
+
     @Inject
     abstract public ExecOperations getExecOperations();
 
@@ -46,6 +56,9 @@ public abstract class StatusTask extends DefaultTask {
         getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
         getPoolName().convention(extension.getPool().getName());
         getDistributionName().convention(extension.getBaseImage().getName());
+        getDownloadDir().convention(extension.getBaseImage().getDownloadDir());
+        getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
+        getBaseImageFile().convention(extension.getBaseImage().getBaseImageFile());
     }
 
     @TaskAction
@@ -96,11 +109,13 @@ public abstract class StatusTask extends DefaultTask {
                                     .error("missing catalog hello-world")
                     );
                 });
-
-                var distribution = new Distribution(getProject().getObjects(), getDistributionName());
-                info("XDG_DATA_HOME", () -> distribution.getDownloadDir());
-                info("Distribution", () -> distribution.getName().get());
             });
+
+            info("XDG_DATA_HOME", () -> getDownloadDir().get().getAsFile().toPath());
+            evaluate2("Base image", () -> getBaseImageFile().getAsFile().get().toPath(),
+                    status -> status.check(Files::exists)
+                            .ok(Path::toString)
+                            .error("missing"));
         }
     }
 

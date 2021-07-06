@@ -29,8 +29,6 @@ public class TestbedPlugin implements Plugin<Project> {
         TestbedExtension extension = project.getExtensions()
                 .create("testbed", TestbedExtension.class);
 
-        var distribution = new Distribution(project.getObjects(), extension.getBaseImage().getName());
-
         extension.configure(project.getLayout());
         var registrar = new TransformationTaskRegistrar(project);
 
@@ -52,7 +50,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var downloadDistribution = project.getTasks().register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
-                task -> task.initialize(extension, distribution));
+                task -> task.initialize(extension));
 
         var createRootImage = project.getTasks().register(
                 CREATE_ROOT_IMAGE_TASK_NAME,

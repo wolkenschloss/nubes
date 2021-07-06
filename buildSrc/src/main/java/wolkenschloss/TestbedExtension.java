@@ -57,8 +57,9 @@ public abstract class TestbedExtension {
         getPool().getCidataImageName().convention("cidata.img");
         getPool().getName().convention("testbed");
 
-        getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-        getBaseImage().getName().convention("ubuntu-20.04");
+        getBaseImage().initialize();
+//        getBaseImage().getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
+//        getBaseImage().getName().convention("ubuntu-20.04");
     }
 
     @Nested
@@ -71,14 +72,6 @@ public abstract class TestbedExtension {
     abstract public UserExtension getUser();
     public void user(Action<? super UserExtension> action) {
         action.execute(getUser());
-    }
-
-    // ???
-    @Nested
-    abstract public TestbedView getView();
-
-    public void view(Action<? super TestbedView> action) {
-        action.execute(getView());
     }
 
     @Nested
