@@ -58,6 +58,7 @@ abstract public class Start extends DefaultTask {
 
     public void initialize(TestbedExtension extension, TaskProvider<Transform> transformDomainDescription, TaskProvider<CreatePool> createPool) {
         dependsOn(createPool);
+        setDescription("Starts the libvirt domain and waits for the callback.");
         getDomain().convention(extension.getDomain().getName());
         getHostname().convention(extension.getDomain().getName());
         getPort().convention(extension.getHost().getCallbackPort());

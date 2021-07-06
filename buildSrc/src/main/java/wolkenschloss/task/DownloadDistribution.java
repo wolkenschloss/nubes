@@ -1,8 +1,6 @@
 package wolkenschloss.task;
 
 import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleException;
-import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFile;
@@ -13,13 +11,14 @@ import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.process.ExecOperations;
 import wolkenschloss.BaseImageExtension;
-import wolkenschloss.TestbedExtension;
 
 import javax.inject.Inject;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,9 +73,6 @@ abstract public class DownloadDistribution extends DefaultTask {
         return parent.resolve("SHA256SUMS.gpg").toURL();
     }
 
-    @Inject
-    protected abstract ProgressLoggerFactory getProgressLoggerFactory();
-
     @TaskAction
     public void download() throws URISyntaxException, IOException {
 
@@ -99,9 +95,9 @@ abstract public class DownloadDistribution extends DefaultTask {
             var success = f.setWritable(false, false)
                     && f.setReadable(true, true)
                     && f.setExecutable(false, false);
-            if (!success)  {
+            if (!success) {
                 var message = String.format("Can not change file permissions: %s", file.getPath());
-                throw new GradleException(message);
+                getLogger().warn(message);
             }
         });
     }
@@ -128,41 +124,23 @@ abstract public class DownloadDistribution extends DefaultTask {
     }
 
     private void downloadFile(URL src) throws IOException {
-        var progressLogger = getProgressLoggerFactory()
-                .newOperation(DownloadDistribution.class);
 
-        progressLogger.start("Download base Image", src.getFile());
+        getLogger().lifecycle("Downloading file {}", src);
 
-        try (InputStream input = src.openStream()) {
+        var filename = Path.of(src.getFile()).getFileName();
+        var dst = getDistributionDir().file(filename.toString()).get().getAsFile();
 
-            OutputStream output;
-            var filename = Path.of(src.getFile()).getFileName();
+        //noinspection ResultOfMethodCallIgnored
+        dst.getParentFile().mkdirs();
 
-            var dst = getDistributionDir().file(filename.toString()).get().getAsFile();
-            getLogger().info("Downloading {}", dst.getAbsolutePath());
-
-            dst.getParentFile().mkdirs();
-
-            if (!dst.exists()) {
-                try {
-                    output = new FileOutputStream(dst);
-                } catch (FileNotFoundException e) {
-                    throw new GradleScriptException("Datei nicht geschrieben werden", e);
-                }
-
-                byte[] buffer = new byte[1444];
-                int byteRead;
-                int byteSum = 0;
-                while ((byteRead = input.read(buffer)) != -1) {
-                    byteSum += byteRead;
-                    output.write(buffer, 0, byteRead);
-                    progressLogger.progress(String.format("%d MB", byteSum / (1024 * 1024)));
-                }
-
-                output.close();
-            }
+        if (dst.exists()) {
+            return;
         }
 
-        progressLogger.completed();
+        try (InputStream input = src.openStream()) {
+            try (var output = new FileOutputStream(dst)) {
+                input.transferTo(output);
+            }
+        }
     }
 }
