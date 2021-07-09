@@ -54,15 +54,15 @@ public abstract class StatusTask extends DefaultTask {
     @Inject
     abstract public ExecOperations getExecOperations();
 
-    public void initialize(TestbedExtension extension, TaskProvider<Start> startDomain, TaskProvider<CopyKubeConfig> readKubeConfig) {
-        getDomainName().convention(extension.getDomain().getName());
+    public void initialize(StatusTaskParameter parameter, TaskProvider<Start> startDomain, TaskProvider<CopyKubeConfig> readKubeConfig) {
+        getDomainName().convention(parameter.getDomainName());
         getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
         getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-        getPoolName().convention(extension.getPool().getName());
-        getDistributionName().convention(extension.getBaseImage().getName());
-        getDownloadDir().convention(extension.getBaseImage().getDownloadDir());
-        getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
-        getBaseImageFile().convention(extension.getBaseImage().getBaseImageFile());
+        getPoolName().convention(parameter.getPoolName());
+        getDistributionName().convention(parameter.getDistributionName());
+        getDownloadDir().convention(parameter.getDownloadDir());
+        getDistributionDir().convention(parameter.getDistributionDir());
+        getBaseImageFile().convention(parameter.getBaseImageFile());
     }
 
     @TaskAction

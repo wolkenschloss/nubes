@@ -10,6 +10,8 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
 import wolkenschloss.task.start.StartParameter;
+import wolkenschloss.task.status.StatusTaskParameter;
+
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,6 +64,13 @@ public abstract class TestbedExtension {
         getStartParameter().getDomain().set(getDomain().getName());
         getStartParameter().getPort().set(getHost().getCallbackPort());
         getStartParameter().getRunDirectory().set(getRunDirectory());
+
+        getStatusParameter().getDomainName().set(getDomain().getName());
+        getStatusParameter().getPoolName().set(getPool().getName());
+        getStatusParameter().getDistributionName().set(getBaseImage().getName());
+        getStatusParameter().getDownloadDir().set(getBaseImage().getDownloadDir());
+        getStatusParameter().getDistributionDir().set(getBaseImage().getDistributionDir());
+        getStatusParameter().getBaseImageFile().set(getBaseImage().getBaseImageFile());
     }
 
     @Nested
@@ -141,4 +150,7 @@ public abstract class TestbedExtension {
 
     @Nested
     abstract public StartParameter getStartParameter();
+
+    @Nested
+    abstract public StatusTaskParameter getStatusParameter();
 }

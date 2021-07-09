@@ -96,7 +96,7 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register(
                 STATUS_TASK_NAME,
                 StatusTask.class,
-                task -> task.initialize(extension, startDomain, readKubeConfig));
+                task -> task.initialize( extension.getStatusParameter(), startDomain, readKubeConfig));
 
         project.getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(extension.asPropertyMap(project.getObjects())));
