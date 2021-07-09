@@ -86,7 +86,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var startDomain = project.getTasks().register(
                 START_DOMAIN_TASK_NAME,
                 Start.class,
-                task -> task.initialize(extension, transformDomainDescription, createPool));
+                task -> task.initialize(extension.getStartParameter(), transformDomainDescription, createPool));
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,

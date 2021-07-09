@@ -9,7 +9,7 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
-
+import wolkenschloss.task.start.StartParameter;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -58,6 +58,10 @@ public abstract class TestbedExtension {
         getPool().getName().convention("testbed");
 
         getBaseImage().initialize();
+
+        getStartParameter().getDomain().set(getDomain().getName());
+        getStartParameter().getPort().set(getHost().getCallbackPort());
+        getStartParameter().getRunDirectory().set(getRunDirectory());
     }
 
     @Nested
@@ -134,4 +138,7 @@ public abstract class TestbedExtension {
     abstract public DirectoryProperty getGeneratedCloudInitDirectory();
 
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
+
+    @Nested
+    abstract public StartParameter getStartParameter();
 }

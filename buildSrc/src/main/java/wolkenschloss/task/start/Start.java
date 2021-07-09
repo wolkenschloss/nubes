@@ -13,7 +13,6 @@ import org.libvirt.LibvirtException;
 // TODO: Refactor
 import wolkenschloss.Domain;
 import wolkenschloss.Testbed;
-import wolkenschloss.TestbedExtension;
 
 // Diese Beziehung ist OK.
 import wolkenschloss.task.CreatePool;
@@ -57,14 +56,14 @@ abstract public class Start extends DefaultTask {
     @OutputFile
     abstract public RegularFileProperty getKnownHostsFile();
 
-    public void initialize(TestbedExtension extension, TaskProvider<Transform> transformDomainDescription, TaskProvider<CreatePool> createPool) {
+    public void initialize(StartParameter parameter, TaskProvider<Transform> transformDomainDescription, TaskProvider<CreatePool> createPool) {
         dependsOn(createPool);
         setDescription("Starts the libvirt domain and waits for the callback.");
-        getDomain().convention(extension.getDomain().getName());
-        getPort().convention(extension.getHost().getCallbackPort());
+        getDomain().convention(parameter.getDomain());
+        getPort().convention(parameter.getPort());
         getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
         getPoolRunFile().convention(createPool.get().getPoolRunFile());
-        getKnownHostsFile().convention(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+        getKnownHostsFile().convention(parameter.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
     }
 
     @TaskAction
