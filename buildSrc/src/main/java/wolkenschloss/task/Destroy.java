@@ -10,13 +10,12 @@ import org.gradle.api.tasks.Destroys;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskProvider;
+
+// TODO: Refactor
 import wolkenschloss.Testbed;
 import wolkenschloss.TestbedExtension;
 
 import javax.inject.Inject;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Collectors;
 
 public abstract class Destroy extends DefaultTask {
 

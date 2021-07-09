@@ -7,7 +7,7 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 
-// TODO: wolkenschloss.task darf nicht auf wolkenschloss zugreifen.
+// TODO: Refactor. wolkenschloss.task darf nicht auf wolkenschloss zugreifen.
 import wolkenschloss.TestbedExtension;
 
 import java.nio.file.Files;

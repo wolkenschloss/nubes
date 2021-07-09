@@ -5,8 +5,12 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
+
+// TODO: Refactor
 import wolkenschloss.Testbed;
 import wolkenschloss.TestbedExtension;
+
+// Diese Beziehung ist OK
 import wolkenschloss.task.start.Start;
 
 import javax.inject.Inject;

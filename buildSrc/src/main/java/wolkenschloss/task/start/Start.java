@@ -9,9 +9,13 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
+
+// TODO: Refactor
 import wolkenschloss.Domain;
 import wolkenschloss.Testbed;
 import wolkenschloss.TestbedExtension;
+
+// Diese Beziehung ist OK.
 import wolkenschloss.task.CreatePool;
 import wolkenschloss.task.Transform;
 

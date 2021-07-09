@@ -12,6 +12,8 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
+
+// TODO: Refactor
 import wolkenschloss.BaseImageExtension;
 
 import javax.inject.Inject;
