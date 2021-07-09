@@ -40,9 +40,6 @@ abstract public class Start extends DefaultTask {
     @Input
     abstract public Property<String> getDomain();
 
-    @Input
-    abstract public Property<String> getHostname();
-
     @Internal
     abstract public Property<Integer> getPort();
 
@@ -64,7 +61,6 @@ abstract public class Start extends DefaultTask {
         dependsOn(createPool);
         setDescription("Starts the libvirt domain and waits for the callback.");
         getDomain().convention(extension.getDomain().getName());
-        getHostname().convention(extension.getDomain().getName());
         getPort().convention(extension.getHost().getCallbackPort());
         getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
         getPoolRunFile().convention(createPool.get().getPoolRunFile());
@@ -73,7 +69,7 @@ abstract public class Start extends DefaultTask {
 
     @TaskAction
     public void exec() throws Throwable {
-        try (var testbed = new Testbed(getHostname().get())) {
+        try (var testbed = new Testbed(getDomain().get())) {
             var xml = Files.readString(getXmlDescription().get().getAsFile().toPath());
             var domain = testbed.getConnection().domainDefineXML(xml);
 
@@ -110,7 +106,7 @@ abstract public class Start extends DefaultTask {
             BlockingQueue<String> serverKeyResult = new SynchronousQueue<>();
 
             var server = HttpServer.create(new InetSocketAddress(getPort().get()), 0);
-            server.createContext(String.format("/%s", getHostname().get()), new CallbackHandler(serverKeyResult, getLogger()));
+            server.createContext(String.format("/%s", getDomain().get()), new CallbackHandler(serverKeyResult, getLogger()));
 
             server.setExecutor(executor);
             server.start();
