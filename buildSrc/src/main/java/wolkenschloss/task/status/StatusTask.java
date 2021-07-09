@@ -28,28 +28,28 @@ import java.util.function.Predicate;
 public abstract class StatusTask extends DefaultTask {
 
     @Internal
-    abstract public Property<String> getDomainName();
+    abstract Property<String> getDomainName();
 
     @Internal
-    public abstract Property<String> getPoolName();
+    abstract Property<String> getPoolName();
+
+    @Internal
+    abstract Property<String> getDistributionName();
+
+    @Internal
+    abstract DirectoryProperty getDownloadDir();
+
+    @Internal
+    abstract DirectoryProperty getDistributionDir();
+
+    @Internal
+    abstract RegularFileProperty getBaseImageFile();
 
     @Internal
     abstract public RegularFileProperty getKnownHostsFile();
 
     @Internal
     abstract public RegularFileProperty getKubeConfigFile();
-
-    @Internal
-    abstract public Property<String> getDistributionName();
-
-    @Internal
-    abstract public DirectoryProperty getDownloadDir();
-
-    @Internal
-    abstract public DirectoryProperty getDistributionDir();
-
-    @Internal
-    abstract public RegularFileProperty getBaseImageFile();
 
     @Inject
     abstract public ExecOperations getExecOperations();
