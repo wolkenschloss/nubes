@@ -9,8 +9,7 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
-// TODO: Refactor
-import wolkenschloss.Testbed;
+import wolkenschloss.model.Testbed;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;

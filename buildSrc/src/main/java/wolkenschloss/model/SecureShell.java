@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.model;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.process.ExecOperations;

@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.model;
 
 import com.jayway.jsonpath.JsonPath;
 import org.gradle.api.GradleException;

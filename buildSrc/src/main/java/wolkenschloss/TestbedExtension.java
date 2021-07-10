@@ -9,15 +9,15 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
-import wolkenschloss.task.start.StartParameter;
-import wolkenschloss.task.status.StatusTaskParameter;
-import wolkenschloss.task.CopyKubeConfigParameter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+
+import wolkenschloss.model.Testbed;
+import wolkenschloss.model.IpUtil;
 
 public abstract class TestbedExtension {
 
@@ -61,20 +61,6 @@ public abstract class TestbedExtension {
         getPool().getName().convention("testbed");
 
         getBaseImage().initialize();
-
-        getStartParameter().getDomain().set(getDomain().getName());
-        getStartParameter().getPort().set(getHost().getCallbackPort());
-        getStartParameter().getRunDirectory().set(getRunDirectory());
-
-        getStatusParameter().getDomainName().set(getDomain().getName());
-        getStatusParameter().getPoolName().set(getPool().getName());
-        getStatusParameter().getDistributionName().set(getBaseImage().getName());
-        getStatusParameter().getDownloadDir().set(getBaseImage().getDownloadDir());
-        getStatusParameter().getDistributionDir().set(getBaseImage().getDistributionDir());
-        getStatusParameter().getBaseImageFile().set(getBaseImage().getBaseImageFile());
-
-        getCopyKubeConfigParameter().getDomainName().set(getDomain().getName());
-        getCopyKubeConfigParameter().getRunDirectory().set(getRunDirectory());
     }
 
     @Nested
@@ -151,13 +137,4 @@ public abstract class TestbedExtension {
     abstract public DirectoryProperty getGeneratedCloudInitDirectory();
 
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
-
-    @Nested
-    abstract public StartParameter getStartParameter();
-
-    @Nested
-    abstract public StatusTaskParameter getStatusParameter();
-
-    @Nested
-    abstract public CopyKubeConfigParameter getCopyKubeConfigParameter();
 }

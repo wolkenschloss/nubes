@@ -35,13 +35,8 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
-    private static String templateFilename(String filename) {
-        return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
-    }
-
     @Override
     public void apply(Project project) {
-
         TestbedExtension extension = project.getExtensions()
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class);
 
@@ -101,7 +96,13 @@ public class TestbedPlugin implements Plugin<Project> {
         var createPool = project.getTasks().register(
                 CREATE_POOL_TASK_NAME,
                 CreatePool.class,
-                task -> task.initialize(extension, createDataSourceImage, createRootImage, transformPoolDescription));
+                task -> {
+                    task.getPoolName().convention(extension.getPool().getName());
+                    task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
+                    task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
+                    task.getDomainName().convention(extension.getDomain().getName());
+                    task.dependsOn(createRootImage, createDataSourceImage);
+                });
 
         var startDomain = project.getTasks().register(
                 START_DOMAIN_TASK_NAME,
@@ -155,5 +156,9 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
                     task.getBuildDir().convention(project.getLayout().getBuildDirectory());
                 });
+    }
+
+    private static String templateFilename(String filename) {
+        return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
     }
 }

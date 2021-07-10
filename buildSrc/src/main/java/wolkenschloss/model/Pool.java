@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.model;
 
 import org.libvirt.StoragePool;
 import wolkenschloss.task.CheckedConsumer;

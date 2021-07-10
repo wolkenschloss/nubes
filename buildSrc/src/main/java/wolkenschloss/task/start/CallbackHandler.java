@@ -33,5 +33,4 @@ public class CallbackHandler implements HttpHandler {
 
         exchange.close();
     }
-
 }

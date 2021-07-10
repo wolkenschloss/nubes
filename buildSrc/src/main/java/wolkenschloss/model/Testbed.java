@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.model;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
@@ -6,6 +6,7 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
+import wolkenschloss.CheckedFunction;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.io.IOException;

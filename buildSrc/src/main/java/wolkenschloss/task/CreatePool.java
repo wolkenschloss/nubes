@@ -8,7 +8,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 
 // TODO: Refactor. wolkenschloss.task darf nicht auf wolkenschloss zugreifen.
-import wolkenschloss.TestbedExtension;
+import wolkenschloss.model.Testbed;
 
 import java.nio.file.Files;
 
@@ -28,20 +28,10 @@ abstract public class CreatePool extends DefaultTask {
     @OutputFile
     abstract public RegularFileProperty getPoolRunFile();
 
-    public void initialize(TestbedExtension extension, TaskProvider<CreateDataSourceImage> createDataSourceImage, TaskProvider<CreateRootImage> createRootImage, TaskProvider<Transform> transformPoolDescription) {
-        getPoolName().convention(extension.getPool().getName());
-        getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
-        getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
-        getDomainName().convention(extension.getDomain().getName());
-        dependsOn(createRootImage, createDataSourceImage);
-    }
-
     @TaskAction
     public void exec() {
 
-        var tbe = this.getProject().getExtensions().getByType(TestbedExtension.class);
-        try (var testbed = tbe.create()) {
-
+        try (var testbed = new Testbed(getDomainName().get())) {
             if (getPoolRunFile().get().getAsFile().exists()) {
                 testbed.destroyPool(getPoolRunFile());
                 getLogger().info("Pool destroyed");

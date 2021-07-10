@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.model;
 
 import org.gradle.api.GradleScriptException;
 
@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-class IpUtil {
+public class IpUtil {
 
     public static String getHostAddress() {
         try (final DatagramSocket socket = new DatagramSocket()) {

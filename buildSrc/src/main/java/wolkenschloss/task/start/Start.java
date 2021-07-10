@@ -11,8 +11,8 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
 
 // TODO: Refactor
-import wolkenschloss.Domain;
-import wolkenschloss.Testbed;
+import wolkenschloss.model.Domain;
+import wolkenschloss.model.Testbed;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -29,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 @CacheableTask
 abstract public class Start extends DefaultTask {
-
-
 
     @Input
     abstract public Property<String> getDomain();
