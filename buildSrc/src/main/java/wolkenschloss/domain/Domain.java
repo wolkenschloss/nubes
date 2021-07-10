@@ -5,6 +5,8 @@ import org.gradle.api.GradleException;
 import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
 import wolkenschloss.pool.Pool;
+
+// TODO: Refactor
 import wolkenschloss.task.CheckedConsumer;
 
 import java.util.ArrayList;
@@ -12,16 +14,11 @@ import java.util.ArrayList;
 // TODO Kandidat für Testbed Klasse
 public class Domain implements AutoCloseable {
 
-//    private final String name;
-//    private final int retries;
-
     private final org.libvirt.Domain domain;
 
     public Domain(org.libvirt.Domain domain) {
         this.domain = domain;
     }
-
-
 
     public String getTestbedHostAddress() throws Throwable {
 
@@ -47,7 +44,6 @@ public class Domain implements AutoCloseable {
 
         }
 
-
     // Erfordert die Installation des Paketes qemu-guest-agent in der VM.
     // Gebe 30 Sekunden Timeout. Der erste Start könnte etwas länger dauern.
     private String getInterfaces(int retries) throws LibvirtException, InterruptedException {
@@ -72,8 +68,6 @@ public class Domain implements AutoCloseable {
     public Pool getPool(String name) {
         return new Pool(name);
     }
-
-
 
     @Override
     public void close() throws Exception {

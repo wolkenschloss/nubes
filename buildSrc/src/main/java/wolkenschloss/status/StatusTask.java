@@ -15,6 +15,7 @@ import wolkenschloss.model.SecureShell;
 import wolkenschloss.Testbed;
 
 // Diese Beziehung ist Ok.
+import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.task.CheckedConsumer;
 
 import javax.inject.Inject;
@@ -28,9 +29,6 @@ public abstract class StatusTask extends DefaultTask {
 
     @Internal
     abstract public Property<String> getDomainName();
-
-    @Internal
-    abstract public Property<String> getPoolName();
 
     @Internal
     abstract public Property<String> getDistributionName();
@@ -52,6 +50,9 @@ public abstract class StatusTask extends DefaultTask {
 
     @Inject
     abstract public ExecOperations getExecOperations();
+
+    @Internal
+    abstract public Property<PoolOperations> getPoolOperations();
 
     @TaskAction
     public void printStatus() throws Throwable {
@@ -80,8 +81,8 @@ public abstract class StatusTask extends DefaultTask {
                                 .ok(Path::toString)
                                 .error("missing"));
 
-                var pool = domain.getPool(getPoolName().get());
-                check("Pool", pool::run, p -> {
+                var poolOperations = getPoolOperations().get();
+                check("Pool", poolOperations::run, p -> {
                     info("Pool Name", p::getName);
                     info("Pool Autostart", p::getAutostart);
                     info("Pool isActive", p::isActive);

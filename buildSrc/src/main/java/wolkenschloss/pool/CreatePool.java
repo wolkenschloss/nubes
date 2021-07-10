@@ -7,9 +7,7 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 
-// TODO: Refactor. wolkenschloss.task darf nicht auf wolkenschloss zugreifen.
-import wolkenschloss.Testbed;
-
+import java.io.File;
 import java.nio.file.Files;
 
 @CacheableTask
@@ -28,27 +26,33 @@ abstract public class CreatePool extends DefaultTask {
     @OutputFile
     abstract public RegularFileProperty getPoolRunFile();
 
+    @Internal
+    abstract public Property<PoolOperations> getPoolOperations();
+
     @TaskAction
     public void exec() {
 
-        try (var testbed = new Testbed(getDomainName().get())) {
-            if (getPoolRunFile().get().getAsFile().exists()) {
-                testbed.destroyPool(getPoolRunFile());
+        var poolOperations = getPoolOperations().get();
+
+        try {
+            File runFile = getPoolRunFile().get().getAsFile();
+            if (runFile.exists()) {
+                poolOperations.destroyPool(getPoolRunFile());
                 getLogger().info("Pool destroyed");
             }
 
-            if (testbed.poolExistiert(getPoolName())) {
+            if (poolOperations.poolExistiert(getPoolName())) {
                 var message = String.format(
                         "Der Pool %1$s existiert bereits, aber die Markierung-Datei %2$s ist nicht vorhanden.%n" +
                                 "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1$s && virsh pool-undefine %1$s'",
                         getPoolName().get(),
-                        getPoolRunFile().get().getAsFile().getPath());
+                        runFile.getPath());
 
                 throw new GradleException(message);
             }
 
-            var uuid = testbed.createPool(getXmlDescription());
-            Files.writeString(getPoolRunFile().getAsFile().get().toPath(), uuid.toString());
+            var uuid = poolOperations.createPool(getXmlDescription());
+            Files.writeString(runFile.toPath(), uuid.toString());
 
         } catch (Exception e) {
             throw new GradleScriptException("Can not define storage pool", e);

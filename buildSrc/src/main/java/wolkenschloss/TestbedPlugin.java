@@ -3,13 +3,9 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import wolkenschloss.task.*;
 import wolkenschloss.domain.Start;
+import wolkenschloss.pool.*;
 import wolkenschloss.transformation.TransformationTaskRegistrar;
-import wolkenschloss.pool.CreateDataSourceImage;
-import wolkenschloss.pool.DownloadDistribution;
-import wolkenschloss.pool.CreateRootImage;
-import wolkenschloss.pool.CreatePool;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.status.StatusTask;
 
@@ -47,6 +43,12 @@ public class TestbedPlugin implements Plugin<Project> {
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class);
 
         extension.configure(project.getLayout());
+        var poolOperations = project.getGradle().getSharedServices().registerIfAbsent(
+                "poolops",
+                PoolOperations.class, spec -> {
+                    spec.getParameters().getPoolName().set(extension.getPool().getName());
+                });
+
         var registrar = new TransformationTaskRegistrar(project);
 
         var transformNetworkConfig = registrar.register(
@@ -103,6 +105,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 CREATE_POOL_TASK_NAME,
                 CreatePool.class,
                 task -> {
+                    task.getPoolOperations().set(poolOperations);
                     task.getPoolName().convention(extension.getPool().getName());
                     task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
@@ -136,10 +139,10 @@ public class TestbedPlugin implements Plugin<Project> {
                 STATUS_TASK_NAME,
                 StatusTask.class,
                 task -> {
+                    task.getPoolOperations().set(poolOperations);
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-                    task.getPoolName().convention(extension.getPool().getName());
                     task.getDistributionName().convention(extension.getBaseImage().getName());
                     task.getDownloadDir().convention(extension.getBaseImage().getDownloadDir());
                     task.getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
@@ -158,6 +161,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 DESTROY_TASK_NAME,
                 Destroy.class,
                 task -> {
+                    task.getPoolOperations().set(poolOperations);
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
                     task.getBuildDir().convention(project.getLayout().getBuildDirectory());

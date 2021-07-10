@@ -8,6 +8,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Destroys;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
+import wolkenschloss.pool.PoolOperations;
 
 import javax.inject.Inject;
 
@@ -25,6 +26,9 @@ public abstract class Destroy extends DefaultTask {
     @Inject
     abstract public FileSystemOperations getFileSystemOperations();
 
+    @Internal
+    abstract public Property<PoolOperations> getPoolOperations();
+
     @TaskAction
     public void destroy() throws Exception {
 
@@ -34,7 +38,7 @@ public abstract class Destroy extends DefaultTask {
                 getLogger().info("Domain deleted.");
             }
 
-            testbed.deletePoolIfExists(getPoolRunFile());
+            getPoolOperations().get().deletePoolIfExists(getPoolRunFile());
         }
 
         getFileSystemOperations().delete(spec -> {

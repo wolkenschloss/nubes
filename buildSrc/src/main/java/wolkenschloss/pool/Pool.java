@@ -11,12 +11,6 @@ public class Pool {
         this.name = name;
     }
 
-    public void run(CheckedConsumer<StoragePool> consumer) throws Throwable {
-        var connection = new org.libvirt.Connect("qemu:///system");
-        var pool = connection.storagePoolLookupByName(name);
-        consumer.accept(pool);
-        pool.free();
-        connection.close();
-    }
+
 }
 
