@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Nested;
 import org.libvirt.LibvirtException;
 import wolkenschloss.task.start.StartParameter;
 import wolkenschloss.task.status.StatusTaskParameter;
+import wolkenschloss.task.CopyKubeConfigParameter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -71,6 +72,9 @@ public abstract class TestbedExtension {
         getStatusParameter().getDownloadDir().set(getBaseImage().getDownloadDir());
         getStatusParameter().getDistributionDir().set(getBaseImage().getDistributionDir());
         getStatusParameter().getBaseImageFile().set(getBaseImage().getBaseImageFile());
+
+        getCopyKubeConfigParameter().getDomainName().set(getDomain().getName());
+        getCopyKubeConfigParameter().getKubeConfigFile().set(getRunDirectory())
     }
 
     @Nested
@@ -153,4 +157,7 @@ public abstract class TestbedExtension {
 
     @Nested
     abstract public StatusTaskParameter getStatusParameter();
+
+    @Nested
+    abstract public CopyKubeConfigParameter getCopyKubeConfigParameter();
 }

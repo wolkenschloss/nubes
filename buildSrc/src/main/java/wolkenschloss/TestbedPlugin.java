@@ -91,7 +91,7 @@ public class TestbedPlugin implements Plugin<Project> {
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
-                task -> task.initialize(extension, startDomain));
+                task -> task.initialize(extension.getCopyKubeConfigParameter(), extension, startDomain));
 
         project.getTasks().register(
                 STATUS_TASK_NAME,

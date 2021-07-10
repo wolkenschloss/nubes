@@ -37,7 +37,7 @@ public abstract class CopyKubeConfig extends DefaultTask {
     @Inject
     abstract public ExecOperations getExecOperations();
 
-    public void initialize(TestbedExtension extension, TaskProvider<Start> startDomain) {
+    public void initialize(CopyKubeConfigParameter parameter, TestbedExtension extension, TaskProvider<Start> startDomain) {
         getDomainName().convention(extension.getDomain().getName());
         getKubeConfigFile().convention(extension.getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
         getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());

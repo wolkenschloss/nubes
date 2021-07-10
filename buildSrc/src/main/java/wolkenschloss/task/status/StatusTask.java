@@ -11,7 +11,9 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 
 // TODO: Refactor
-import wolkenschloss.*;
+import wolkenschloss.Domain;
+import wolkenschloss.SecureShell;
+import wolkenschloss.Testbed;
 
 // Diese Beziehung ist Ok.
 import wolkenschloss.task.CheckedConsumer;
