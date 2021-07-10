@@ -14,10 +14,6 @@ import org.libvirt.LibvirtException;
 import wolkenschloss.Domain;
 import wolkenschloss.Testbed;
 
-// Diese Beziehung ist OK.
-import wolkenschloss.task.CreatePool;
-import wolkenschloss.task.Transform;
-
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -34,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @CacheableTask
 abstract public class Start extends DefaultTask {
 
-    public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
+
 
     @Input
     abstract public Property<String> getDomain();
@@ -55,16 +51,6 @@ abstract public class Start extends DefaultTask {
 
     @OutputFile
     abstract public RegularFileProperty getKnownHostsFile();
-
-    public void initialize(StartParameter parameter, TaskProvider<Transform> transformDomainDescription, TaskProvider<CreatePool> createPool) {
-        dependsOn(createPool);
-        setDescription("Starts the libvirt domain and waits for the callback.");
-        getDomain().convention(parameter.getDomain());
-        getPort().convention(parameter.getPort());
-        getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
-        getPoolRunFile().convention(createPool.get().getPoolRunFile());
-        getKnownHostsFile().convention(parameter.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
-    }
 
     @TaskAction
     public void exec() throws Throwable {

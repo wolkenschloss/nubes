@@ -6,7 +6,6 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.TaskProvider;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 
@@ -17,8 +16,6 @@ import wolkenschloss.Testbed;
 
 // Diese Beziehung ist Ok.
 import wolkenschloss.task.CheckedConsumer;
-import wolkenschloss.task.CopyKubeConfig;
-import wolkenschloss.task.start.Start;
 
 import javax.inject.Inject;
 import java.nio.file.Files;
@@ -30,22 +27,22 @@ import java.util.function.Predicate;
 public abstract class StatusTask extends DefaultTask {
 
     @Internal
-    abstract Property<String> getDomainName();
+    abstract public Property<String> getDomainName();
 
     @Internal
-    abstract Property<String> getPoolName();
+    abstract public Property<String> getPoolName();
 
     @Internal
-    abstract Property<String> getDistributionName();
+    abstract public Property<String> getDistributionName();
 
     @Internal
-    abstract DirectoryProperty getDownloadDir();
+    abstract public  DirectoryProperty getDownloadDir();
 
     @Internal
-    abstract DirectoryProperty getDistributionDir();
+    abstract public  DirectoryProperty getDistributionDir();
 
     @Internal
-    abstract RegularFileProperty getBaseImageFile();
+    abstract public  RegularFileProperty getBaseImageFile();
 
     @Internal
     abstract public RegularFileProperty getKnownHostsFile();
@@ -55,17 +52,6 @@ public abstract class StatusTask extends DefaultTask {
 
     @Inject
     abstract public ExecOperations getExecOperations();
-
-    public void initialize(StatusTaskParameter parameter, TaskProvider<Start> startDomain, TaskProvider<CopyKubeConfig> readKubeConfig) {
-        getDomainName().convention(parameter.getDomainName());
-        getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
-        getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-        getPoolName().convention(parameter.getPoolName());
-        getDistributionName().convention(parameter.getDistributionName());
-        getDownloadDir().convention(parameter.getDownloadDir());
-        getDistributionDir().convention(parameter.getDistributionDir());
-        getBaseImageFile().convention(parameter.getBaseImageFile());
-    }
 
     @TaskAction
     public void printStatus() throws Throwable {

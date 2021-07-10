@@ -33,6 +33,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
     public static final String DEFAULT_IMAGE_SIZE = "20G";
     public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+    public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
     private static String templateFilename(String filename) {
         return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
@@ -105,7 +106,15 @@ public class TestbedPlugin implements Plugin<Project> {
         var startDomain = project.getTasks().register(
                 START_DOMAIN_TASK_NAME,
                 Start.class,
-                task -> task.initialize(extension.getStartParameter(), transformDomainDescription, createPool));
+                task -> {
+                    task.dependsOn(createPool);
+                    task.setDescription("Starts the libvirt domain and waits for the callback.");
+                    task.getDomain().convention(extension.getDomain().getName());
+                    task.getPort().convention(extension.getHost().getCallbackPort());
+                    task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
+                    task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
+                    task.getKnownHostsFile().convention(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                });
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
@@ -119,7 +128,16 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register(
                 STATUS_TASK_NAME,
                 StatusTask.class,
-                task -> task.initialize( extension.getStatusParameter(), startDomain, readKubeConfig));
+                task -> {
+                    task.getDomainName().convention(extension.getDomain().getName());
+                    task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
+                    task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+                    task.getPoolName().convention(extension.getPool().getName());
+                    task.getDistributionName().convention(extension.getBaseImage().getName());
+                    task.getDownloadDir().convention(extension.getBaseImage().getDownloadDir());
+                    task.getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
+                    task.getBaseImageFile().convention(extension.getBaseImage().getBaseImageFile());
+                });
 
         project.getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(extension.asPropertyMap(project.getObjects())));
