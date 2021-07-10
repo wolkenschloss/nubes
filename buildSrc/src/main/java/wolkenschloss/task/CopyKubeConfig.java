@@ -3,15 +3,14 @@ package wolkenschloss.task;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
 // TODO: Refactor
 import wolkenschloss.Testbed;
-import wolkenschloss.TestbedExtension;
-
-// Diese Beziehung ist OK
-import wolkenschloss.task.start.Start;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
@@ -22,8 +21,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
 public abstract class CopyKubeConfig extends DefaultTask {
-
-    public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
     @Input
     abstract public Property<String> getDomainName();
@@ -36,12 +33,6 @@ public abstract class CopyKubeConfig extends DefaultTask {
 
     @Inject
     abstract public ExecOperations getExecOperations();
-
-    public void initialize(CopyKubeConfigParameter parameter, TestbedExtension extension, TaskProvider<Start> startDomain) {
-        getDomainName().convention(extension.getDomain().getName());
-        getKubeConfigFile().convention(extension.getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
-        getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
-    }
 
     @TaskAction
     public void read() throws Throwable {

@@ -3,9 +3,6 @@ package wolkenschloss.task;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.*;
 
-// TODO: Refactor
-import wolkenschloss.TestbedExtension;
-
 @CacheableTask
 abstract public class CreateDataSourceImage extends Exec {
 
@@ -23,12 +20,6 @@ abstract public class CreateDataSourceImage extends Exec {
 
     @OutputFile
     abstract public RegularFileProperty getCidata();
-
-    public void initialize(TestbedExtension extension, TaskProvider<Transform> transformNetworkConfig, TaskProvider<Transform> transformUserData) {
-        getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
-        getUserData().convention(transformUserData.get().getOutputFile());
-        getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
-    }
 
     @TaskAction
     @Override

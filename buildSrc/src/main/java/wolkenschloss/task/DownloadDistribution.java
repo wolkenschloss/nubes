@@ -13,9 +13,6 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
-// TODO: Refactor
-import wolkenschloss.BaseImageExtension;
-
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,13 +48,6 @@ abstract public class DownloadDistribution extends DefaultTask {
 
     @Internal
     abstract public DirectoryProperty getDistributionDir();
-
-    public void initialize(BaseImageExtension baseImage) {
-        getBaseImageLocation().convention(baseImage.getUrl());
-        getDistributionName().convention(baseImage.getName());
-        getBaseImage().convention(baseImage.getBaseImageFile());
-        getDistributionDir().convention(baseImage.getDistributionDir());
-    }
 
     private URL getBaseImageUrl() throws MalformedURLException {
         return new URL(getBaseImageLocation().get());

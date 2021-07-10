@@ -30,6 +30,10 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String DOMAIN_DESCRIPTION_FILE_NAME = "domain.xml";
     public static final String TESTBED_EXTENSION_NAME = "testbed";
 
+    public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
+    public static final String DEFAULT_IMAGE_SIZE = "20G";
+    public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+
     private static String templateFilename(String filename) {
         return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
     }
@@ -56,17 +60,32 @@ public class TestbedPlugin implements Plugin<Project> {
         var createDataSourceImage = project.getTasks().register(
                 CREATE_DATA_SOURCE_IMAGE_TASK_NAME,
                 CreateDataSourceImage.class,
-                task -> task.initialize(extension, transformNetworkConfig, transformUserData));
+                task -> {
+                    task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
+                    task.getUserData().convention(transformUserData.get().getOutputFile());
+                    task.getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
+                });
 
         var downloadDistribution = project.getTasks().register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
-                task -> task.initialize(extension.getBaseImage()));
+                task -> {
+                    var baseImage = extension.getBaseImage();
+                    task.getBaseImageLocation().convention(baseImage.getUrl());
+                    task.getDistributionName().convention(baseImage.getName());
+                    task.getBaseImage().convention(baseImage.getBaseImageFile());
+                    task.getDistributionDir().convention(baseImage.getDistributionDir());
+                });
 
         var createRootImage = project.getTasks().register(
                 CREATE_ROOT_IMAGE_TASK_NAME,
                 CreateRootImage.class,
-                task -> task.initialize(extension, downloadDistribution));
+                task -> {
+                    task.getSize().convention(DEFAULT_IMAGE_SIZE);
+                    task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
+                    task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
+                    task.getRootImageMd5File().convention(extension.getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
+                });
 
         var transformPoolDescription = registrar.register(
                 TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
@@ -91,7 +110,11 @@ public class TestbedPlugin implements Plugin<Project> {
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
-                task -> task.initialize(extension.getCopyKubeConfigParameter(), extension, startDomain));
+                task -> {
+                    task.getDomainName().convention(extension.getDomain().getName());
+                    task.getKubeConfigFile().convention(extension.getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
+                    task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+                });
 
         project.getTasks().register(
                 STATUS_TASK_NAME,
@@ -109,6 +132,10 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register(
                 DESTROY_TASK_NAME,
                 Destroy.class,
-                task -> task.initialize(project, extension, createPool));
+                task -> {
+                    task.getDomain().convention(extension.getDomain().getName());
+                    task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
+                    task.getBuildDir().convention(project.getLayout().getBuildDirectory());
+                });
     }
 }

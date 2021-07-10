@@ -74,7 +74,7 @@ public abstract class TestbedExtension {
         getStatusParameter().getBaseImageFile().set(getBaseImage().getBaseImageFile());
 
         getCopyKubeConfigParameter().getDomainName().set(getDomain().getName());
-        getCopyKubeConfigParameter().getKubeConfigFile().set(getRunDirectory())
+        getCopyKubeConfigParameter().getRunDirectory().set(getRunDirectory());
     }
 
     @Nested
