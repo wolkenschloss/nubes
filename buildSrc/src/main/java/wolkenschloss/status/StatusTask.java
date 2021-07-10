@@ -1,4 +1,4 @@
-package wolkenschloss.task.status;
+package wolkenschloss.status;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;

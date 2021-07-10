@@ -11,7 +11,7 @@ import wolkenschloss.pool.DownloadDistribution;
 import wolkenschloss.pool.CreateRootImage;
 import wolkenschloss.pool.CreatePool;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.task.status.StatusTask;
+import wolkenschloss.status.StatusTask;
 
 public class TestbedPlugin implements Plugin<Project> {
 

@@ -1,4 +1,4 @@
-package wolkenschloss.task;
+package wolkenschloss;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;

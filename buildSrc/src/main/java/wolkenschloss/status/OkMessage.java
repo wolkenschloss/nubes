@@ -1,4 +1,4 @@
-package wolkenschloss.task.status;
+package wolkenschloss.status;
 
 import java.util.function.Function;
 

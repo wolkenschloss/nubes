@@ -1,4 +1,4 @@
-package wolkenschloss.task.status;
+package wolkenschloss.status;
 
 public interface StatusChecker {
     void run(String label);

@@ -136,13 +136,13 @@ public class Testbed implements AutoCloseable {
 
     public <T> T withDomain(CheckedFunction<Domain, T> consumer) throws Throwable {
 
-        try(var domain = new Domain(this, this.name)) {
+        try(var domain = new Domain(this.connection.domainLookupByName(this.name))) {
             return consumer.apply(domain);
         }
     }
 
     public <T> void withDomain(CheckedConsumer<Domain> method) throws Throwable {
-        try(var domain = new Domain(this, this.name)) {
+        try(var domain = new Domain(this.connection.domainLookupByName(this.name))) {
             method.accept(domain);
         }
     }

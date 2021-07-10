@@ -6,7 +6,6 @@ import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
 import wolkenschloss.pool.Pool;
 import wolkenschloss.model.Registry;
-import wolkenschloss.model.Testbed;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.util.ArrayList;
@@ -19,13 +18,8 @@ public class Domain implements AutoCloseable {
 
     private final org.libvirt.Domain domain;
 
-//    public Domain(@SuppressWarnings("CdiInjectionPointsInspection") String name, int retries){
-//        this.name = name;
-//        this.retries = retries;
-//    }
-
-    public Domain(Testbed testbed, String name) throws LibvirtException {
-        this.domain = testbed.getConnection().domainLookupByName(name);
+    public Domain(org.libvirt.Domain domain) {
+        this.domain = domain;
     }
 
     public Registry getRegistry() throws Throwable {
