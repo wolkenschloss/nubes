@@ -1,6 +1,4 @@
-package wolkenschloss.task.start;
-
-import wolkenschloss.task.start.FormData;
+package wolkenschloss.domain;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

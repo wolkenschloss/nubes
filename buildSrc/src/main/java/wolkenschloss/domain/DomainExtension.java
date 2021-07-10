@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.domain;
 
 import org.gradle.api.provider.Property;
 

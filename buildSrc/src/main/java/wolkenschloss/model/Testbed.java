@@ -17,6 +17,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO: Refactor
+import wolkenschloss.domain.Domain;
+
 public class Testbed implements AutoCloseable {
 
     private final String name;

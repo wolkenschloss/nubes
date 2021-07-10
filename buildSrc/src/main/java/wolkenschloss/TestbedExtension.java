@@ -18,6 +18,9 @@ import java.util.Map;
 
 import wolkenschloss.model.Testbed;
 import wolkenschloss.model.IpUtil;
+import wolkenschloss.domain.DomainExtension;
+import wolkenschloss.pool.PoolExtension;
+import wolkenschloss.pool.BaseImageExtension;
 
 public abstract class TestbedExtension {
 

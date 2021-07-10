@@ -4,7 +4,13 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import wolkenschloss.task.*;
-import wolkenschloss.task.start.Start;
+import wolkenschloss.domain.Start;
+import wolkenschloss.transformation.TransformationTaskRegistrar;
+import wolkenschloss.pool.CreateDataSourceImage;
+import wolkenschloss.pool.DownloadDistribution;
+import wolkenschloss.pool.CreateRootImage;
+import wolkenschloss.pool.CreatePool;
+import wolkenschloss.transformation.Transform;
 import wolkenschloss.task.status.StatusTask;
 
 public class TestbedPlugin implements Plugin<Project> {

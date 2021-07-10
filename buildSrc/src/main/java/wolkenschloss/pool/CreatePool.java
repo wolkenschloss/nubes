@@ -1,4 +1,4 @@
-package wolkenschloss.task;
+package wolkenschloss.pool;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;

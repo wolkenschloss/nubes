@@ -1,4 +1,4 @@
-package wolkenschloss.task;
+package wolkenschloss.pool;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;

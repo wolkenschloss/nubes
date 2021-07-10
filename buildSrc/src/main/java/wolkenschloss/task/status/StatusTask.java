@@ -10,7 +10,7 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 
 // TODO: Refactor
-import wolkenschloss.model.Domain;
+import wolkenschloss.domain.Domain;
 import wolkenschloss.model.SecureShell;
 import wolkenschloss.model.Testbed;
 

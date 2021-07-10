@@ -1,4 +1,4 @@
-package wolkenschloss.task.start;
+package wolkenschloss.domain;
 
 import com.sun.net.httpserver.HttpServer;
 import org.gradle.api.DefaultTask;
@@ -11,7 +11,6 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
 
 // TODO: Refactor
-import wolkenschloss.model.Domain;
 import wolkenschloss.model.Testbed;
 
 import javax.inject.Inject;

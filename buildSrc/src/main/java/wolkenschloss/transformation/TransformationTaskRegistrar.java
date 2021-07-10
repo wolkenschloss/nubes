@@ -1,12 +1,11 @@
-package wolkenschloss;
+package wolkenschloss.transformation;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
-import wolkenschloss.task.Transform;
 
-class TransformationTaskRegistrar {
+public class TransformationTaskRegistrar {
 
     private final Project project;
 

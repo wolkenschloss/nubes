@@ -1,9 +1,12 @@
-package wolkenschloss.model;
+package wolkenschloss.domain;
 
 import com.jayway.jsonpath.JsonPath;
 import org.gradle.api.GradleException;
 import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
+import wolkenschloss.pool.Pool;
+import wolkenschloss.model.Registry;
+import wolkenschloss.model.Testbed;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.util.ArrayList;

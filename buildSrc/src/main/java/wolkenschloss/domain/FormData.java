@@ -1,4 +1,4 @@
-package wolkenschloss.task.start;
+package wolkenschloss.domain;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

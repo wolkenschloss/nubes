@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.pool;
 
 import org.gradle.api.provider.Property;
 
