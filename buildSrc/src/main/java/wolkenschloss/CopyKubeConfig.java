@@ -8,8 +8,7 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
-
-import wolkenschloss.model.Testbed;
+import wolkenschloss.model.SecureShell;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
@@ -36,30 +35,19 @@ public abstract class CopyKubeConfig extends DefaultTask {
     @TaskAction
     public void read() throws Throwable {
         try (var testbed = new Testbed(getDomainName().get())) {
-            var config = testbed.withDomain(domain -> {
-                var ip = domain.getTestbedHostAddress();
+            var secureShell = testbed.getExec(getExecOperations(), getKnownHostsFile());
+            var executor = secureShell.execute("microk8s", "config");
+            executor.accept((SecureShell.Result result) -> {
+                var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+                var attributes = PosixFilePermissions.asFileAttribute(permissions);
+                var path = getKubeConfigFile().get().getAsFile().toPath();
+                var file = Files.createFile(path, attributes);
 
-                try (var stdout = new ByteArrayOutputStream()) {
-                    getExecOperations().exec(e -> {
-                        e.commandLine("ssh");
-                        e.args("-o", String.format("UserKnownHostsFile=%s", getKnownHostsFile().get().getAsFile().getAbsolutePath()),
-                                ip, "microk8s", "config");
-                        e.setStandardOutput(stdout);
-                    }).assertNormalExitValue();
-
-                    return stdout.toString();
-                }
+                Files.writeString(
+                        file.toAbsolutePath(),
+                        result.getStdout(),
+                        StandardOpenOption.WRITE);
             });
-
-            var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
-            var attributes = PosixFilePermissions.asFileAttribute(permissions);
-            var path = getKubeConfigFile().get().getAsFile().toPath();
-            var file = Files.createFile(path, attributes);
-
-            Files.writeString(
-                    file.toAbsolutePath(),
-                    config,
-                    StandardOpenOption.WRITE);
         }
     }
 }

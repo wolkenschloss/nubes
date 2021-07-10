@@ -1,4 +1,4 @@
-package wolkenschloss.model;
+package wolkenschloss.status;
 
 import com.google.cloud.tools.jib.api.*;
 import com.jayway.jsonpath.DocumentContext;

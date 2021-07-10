@@ -5,7 +5,6 @@ import org.gradle.api.GradleException;
 import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
 import wolkenschloss.pool.Pool;
-import wolkenschloss.model.Registry;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.util.ArrayList;
@@ -22,16 +21,7 @@ public class Domain implements AutoCloseable {
         this.domain = domain;
     }
 
-    public Registry getRegistry() throws Throwable {
-        var testbed = getTestbedHostAddress();
-        var registry = new Registry(String.format("%s:32000", testbed));
 
-        return registry.connect();
-    }
-
-    public void withRegistry(CheckedConsumer<Registry> consumer) throws Throwable {
-        consumer.accept(getRegistry());
-    }
 
     public String getTestbedHostAddress() throws Throwable {
 

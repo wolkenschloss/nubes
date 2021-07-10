@@ -1,4 +1,4 @@
-package wolkenschloss.model;
+package wolkenschloss;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
@@ -6,7 +6,7 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
-import wolkenschloss.CheckedFunction;
+import wolkenschloss.model.SecureShell;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.io.IOException;
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import wolkenschloss.status.Registry;
 
 // TODO: Refactor
 import wolkenschloss.domain.Domain;
@@ -147,7 +149,19 @@ public class Testbed implements AutoCloseable {
         }
     }
 
-    public SecureShell getExec(ExecOperations operations, RegularFileProperty knownHosts){
-        return new SecureShell(this, operations, knownHosts);
+    public SecureShell getExec(ExecOperations operations, RegularFileProperty knownHosts) throws Throwable {
+        var ip = this.withDomain(Domain::getTestbedHostAddress);
+        return new SecureShell(ip, operations, knownHosts);
+    }
+
+    public Registry getRegistry() throws Throwable {
+        var ip = this.withDomain(Domain::getTestbedHostAddress);
+        var registry = new Registry(String.format("%s:32000", ip));
+
+        return registry.connect();
+    }
+
+    public void withRegistry(CheckedConsumer<Registry> consumer) throws Throwable {
+        consumer.accept(getRegistry());
     }
 }

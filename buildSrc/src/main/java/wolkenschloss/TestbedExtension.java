@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import wolkenschloss.model.Testbed;
 import wolkenschloss.model.IpUtil;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.PoolExtension;

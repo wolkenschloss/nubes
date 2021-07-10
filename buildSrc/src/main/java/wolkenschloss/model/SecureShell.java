@@ -9,15 +9,15 @@ import java.util.Arrays;
 import java.util.Vector;
 
 public class SecureShell {
-    private final Testbed testbed;
+    private final String ip;
     private final ExecOperations operations;
     private final RegularFileProperty knownHostFile;
 
     public SecureShell(
-            Testbed testbed,
+            String ip,
             @SuppressWarnings("CdiInjectionPointsInspection") ExecOperations operations,
             @SuppressWarnings("CdiInjectionPointsInspection") RegularFileProperty knownHostFile) {
-        this.testbed = testbed;
+        this.ip = ip;
         this.operations = operations;
         this.knownHostFile = knownHostFile;
     }
@@ -51,8 +51,7 @@ public class SecureShell {
 
     public CheckedConsumer<CheckedConsumer<Result>> execute(Object... args) {
 
-        return (CheckedConsumer<Result> consumer) -> testbed.withDomain(domain -> {
-            var ip = domain.getTestbedHostAddress();
+        return (CheckedConsumer<Result> consumer) -> {
 
             var arguments = new Vector<>();
             arguments.addAll(Arrays.asList("-o",
@@ -75,6 +74,6 @@ public class SecureShell {
                             result.getExitValue()));
                 }
             }
-        });
+        };
     }
 }

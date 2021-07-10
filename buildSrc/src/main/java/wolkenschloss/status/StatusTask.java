@@ -12,7 +12,7 @@ import org.libvirt.DomainInfo;
 // TODO: Refactor
 import wolkenschloss.domain.Domain;
 import wolkenschloss.model.SecureShell;
-import wolkenschloss.model.Testbed;
+import wolkenschloss.Testbed;
 
 // Diese Beziehung ist Ok.
 import wolkenschloss.task.CheckedConsumer;
@@ -92,7 +92,7 @@ public abstract class StatusTask extends DefaultTask {
                     );
                 });
 
-                check("Registry", domain::withRegistry, registry -> {
+                check("Registry", testbed::withRegistry, registry -> {
                     info("Address", registry::getAddress);
                     info("Upload Image", () -> registry.uploadImage("hello-world:latest"));
                     evaluate2("Catalogs", registry::listCatalogs,
@@ -144,6 +144,4 @@ public abstract class StatusTask extends DefaultTask {
             getLogger().error(String.format("✗ %-15s: %s", label, e.getMessage()));
         }
     }
-
-
 }

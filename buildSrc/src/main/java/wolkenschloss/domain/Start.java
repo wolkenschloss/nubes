@@ -11,7 +11,7 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
 
 // TODO: Refactor
-import wolkenschloss.model.Testbed;
+import wolkenschloss.Testbed;
 
 import javax.inject.Inject;
 import java.io.IOException;

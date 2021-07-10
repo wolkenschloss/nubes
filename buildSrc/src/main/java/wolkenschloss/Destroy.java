@@ -9,8 +9,6 @@ import org.gradle.api.tasks.Destroys;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 
-import wolkenschloss.model.Testbed;
-
 import javax.inject.Inject;
 
 public abstract class Destroy extends DefaultTask {
