@@ -8,17 +8,15 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
-import org.libvirt.LibvirtException;
+import wolkenschloss.domain.DomainExtension;
+import wolkenschloss.pool.BaseImageExtension;
+import wolkenschloss.pool.PoolExtension;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-
-import wolkenschloss.domain.DomainExtension;
-import wolkenschloss.pool.PoolExtension;
-import wolkenschloss.pool.BaseImageExtension;
 
 public abstract class TestbedExtension {
 
@@ -123,10 +121,6 @@ public abstract class TestbedExtension {
         property.put("pool", pool);
 
         return property;
-    }
-
-    public Testbed create() throws LibvirtException {
-        return new Testbed(getDomain().getName().get());
     }
 
     abstract public DirectoryProperty getPoolDirectory();

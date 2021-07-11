@@ -15,6 +15,8 @@ import wolkenschloss.model.SecureShellService;
 // Diese Beziehung ist Ok.
 import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.domain.DomainOperations;
+
+// TODO: Refactor
 import wolkenschloss.CheckedConsumer;
 
 import javax.inject.Inject;

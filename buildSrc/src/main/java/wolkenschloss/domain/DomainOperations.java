@@ -110,6 +110,35 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         domain.free();
     }
 
+    public boolean deleteDomainIfExists(Property<String> name) throws LibvirtException {
+
+        var deleted = false;
+
+        var domainIds = connection.listDomains();
+
+        for (var domainId : domainIds) {
+            var domain = connection.domainLookupByID(domainId);
+            if (domain.getName().equals(name.get())) {
+                domain.destroy();
+                deleted = true;
+            }
+            domain.free();
+        }
+
+        var definedDomains = connection.listDefinedDomains();
+
+        for (var definedDomain : definedDomains) {
+            if (definedDomain.equals(name.get())) {
+                var domain = connection.domainLookupByName(definedDomain);
+                domain.undefine();
+                deleted = true;
+                domain.free();
+            }
+        }
+
+        return deleted;
+    }
+
     @Override
     public void close() throws Exception {
         if (connection != null) {

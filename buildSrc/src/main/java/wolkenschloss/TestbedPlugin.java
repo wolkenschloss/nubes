@@ -192,6 +192,7 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
                     task.getBuildDir().convention(project.getLayout().getBuildDirectory());
+                    task.getDomainOperations().set(domainOperations);
                 });
     }
 

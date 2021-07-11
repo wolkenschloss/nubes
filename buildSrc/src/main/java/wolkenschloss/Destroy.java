@@ -8,6 +8,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Destroys;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
+import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.pool.PoolOperations;
 
 import javax.inject.Inject;
@@ -29,17 +30,20 @@ public abstract class Destroy extends DefaultTask {
     @Internal
     abstract public Property<PoolOperations> getPoolOperations();
 
+    @Internal
+    abstract public Property<DomainOperations> getDomainOperations();
+
     @TaskAction
     public void destroy() throws Exception {
 
-        try (var testbed = new Testbed(getDomain().get())) {
-            var deleted = testbed.deleteDomainIfExists(getDomain());
-            if (deleted) {
-                getLogger().info("Domain deleted.");
-            }
-
-            getPoolOperations().get().deletePoolIfExists(getPoolRunFile());
+        var domainOperations = getDomainOperations().get();
+        var deleted = domainOperations.deleteDomainIfExists(getDomain());
+        if (deleted) {
+            getLogger().info("Domain deleted.");
         }
+
+        getPoolOperations().get().deletePoolIfExists(getPoolRunFile());
+
 
         getFileSystemOperations().delete(spec -> {
             spec.delete(getBuildDir());

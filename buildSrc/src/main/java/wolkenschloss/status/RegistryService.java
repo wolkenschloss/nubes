@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutionException;
 
 import org.gradle.api.provider.Property;
 import wolkenschloss.domain.DomainOperations;
+
+// TODO: Refactor
 import wolkenschloss.CheckedConsumer;
 
 public abstract class RegistryService implements BuildService<RegistryService.Params> {
