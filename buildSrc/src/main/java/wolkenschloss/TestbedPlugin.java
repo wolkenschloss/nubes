@@ -8,10 +8,11 @@ import wolkenschloss.domain.Start;
 import wolkenschloss.model.SecureShellService;
 import wolkenschloss.pool.*;
 import wolkenschloss.status.RegistryService;
-import wolkenschloss.transformation.TransformationTaskRegistrar;
-import wolkenschloss.transformation.Transform;
 import wolkenschloss.status.StatusTask;
+import wolkenschloss.transformation.Transform;
+import wolkenschloss.transformation.TransformationTaskRegistrar;
 
+@SuppressWarnings("UnstableApiUsage")
 public class TestbedPlugin implements Plugin<Project> {
 
     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformNetworkConfig";
@@ -43,32 +44,33 @@ public class TestbedPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         TestbedExtension extension = project.getExtensions()
-                .create(TESTBED_EXTENSION_NAME, TestbedExtension.class);
+                .create(TESTBED_EXTENSION_NAME, TestbedExtension.class)
+                .configure(project.getLayout());
 
-        extension.configure(project.getLayout());
+        var sharedServices = project.getGradle().getSharedServices();
 
-        var domainOperations = project.getGradle().getSharedServices().registerIfAbsent("domainops", DomainOperations.class, spec -> {
-            spec.getParameters().getDomainName().set(extension.getDomain().getName());
-        });
+        var domainOperations = sharedServices.registerIfAbsent(
+                "domainops",
+                DomainOperations.class,
+                spec -> spec.getParameters().getDomainName().set(extension.getDomain().getName()));
 
-        var secureShellService = project.getGradle().getSharedServices().registerIfAbsent("sshservice", SecureShellService.class, spec -> {
-            spec.getParameters().getDomainOperations().set(domainOperations);
-            spec.getParameters().getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
-        });
-
-        var poolOperations = project.getGradle().getSharedServices().registerIfAbsent(
-                "poolops",
-                PoolOperations.class, spec -> {
-                    spec.getParameters().getPoolName().set(extension.getPool().getName());
-                });
-
-        var registryService = project.getGradle().getSharedServices().registerIfAbsent(
-                "registryService",
-                RegistryService.class,
+        var secureShellService = sharedServices.registerIfAbsent(
+                "sshservice",
+                SecureShellService.class,
                 spec -> {
                     spec.getParameters().getDomainOperations().set(domainOperations);
-                }
-        );
+                    spec.getParameters().getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                });
+
+        var poolOperations = sharedServices.registerIfAbsent(
+                "poolops",
+                PoolOperations.class,
+                spec -> spec.getParameters().getPoolName().set(extension.getPool().getName()));
+
+        var registryService = sharedServices.registerIfAbsent(
+                "registryService",
+                RegistryService.class,
+                spec -> spec.getParameters().getDomainOperations().set(domainOperations));
 
         var registrar = new TransformationTaskRegistrar(project);
 
@@ -117,11 +119,6 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)),
                 extension.getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME));
 
-        var transformDomainDescription = registrar.register(
-                TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
-                extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)),
-                extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME));
-
         var createPool = project.getTasks().register(
                 CREATE_POOL_TASK_NAME,
                 CreatePool.class,
@@ -134,6 +131,11 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.dependsOn(createRootImage, createDataSourceImage);
                 });
 
+        var transformDomainDescription = registrar.register(
+                TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
+                extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)),
+                extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME));
+        
         var startDomain = project.getTasks().register(
                 START_DOMAIN_TASK_NAME,
                 Start.class,
@@ -147,7 +149,6 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getKnownHostsFile().convention(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
                     task.getDomainOperations().set(domainOperations);
                 });
-
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,

@@ -22,19 +22,7 @@ public abstract class TestbedExtension {
 
     public static final int DEFAULT_CALLBACK_PORT = 9191;
 
-    @Nonnull
-    public static String readSshKey(RegularFile sshKeyFile) {
-
-        var file = sshKeyFile.getAsFile();
-
-        try {
-            return Files.readString(file.toPath()).trim();
-        } catch (IOException e) {
-            throw new GradleScriptException("Can not read public ssh key", e);
-        }
-    }
-
-    public void configure(ProjectLayout layout) {
+    public TestbedExtension configure(ProjectLayout layout) {
         // Set build directories
         var buildDirectory = layout.getBuildDirectory();
         getPoolDirectory().set(buildDirectory.dir("pool"));
@@ -60,6 +48,8 @@ public abstract class TestbedExtension {
         getPool().getName().convention("testbed");
 
         getBaseImage().initialize();
+
+        return this;
     }
 
     @Nested
@@ -132,4 +122,16 @@ public abstract class TestbedExtension {
     abstract public DirectoryProperty getGeneratedCloudInitDirectory();
 
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
+
+    @Nonnull
+    public static String readSshKey(RegularFile sshKeyFile) {
+
+        var file = sshKeyFile.getAsFile();
+
+        try {
+            return Files.readString(file.toPath()).trim();
+        } catch (IOException e) {
+            throw new GradleScriptException("Can not read public ssh key", e);
+        }
+    }
 }
