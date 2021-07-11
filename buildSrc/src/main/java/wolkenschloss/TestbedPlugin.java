@@ -70,11 +70,6 @@ public class TestbedPlugin implements Plugin<Project> {
                 }
         );
 
-        project.getGradle().getSharedServices().getRegistrations().forEach(reg -> {
-            project.getLogger().quiet(reg.getName());
-        });
-
-
         var registrar = new TransformationTaskRegistrar(project);
 
         var transformNetworkConfig = registrar.register(
