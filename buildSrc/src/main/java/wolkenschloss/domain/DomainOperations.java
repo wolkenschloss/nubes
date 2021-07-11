@@ -15,7 +15,6 @@ import wolkenschloss.CheckedConsumer;
 
 import java.util.ArrayList;
 
-// TODO Kandidat für Testbed Klasse
 public abstract class DomainOperations implements BuildService<DomainOperations.Params>, AutoCloseable {
 
     private final Connect connection;
@@ -89,11 +88,6 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         }
     }
 
-//    public <T> T withDomain(CheckedFunction<Domain, T> consumer) throws Throwable {
-//
-//            return consumer.apply(this.domain);
-//    }
-//
     public <T> void withDomain(CheckedConsumer<DomainOperations> method) throws Throwable {
         var name = getParameters().getDomainName().get();
         var domain = connection.domainLookupByName(name);

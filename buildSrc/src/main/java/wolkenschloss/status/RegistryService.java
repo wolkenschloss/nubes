@@ -35,19 +35,6 @@ public abstract class RegistryService implements BuildService<RegistryService.Pa
         this.name = String.format("%s:32000", ip);
     }
 
-    public RegistryService connect() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(getUri()).build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            throw new GradleException(String.format("Return Code from Registry: %d", response.statusCode()));
-        }
-
-        return this;
-    }
-
     public String getAddress() {
         return name;
     }
