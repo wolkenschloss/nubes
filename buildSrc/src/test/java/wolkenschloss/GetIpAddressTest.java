@@ -1,4 +1,4 @@
-package wolkenschloss.model;
+package wolkenschloss;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

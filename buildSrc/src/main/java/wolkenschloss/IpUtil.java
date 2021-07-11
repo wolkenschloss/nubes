@@ -1,4 +1,4 @@
-package wolkenschloss.model;
+package wolkenschloss;
 
 import org.gradle.api.GradleScriptException;
 
