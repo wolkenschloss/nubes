@@ -1,4 +1,4 @@
-package wolkenschloss.task;
+package wolkenschloss;
 
 @FunctionalInterface
 public interface CheckedConsumer<T> {

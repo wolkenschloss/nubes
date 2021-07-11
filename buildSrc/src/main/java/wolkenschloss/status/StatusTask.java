@@ -15,7 +15,7 @@ import wolkenschloss.model.SecureShellService;
 // Diese Beziehung ist Ok.
 import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.domain.DomainOperations;
-import wolkenschloss.task.CheckedConsumer;
+import wolkenschloss.CheckedConsumer;
 
 import javax.inject.Inject;
 import java.nio.file.Files;

@@ -11,8 +11,7 @@ import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
 // TODO: Refactor
-import wolkenschloss.CheckedFunction;
-import wolkenschloss.task.CheckedConsumer;
+import wolkenschloss.CheckedConsumer;
 
 import java.util.ArrayList;
 

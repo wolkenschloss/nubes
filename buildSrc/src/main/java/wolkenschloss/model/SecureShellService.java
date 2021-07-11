@@ -5,7 +5,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.services.BuildService;
 import org.gradle.process.ExecOperations;
 import wolkenschloss.domain.DomainOperations;
-import wolkenschloss.task.CheckedConsumer;
+import wolkenschloss.CheckedConsumer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
