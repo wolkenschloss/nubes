@@ -1,25 +1,28 @@
 package wolkenschloss.model;
 
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.Property;
+import org.gradle.api.services.BuildService;
 import org.gradle.process.ExecOperations;
+import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.task.CheckedConsumer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Vector;
 
-public class SecureShell {
-    private final String ip;
-    private final ExecOperations operations;
-    private final RegularFileProperty knownHostFile;
+public abstract class SecureShellService implements BuildService<SecureShellService.Params> {
 
-    public SecureShell(
-            String ip,
-            @SuppressWarnings("CdiInjectionPointsInspection") ExecOperations operations,
-            @SuppressWarnings("CdiInjectionPointsInspection") RegularFileProperty knownHostFile) {
-        this.ip = ip;
-        this.operations = operations;
-        this.knownHostFile = knownHostFile;
+    public interface Params extends org.gradle.api.services.BuildServiceParameters {
+        Property<DomainOperations> getDomainOperations();
+        RegularFileProperty getKnownHostsFile();
+    }
+
+    private final String ip;
+
+    public SecureShellService() throws Throwable {
+        DomainOperations domainOperations = getParameters().getDomainOperations().get();
+        this.ip = domainOperations.getTestbedHostAddress();
     }
 
     public static class Result {
@@ -49,19 +52,20 @@ public class SecureShell {
         }
     }
 
-    public CheckedConsumer<CheckedConsumer<Result>> execute(Object... args) {
+    public CheckedConsumer<CheckedConsumer<Result>> execute(ExecOperations execOperations, Object... args) {
 
         return (CheckedConsumer<Result> consumer) -> {
 
+            var knownHostsFile = getParameters().getKnownHostsFile().getAsFile().get().getPath();
             var arguments = new Vector<>();
             arguments.addAll(Arrays.asList("-o",
-                    String.format("UserKnownHostsFile=%s", this.knownHostFile.get().getAsFile().getPath()),
+                    String.format("UserKnownHostsFile=%s", knownHostsFile),
                     ip));
             arguments.addAll(Arrays.asList(args));
 
             try (var stdout = new ByteArrayOutputStream()) {
                 try (var stderr = new ByteArrayOutputStream()) {
-                    var result = operations.exec(spec -> {
+                    var result = execOperations.exec(spec -> {
                         spec.commandLine("ssh")
                                 .args(arguments)
                                 .setStandardOutput(stdout)

@@ -8,10 +8,6 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
-import org.libvirt.LibvirtException;
-
-// TODO: Refactor
-import wolkenschloss.Testbed;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -49,27 +45,34 @@ abstract public class Start extends DefaultTask {
     @OutputFile
     abstract public RegularFileProperty getKnownHostsFile();
 
+    @Internal
+    abstract public Property<DomainOperations> getDomainOperations();
+
     @TaskAction
     public void exec() throws Throwable {
-        try (var testbed = new Testbed(getDomain().get())) {
-            var xml = Files.readString(getXmlDescription().get().getAsFile().toPath());
-            var domain = testbed.getConnection().domainDefineXML(xml);
 
-            try {
-                testbed.getConnection().domainCreateXML(xml, 0);
-            } finally {
-                domain.free();
-            }
+        var knownHostsFile = getKnownHostsFile().getAsFile().get();
 
-            var serverKey = waitForCallback();
-            updateKnownHosts(testbed, serverKey);
-        } catch (LibvirtException e) {
-            throw new GradleScriptException("Fehler beim Zugriff auf libvirt", e);
+        if (knownHostsFile.exists()) {
+            var message = String.format("File %s already exists. Destroy testbed with './gradlew :%s:destroy' before starting a new one",
+                    knownHostsFile.getPath(),
+                    getProject().getName());
+
+            throw new GradleException(message);
         }
+
+        DomainOperations domainOperations = getDomainOperations().get();
+        String xml = Files.readString(getXmlDescription().get().getAsFile().toPath());
+        domainOperations.create(xml);
+
+        var serverKey = waitForCallback();
+        updateKnownHosts(serverKey);
     }
 
-    public void updateKnownHosts(Testbed testbed, String serverKey) throws Throwable {
-        var ip = testbed.withDomain(Domain::getTestbedHostAddress);
+    public void updateKnownHosts(String serverKey) throws Throwable {
+        DomainOperations domainOperations = getDomainOperations().get();
+
+        var ip = domainOperations.getTestbedHostAddress();
 
         var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
         var attributes = PosixFilePermissions.asFileAttribute(permissions);

@@ -10,12 +10,11 @@ import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 
 // TODO: Refactor
-import wolkenschloss.domain.Domain;
-import wolkenschloss.model.SecureShell;
-import wolkenschloss.Testbed;
+import wolkenschloss.model.SecureShellService;
 
 // Diese Beziehung ist Ok.
 import wolkenschloss.pool.PoolOperations;
+import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.task.CheckedConsumer;
 
 import javax.inject.Inject;
@@ -54,18 +53,27 @@ public abstract class StatusTask extends DefaultTask {
     @Internal
     abstract public Property<PoolOperations> getPoolOperations();
 
+    @Internal
+    abstract public Property<DomainOperations> getDomainOperations();
+
+    @Internal
+    abstract public Property<SecureShellService> getSecureShellService();
+
+    @Internal
+    abstract public Property<RegistryService> getRegistryService();
+
     @TaskAction
     public void printStatus() throws Throwable {
         getLogger().quiet("Status of {}", getDomainName().get());
 
-        try (var testbed = new Testbed(getDomainName().get())) {
+        DomainOperations domainOperations = getDomainOperations().get();
 
-            check("Testbed", testbed::withDomain, (CheckedConsumer<Domain>) domain -> {
+            check("Testbed", domainOperations::withDomain, (CheckedConsumer<DomainOperations>) domain -> {
 
                 info("IP Address", domain::getTestbedHostAddress);
 
-                SecureShell shell = testbed.getExec(getExecOperations(), getKnownHostsFile());
-                check("ssh uname", shell.execute("uname", "-norm"), result -> {
+                SecureShellService shell = getSecureShellService().get();
+                check("ssh uname", shell.execute(getExecOperations(), "uname", "-norm"), result -> {
                     info("stdout", result::getStdout);
                     info("exit code", result::getExitValue);
                 });
@@ -93,7 +101,8 @@ public abstract class StatusTask extends DefaultTask {
                     );
                 });
 
-                check("Registry", testbed::withRegistry, registry -> {
+                RegistryService registryService = getRegistryService().get();
+                check("Registry", registryService::withRegistry, (RegistryService registry) -> {
                     info("Address", registry::getAddress);
                     info("Upload Image", () -> registry.uploadImage("hello-world:latest"));
                     evaluate2("Catalogs", registry::listCatalogs,
@@ -109,7 +118,7 @@ public abstract class StatusTask extends DefaultTask {
                     status -> status.check(Files::exists)
                             .ok(Path::toString)
                             .error("missing"));
-        }
+
     }
 
     private <T> void check(String label, T value, Predicate<T> requiredCondition) {

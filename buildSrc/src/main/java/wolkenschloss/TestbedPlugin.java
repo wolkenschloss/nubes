@@ -3,8 +3,11 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.domain.Start;
+import wolkenschloss.model.SecureShellService;
 import wolkenschloss.pool.*;
+import wolkenschloss.status.RegistryService;
 import wolkenschloss.transformation.TransformationTaskRegistrar;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.status.StatusTask;
@@ -43,11 +46,34 @@ public class TestbedPlugin implements Plugin<Project> {
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class);
 
         extension.configure(project.getLayout());
+
+        var domainOperations = project.getGradle().getSharedServices().registerIfAbsent("domainops", DomainOperations.class, spec -> {
+            spec.getParameters().getDomainName().set(extension.getDomain().getName());
+        });
+
+        var secureShellService = project.getGradle().getSharedServices().registerIfAbsent("sshservice", SecureShellService.class, spec -> {
+            spec.getParameters().getDomainOperations().set(domainOperations);
+            spec.getParameters().getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+        });
+
         var poolOperations = project.getGradle().getSharedServices().registerIfAbsent(
                 "poolops",
                 PoolOperations.class, spec -> {
                     spec.getParameters().getPoolName().set(extension.getPool().getName());
                 });
+
+        var registryService = project.getGradle().getSharedServices().registerIfAbsent(
+                "registryService",
+                RegistryService.class,
+                spec -> {
+                    spec.getParameters().getDomainOperations().set(domainOperations);
+                }
+        );
+
+        project.getGradle().getSharedServices().getRegistrations().forEach(reg -> {
+            project.getLogger().quiet(reg.getName());
+        });
+
 
         var registrar = new TransformationTaskRegistrar(project);
 
@@ -124,7 +150,9 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
                     task.getKnownHostsFile().convention(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                    task.getDomainOperations().set(domainOperations);
                 });
+
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
@@ -133,6 +161,7 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(extension.getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
                     task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+                    task.getSecureShellService().set(secureShellService);
                 });
 
         project.getTasks().register(
@@ -140,6 +169,9 @@ public class TestbedPlugin implements Plugin<Project> {
                 StatusTask.class,
                 task -> {
                     task.getPoolOperations().set(poolOperations);
+                    task.getDomainOperations().set(domainOperations);
+                    task.getRegistryService().set(registryService);
+                    task.getSecureShellService().set(secureShellService);
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());

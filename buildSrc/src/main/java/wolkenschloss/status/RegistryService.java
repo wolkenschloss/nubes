@@ -4,6 +4,8 @@ import com.google.cloud.tools.jib.api.*;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.gradle.api.GradleException;
+import org.gradle.api.services.BuildService;
+import org.gradle.api.services.BuildServiceParameters;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,14 +15,25 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class Registry {
-    private final String name;
+import org.gradle.api.provider.Property;
+import wolkenschloss.domain.DomainOperations;
+import wolkenschloss.task.CheckedConsumer;
 
-    public Registry(@SuppressWarnings("CdiInjectionPointsInspection") String name) {
-        this.name = name;
+public abstract class RegistryService implements BuildService<RegistryService.Params> {
+
+    public interface Params extends BuildServiceParameters {
+        Property<DomainOperations> getDomainOperations();
     }
 
-    public Registry connect() throws IOException, InterruptedException {
+    private final String name;
+
+    public RegistryService() throws Throwable {
+        DomainOperations domainOperations = getParameters().getDomainOperations().get();
+        var ip = domainOperations.getTestbedHostAddress();
+        this.name = String.format("%s:32000", ip);
+    }
+
+    public RegistryService connect() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(getUri()).build();
 
@@ -66,6 +79,10 @@ public class Registry {
     public URI getUri() {
         //noinspection HttpUrlsUsage
         return URI.create(String.format("http://%s", name));
+    }
+
+    public <T> void withRegistry(CheckedConsumer<RegistryService> method) throws Throwable {
+        method.accept(this);
     }
 
     @Override
