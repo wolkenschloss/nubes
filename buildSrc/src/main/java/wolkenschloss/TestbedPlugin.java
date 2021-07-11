@@ -43,6 +43,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        var providers = project.getProviders();
         TestbedExtension extension = project.getExtensions()
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class)
                 .configure(project.getLayout());
@@ -124,10 +125,8 @@ public class TestbedPlugin implements Plugin<Project> {
                 CreatePool.class,
                 task -> {
                     task.getPoolOperations().set(poolOperations);
-                    task.getPoolName().convention(extension.getPool().getName());
                     task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
-                    task.getDomainName().convention(extension.getDomain().getName());
                     task.dependsOn(createRootImage, createDataSourceImage);
                 });
 

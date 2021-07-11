@@ -3,28 +3,19 @@ package wolkenschloss.pool;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.GradleScriptException;
+import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.PathSensitive;
-import org.gradle.api.tasks.PathSensitivity;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.provider.ProviderFactory;
+import org.gradle.api.tasks.*;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.UUID;
 
 @CacheableTask
 abstract public class CreatePool extends DefaultTask {
-
-    @Input
-    public abstract Property<String> getPoolName();
-
-    @Input
-    public abstract Property<String> getDomainName();
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -36,6 +27,12 @@ abstract public class CreatePool extends DefaultTask {
     @Internal
     abstract public Property<PoolOperations> getPoolOperations();
 
+    @Inject
+    abstract public FileSystemOperations getFso();
+
+    @Inject
+    abstract public ProviderFactory getProviderFactory();
+
     @TaskAction
     public void exec() {
 
@@ -43,22 +40,26 @@ abstract public class CreatePool extends DefaultTask {
 
         try {
             File runFile = getPoolRunFile().get().getAsFile();
+            var runFileContent = getProviderFactory().fileContents(getPoolRunFile());
             if (runFile.exists()) {
-                poolOperations.destroyPool(getPoolRunFile());
+                var oldPoolUuid = runFileContent.getAsText().map(UUID::fromString).get();
+                poolOperations.destroy(oldPoolUuid);
+                getFso().delete(spec -> spec.delete(getPoolRunFile()));
+
                 getLogger().info("Pool destroyed");
             }
 
-            if (poolOperations.poolExistiert(getPoolName())) {
+            if (poolOperations.exists()) {
                 var message = String.format(
                         "Der Pool %1$s existiert bereits, aber die Markierung-Datei %2$s ist nicht vorhanden.%n" +
                                 "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1$s && virsh pool-undefine %1$s'",
-                        getPoolName().get(),
+                        poolOperations.getParameters().getPoolName().get(),
                         runFile.getPath());
 
                 throw new GradleException(message);
             }
 
-            var uuid = poolOperations.createPool(getXmlDescription());
+            var uuid = poolOperations.create(getXmlDescription());
             Files.writeString(runFile.toPath(), uuid.toString());
 
         } catch (Exception e) {

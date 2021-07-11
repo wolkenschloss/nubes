@@ -29,18 +29,14 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
         this.connection = new Connect("qemu:///system");
     }
 
-    public void destroyPool(RegularFileProperty poolRunFile) throws IOException, LibvirtException {
-        var uuid = UUID.fromString(Files.readString(poolRunFile.getAsFile().get().toPath()));
-
-        fallsPoolExistiert(uuid, pool -> {
+    public void destroy(UUID poolId) throws LibvirtException {
+        fallsPoolExistiert(poolId, pool -> {
             pool.destroy();
             pool.undefine();
         });
-
-        Files.delete(poolRunFile.getAsFile().get().toPath());
     }
 
-    public UUID createPool(RegularFileProperty xmlDescription) throws IOException, LibvirtException {
+    public UUID create(RegularFileProperty xmlDescription) throws IOException, LibvirtException {
         var file = xmlDescription.get().getAsFile().getAbsoluteFile().toPath();
         var xml = Files.readString(file);
 
@@ -51,12 +47,6 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
             return UUID.fromString(pool.getUUIDString());
         } finally {
             pool.free();
-        }
-    }
-
-    public void deletePoolIfExists(RegularFileProperty poolRunFile) throws LibvirtException, IOException {
-        if (poolRunFile.get().getAsFile().exists()){
-            destroyPool(poolRunFile);
         }
     }
 
@@ -81,8 +71,9 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
         }
     }
 
-    public boolean poolExistiert(Property<String> poolName) throws LibvirtException {
-        return allPools().contains(poolName.get());
+    public boolean exists() throws LibvirtException {
+        var poolName = getParameters().getPoolName().get();
+        return allPools().contains(poolName);
     }
 
     public void run(Consumer<StoragePool> consumer) {
