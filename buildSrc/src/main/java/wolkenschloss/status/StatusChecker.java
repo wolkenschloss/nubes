@@ -1,5 +1,5 @@
 package wolkenschloss.status;
 
-public interface StatusChecker {
+interface StatusChecker {
     void run(String label);
 }

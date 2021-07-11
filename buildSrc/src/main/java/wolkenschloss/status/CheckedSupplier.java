@@ -1,6 +1,6 @@
 package wolkenschloss.status;
 
 @FunctionalInterface
-public interface CheckedSupplier<T> {
+interface CheckedSupplier<T> {
     T apply() throws Throwable;
 }

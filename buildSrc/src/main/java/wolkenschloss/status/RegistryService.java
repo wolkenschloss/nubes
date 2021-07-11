@@ -21,7 +21,6 @@ import wolkenschloss.domain.DomainOperations;
 
 // TODO: Refactor
 
-
 public abstract class RegistryService implements BuildService<RegistryService.Params> {
 
     public interface Params extends BuildServiceParameters {

@@ -3,7 +3,7 @@ package wolkenschloss.status;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class StatusBuilder<T> implements Check<T>, OkMessage<T>, ErrorMessage<T>, StatusChecker {
+class StatusBuilder<T> implements Check<T>, OkMessage<T>, ErrorMessage<T>, StatusChecker {
 
     private final StatusTask statusTask;
     private final CheckedSupplier<T> fn;

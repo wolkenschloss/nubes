@@ -16,8 +16,6 @@ import wolkenschloss.model.SecureShellService;
 import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.domain.DomainOperations;
 
-// TODO: Refactor
-
 import javax.inject.Inject;
 import java.nio.file.Files;
 import java.nio.file.Path;
