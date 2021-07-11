@@ -25,7 +25,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         this.connection = new Connect("qemu:///system");
     }
 
-    public String getTestbedHostAddress() throws Throwable {
+    public String getTestbedHostAddress() throws LibvirtException, InterruptedException {
 
                 String result = getInterfaces(10);
 

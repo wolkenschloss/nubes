@@ -6,8 +6,6 @@ import org.gradle.api.services.BuildService;
 import org.gradle.process.ExecOperations;
 import wolkenschloss.domain.DomainOperations;
 
-// TODO: Refactor
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;

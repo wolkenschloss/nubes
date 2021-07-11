@@ -5,11 +5,11 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 
-public class TransformationTaskRegistrar {
+public class TaskRegistrar {
 
     private final Project project;
 
-    public TransformationTaskRegistrar(Project project) {
+    public TaskRegistrar(Project project) {
         this.project = project;
     }
 

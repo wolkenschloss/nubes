@@ -8,6 +8,7 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
+import org.libvirt.LibvirtException;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -49,7 +50,7 @@ abstract public class Start extends DefaultTask {
     abstract public Property<DomainOperations> getDomainOperations();
 
     @TaskAction
-    public void exec() throws Throwable {
+    public void exec() throws IOException, LibvirtException, InterruptedException {
 
         var knownHostsFile = getKnownHostsFile().getAsFile().get();
 
@@ -69,7 +70,7 @@ abstract public class Start extends DefaultTask {
         updateKnownHosts(serverKey);
     }
 
-    public void updateKnownHosts(String serverKey) throws Throwable {
+    public void updateKnownHosts(String serverKey) throws IOException, LibvirtException, InterruptedException {
         DomainOperations domainOperations = getDomainOperations().get();
 
         var ip = domainOperations.getTestbedHostAddress();

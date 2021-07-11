@@ -10,7 +10,7 @@ import wolkenschloss.pool.*;
 import wolkenschloss.status.RegistryService;
 import wolkenschloss.status.StatusTask;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.transformation.TransformationTaskRegistrar;
+import wolkenschloss.transformation.TaskRegistrar;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TestbedPlugin implements Plugin<Project> {
@@ -72,7 +72,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 RegistryService.class,
                 spec -> spec.getParameters().getDomainOperations().set(domainOperations));
 
-        var registrar = new TransformationTaskRegistrar(project);
+        var registrar = new TaskRegistrar(project);
 
         var transformNetworkConfig = registrar.register(
                 TRANSFORM_NETWORK_CONFIG_TASK_NAME,
@@ -135,7 +135,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
                 extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)),
                 extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME));
-        
+
         var startDomain = project.getTasks().register(
                 START_DOMAIN_TASK_NAME,
                 Start.class,
