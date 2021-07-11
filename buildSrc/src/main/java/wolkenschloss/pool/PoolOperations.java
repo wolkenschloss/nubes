@@ -67,7 +67,6 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
                 .collect(Collectors.toList());
     }
 
-    // TODO Kandidat für Testbed Klasse
     public void fallsPoolExistiert(UUID poolId, StoragePoolConsumer consumer) throws LibvirtException {
         for (var poolName : allPools()) {
             var pool = connection.storagePoolLookupByName(poolName);

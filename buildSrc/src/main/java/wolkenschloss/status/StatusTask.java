@@ -63,17 +63,17 @@ public abstract class StatusTask extends DefaultTask {
     abstract public Property<RegistryService> getRegistryService();
 
     @TaskAction
-    public void printStatus() throws Throwable {
+    public void printStatus() {
         getLogger().quiet("Status of {}", getDomainName().get());
 
         DomainOperations domainOperations = getDomainOperations().get();
 
-            check("Testbed", domainOperations::withDomain, (Consumer<DomainOperations>) domain -> {
+        check("Testbed", domainOperations::withDomain, (Consumer<DomainOperations>) domain -> {
 
-                info("IP Address", domain::getTestbedHostAddress);
+            info("IP Address", domain::getTestbedHostAddress);
 
-                SecureShellService shell = getSecureShellService().get();
-                check("ssh uname", shell.execute(getExecOperations(), "uname", "-norm"), result -> {
+            SecureShellService shell = getSecureShellService().get();
+            check("ssh uname", shell.execute(getExecOperations(), "uname", "-norm"), result -> {
                     info("stdout", result::getStdout);
                     info("exit code", result::getExitValue);
                 });

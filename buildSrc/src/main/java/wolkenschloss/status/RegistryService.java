@@ -19,8 +19,6 @@ import java.util.function.Consumer;
 import org.gradle.api.provider.Property;
 import wolkenschloss.domain.DomainOperations;
 
-// TODO: Refactor
-
 public abstract class RegistryService implements BuildService<RegistryService.Params> {
 
     public interface Params extends BuildServiceParameters {

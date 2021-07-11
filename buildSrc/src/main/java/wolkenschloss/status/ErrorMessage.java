@@ -1,5 +1,5 @@
 package wolkenschloss.status;
 
 interface ErrorMessage<T> {
-    public StatusChecker error(String message);
+    StatusChecker error(String message);
 }
