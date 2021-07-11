@@ -17,12 +17,12 @@ import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.domain.DomainOperations;
 
 // TODO: Refactor
-import wolkenschloss.CheckedConsumer;
 
 import javax.inject.Inject;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -70,7 +70,7 @@ public abstract class StatusTask extends DefaultTask {
 
         DomainOperations domainOperations = getDomainOperations().get();
 
-            check("Testbed", domainOperations::withDomain, (CheckedConsumer<DomainOperations>) domain -> {
+            check("Testbed", domainOperations::withDomain, (Consumer<DomainOperations>) domain -> {
 
                 info("IP Address", domain::getTestbedHostAddress);
 
@@ -148,7 +148,7 @@ public abstract class StatusTask extends DefaultTask {
         }
     }
 
-    private <T> void check(String label, CheckedConsumer<CheckedConsumer<T>> fn, CheckedConsumer<T> with) {
+    private <T> void check(String label, Consumer<Consumer<T>> fn, Consumer<T> with) {
         try {
             fn.accept(with);
             getLogger().quiet(String.format("✓ %-15s: %s", label, "OK"));

@@ -13,7 +13,9 @@ import org.gradle.process.ExecOperations;
 import wolkenschloss.model.SecureShellService;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -48,12 +50,23 @@ public abstract class CopyKubeConfig extends DefaultTask {
             var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
             var attributes = PosixFilePermissions.asFileAttribute(permissions);
             var path = getKubeConfigFile().get().getAsFile().toPath();
-            var file = Files.createFile(path, attributes);
 
-            Files.writeString(
-                    file.toAbsolutePath(),
-                    result.getStdout(),
-                    StandardOpenOption.WRITE);
+            Path file;
+            
+            try {
+                file = Files.createFile(path, attributes);
+            } catch (IOException exception) {
+                throw new RuntimeException("Can not create File", exception);
+            }
+
+            try {
+                Files.writeString(
+                        file.toAbsolutePath(),
+                        result.getStdout(),
+                        StandardOpenOption.WRITE);
+            } catch (IOException exception) {
+                throw new RuntimeException("Can not write File", exception);
+            }
         });
     }
 }

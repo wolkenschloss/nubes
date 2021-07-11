@@ -6,14 +6,12 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
 import org.libvirt.Connect;
-import org.libvirt.DomainInfo;
 import org.libvirt.Domain;
+import org.libvirt.DomainInfo;
 import org.libvirt.LibvirtException;
 
-// TODO: Refactor
-import wolkenschloss.CheckedConsumer;
-
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public abstract class DomainOperations implements BuildService<DomainOperations.Params>, AutoCloseable {
 
@@ -75,26 +73,41 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         }
     }
 
-    public void withInfo(CheckedConsumer<DomainInfo> consumer) throws Throwable {
+    public void withInfo(Consumer<DomainInfo> consumer) {
         var name = getParameters().getDomainName().get();
-        var domain = connection.domainLookupByName(name);
         try {
-            var info = domain.getInfo();
-            consumer.accept(info);
-        } finally {
-            if (domain != null) {
-                domain.free();
+            Domain domain = null;
+            try {
+                domain = connection.domainLookupByName(name);
+                var info = domain.getInfo();
+                consumer.accept(info);
+            } catch (LibvirtException exception) {
+                throw new RuntimeException("Can not process domain info.", exception);
+            } finally {
+                if (domain != null) {
+                    domain.free();
+                }
             }
+        } catch (LibvirtException exception) {
+            throw new RuntimeException("Can not free domain.", exception);
         }
     }
 
-    public <T> void withDomain(CheckedConsumer<DomainOperations> method) throws Throwable {
+    public <T> void withDomain(Consumer<DomainOperations> method) {
         var name = getParameters().getDomainName().get();
-        var domain = connection.domainLookupByName(name);
+        Domain domain = null;
         try {
-            method.accept(this);
-        } finally {
-            domain.free();
+            try {
+                domain = connection.domainLookupByName(name);
+                method.accept(this);
+            } catch (LibvirtException exception) {
+                throw new RuntimeException("Can not lookup domain", exception);
+            } finally {
+                domain.free();
+            }
+        } catch (LibvirtException exception) {
+
+            throw new RuntimeException("Can not free domain", exception);
         }
     }
 

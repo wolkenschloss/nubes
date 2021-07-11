@@ -14,12 +14,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import org.gradle.api.provider.Property;
 import wolkenschloss.domain.DomainOperations;
 
 // TODO: Refactor
-import wolkenschloss.CheckedConsumer;
+
 
 public abstract class RegistryService implements BuildService<RegistryService.Params> {
 
@@ -70,7 +71,7 @@ public abstract class RegistryService implements BuildService<RegistryService.Pa
         return URI.create(String.format("http://%s", name));
     }
 
-    public <T> void withRegistry(CheckedConsumer<RegistryService> method) throws Throwable {
+    public <T> void withRegistry(Consumer<RegistryService> method) {
         method.accept(this);
     }
 

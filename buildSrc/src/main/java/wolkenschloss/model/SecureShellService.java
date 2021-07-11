@@ -7,11 +7,12 @@ import org.gradle.process.ExecOperations;
 import wolkenschloss.domain.DomainOperations;
 
 // TODO: Refactor
-import wolkenschloss.CheckedConsumer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 public abstract class SecureShellService implements BuildService<SecureShellService.Params> {
 
@@ -54,9 +55,9 @@ public abstract class SecureShellService implements BuildService<SecureShellServ
         }
     }
 
-    public CheckedConsumer<CheckedConsumer<Result>> execute(ExecOperations execOperations, Object... args) {
+    public Consumer<Consumer<Result>> execute(ExecOperations execOperations, Object... args) {
 
-        return (CheckedConsumer<Result> consumer) -> {
+        return (Consumer<Result> consumer) -> {
 
             var knownHostsFile = getParameters().getKnownHostsFile().getAsFile().get().getPath();
             var arguments = new Vector<>();
@@ -79,6 +80,8 @@ public abstract class SecureShellService implements BuildService<SecureShellServ
                             stderr.toString().trim(),
                             result.getExitValue()));
                 }
+            } catch (IOException exception) {
+                throw new RuntimeException("Can not create streams.", exception);
             }
         };
     }

@@ -8,14 +8,12 @@ import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
 
-// TODO: Refactor
-import wolkenschloss.CheckedConsumer;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,16 +86,22 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
         return allPools().contains(poolName.get());
     }
 
-    public void run(CheckedConsumer<StoragePool> consumer) throws Throwable {
+    public void run(Consumer<StoragePool> consumer) {
         StoragePool pool = null;
 
         try {
-            pool = connection.storagePoolLookupByName(getParameters().getPoolName().get());
-            consumer.accept(pool);
-        } finally {
-            if (pool != null) {
-                pool.free();
+            try {
+                pool = connection.storagePoolLookupByName(getParameters().getPoolName().get());
+                consumer.accept(pool);
+            } catch (LibvirtException exception) {
+                throw new RuntimeException("Unkown storage pool", exception);
+            } finally {
+                if (pool != null) {
+                    pool.free();
+                }
             }
+        } catch (LibvirtException exception) {
+            throw new RuntimeException("Can not free storage pool", exception);
         }
     }
 
