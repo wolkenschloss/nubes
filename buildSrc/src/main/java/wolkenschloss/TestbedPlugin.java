@@ -4,7 +4,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import wolkenschloss.domain.DomainOperations;
-import wolkenschloss.domain.Start;
+import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.model.SecureShellService;
 import wolkenschloss.pool.*;
 import wolkenschloss.status.RegistryService;
@@ -25,7 +25,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
     public static final String CREATE_POOL_TASK_NAME = "createPool";
-    public static final String START_DOMAIN_TASK_NAME = "startDomain";
+    public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
@@ -135,9 +135,9 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)),
                 extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME));
 
-        var startDomain = project.getTasks().register(
-                START_DOMAIN_TASK_NAME,
-                Start.class,
+        var buildDomain = project.getTasks().register(
+                BUILD_DOMAIN_TASK_NAME,
+                BuildDomain.class,
                 task -> {
                     task.dependsOn(createPool);
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
@@ -154,7 +154,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> {
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(extension.getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
-                    task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+                    task.getKnownHostsFile().convention(buildDomain.get().getKnownHostsFile());
                     task.getSecureShellService().set(secureShellService);
                 });
 
@@ -168,7 +168,7 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getSecureShellService().set(secureShellService);
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
-                    task.getKnownHostsFile().convention(startDomain.get().getKnownHostsFile());
+                    task.getKnownHostsFile().convention(buildDomain.get().getKnownHostsFile());
                     task.getDistributionName().convention(extension.getBaseImage().getName());
                     task.getDownloadDir().convention(extension.getBaseImage().getDownloadDir());
                     task.getDistributionDir().convention(extension.getBaseImage().getDistributionDir());
