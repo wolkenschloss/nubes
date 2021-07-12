@@ -15,7 +15,7 @@ import wolkenschloss.status.RegistryService;
 
 import java.util.Map;
 
-public abstract class TestbedExtension {
+public abstract class TestbedExtension  {
 
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
@@ -23,19 +23,15 @@ public abstract class TestbedExtension {
         // Set build directories
         var layout = project.getLayout();
         var buildDirectory = layout.getBuildDirectory();
-
+        var sharedServices = project.getGradle().getSharedServices();
 
         getRunDirectory().set(buildDirectory.dir("run"));
-        getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
-        getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
-
-        getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
+        getTransformation().getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
+        getTransformation().getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
+        getTransformation().getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
 
         getUser().initialize();
         getHost().initialize();
-
-        var sharedServices = project.getGradle().getSharedServices();
-
         getPool().initialize(sharedServices, buildDirectory);
         getBaseImage().initialize();
 
@@ -84,6 +80,12 @@ public abstract class TestbedExtension {
         action.execute(getBaseImage());
     }
 
+    @Nested
+    abstract public TransformationExtension getTransformation();
+    public void transformation(Action<? super TransformationExtension> action) {
+        action.execute(getTransformation());
+    }
+
     /**
      * Liefert die Beschreibung des Prüfstandes als Map
      * @param objects Tja
@@ -117,12 +119,6 @@ public abstract class TestbedExtension {
     }
 
     abstract public DirectoryProperty getRunDirectory();
-
-    abstract public DirectoryProperty getSourceDirectory();
-
-    abstract public DirectoryProperty getGeneratedCloudInitDirectory();
-
-    abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 
     abstract public Property<SecureShellService> getSecureShellService();
 

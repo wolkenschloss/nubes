@@ -119,8 +119,8 @@ public class Registrar {
                 .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms pool.xml template")
-                .template(getExtension().getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
-                .output(getExtension().getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME))
+                .template(getExtension().getTransformation().getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
+                .output(getExtension().getTransformation().getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME))
                 .register(getProject());
 
         return getProject().getTasks().register(
@@ -168,16 +168,16 @@ public class Registrar {
                 .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms network-config template")
-                .template(getExtension().getSourceDirectory().file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
-                .output(getExtension().getGeneratedCloudInitDirectory().file(NETWORK_CONFIG_FILE_NAME))
+                .template(getExtension().getTransformation().getSourceDirectory().file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
+                .output(getExtension().getTransformation().getGeneratedCloudInitDirectory().file(NETWORK_CONFIG_FILE_NAME))
                 .register(getProject());
 
         var transformUserData = TaskRegistrar.create()
                 .name(TRANSFORM_USER_DATA_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms user-data template")
-                .template(getExtension().getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)))
-                .output(getExtension().getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME))
+                .template(getExtension().getTransformation().getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)))
+                .output(getExtension().getTransformation().getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME))
                 .register(getProject());
 
         return getProject().getTasks().register(
@@ -199,8 +199,8 @@ public class Registrar {
                 .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms domain.xml")
-                .template(getExtension().getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
-                .output(getExtension().getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME))
+                .template(getExtension().getTransformation().getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
+                .output(getExtension().getTransformation().getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME))
                 .register(getProject());
 
         return getProject().getTasks().register(
