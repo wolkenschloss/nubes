@@ -1,4 +1,4 @@
-package wolkenschloss;
+package wolkenschloss.transformation;
 
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;

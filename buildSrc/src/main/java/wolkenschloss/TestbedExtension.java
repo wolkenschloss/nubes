@@ -12,6 +12,7 @@ import wolkenschloss.pool.BaseImageExtension;
 import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.remote.SecureShellService;
 import wolkenschloss.status.RegistryService;
+import wolkenschloss.transformation.TransformationExtension;
 
 import java.util.Map;
 

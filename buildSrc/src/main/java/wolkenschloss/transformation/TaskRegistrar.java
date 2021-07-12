@@ -5,7 +5,6 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
-import wolkenschloss.TransformationExtension;
 
 import java.util.function.Function;
 

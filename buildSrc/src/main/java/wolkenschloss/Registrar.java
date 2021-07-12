@@ -56,8 +56,8 @@ public class Registrar {
     public void register() {
         var buildDataSourceImage = getBuildDataSourceImageTaskProvider();
         var buildRootImage = getBuildRootImageTaskProvider();
-        var buildPool = getBuildPoolTaskProvider(buildDataSourceImage, buildRootImage);
-        var buildDomain = getBuildDomainTaskProvider(buildPool);
+        var buildPool = getBuildPoolTaskProvider();
+        var buildDomain = getBuildDomainTaskProvider();
         var readKubeConfig = getCopyKubeConfigTaskProvider(buildDomain);
 
         getProject().getTasks().withType(Transform.class).configureEach(
@@ -114,8 +114,12 @@ public class Registrar {
         return readKubeConfig;
     }
 
-    private TaskProvider<BuildPool> getBuildPoolTaskProvider(TaskProvider<BuildDataSourceImage> buildDataSourceImage, TaskProvider<BuildRootImage> buildRootImage) {
-        var transformPoolDescription = TaskRegistrar.create(getExtension().getTransformation())
+    private TaskProvider<BuildPool> getBuildPoolTaskProvider() {
+        var buildDataSourceImage = getProject().getTasks().findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
+        var buildRootImage = getProject().getTasks().findByName(BUILD_ROOT_IMAGE_TASK_NAME);
+
+        // Refactor: Move
+        TaskRegistrar.create(getExtension().getTransformation())
                 .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms pool.xml template")
@@ -123,13 +127,17 @@ public class Registrar {
                 .outputDescription(dst -> dst.file(POOL_DESCRIPTION_FILE_NAME))
                 .register(getProject());
 
+        var transformPoolDescription = getProject().getTasks()
+                .withType(Transform.class)
+                .getByName(TRANSFORM_POOL_DESCRIPTION_TASK_NAME);
+
         return getProject().getTasks().register(
                 BUILD_POOL_TASK_NAME,
                 BuildPool.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
-                    task.getPoolDescriptionFile().convention(transformPoolDescription.get().getOutputFile());
+                    task.getPoolDescriptionFile().convention(transformPoolDescription.getOutputFile());
                     task.getPoolRunFile().convention(getExtension().getRunDirectory().file("pool.run"));
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
@@ -164,7 +172,7 @@ public class Registrar {
     }
 
     private TaskProvider<BuildDataSourceImage> getBuildDataSourceImageTaskProvider() {
-        var transformNetworkConfig = TaskRegistrar.create(getExtension().getTransformation())
+        TaskRegistrar.create(getExtension().getTransformation())
                 .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms network-config template")
@@ -172,7 +180,7 @@ public class Registrar {
                 .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
                 .register(getProject());
 
-        var transformUserData = TaskRegistrar.create(getExtension().getTransformation())
+        TaskRegistrar.create(getExtension().getTransformation())
                 .name(TRANSFORM_USER_DATA_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms user-data template")
@@ -180,13 +188,17 @@ public class Registrar {
                 .outputCloudConfig(dst -> dst.file(USER_DATA_FILE_NAME))
                 .register(getProject());
 
+        var transformationTasks = getProject().getTasks().withType(Transform.class);
+        var transformNetworkConfig = transformationTasks.getByName(TRANSFORM_NETWORK_CONFIG_TASK_NAME);
+        var transformUserData = transformationTasks.getByName(TRANSFORM_USER_DATA_TASK_NAME);
+
         return getProject().getTasks().register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
-                    task.getUserData().convention(transformUserData.get().getOutputFile());
+                    task.getNetworkConfig().convention(transformNetworkConfig.getOutputFile());
+                    task.getUserData().convention(transformUserData.getOutputFile());
 
                     task.getDataSourceImage().convention(
                             getExtension().getPool().getPoolDirectory()
@@ -194,14 +206,20 @@ public class Registrar {
                 });
     }
 
-    private TaskProvider<BuildDomain> getBuildDomainTaskProvider(TaskProvider<BuildPool> buildPool) {
-        var transformDomainDescription = TaskRegistrar.create(getExtension().getTransformation())
+    private TaskProvider<BuildDomain> getBuildDomainTaskProvider() {
+        var buildPool = getProject().getTasks().findByName(BUILD_POOL_TASK_NAME);
+
+        TaskRegistrar.create(getExtension().getTransformation())
                 .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
                 .description("Transforms domain.xml")
                 .template(src -> src.file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
                 .outputDescription(dst -> dst.file(DOMAIN_DESCRIPTION_FILE_NAME))
                 .register(getProject());
+
+        var transformDomainDescription = getProject().getTasks()
+                .withType(Transform.class)
+                .getByName(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME);
 
         return getProject().getTasks().register(
                 BUILD_DOMAIN_TASK_NAME,
@@ -212,7 +230,7 @@ public class Registrar {
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
                     task.getDomain().convention(getExtension().getDomain().getName());
                     task.getPort().convention(getExtension().getHost().getCallbackPort());
-                    task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
+                    task.getXmlDescription().convention(transformDomainDescription.getOutputFile());
 
                     task.getKnownHostsFile().convention(extension.getRunDirectory()
                             .file(TestbedExtension.DEFAULT_KNOWN_HOSTS_FILE_NAME));
