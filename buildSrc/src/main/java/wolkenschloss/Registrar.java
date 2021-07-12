@@ -3,6 +3,8 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.file.RegularFile;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
@@ -53,9 +55,10 @@ public class Registrar {
 
         DomainExtension domain = getExtension().getDomain();
         HostExtension host = getExtension().getHost();
-        registerBuildDomainTask(tasks, domain, host);
 
-        getCopyKubeConfigTaskProvider(getProject().getTasks(), getExtension().getDomain());
+        registerBuildDomainTask(tasks, domain, host);
+        registerReadKubeConfig(tasks, domain, getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
+        registerStatusTask(tasks, domain);
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
@@ -89,21 +92,29 @@ public class Registrar {
                 });
     }
 
-    private void getCopyKubeConfigTaskProvider(TaskContainer tasks, DomainExtension domain) {
-
+    private void registerReadKubeConfig(TaskContainer tasks, DomainExtension domain, Provider<RegularFile> kubeConfig) {
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
 
-        var readKubeConfig = tasks.register(
+        tasks.register(
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
                     task.getDomainName().convention(domain.getName());
-                    task.getKubeConfigFile().convention(getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
+                    task.getKubeConfigFile().convention(kubeConfig);
                     task.getKnownHostsFile().convention(knownHostsFile);
                     task.getDomainOperations().set(domain.getDomainOperations());
                 });
+    }
+
+    private void registerStatusTask(TaskContainer tasks, DomainExtension domain) {
+
+        var readKubeConfig = tasks.named(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
+
+        var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
+                .map(BuildDomain::getKnownHostsFile)
+                .get();
 
         var downloadDistribution = tasks.named(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
