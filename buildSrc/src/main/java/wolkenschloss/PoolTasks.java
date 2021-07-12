@@ -17,7 +17,8 @@ public class PoolTasks {
         this.pool = pool;
     }
 
-    public static void registerBuildPoolTask(TaskContainer tasks, PoolExtension pool) {
+    public void registerBuildPoolTask(TaskContainer tasks) {
+
         var buildDataSourceImage = tasks.findByName(Registrar.BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
         var buildRootImage = tasks.findByName(Registrar.BUILD_ROOT_IMAGE_TASK_NAME);
 
@@ -37,7 +38,7 @@ public class PoolTasks {
                 });
     }
 
-    public static void registerBuildRootImageTask(TaskContainer tasks, PoolExtension pool) {
+    public void registerBuildRootImageTask(TaskContainer tasks) {
         var downloadDistributionTask = tasks.named(
                 DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
 
