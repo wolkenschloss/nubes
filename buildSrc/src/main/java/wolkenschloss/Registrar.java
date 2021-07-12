@@ -3,12 +3,10 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.BuildDomain;
-import wolkenschloss.pool.BuildDataSourceImage;
-import wolkenschloss.pool.BuildPool;
-import wolkenschloss.pool.BuildRootImage;
-import wolkenschloss.pool.DownloadDistribution;
+import wolkenschloss.pool.*;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasksRegistrar;
@@ -44,10 +42,9 @@ public class Registrar {
         new TransformationTasksRegistrar(project, BUILD_GROUP_NAME)
                 .registerTransformationTasks(extension.getTransformation());
 
-        registerBuildDataSourceImageTask();
-        registerBuildRootImageTask();
+        registerBuildDataSourceImageTask(getProject().getTasks(), BUILD_GROUP_NAME, getExtension().getPool());
+        registerBuildRootImageTask(getProject().getTasks(), getExtension().getBaseImage(), getExtension().getPool());
         registerBuildPoolTask();
-
 
         registerBuildDomainTask();
 
@@ -141,45 +138,55 @@ public class Registrar {
                 });
     }
 
-    private void registerBuildRootImageTask() {
-        var downloadDistribution = getProject().getTasks().register(
-                DOWNLOAD_DISTRIBUTION_TASK_NAME,
-                DownloadDistribution.class,
-                task -> {
-                    var baseImage = getExtension().getBaseImage();
-                    task.getBaseImageLocation().convention(baseImage.getUrl());
-                    task.getDistributionName().convention(baseImage.getName());
-                    task.getBaseImage().convention(baseImage.getBaseImageFile());
-                    task.getDistributionDir().convention(baseImage.getDistributionDir());
-                });
+    private void registerBuildRootImageTask(TaskContainer tasks, BaseImageExtension baseImage1, PoolExtension pool) {
+        registerDownloadDistributionTask(tasks, baseImage1);
 
-        getProject().getTasks().register(
+        var downloadDistributionTask = tasks.named(DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
+
+        tasks.register(
                 BUILD_ROOT_IMAGE_TASK_NAME,
                 BuildRootImage.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getSize().convention(DEFAULT_IMAGE_SIZE);
-                    task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
-
-                    task.getRootImage().convention(
-                            getExtension().getPool().getPoolDirectory()
-                                    .file(getExtension().getPool().getRootImageName()));
-
+                    task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
+                    task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
                     task.getRootImageMd5File().convention(getExtension().getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
                 });
     }
 
-    private void registerBuildDataSourceImageTask() {
-        getProject().getTasks().register(
+    private void registerDownloadDistributionTask(TaskContainer tasks, BaseImageExtension baseImage1) {
+        tasks.register(
+                DOWNLOAD_DISTRIBUTION_TASK_NAME,
+                DownloadDistribution.class,
+                task -> {
+                    var baseImage = baseImage1;
+                    task.getBaseImageLocation().convention(baseImage.getUrl());
+                    task.getDistributionName().convention(baseImage.getName());
+                    task.getBaseImage().convention(baseImage.getBaseImageFile());
+                    task.getDistributionDir().convention(baseImage.getDistributionDir());
+                });
+    }
+
+    public static void registerBuildDataSourceImageTask(TaskContainer tasks, String group, PoolExtension poolExtension) {
+        var transformNetworkConfigTask =  tasks.named(
+                TransformationTasksRegistrar.TRANSFORM_NETWORK_CONFIG_TASK_NAME,
+                Transform.class);
+
+        var transformUserDataTask = tasks.named(
+                TransformationTasksRegistrar.TRANSFORM_USER_DATA_TASK_NAME,
+                Transform.class);
+
+        tasks.register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
                 task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.getNetworkConfig().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_NETWORK_CONFIG_TASK_NAME).getOutputFile());
-                    task.getUserData().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_USER_DATA_TASK_NAME).getOutputFile());
+                    task.setGroup(group);
+                    task.getNetworkConfig().convention(transformNetworkConfigTask.get().getOutputFile());
+                    task.getUserData().convention(transformUserDataTask.get().getOutputFile());
                     task.getDataSourceImage().convention(
-                            getExtension().getPool().getPoolDirectory()
-                                    .file(getExtension().getPool().getCidataImageName()));
+                            poolExtension.getPoolDirectory()
+                                    .file(poolExtension.getCidataImageName()));
                 });
     }
 
