@@ -23,7 +23,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
-    public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
+    public static final String BUILD_ROOT_IMAGE_TASK_NAME = "root";
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
@@ -91,7 +91,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> {
                     task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
                     task.getUserData().convention(transformUserData.get().getOutputFile());
-                    task.getCidata().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
+                    task.getDataSourceImage().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
                 });
 
         var downloadDistribution = project.getTasks().register(
@@ -105,9 +105,9 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getDistributionDir().convention(baseImage.getDistributionDir());
                 });
 
-        var createRootImage = project.getTasks().register(
-                CREATE_ROOT_IMAGE_TASK_NAME,
-                CreateRootImage.class,
+        var buildRootImage = project.getTasks().register(
+                BUILD_ROOT_IMAGE_TASK_NAME,
+                BuildRootImage.class,
                 task -> {
                     task.getSize().convention(DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
@@ -127,7 +127,7 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getPoolOperations().set(poolOperations);
                     task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
-                    task.dependsOn(createRootImage, buildDataSourceImage);
+                    task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
 
         var transformDomainDescription = registrar.register(

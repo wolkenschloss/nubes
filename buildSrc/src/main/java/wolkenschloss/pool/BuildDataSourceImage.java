@@ -25,14 +25,14 @@ abstract public class BuildDataSourceImage extends Exec {
     abstract public RegularFileProperty getUserData();
 
     @OutputFile
-    abstract public RegularFileProperty getCidata();
+    abstract public RegularFileProperty getDataSourceImage();
 
     @TaskAction
     @Override
     public void exec() {
         args("--network-config",
                 getNetworkConfig().get(),
-                getCidata().get(),
+                getDataSourceImage().get(),
                 getUserData().get());
 
         super.exec();
