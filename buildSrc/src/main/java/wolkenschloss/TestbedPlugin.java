@@ -24,7 +24,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
-    public static final String CREATE_POOL_TASK_NAME = "createPool";
+    public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String STATUS_TASK_NAME = "status";
@@ -120,9 +120,9 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)),
                 extension.getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME));
 
-        var createPool = project.getTasks().register(
-                CREATE_POOL_TASK_NAME,
-                CreatePool.class,
+        var buildPool = project.getTasks().register(
+                BUILD_POOL_TASK_NAME,
+                BuildPool.class,
                 task -> {
                     task.getPoolOperations().set(poolOperations);
                     task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
@@ -139,7 +139,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
                 task -> {
-                    task.dependsOn(createPool);
+                    task.dependsOn(buildPool);
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPort().convention(extension.getHost().getCallbackPort());
@@ -189,7 +189,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> {
                     task.getPoolOperations().set(poolOperations);
                     task.getDomain().convention(extension.getDomain().getName());
-                    task.getPoolRunFile().convention(createPool.get().getPoolRunFile());
+                    task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
                     task.getBuildDir().convention(project.getLayout().getBuildDirectory());
                     task.getDomainOperations().set(domainOperations);
                 });

@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.util.UUID;
 
 @CacheableTask
-abstract public class CreatePool extends DefaultTask {
+abstract public class BuildPool extends DefaultTask {
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -42,7 +42,10 @@ abstract public class CreatePool extends DefaultTask {
             File runFile = getPoolRunFile().get().getAsFile();
             var runFileContent = getProviderFactory().fileContents(getPoolRunFile());
             if (runFile.exists()) {
+
+                @SuppressWarnings("NullableProblems")
                 var oldPoolUuid = runFileContent.getAsText().map(UUID::fromString).get();
+
                 poolOperations.destroy(oldPoolUuid);
                 getFso().delete(spec -> spec.delete(getPoolRunFile()));
 
@@ -52,7 +55,8 @@ abstract public class CreatePool extends DefaultTask {
             if (poolOperations.exists()) {
                 var message = String.format(
                         "Der Pool %1$s existiert bereits, aber die Markierung-Datei %2$s ist nicht vorhanden.%n" +
-                                "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1$s && virsh pool-undefine %1$s'",
+                        "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1$s && virsh "+
+                        "pool-undefine %1$s'",
                         poolOperations.getParameters().getPoolName().get(),
                         runFile.getPath());
 
