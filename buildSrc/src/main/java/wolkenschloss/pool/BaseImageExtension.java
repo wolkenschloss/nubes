@@ -10,6 +10,10 @@ import java.nio.file.Path;
 
 public abstract class BaseImageExtension {
 
+    public static final String DEFAULT_DOWNLOAD_URL = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img";
+    public static final String DEFAULT_DISTRIBUTION_NAME = "ubuntu-20.04";
+    public static final String APP_NAME = "testbed";
+
     @Inject
     public abstract ObjectFactory getObjects();
 
@@ -24,10 +28,10 @@ public abstract class BaseImageExtension {
     public abstract RegularFileProperty getBaseImageFile();
 
     public void initialize() {
-        getUrl().convention("https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img");
-        getName().convention("ubuntu-20.04");
+        getUrl().convention(DEFAULT_DOWNLOAD_URL);
+        getName().convention(DEFAULT_DISTRIBUTION_NAME);
 
-        var xdgDataHome = getXdgDataHome().resolve("testbed");
+        var xdgDataHome = getXdgDataHome().resolve(APP_NAME);
 
         getDownloadDir().set(xdgDataHome.toFile());
 

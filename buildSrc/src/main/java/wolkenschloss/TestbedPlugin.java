@@ -21,7 +21,7 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
     public static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
 
-    public static final String CREATE_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
+    public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     public static final String CREATE_ROOT_IMAGE_TASK_NAME = "root";
     public static final String CREATE_POOL_TASK_NAME = "createPool";
@@ -85,9 +85,9 @@ public class TestbedPlugin implements Plugin<Project> {
                 extension.getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)),
                 extension.getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME));
 
-        var createDataSourceImage = project.getTasks().register(
-                CREATE_DATA_SOURCE_IMAGE_TASK_NAME,
-                CreateDataSourceImage.class,
+        var buildDataSourceImage = project.getTasks().register(
+                BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
+                BuildDataSourceImage.class,
                 task -> {
                     task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
                     task.getUserData().convention(transformUserData.get().getOutputFile());
@@ -127,7 +127,7 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getPoolOperations().set(poolOperations);
                     task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
-                    task.dependsOn(createRootImage, createDataSourceImage);
+                    task.dependsOn(createRootImage, buildDataSourceImage);
                 });
 
         var transformDomainDescription = registrar.register(

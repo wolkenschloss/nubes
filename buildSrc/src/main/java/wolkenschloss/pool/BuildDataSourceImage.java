@@ -10,9 +10,9 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 
 @CacheableTask
-abstract public class CreateDataSourceImage extends Exec {
+abstract public class BuildDataSourceImage extends Exec {
 
-    public CreateDataSourceImage() {
+    public BuildDataSourceImage() {
         commandLine("cloud-localds");
     }
 
