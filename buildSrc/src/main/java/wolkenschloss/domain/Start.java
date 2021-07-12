@@ -36,10 +36,6 @@ abstract public class Start extends DefaultTask {
     @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getXmlDescription();
 
-    @InputFile
-    @PathSensitive(PathSensitivity.RELATIVE)
-    abstract public RegularFileProperty getPoolRunFile();
-
     @Inject
     abstract protected ExecOperations getExecOperations();
 
@@ -92,7 +88,10 @@ abstract public class Start extends DefaultTask {
             BlockingQueue<String> serverKeyResult = new SynchronousQueue<>();
 
             var server = HttpServer.create(new InetSocketAddress(getPort().get()), 0);
-            server.createContext(String.format("/%s", getDomain().get()), new CallbackHandler(serverKeyResult, getLogger()));
+
+            server.createContext(
+                    String.format("/%s", getDomain().get()),
+                    new CallbackHandler(serverKeyResult, getLogger()));
 
             server.setExecutor(executor);
             server.start();
