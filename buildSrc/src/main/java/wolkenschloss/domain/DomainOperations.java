@@ -167,10 +167,16 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         };
     }
 
+    public RegistryService getRegistry() {
+        try {
+            return new RegistryService(getTestbedHostAddress());
+        } catch (Throwable throwable) {
+            throw new RuntimeException("Can not create registry service", throwable);
+        }
+    }
+
     @Override
     public void close() throws Exception {
-        if (connection != null) {
-            this.connection.close();
-        }
+        this.connection.close();
     }
 }

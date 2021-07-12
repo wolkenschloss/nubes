@@ -34,23 +34,9 @@ public abstract class TestbedExtension  {
         getPool().initialize(sharedServices, buildDirectory, getRunDirectory());
         getBaseImage().initialize();
 
-        var domainOperations = getDomain().initialize(
+        getDomain().initialize(
                 sharedServices,
                 getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
-
-//        getSecureShellService().set(sharedServices.registerIfAbsent(
-//                "sshservice",
-//                SecureShellService.class,
-//                spec -> {
-//                    var parameters = spec.getParameters();
-//                    parameters.getDomainOperations().set(domainOperations);
-//                    parameters.getKnownHostsFile().set(getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
-//                }));
-
-        getRegistryService().set(sharedServices.registerIfAbsent(
-                "registryService",
-                RegistryService.class,
-                spec -> spec.getParameters().getDomainOperations().set(domainOperations)));
 
         return this;
     }

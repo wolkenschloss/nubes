@@ -117,7 +117,6 @@ public class Registrar {
                 task -> {
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
                     task.getDomainOperations().set(domain.getDomainOperations());
-                    task.getRegistryService().set(getExtension().getRegistryService());
                     task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);

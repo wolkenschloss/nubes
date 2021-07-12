@@ -4,8 +4,6 @@ import com.google.cloud.tools.jib.api.*;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.gradle.api.GradleException;
-import org.gradle.api.services.BuildService;
-import org.gradle.api.services.BuildServiceParameters;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,19 +14,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import org.gradle.api.provider.Property;
-
-public abstract class RegistryService implements BuildService<RegistryService.Params> {
-
-    public interface Params extends BuildServiceParameters {
-        Property<DomainOperations> getDomainOperations();
-    }
+public class RegistryService {
 
     private final String name;
 
-    public RegistryService() throws Throwable {
-        DomainOperations domainOperations = getParameters().getDomainOperations().get();
-        var ip = domainOperations.getTestbedHostAddress();
+    public RegistryService(String ip) {
         this.name = String.format("%s:32000", ip);
     }
 

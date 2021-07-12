@@ -47,9 +47,6 @@ public abstract class Status extends DefaultTask {
     @Internal
     abstract public Property<DomainOperations> getDomainOperations();
 
-    @Internal
-    abstract public Property<RegistryService> getRegistryService();
-
     @TaskAction
     public void printStatus() {
         getLogger().quiet("Status of {}", getDomainName().get());
@@ -90,7 +87,7 @@ public abstract class Status extends DefaultTask {
                     );
                 });
 
-                RegistryService registryService = getRegistryService().get();
+                RegistryService registryService = domain.getRegistry();
                 check("Registry", registryService::withRegistry, (RegistryService registry) -> {
                     info("Address", registry::getAddress);
                     info("Upload Image", () -> registry.uploadImage("hello-world:latest"));
