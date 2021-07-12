@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 
-import wolkenschloss.remote.SecureShellService;
+import wolkenschloss.domain.SecureShellService;
 import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.domain.DomainOperations;
 

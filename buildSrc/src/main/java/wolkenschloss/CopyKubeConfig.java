@@ -10,7 +10,7 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
-import wolkenschloss.remote.SecureShellService;
+import wolkenschloss.domain.SecureShellService;
 
 import javax.inject.Inject;
 import java.io.IOException;

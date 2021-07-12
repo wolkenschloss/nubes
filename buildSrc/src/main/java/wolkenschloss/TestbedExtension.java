@@ -10,7 +10,7 @@ import org.gradle.api.tasks.Nested;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.BaseImageExtension;
 import wolkenschloss.pool.PoolExtension;
-import wolkenschloss.remote.SecureShellService;
+import wolkenschloss.domain.SecureShellService;
 import wolkenschloss.status.RegistryService;
 import wolkenschloss.transformation.TransformationExtension;
 

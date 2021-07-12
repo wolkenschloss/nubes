@@ -1,10 +1,9 @@
-package wolkenschloss.remote;
+package wolkenschloss.domain;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.services.BuildService;
 import org.gradle.process.ExecOperations;
-import wolkenschloss.domain.DomainOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
