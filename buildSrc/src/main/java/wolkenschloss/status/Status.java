@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class StatusTask extends DefaultTask {
+public abstract class Status extends DefaultTask {
 
     @Internal
     abstract public Property<String> getDomainName();

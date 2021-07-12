@@ -8,7 +8,7 @@ import wolkenschloss.domain.Start;
 import wolkenschloss.model.SecureShellService;
 import wolkenschloss.pool.*;
 import wolkenschloss.status.RegistryService;
-import wolkenschloss.status.StatusTask;
+import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TaskRegistrar;
 
@@ -161,7 +161,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         project.getTasks().register(
                 STATUS_TASK_NAME,
-                StatusTask.class,
+                Status.class,
                 task -> {
                     task.getPoolOperations().set(poolOperations);
                     task.getDomainOperations().set(domainOperations);

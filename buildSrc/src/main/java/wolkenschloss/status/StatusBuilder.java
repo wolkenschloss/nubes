@@ -5,13 +5,13 @@ import java.util.function.Predicate;
 
 class StatusBuilder<T> implements Check<T>, OkMessage<T>, ErrorMessage<T>, StatusChecker {
 
-    private final StatusTask statusTask;
+    private final Status statusTask;
     private final CheckedSupplier<T> fn;
     private Predicate<T> predicate;
     private String errorMessage;
     private Function<T, String> okMessageProducer;
 
-    public StatusBuilder(StatusTask statusTask, CheckedSupplier<T> fn) {
+    public StatusBuilder(Status statusTask, CheckedSupplier<T> fn) {
         this.statusTask = statusTask;
         this.fn = fn;
     }
