@@ -3,49 +3,34 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.pool.BuildDataSourceImage;
 import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.BuildRootImage;
-import wolkenschloss.pool.DownloadDistribution;
 import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.remote.SecureShellService;
 import wolkenschloss.status.RegistryService;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.transformation.TaskRegistrar;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TestbedPlugin implements Plugin<Project> {
 
-    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformNetworkConfig";
-    public static final String TRANSFORM_USER_DATA_TASK_NAME = "transformUserData";
-    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "transformDomainDescription";
-    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
-    public static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
 
-    public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
-    public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
-    public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
-    public static final String BUILD_POOL_TASK_NAME = "buildPool";
-    public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
     public static final String DESTROY_TASK_NAME = "destroy";
-    public static final String NETWORK_CONFIG_FILE_NAME = "network-config";
-    public static final String USER_DATA_FILE_NAME = "user-data";
-    public static final String POOL_DESCRIPTION_FILE_NAME = "pool.xml";
-    public static final String DOMAIN_DESCRIPTION_FILE_NAME = "domain.xml";
+
     public static final String TESTBED_EXTENSION_NAME = "testbed";
 
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
-    public static final String DEFAULT_IMAGE_SIZE = "20G";
-    public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
-    public static final String BUILD_GROUP_NAME = "build";
+
 
     @Override
     public void apply(Project project) {
@@ -80,101 +65,16 @@ public class TestbedPlugin implements Plugin<Project> {
                 RegistryService.class,
                 spec -> spec.getParameters().getDomainOperations().set(domainOperations));
 
-        var transformNetworkConfig = TaskRegistrar.create()
-                .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms network-config template")
-                .template(extension.getSourceDirectory().file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
-                .output(extension.getGeneratedCloudInitDirectory().file(NETWORK_CONFIG_FILE_NAME))
-                .register(project);
+        var registrar = new Registrar(project, extension);
 
-        var transformUserData = TaskRegistrar.create()
-                .name(TRANSFORM_USER_DATA_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms user-data template")
-                .template(extension.getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)))
-                .output(extension.getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME))
-                .register(project);
+        TaskProvider<BuildDataSourceImage> buildDataSourceImage = registrar.getBuildDataSourceImageTaskProvider();
 
-        var buildDataSourceImage = project.getTasks().register(
-                BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
-                BuildDataSourceImage.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
-                    task.getUserData().convention(transformUserData.get().getOutputFile());
+        TaskProvider<BuildRootImage> buildRootImage = registrar.getBuildRootImageTaskProvider();
 
-                    task.getDataSourceImage().convention(
-                            extension.getPoolDirectory()
-                                    .file(extension.getPool().getCidataImageName()));
-                });
+        TaskProvider<BuildPool> buildPool = registrar.getBuildPoolTaskProvider(poolOperations, buildDataSourceImage, buildRootImage);
 
-        var downloadDistribution = project.getTasks().register(
-                DOWNLOAD_DISTRIBUTION_TASK_NAME,
-                DownloadDistribution.class,
-                task -> {
-                    var baseImage = extension.getBaseImage();
-                    task.getBaseImageLocation().convention(baseImage.getUrl());
-                    task.getDistributionName().convention(baseImage.getName());
-                    task.getBaseImage().convention(baseImage.getBaseImageFile());
-                    task.getDistributionDir().convention(baseImage.getDistributionDir());
-                });
 
-        var buildRootImage = project.getTasks().register(
-                BUILD_ROOT_IMAGE_TASK_NAME,
-                BuildRootImage.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.getSize().convention(DEFAULT_IMAGE_SIZE);
-                    task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
-
-                    task.getRootImage().convention(
-                            extension.getPoolDirectory()
-                            .file(extension.getPool().getRootImageName()));
-
-                    task.getRootImageMd5File().convention(extension.getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
-                });
-
-        var transformPoolDescription = TaskRegistrar.create()
-                .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms pool.xml template")
-                .template(extension.getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
-                .output(extension.getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME))
-                .register(project);
-
-        var buildPool = project.getTasks().register(
-                BUILD_POOL_TASK_NAME,
-                BuildPool.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(poolOperations);
-                    task.getPoolDescriptionFile().convention(transformPoolDescription.get().getOutputFile());
-                    task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
-                    task.dependsOn(buildRootImage, buildDataSourceImage);
-                });
-
-        var transformDomainDescription = TaskRegistrar.create()
-                .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms domain.xml")
-                .template(extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
-                .output(extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME))
-                .register(project);
-
-        var buildDomain = project.getTasks().register(
-                BUILD_DOMAIN_TASK_NAME,
-                BuildDomain.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.dependsOn(buildPool);
-                    task.setDescription("Starts the libvirt domain and waits for the callback.");
-                    task.getDomain().convention(extension.getDomain().getName());
-                    task.getPort().convention(extension.getHost().getCallbackPort());
-                    task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
-                    task.getKnownHostsFile().convention(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
-                    task.getDomainOperations().set(domainOperations);
-                });
+        TaskProvider<BuildDomain> buildDomain = registrar.getBuildDomainTaskProvider(domainOperations, buildPool);
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
@@ -210,7 +110,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 START_TASK_NAME,
                 DefaultTask.class,
                 task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
+                    task.setGroup(Registrar.BUILD_GROUP_NAME);
                     task.dependsOn(readKubeConfig);
                 });
 
@@ -218,7 +118,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 DESTROY_TASK_NAME,
                 Destroy.class,
                 task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
+                    task.setGroup(Registrar.BUILD_GROUP_NAME);
                     task.getPoolOperations().set(poolOperations);
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
@@ -227,7 +127,4 @@ public class TestbedPlugin implements Plugin<Project> {
                 });
     }
 
-    private static String templateFilename(String filename) {
-        return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
-    }
 }
