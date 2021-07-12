@@ -9,6 +9,7 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.services.BuildServiceRegistry;
 import org.gradle.api.tasks.Nested;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.domain.DomainOperations;
@@ -29,8 +30,9 @@ public abstract class TestbedExtension {
     public static final int DEFAULT_CALLBACK_PORT = 9191;
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
-    public TestbedExtension configure(Project project, ProjectLayout layout) {
+    public TestbedExtension configure(Project project) {
         // Set build directories
+        var layout = project.getLayout();
         var buildDirectory = layout.getBuildDirectory();
         getPoolDirectory().set(buildDirectory.dir("pool"));
         getRunDirectory().set(buildDirectory.dir("run"));
@@ -56,17 +58,19 @@ public abstract class TestbedExtension {
 
         getBaseImage().initialize();
 
-        getPoolOperations().set(project.getGradle().getSharedServices().registerIfAbsent(
+        BuildServiceRegistry sharedServices = project.getGradle().getSharedServices();
+
+        getPoolOperations().set(sharedServices.registerIfAbsent(
                 "poolops",
                 PoolOperations.class,
                 spec -> spec.getParameters().getPoolName().set(getPool().getName())));
 
-        getDomainOperations().set(project.getGradle().getSharedServices().registerIfAbsent(
+        getDomainOperations().set(sharedServices.registerIfAbsent(
                 "domainops",
                 DomainOperations.class,
                 spec -> spec.getParameters().getDomainName().set(getDomain().getName())));
 
-        getSecureShellService().set(project.getGradle().getSharedServices().registerIfAbsent(
+        getSecureShellService().set(sharedServices.registerIfAbsent(
                 "sshservice",
                 SecureShellService.class,
                 spec -> {
@@ -75,7 +79,7 @@ public abstract class TestbedExtension {
                     parameters.getKnownHostsFile().set(getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
                 }));
 
-        getRegistryService().set(project.getGradle().getSharedServices().registerIfAbsent(
+        getRegistryService().set(sharedServices.registerIfAbsent(
                 "registryService",
                 RegistryService.class,
                 spec -> spec.getParameters().getDomainOperations().set(getDomainOperations())));

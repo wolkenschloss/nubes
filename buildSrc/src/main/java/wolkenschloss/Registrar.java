@@ -1,10 +1,8 @@
 package wolkenschloss;
 
 import org.gradle.api.Project;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.BuildDomain;
-import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.pool.BuildDataSourceImage;
 import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.BuildRootImage;

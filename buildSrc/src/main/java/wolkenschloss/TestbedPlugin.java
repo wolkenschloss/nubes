@@ -26,7 +26,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
         TestbedExtension extension = project.getExtensions()
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class)
-                .configure(project, project.getLayout());
+                .configure(project);
 
         var sharedServices = project.getGradle().getSharedServices();
 
