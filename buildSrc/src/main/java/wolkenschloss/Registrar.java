@@ -58,14 +58,12 @@ public class Registrar {
     public void register() {
 
         var transformExtension = extension.getTransformation();
-        registerTransformUserDataTask(project, transformExtension);
-        registerTransformNetworkConfigTask(project, transformExtension);
-        registerTransformPoolDescriptionTask(project, transformExtension);
-        registerTransformDomainDescriptionTask(project, transformExtension);
+        registerTransformationTasks(project, transformExtension);
 
         registerBuildDataSourceImageTask();
         registerBuildRootImageTask();
         registerBuildPoolTask();
+
         registerBuildDomainTask();
         var readKubeConfig = getCopyKubeConfigTaskProvider();
 
@@ -81,6 +79,13 @@ public class Registrar {
                 });
 
         registerDestroyTask();
+    }
+
+    public static void registerTransformationTasks(Project project, TransformationExtension transformExtension) {
+        registerTransformUserDataTask(project, transformExtension);
+        registerTransformNetworkConfigTask(project, transformExtension);
+        registerTransformPoolDescriptionTask(project, transformExtension);
+        registerTransformDomainDescriptionTask(project, transformExtension);
     }
 
     <S extends Task> S findTask(Class<S> type, String name) {
@@ -222,7 +227,7 @@ public class Registrar {
                 });
     }
 
-    private void registerTransformPoolDescriptionTask(Project project, TransformationExtension extension) {
+    public static void registerTransformPoolDescriptionTask(Project project, TransformationExtension extension) {
         TaskRegistrar.create(extension)
                 .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -232,7 +237,7 @@ public class Registrar {
                 .register(project);
     }
 
-    private void registerTransformDomainDescriptionTask(Project project, TransformationExtension extension) {
+    public static void registerTransformDomainDescriptionTask(Project project, TransformationExtension extension) {
         TaskRegistrar.create(extension)
                 .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -242,7 +247,7 @@ public class Registrar {
                 .register(project);
     }
 
-    private void registerTransformUserDataTask(Project project, TransformationExtension extension) {
+    public static void registerTransformUserDataTask(Project project, TransformationExtension extension) {
         TaskRegistrar.create(extension)
                 .name(TRANSFORM_USER_DATA_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -252,7 +257,7 @@ public class Registrar {
                 .register(project);
     }
 
-    private void registerTransformNetworkConfigTask(Project project, TransformationExtension extension) {
+    public static void registerTransformNetworkConfigTask(Project project, TransformationExtension extension) {
         TaskRegistrar.create(extension)
                 .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
