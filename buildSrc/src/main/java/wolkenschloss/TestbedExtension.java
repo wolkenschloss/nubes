@@ -8,13 +8,10 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.services.BuildServiceRegistry;
 import org.gradle.api.tasks.Nested;
 import wolkenschloss.domain.DomainExtension;
-import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.pool.BaseImageExtension;
 import wolkenschloss.pool.PoolExtension;
-import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.remote.SecureShellService;
 import wolkenschloss.status.RegistryService;
 
@@ -33,6 +30,7 @@ public abstract class TestbedExtension {
         // Set build directories
         var layout = project.getLayout();
         var buildDirectory = layout.getBuildDirectory();
+
         getPoolDirectory().set(buildDirectory.dir("pool"));
         getRunDirectory().set(buildDirectory.dir("run"));
         getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
@@ -44,44 +42,29 @@ public abstract class TestbedExtension {
         getUser().getSshKey().convention(getUser().getSshKeyFile().map(TestbedExtension::readSshKey));
         getUser().getName().convention(System.getenv("USER"));
 
-        getDomain().getName().convention("testbed");
-        getDomain().getFqdn().convention("testbed.wolkenschloss.local");
-        getDomain().getLocale().convention(System.getenv("LANG"));
-
         getHost().getHostAddress().convention(IpUtil.getHostAddress());
         getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
 
-        getPool().getRootImageName().convention("root.qcow2");
-        getPool().getCidataImageName().convention("cidata.img");
-        getPool().getName().convention("testbed");
-
-        getBaseImage().initialize();
-
         var sharedServices = project.getGradle().getSharedServices();
 
-        getPool().getPoolOperations().set(sharedServices.registerIfAbsent(
-                "poolops",
-                PoolOperations.class,
-                spec -> spec.getParameters().getPoolName().set(getPool().getName())));
+        getPool().initialize(sharedServices);
+        getBaseImage().initialize();
 
-        getDomainOperations().set(sharedServices.registerIfAbsent(
-                "domainops",
-                DomainOperations.class,
-                spec -> spec.getParameters().getDomainName().set(getDomain().getName())));
+        var domainOperations = getDomain().initialize(sharedServices);
 
         getSecureShellService().set(sharedServices.registerIfAbsent(
                 "sshservice",
                 SecureShellService.class,
                 spec -> {
                     var parameters = spec.getParameters();
-                    parameters.getDomainOperations().set(getDomainOperations());
+                    parameters.getDomainOperations().set(domainOperations);
                     parameters.getKnownHostsFile().set(getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
                 }));
 
         getRegistryService().set(sharedServices.registerIfAbsent(
                 "registryService",
                 RegistryService.class,
-                spec -> spec.getParameters().getDomainOperations().set(getDomainOperations())));
+                spec -> spec.getParameters().getDomainOperations().set(domainOperations)));
 
         return this;
     }
@@ -159,7 +142,7 @@ public abstract class TestbedExtension {
 
 
 
-    abstract public Property<DomainOperations> getDomainOperations();
+
 
     abstract public Property<SecureShellService> getSecureShellService();
 

@@ -80,7 +80,7 @@ public class Registrar {
                     task.getDomain().convention(getExtension().getDomain().getName());
                     task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
                     task.getBuildDir().convention(getProject().getLayout().getBuildDirectory());
-                    task.getDomainOperations().set(getExtension().getDomainOperations());
+                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                 });
     }
 
@@ -100,7 +100,7 @@ public class Registrar {
                 Status.class,
                 task -> {
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
-                    task.getDomainOperations().set(getExtension().getDomainOperations());
+                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                     task.getRegistryService().set(getExtension().getRegistryService());
                     task.getSecureShellService().set(getExtension().getSecureShellService());
                     task.getDomainName().convention(getExtension().getDomain().getName());
@@ -217,7 +217,7 @@ public class Registrar {
                     task.getKnownHostsFile().convention(extension.getRunDirectory()
                             .file(TestbedExtension.DEFAULT_KNOWN_HOSTS_FILE_NAME));
 
-                    task.getDomainOperations().set(getExtension().getDomainOperations());
+                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                 });
     }
 
