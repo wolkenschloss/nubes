@@ -49,6 +49,8 @@ abstract public class BuildPool extends DefaultTask {
             var runFileContent = getProviderFactory().fileContents(getPoolRunFile());
             if (runFile.exists()) {
 
+                var str = runFileContent.getAsText().get();
+
                 @SuppressWarnings("NullableProblems")
                 var oldPoolUuid = runFileContent.getAsText().map(UUID::fromString).get();
 

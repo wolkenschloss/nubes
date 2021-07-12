@@ -7,22 +7,21 @@ import org.gradle.process.ExecOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.function.Consumer;
 
-public abstract class SecureShellService implements BuildService<SecureShellService.Params> {
+public class SecureShellService {
 
-    public interface Params extends org.gradle.api.services.BuildServiceParameters {
-        Property<DomainOperations> getDomainOperations();
-        RegularFileProperty getKnownHostsFile();
-    }
-
+    private final ExecOperations execOperations;
     private final String ip;
+    private final RegularFileProperty knownHostsFile;
 
-    public SecureShellService() throws Throwable {
-        DomainOperations domainOperations = getParameters().getDomainOperations().get();
-        this.ip = domainOperations.getTestbedHostAddress();
+    public SecureShellService(ExecOperations execOperations, String ip, RegularFileProperty knownHostsFile) throws Throwable {
+        this.execOperations = execOperations;
+        this.ip = ip;
+        this.knownHostsFile = knownHostsFile;
     }
 
     public static class Result {
@@ -52,14 +51,17 @@ public abstract class SecureShellService implements BuildService<SecureShellServ
         }
     }
 
-    public Consumer<Consumer<Result>> execute(ExecOperations execOperations, Object... args) {
+    @FunctionalInterface
+    public interface ShellCommand<T> {
+        void execute(T fn);
+    }
 
+    public ShellCommand<Consumer<Result>> command(Object... args) {
         return (Consumer<Result> consumer) -> {
 
-            var knownHostsFile = getParameters().getKnownHostsFile().getAsFile().get().getPath();
             var arguments = new Vector<>();
             arguments.addAll(Arrays.asList("-o",
-                    String.format("UserKnownHostsFile=%s", knownHostsFile),
+                    String.format("UserKnownHostsFile=%s", knownHostsFile.get().getAsFile().getPath()),
                     ip));
             arguments.addAll(Arrays.asList(args));
 
@@ -82,4 +84,40 @@ public abstract class SecureShellService implements BuildService<SecureShellServ
             }
         };
     }
+
+    public Consumer<Consumer<Result>> withCommand(Object... args) {
+        return (Consumer<Result> consumer) -> {
+            command(args).execute(consumer);
+        };
+    }
+
+//    public Consumer<Consumer<Result>> execute(ExecOperations execOperations, Object... args) {
+//
+//        return (Consumer<Result> consumer) -> {
+//
+//            var arguments = new Vector<>();
+//            arguments.addAll(Arrays.asList("-o",
+//                    String.format("UserKnownHostsFile=%s", knownHostsFile),
+//                    ip));
+//            arguments.addAll(Arrays.asList(args));
+//
+//            try (var stdout = new ByteArrayOutputStream()) {
+//                try (var stderr = new ByteArrayOutputStream()) {
+//                    var result = execOperations.exec(spec -> {
+//                        spec.commandLine("ssh")
+//                                .args(arguments)
+//                                .setStandardOutput(stdout)
+//                                .setErrorOutput(stderr);
+//                    }).assertNormalExitValue();
+//
+//                    consumer.accept(new Result(
+//                            stdout.toString().trim(),
+//                            stderr.toString().trim(),
+//                            result.getExitValue()));
+//                }
+//            } catch (IOException exception) {
+//                throw new RuntimeException("Can not create streams.", exception);
+//            }
+//        };
+//    }
 }

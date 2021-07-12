@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
-
+import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.domain.SecureShellService;
 
 import javax.inject.Inject;
@@ -36,17 +36,17 @@ public abstract class CopyKubeConfig extends DefaultTask {
     abstract public ExecOperations getExecOperations();
 
     @Internal
-    abstract public Property<SecureShellService> getSecureShellService();
+    abstract public Property<DomainOperations> getDomainOperations();
 
     @TaskAction
     public void read() throws Throwable {
 
-        var secureShell = getSecureShellService().get();
-        var executor = secureShell.execute(
-                getExecOperations(),
-                "microk8s", "config");
+        var domain = getDomainOperations().get();
 
-        executor.accept((SecureShellService.Result result) -> {
+        var shell = domain.getShell(getExecOperations());
+        var command = shell.command("microk8s", "config");
+
+        command.execute((SecureShellService.Result result) ->  {
             var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
             var attributes = PosixFilePermissions.asFileAttribute(permissions);
             var path = getKubeConfigFile().get().getAsFile().toPath();

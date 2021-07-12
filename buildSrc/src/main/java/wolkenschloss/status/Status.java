@@ -54,9 +54,6 @@ public abstract class Status extends DefaultTask {
     abstract public Property<DomainOperations> getDomainOperations();
 
     @Internal
-    abstract public Property<SecureShellService> getSecureShellService();
-
-    @Internal
     abstract public Property<RegistryService> getRegistryService();
 
     @TaskAction
@@ -69,17 +66,18 @@ public abstract class Status extends DefaultTask {
 
             info("IP Address", domain::getTestbedHostAddress);
 
-            SecureShellService shell = getSecureShellService().get();
-            check("ssh uname", shell.execute(getExecOperations(), "uname", "-norm"), result -> {
+            check("Secure Shell", domain.withShell(getExecOperations()), shell -> {
+                check("ssh uname", shell.withCommand("uname", "-norm"), result -> {
                     info("stdout", result::getStdout);
                     info("exit code", result::getExitValue);
                 });
+            });
 
-                check("Connect", domain::withInfo, info -> {
-                    check("State", info.state, s -> s == DomainInfo.DomainState.VIR_DOMAIN_RUNNING);
-                    check("Memory (MB)", info.memory / 1024, m -> m >= 4096);
-                    check("Virtual CPU's", info.nrVirtCpu, n -> n > 1);
-                });
+            check("Connect", domain::withInfo, info -> {
+                check("State", info.state, s -> s == DomainInfo.DomainState.VIR_DOMAIN_RUNNING);
+                check("Memory (MB)", info.memory / 1024, m -> m >= 4096);
+                check("Virtual CPU's", info.nrVirtCpu, n -> n > 1);
+            });
 
                 evaluate2("K8s config", () -> getKubeConfigFile().getAsFile().get().toPath(),
                         status -> status.check(Files::exists)

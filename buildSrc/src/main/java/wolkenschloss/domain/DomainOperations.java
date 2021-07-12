@@ -2,9 +2,11 @@ package wolkenschloss.domain;
 
 import com.jayway.jsonpath.JsonPath;
 import org.gradle.api.GradleException;
+import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.services.BuildService;
 import org.gradle.api.services.BuildServiceParameters;
+import org.gradle.process.ExecOperations;
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.DomainInfo;
@@ -19,6 +21,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
 
     public interface Params extends BuildServiceParameters {
         Property<String> getDomainName();
+        RegularFileProperty getKnownHostsFile();
     }
 
     public DomainOperations() throws LibvirtException {
@@ -145,6 +148,23 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         }
 
         return deleted;
+    }
+
+    public SecureShellService getShell(ExecOperations execOperations) throws Throwable {
+        var ip = getTestbedHostAddress();
+        return new SecureShellService(execOperations, ip, getParameters().getKnownHostsFile());
+    }
+
+    public Consumer<Consumer<SecureShellService>> withShell(ExecOperations execOperations) {
+        return (Consumer<SecureShellService> fn) -> {
+            SecureShellService shell = null;
+            try {
+                shell = new SecureShellService(execOperations, getTestbedHostAddress(), getParameters().getKnownHostsFile());
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+            fn.accept(shell);
+        };
     }
 
     @Override

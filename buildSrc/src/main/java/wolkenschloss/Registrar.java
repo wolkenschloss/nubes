@@ -31,6 +31,8 @@ public class Registrar {
     public static final String START_TASK_NAME = "start";
     public static final String DESTROY_TASK_NAME = "destroy";
 
+
+
     private final Project project;
     private final TestbedExtension extension;
 
@@ -95,7 +97,7 @@ public class Registrar {
     private void getCopyKubeConfigTaskProvider(TaskContainer tasks) {
 
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
-                .map(t -> t.getKnownHostsFile())
+                .map(BuildDomain::getKnownHostsFile)
                 .get();
 
         var readKubeConfig = tasks.register(
@@ -105,7 +107,7 @@ public class Registrar {
                     task.getDomainName().convention(getExtension().getDomain().getName());
                     task.getKubeConfigFile().convention(getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
                     task.getKnownHostsFile().convention(knownHostsFile);
-                    task.getSecureShellService().set(getExtension().getSecureShellService());
+                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                 });
 
         tasks.register(
@@ -115,7 +117,6 @@ public class Registrar {
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
                     task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                     task.getRegistryService().set(getExtension().getRegistryService());
-                    task.getSecureShellService().set(getExtension().getSecureShellService());
                     task.getDomainName().convention(getExtension().getDomain().getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
@@ -141,7 +142,7 @@ public class Registrar {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getPoolOperations().set(pool.getPoolOperations());
                     task.getPoolDescriptionFile().convention(transformPoolDescriptionTask.get().getOutputFile());
-                    task.getPoolRunFile().convention(pool.getRootImageMd5File());
+                    task.getPoolRunFile().convention(pool.getPoolRunFile());
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
     }
@@ -207,10 +208,6 @@ public class Registrar {
                 .map(Transform::getOutputFile)
                 .get();
 
-        var knownHostFile = tasks.named(BUILD_POOL_TASK_NAME, BuildPool.class)
-                .map(BuildPool::getPoolRunFile)
-                .get();
-
         tasks.register(
                 BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
@@ -221,8 +218,7 @@ public class Registrar {
                     task.getDomain().convention(domain.getName());
                     task.getPort().convention(host.getCallbackPort());
                     task.getXmlDescription().convention(domainDescription);
-                    task.getKnownHostsFile().convention(knownHostFile);
-
+                    task.getKnownHostsFile().convention(domain.getKnownHostsFile());
                     task.getDomainOperations().set(domain.getDomainOperations());
                 });
     }
