@@ -157,7 +157,7 @@ public class Registrar {
                 });
     }
 
-    private TaskProvider<BuildRootImage> getBuildRootImageTaskProvider() {
+    private void getBuildRootImageTaskProvider() {
         var downloadDistribution = getProject().getTasks().register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
@@ -169,7 +169,7 @@ public class Registrar {
                     task.getDistributionDir().convention(baseImage.getDistributionDir());
                 });
 
-        return getProject().getTasks().register(
+        getProject().getTasks().register(
                 BUILD_ROOT_IMAGE_TASK_NAME,
                 BuildRootImage.class,
                 task -> {
@@ -179,14 +179,14 @@ public class Registrar {
 
                     task.getRootImage().convention(
                             getExtension().getPool().getPoolDirectory()
-                            .file(getExtension().getPool().getRootImageName()));
+                                    .file(getExtension().getPool().getRootImageName()));
 
                     task.getRootImageMd5File().convention(getExtension().getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
                 });
     }
 
-    private TaskProvider<BuildDataSourceImage> getBuildDataSourceImageTaskProvider() {
-        return getProject().getTasks().register(
+    private void getBuildDataSourceImageTaskProvider() {
+        getProject().getTasks().register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
                 task -> {
@@ -199,12 +199,12 @@ public class Registrar {
                 });
     }
 
-    private TaskProvider<BuildDomain> getBuildDomainTaskProvider() {
+    private void getBuildDomainTaskProvider() {
         var buildPool = getProject().getTasks().findByName(BUILD_POOL_TASK_NAME);
 
         var project = getProject();
 
-        return getProject().getTasks().register(
+        getProject().getTasks().register(
                 BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
                 task -> {
