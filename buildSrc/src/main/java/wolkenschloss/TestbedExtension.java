@@ -26,10 +26,8 @@ public abstract class TestbedExtension  {
         var sharedServices = project.getGradle().getSharedServices();
 
         getRunDirectory().set(buildDirectory.dir("run"));
-        getTransformation().getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
-        getTransformation().getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
-        getTransformation().getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
 
+        getTransformation().initialize(layout);
         getUser().initialize();
         getHost().initialize();
         getPool().initialize(sharedServices, buildDirectory);

@@ -1,8 +1,13 @@
 package wolkenschloss.transformation;
 
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
+import wolkenschloss.TransformationExtension;
+
+import java.util.function.Function;
 
 public interface Outputable {
-    Registrable output(Provider<RegularFile> output);
+    Registrable outputDescription(Function<DirectoryProperty, Provider<RegularFile>> fn);
+    Registrable outputCloudConfig(Function<DirectoryProperty, Provider<RegularFile>> fn);
 }

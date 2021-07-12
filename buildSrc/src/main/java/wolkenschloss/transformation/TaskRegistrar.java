@@ -1,23 +1,30 @@
 package wolkenschloss.transformation;
 
 import org.gradle.api.Project;
+import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
+import wolkenschloss.TransformationExtension;
+
+import java.util.function.Function;
 
 // Seems to be over designed.
 public class TaskRegistrar implements Nameable, Groupable, Templatable, Outputable, Registrable, Descriptionable {
 
+    private final TransformationExtension extension;
     private Provider<RegularFile> template;
     private String name;
     private Provider<RegularFile> output;
     private String group;
     private String description;
 
-    private TaskRegistrar() {}
+    private TaskRegistrar(TransformationExtension extension) {
+        this.extension = extension;
+    }
 
-    public static Nameable create() {
-        return new TaskRegistrar();
+    public static Nameable create(TransformationExtension extension) {
+        return new TaskRegistrar(extension);
     }
 
     @Override
@@ -39,14 +46,20 @@ public class TaskRegistrar implements Nameable, Groupable, Templatable, Outputab
     }
 
     @Override
-    public Outputable template(Provider<RegularFile> template) {
-        this.template = template;
+    public Outputable template(Function<DirectoryProperty, Provider<RegularFile>> fn) {
+        this.template = fn.apply(this.extension.getSourceDirectory());
         return this;
     }
 
     @Override
-    public Registrable output(Provider<RegularFile> output) {
-        this.output = output;
+    public Registrable outputDescription(Function<DirectoryProperty, Provider<RegularFile>> fn) {
+        this.output = fn.apply(this.extension.getGeneratedVirshConfigDirectory());
+        return this;
+    }
+
+    @Override
+    public Registrable outputCloudConfig(Function<DirectoryProperty, Provider<RegularFile>> fn) {
+        this.output = fn.apply(this.extension.getGeneratedCloudInitDirectory());
         return this;
     }
 
