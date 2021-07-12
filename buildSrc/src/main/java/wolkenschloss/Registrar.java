@@ -11,8 +11,10 @@ import wolkenschloss.pool.*;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasksRegistrar;
+import wolkenschloss.download.DownloadTasksRegistrar;
 import wolkenschloss.download.BaseImageExtension;
 import wolkenschloss.download.DownloadDistribution;
+
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
 

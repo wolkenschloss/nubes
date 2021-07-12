@@ -1,8 +1,6 @@
-package wolkenschloss;
+package wolkenschloss.download;
 
 import org.gradle.api.tasks.TaskContainer;
-import wolkenschloss.download.BaseImageExtension;
-import wolkenschloss.download.DownloadDistribution;
 
 public class DownloadTasksRegistrar {
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
