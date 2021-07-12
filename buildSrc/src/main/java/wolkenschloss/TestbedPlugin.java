@@ -5,7 +5,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.domain.BuildDomain;
-import wolkenschloss.model.SecureShellService;
+import wolkenschloss.remote.SecureShellService;
 import wolkenschloss.pool.*;
 import wolkenschloss.status.RegistryService;
 import wolkenschloss.status.Status;

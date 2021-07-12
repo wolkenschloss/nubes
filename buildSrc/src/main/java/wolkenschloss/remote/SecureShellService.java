@@ -1,4 +1,4 @@
-package wolkenschloss.model;
+package wolkenschloss.remote;
 
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
