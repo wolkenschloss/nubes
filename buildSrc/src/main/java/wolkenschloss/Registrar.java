@@ -3,7 +3,6 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.tasks.TaskCollection;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.pool.BuildDataSourceImage;
@@ -13,6 +12,7 @@ import wolkenschloss.pool.DownloadDistribution;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.TaskRegistrar;
 import wolkenschloss.transformation.Transform;
+import wolkenschloss.transformation.TransformationExtension;
 
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
@@ -56,6 +56,13 @@ public class Registrar {
     }
 
     public void register() {
+
+        var transformExtension = extension.getTransformation();
+        registerTransformUserDataTask(project, transformExtension);
+        registerTransformNetworkConfigTask(project, transformExtension);
+        registerTransformPoolDescriptionTask(project, transformExtension);
+        registerTransformDomainDescriptionTask(project, transformExtension);
+
         getBuildDataSourceImageTaskProvider();
         getBuildRootImageTaskProvider();
         var buildPool = getBuildPoolTaskProvider();
@@ -138,15 +145,6 @@ public class Registrar {
         var buildDataSourceImage = getProject().getTasks().findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
         var buildRootImage = getProject().getTasks().findByName(BUILD_ROOT_IMAGE_TASK_NAME);
 
-        // Refactor: Move
-        TaskRegistrar.create(getExtension().getTransformation())
-                .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms pool.xml template")
-                .template(src -> src.file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
-                .outputDescription(dst -> dst.file(POOL_DESCRIPTION_FILE_NAME))
-                .register(getProject());
-
         return getProject().getTasks().register(
                 BUILD_POOL_TASK_NAME,
                 BuildPool.class,
@@ -188,22 +186,6 @@ public class Registrar {
     }
 
     private TaskProvider<BuildDataSourceImage> getBuildDataSourceImageTaskProvider() {
-        TaskRegistrar.create(getExtension().getTransformation())
-                .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms network-config template")
-                .template(src -> src.file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
-                .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
-                .register(getProject());
-
-        TaskRegistrar.create(getExtension().getTransformation())
-                .name(TRANSFORM_USER_DATA_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms user-data template")
-                .template(src -> src.file(templateFilename(USER_DATA_FILE_NAME)))
-                .outputCloudConfig(dst -> dst.file(USER_DATA_FILE_NAME))
-                .register(getProject());
-
         return getProject().getTasks().register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
@@ -220,13 +202,7 @@ public class Registrar {
     private TaskProvider<BuildDomain> getBuildDomainTaskProvider() {
         var buildPool = getProject().getTasks().findByName(BUILD_POOL_TASK_NAME);
 
-        TaskRegistrar.create(getExtension().getTransformation())
-                .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms domain.xml")
-                .template(src -> src.file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
-                .outputDescription(dst -> dst.file(DOMAIN_DESCRIPTION_FILE_NAME))
-                .register(getProject());
+        var project = getProject();
 
         return getProject().getTasks().register(
                 BUILD_DOMAIN_TASK_NAME,
@@ -244,6 +220,46 @@ public class Registrar {
 
                     task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                 });
+    }
+
+    private void registerTransformPoolDescriptionTask(Project project, TransformationExtension extension) {
+        TaskRegistrar.create(extension)
+                .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms pool.xml template")
+                .template(src -> src.file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
+                .outputDescription(dst -> dst.file(POOL_DESCRIPTION_FILE_NAME))
+                .register(project);
+    }
+
+    private void registerTransformDomainDescriptionTask(Project project, TransformationExtension extension) {
+        TaskRegistrar.create(extension)
+                .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms domain.xml")
+                .template(src -> src.file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
+                .outputDescription(dst -> dst.file(DOMAIN_DESCRIPTION_FILE_NAME))
+                .register(project);
+    }
+
+    private void registerTransformUserDataTask(Project project, TransformationExtension extension) {
+        TaskRegistrar.create(extension)
+                .name(TRANSFORM_USER_DATA_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms user-data template")
+                .template(src -> src.file(templateFilename(USER_DATA_FILE_NAME)))
+                .outputCloudConfig(dst -> dst.file(USER_DATA_FILE_NAME))
+                .register(project);
+    }
+
+    private void registerTransformNetworkConfigTask(Project project, TransformationExtension extension) {
+        TaskRegistrar.create(extension)
+                .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms network-config template")
+                .template(src -> src.file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
+                .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
+                .register(project);
     }
 
     private Project getProject() {
