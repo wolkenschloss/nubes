@@ -2,7 +2,6 @@ package wolkenschloss;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
@@ -62,7 +61,8 @@ public class Registrar {
 
         registerBuildDomainTask(tasks, domain, host);
         registerReadKubeConfig(tasks, domain, kubeConfig);
-        registerStatusTask(tasks, domain);
+
+        registerStatusTask(tasks, domain, pool);
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
@@ -76,10 +76,6 @@ public class Registrar {
                 });
 
         registerDestroyTask(getProject().getTasks());
-    }
-
-    <S extends Task> S findTask(Class<S> type, String name) {
-        return getProject().getTasks().withType(type).getByName(name);
     }
 
     private void registerDestroyTask(TaskContainer tasks) {
@@ -115,7 +111,7 @@ public class Registrar {
                 });
     }
 
-    private void registerStatusTask(TaskContainer tasks, DomainExtension domain) {
+    public void registerStatusTask(TaskContainer tasks, DomainExtension domain, PoolExtension pool) {
 
         var readKubeConfig = tasks.named(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
@@ -133,7 +129,7 @@ public class Registrar {
                 STATUS_TASK_NAME,
                 Status.class,
                 task -> {
-                    task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
+                    task.getPoolOperations().set(pool.getPoolOperations());
                     task.getDomainOperations().set(domain.getDomainOperations());
                     task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
