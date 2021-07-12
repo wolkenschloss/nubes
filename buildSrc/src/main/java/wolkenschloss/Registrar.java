@@ -43,7 +43,6 @@ public class Registrar {
         new TransformationTasksRegistrar(project, BUILD_GROUP_NAME)
                 .registerTransformationTasks(extension.getTransformation());
 
-
         TaskContainer tasks = getProject().getTasks();
         PoolExtension pool = getExtension().getPool();
         registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME, pool);
@@ -51,7 +50,9 @@ public class Registrar {
         registerBuildRootImageTask(tasks, pool);
         registerBuildPoolTask(tasks, pool);
 
-        registerBuildDomainTask(getProject().getTasks(), getExtension().getDomain(), getExtension().getHost());
+        DomainExtension domain = getExtension().getDomain();
+        HostExtension host = getExtension().getHost();
+        registerBuildDomainTask(tasks, domain, host);
 
         var readKubeConfig = getCopyKubeConfigTaskProvider();
 
@@ -198,7 +199,7 @@ public class Registrar {
                 });
     }
 
-    private void registerBuildDomainTask(TaskContainer tasks, DomainExtension domain, HostExtension host) {
+    public static void registerBuildDomainTask(TaskContainer tasks, DomainExtension domain, HostExtension host) {
         var buildPool = tasks.findByName(BUILD_POOL_TASK_NAME);
 
         var domainDescription = tasks
@@ -206,6 +207,10 @@ public class Registrar {
                     TransformationTasksRegistrar.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
                     Transform.class)
                 .map(Transform::getOutputFile)
+                .get();
+
+        var knownHostFile = tasks.named(BUILD_POOL_TASK_NAME, BuildPool.class)
+                .map(BuildPool::getPoolRunFile)
                 .get();
 
         tasks.register(
@@ -218,9 +223,7 @@ public class Registrar {
                     task.getDomain().convention(domain.getName());
                     task.getPort().convention(host.getCallbackPort());
                     task.getXmlDescription().convention(domainDescription);
-
-                    task.getKnownHostsFile().convention(extension.getRunDirectory()
-                            .file(TestbedExtension.DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                    task.getKnownHostsFile().convention(knownHostFile);
 
                     task.getDomainOperations().set(domain.getDomainOperations());
                 });
