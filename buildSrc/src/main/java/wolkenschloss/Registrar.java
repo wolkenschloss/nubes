@@ -56,7 +56,7 @@ public class Registrar {
 
         PoolExtension pool = getExtension().getPool();
         PoolTasks poolTasks = new PoolTasks(pool);
-        PoolTasks.register(tasks, poolTasks);
+        poolTasks.register(tasks);
 
         DomainExtension domain = getExtension().getDomain();
         HostExtension host = getExtension().getHost();

@@ -17,10 +17,10 @@ public class PoolTasks {
         this.pool = pool;
     }
 
-    public static void register(TaskContainer tasks, PoolTasks poolTasks) {
-        poolTasks.registerBuildDataSourceImageTask(tasks, Registrar.BUILD_GROUP_NAME);
-        poolTasks.registerBuildRootImageTask(tasks);
-        poolTasks.registerBuildPoolTask(tasks);
+    public void register(TaskContainer tasks) {
+        registerBuildDataSourceImageTask(tasks, Registrar.BUILD_GROUP_NAME);
+        registerBuildRootImageTask(tasks);
+        registerBuildPoolTask(tasks);
     }
 
     public void registerBuildPoolTask(TaskContainer tasks) {
