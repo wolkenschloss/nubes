@@ -5,8 +5,12 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.domain.BuildDomain;
+import wolkenschloss.pool.BuildDataSourceImage;
+import wolkenschloss.pool.BuildPool;
+import wolkenschloss.pool.BuildRootImage;
+import wolkenschloss.pool.DownloadDistribution;
+import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.remote.SecureShellService;
-import wolkenschloss.pool.*;
 import wolkenschloss.status.RegistryService;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
@@ -45,7 +49,7 @@ public class TestbedPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        var providers = project.getProviders();
+
         TestbedExtension extension = project.getExtensions()
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class)
                 .configure(project.getLayout());
@@ -61,8 +65,9 @@ public class TestbedPlugin implements Plugin<Project> {
                 "sshservice",
                 SecureShellService.class,
                 spec -> {
-                    spec.getParameters().getDomainOperations().set(domainOperations);
-                    spec.getParameters().getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                    var parameters = spec.getParameters();
+                    parameters.getDomainOperations().set(domainOperations);
+                    parameters.getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
                 });
 
         var poolOperations = sharedServices.registerIfAbsent(
@@ -98,7 +103,10 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
                     task.getUserData().convention(transformUserData.get().getOutputFile());
-                    task.getDataSourceImage().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
+
+                    task.getDataSourceImage().convention(
+                            extension.getPoolDirectory()
+                                    .file(extension.getPool().getCidataImageName()));
                 });
 
         var downloadDistribution = project.getTasks().register(
@@ -119,7 +127,11 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getSize().convention(DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
-                    task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
+
+                    task.getRootImage().convention(
+                            extension.getPoolDirectory()
+                            .file(extension.getPool().getRootImageName()));
+
                     task.getRootImageMd5File().convention(extension.getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
                 });
 
