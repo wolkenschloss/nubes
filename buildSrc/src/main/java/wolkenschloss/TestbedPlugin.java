@@ -75,17 +75,21 @@ public class TestbedPlugin implements Plugin<Project> {
                 RegistryService.class,
                 spec -> spec.getParameters().getDomainOperations().set(domainOperations));
 
-        var registrar = new TaskRegistrar(project);
+        var transformNetworkConfig = TaskRegistrar.create()
+                .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms network-config template")
+                .template(extension.getSourceDirectory().file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
+                .output(extension.getGeneratedCloudInitDirectory().file(NETWORK_CONFIG_FILE_NAME))
+                .register(project);
 
-        var transformNetworkConfig = registrar.register(
-                TRANSFORM_NETWORK_CONFIG_TASK_NAME,
-                extension.getSourceDirectory().file(templateFilename(NETWORK_CONFIG_FILE_NAME)),
-                extension.getGeneratedCloudInitDirectory().file(NETWORK_CONFIG_FILE_NAME));
-
-        var transformUserData = registrar.register(
-                TRANSFORM_USER_DATA_TASK_NAME,
-                extension.getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)),
-                extension.getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME));
+        var transformUserData = TaskRegistrar.create()
+                .name(TRANSFORM_USER_DATA_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms user-data template")
+                .template(extension.getSourceDirectory().file(templateFilename(USER_DATA_FILE_NAME)))
+                .output(extension.getGeneratedCloudInitDirectory().file(USER_DATA_FILE_NAME))
+                .register(project);
 
         var buildDataSourceImage = project.getTasks().register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
@@ -119,10 +123,13 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getRootImageMd5File().convention(extension.getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
                 });
 
-        var transformPoolDescription = registrar.register(
-                TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
-                extension.getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)),
-                extension.getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME));
+        var transformPoolDescription = TaskRegistrar.create()
+                .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms pool.xml template")
+                .template(extension.getSourceDirectory().file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
+                .output(extension.getGeneratedVirshConfigDirectory().file(POOL_DESCRIPTION_FILE_NAME))
+                .register(project);
 
         var buildPool = project.getTasks().register(
                 BUILD_POOL_TASK_NAME,
@@ -135,10 +142,13 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
 
-        var transformDomainDescription = registrar.register(
-                TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
-                extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)),
-                extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME));
+        var transformDomainDescription = TaskRegistrar.create()
+                .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
+                .group(BUILD_GROUP_NAME)
+                .description("Transforms domain.xml")
+                .template(extension.getSourceDirectory().file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
+                .output(extension.getGeneratedVirshConfigDirectory().file(DOMAIN_DESCRIPTION_FILE_NAME))
+                .register(project);
 
         var buildDomain = project.getTasks().register(
                 BUILD_DOMAIN_TASK_NAME,
