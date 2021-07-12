@@ -63,10 +63,10 @@ public class Registrar {
         registerTransformPoolDescriptionTask(project, transformExtension);
         registerTransformDomainDescriptionTask(project, transformExtension);
 
-        getBuildDataSourceImageTaskProvider();
-        getBuildRootImageTaskProvider();
-        getBuildPoolTaskProvider();
-        getBuildDomainTaskProvider();
+        registerBuildDataSourceImageTask();
+        registerBuildRootImageTask();
+        registerBuildPoolTask();
+        registerBuildDomainTask();
         var readKubeConfig = getCopyKubeConfigTaskProvider();
 
         getProject().getTasks().withType(Transform.class).configureEach(
@@ -141,7 +141,7 @@ public class Registrar {
         return readKubeConfig;
     }
 
-    private void getBuildPoolTaskProvider() {
+    private void registerBuildPoolTask() {
         var buildDataSourceImage = getProject().getTasks().findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
         var buildRootImage = getProject().getTasks().findByName(BUILD_ROOT_IMAGE_TASK_NAME);
 
@@ -157,7 +157,7 @@ public class Registrar {
                 });
     }
 
-    private void getBuildRootImageTaskProvider() {
+    private void registerBuildRootImageTask() {
         var downloadDistribution = getProject().getTasks().register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
@@ -185,7 +185,7 @@ public class Registrar {
                 });
     }
 
-    private void getBuildDataSourceImageTaskProvider() {
+    private void registerBuildDataSourceImageTask() {
         getProject().getTasks().register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
@@ -199,7 +199,7 @@ public class Registrar {
                 });
     }
 
-    private void getBuildDomainTaskProvider() {
+    private void registerBuildDomainTask() {
         var buildPool = getProject().getTasks().findByName(BUILD_POOL_TASK_NAME);
 
         var project = getProject();
