@@ -11,12 +11,13 @@ import wolkenschloss.pool.*;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasksRegistrar;
-
+import wolkenschloss.download.BaseImageExtension;
+import wolkenschloss.download.DownloadDistribution;
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
 
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
-    public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
+
     public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
@@ -42,13 +43,14 @@ public class Registrar {
     }
 
     public void register() {
-        new TransformationTasksRegistrar(project, BUILD_GROUP_NAME)
-                .registerTransformationTasks(extension.getTransformation());
+        var transformationTasks = new TransformationTasksRegistrar(project, BUILD_GROUP_NAME);
+        transformationTasks.registerTransformationTasks(extension.getTransformation());
 
         TaskContainer tasks = getProject().getTasks();
 
         BaseImageExtension baseImage = getExtension().getBaseImage();
-        registerDownloadDistributionTask(tasks, baseImage);
+        var downloadTasks = new DownloadTasksRegistrar(tasks);
+        downloadTasks.register(baseImage);
 
         PoolExtension pool = getExtension().getPool();
         registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME, pool);
@@ -120,7 +122,7 @@ public class Registrar {
                 .get();
 
         var downloadDistribution = tasks.named(
-                DOWNLOAD_DISTRIBUTION_TASK_NAME,
+                DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class);
 
         var distributionDir = downloadDistribution.map(d -> d.getDistributionDir().get());
@@ -160,7 +162,8 @@ public class Registrar {
     }
 
     public static void registerBuildRootImageTask(TaskContainer tasks, PoolExtension pool) {
-        var downloadDistributionTask = tasks.named(DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
+        var downloadDistributionTask = tasks.named(
+                DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
 
         tasks.register(
                 BUILD_ROOT_IMAGE_TASK_NAME,
@@ -175,18 +178,7 @@ public class Registrar {
                 });
     }
 
-    public static void registerDownloadDistributionTask(TaskContainer tasks, BaseImageExtension baseImage1) {
-        tasks.register(
-                DOWNLOAD_DISTRIBUTION_TASK_NAME,
-                DownloadDistribution.class,
-                task -> {
-                    var baseImage = baseImage1;
-                    task.getBaseImageLocation().convention(baseImage.getUrl());
-                    task.getDistributionName().convention(baseImage.getName());
-                    task.getBaseImage().convention(baseImage.getBaseImageFile());
-                    task.getDistributionDir().convention(baseImage.getDistributionDir());
-                });
-    }
+
 
     public static void registerBuildDataSourceImageTask(TaskContainer tasks, String group, PoolExtension poolExtension) {
         var transformNetworkConfigTask =  tasks.named(

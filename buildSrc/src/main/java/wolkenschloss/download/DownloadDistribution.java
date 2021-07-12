@@ -1,4 +1,4 @@
-package wolkenschloss.pool;
+package wolkenschloss.download;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;

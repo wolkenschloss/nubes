@@ -8,7 +8,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import wolkenschloss.domain.DomainExtension;
-import wolkenschloss.pool.BaseImageExtension;
+import wolkenschloss.download.BaseImageExtension;
 import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.domain.SecureShellService;
 import wolkenschloss.domain.RegistryService;
