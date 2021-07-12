@@ -65,7 +65,7 @@ public class Registrar {
 
         getBuildDataSourceImageTaskProvider();
         getBuildRootImageTaskProvider();
-        var buildPool = getBuildPoolTaskProvider();
+        getBuildPoolTaskProvider();
         getBuildDomainTaskProvider();
         var readKubeConfig = getCopyKubeConfigTaskProvider();
 
@@ -141,11 +141,11 @@ public class Registrar {
         return readKubeConfig;
     }
 
-    private TaskProvider<BuildPool> getBuildPoolTaskProvider() {
+    private void getBuildPoolTaskProvider() {
         var buildDataSourceImage = getProject().getTasks().findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
         var buildRootImage = getProject().getTasks().findByName(BUILD_ROOT_IMAGE_TASK_NAME);
 
-        return getProject().getTasks().register(
+        getProject().getTasks().register(
                 BUILD_POOL_TASK_NAME,
                 BuildPool.class,
                 task -> {
