@@ -125,7 +125,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 BuildPool.class,
                 task -> {
                     task.getPoolOperations().set(poolOperations);
-                    task.getXmlDescription().convention(transformPoolDescription.get().getOutputFile());
+                    task.getPoolDescriptionFile().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });

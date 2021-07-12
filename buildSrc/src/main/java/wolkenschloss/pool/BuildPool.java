@@ -7,7 +7,13 @@ import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.ProviderFactory;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
+import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -19,7 +25,7 @@ abstract public class BuildPool extends DefaultTask {
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
-    abstract public RegularFileProperty getXmlDescription();
+    abstract public RegularFileProperty getPoolDescriptionFile();
 
     @OutputFile
     abstract public RegularFileProperty getPoolRunFile();
@@ -28,7 +34,7 @@ abstract public class BuildPool extends DefaultTask {
     abstract public Property<PoolOperations> getPoolOperations();
 
     @Inject
-    abstract public FileSystemOperations getFso();
+    abstract public FileSystemOperations getFileSystemOperations();
 
     @Inject
     abstract public ProviderFactory getProviderFactory();
@@ -47,12 +53,13 @@ abstract public class BuildPool extends DefaultTask {
                 var oldPoolUuid = runFileContent.getAsText().map(UUID::fromString).get();
 
                 poolOperations.destroy(oldPoolUuid);
-                getFso().delete(spec -> spec.delete(getPoolRunFile()));
+                getFileSystemOperations().delete(spec -> spec.delete(getPoolRunFile()));
 
                 getLogger().info("Pool destroyed");
             }
 
             if (poolOperations.exists()) {
+                @SuppressWarnings("UnstableApiUsage")
                 var message = String.format(
                         "Der Pool %1$s existiert bereits, aber die Markierung-Datei %2$s ist nicht vorhanden.%n" +
                         "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1$s && virsh "+
@@ -63,7 +70,7 @@ abstract public class BuildPool extends DefaultTask {
                 throw new GradleException(message);
             }
 
-            var uuid = poolOperations.create(getXmlDescription());
+            var uuid = poolOperations.create(getPoolDescriptionFile());
             Files.writeString(runFile.toPath(), uuid.toString());
 
         } catch (Exception e) {
