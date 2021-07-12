@@ -6,6 +6,7 @@ import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.BuildDomain;
+import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.*;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
@@ -22,7 +23,7 @@ public class Registrar {
 
 
     public static final String DEFAULT_IMAGE_SIZE = "20G";
-    public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
@@ -42,11 +43,15 @@ public class Registrar {
         new TransformationTasksRegistrar(project, BUILD_GROUP_NAME)
                 .registerTransformationTasks(extension.getTransformation());
 
-        registerBuildDataSourceImageTask(getProject().getTasks(), BUILD_GROUP_NAME, getExtension().getPool());
-        registerBuildRootImageTask(getProject().getTasks(), getExtension().getBaseImage(), getExtension().getPool());
-        registerBuildPoolTask();
 
-        registerBuildDomainTask();
+        TaskContainer tasks = getProject().getTasks();
+        PoolExtension pool = getExtension().getPool();
+        registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME, pool);
+        registerDownloadDistributionTask(tasks, getExtension().getBaseImage());
+        registerBuildRootImageTask(tasks, pool);
+        registerBuildPoolTask(tasks, pool);
+
+        registerBuildDomainTask(getProject().getTasks(), getExtension().getDomain(), getExtension().getHost());
 
         var readKubeConfig = getCopyKubeConfigTaskProvider();
 
@@ -122,25 +127,27 @@ public class Registrar {
         return readKubeConfig;
     }
 
-    private void registerBuildPoolTask() {
-        var buildDataSourceImage = getProject().getTasks().findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
-        var buildRootImage = getProject().getTasks().findByName(BUILD_ROOT_IMAGE_TASK_NAME);
+    public static void registerBuildPoolTask(TaskContainer tasks, PoolExtension pool) {
+        var buildDataSourceImage = tasks.findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
+        var buildRootImage = tasks.findByName(BUILD_ROOT_IMAGE_TASK_NAME);
 
-        getProject().getTasks().register(
+        var transformPoolDescriptionTask = tasks.named(
+                TransformationTasksRegistrar.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
+                Transform.class);
+
+        tasks.register(
                 BUILD_POOL_TASK_NAME,
                 BuildPool.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
-                    task.getPoolDescriptionFile().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_POOL_DESCRIPTION_TASK_NAME).getOutputFile());
-                    task.getPoolRunFile().convention(getExtension().getRunDirectory().file("pool.run"));
+                    task.getPoolOperations().set(pool.getPoolOperations());
+                    task.getPoolDescriptionFile().convention(transformPoolDescriptionTask.get().getOutputFile());
+                    task.getPoolRunFile().convention(pool.getRootImageMd5File());
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
     }
 
-    private void registerBuildRootImageTask(TaskContainer tasks, BaseImageExtension baseImage1, PoolExtension pool) {
-        registerDownloadDistributionTask(tasks, baseImage1);
-
+    public static void registerBuildRootImageTask(TaskContainer tasks, PoolExtension pool) {
         var downloadDistributionTask = tasks.named(DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
 
         tasks.register(
@@ -151,11 +158,12 @@ public class Registrar {
                     task.getSize().convention(DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
                     task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
-                    task.getRootImageMd5File().convention(getExtension().getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
+                    task.getRootImageMd5File().convention(pool.getRootImageMd5File());
+
                 });
     }
 
-    private void registerDownloadDistributionTask(TaskContainer tasks, BaseImageExtension baseImage1) {
+    public static void registerDownloadDistributionTask(TaskContainer tasks, BaseImageExtension baseImage1) {
         tasks.register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
@@ -190,26 +198,31 @@ public class Registrar {
                 });
     }
 
-    private void registerBuildDomainTask() {
-        var buildPool = getProject().getTasks().findByName(BUILD_POOL_TASK_NAME);
+    private void registerBuildDomainTask(TaskContainer tasks, DomainExtension domain, HostExtension host) {
+        var buildPool = tasks.findByName(BUILD_POOL_TASK_NAME);
 
-        var project = getProject();
+        var domainDescription = tasks
+                .named(
+                    TransformationTasksRegistrar.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
+                    Transform.class)
+                .map(Transform::getOutputFile)
+                .get();
 
-        getProject().getTasks().register(
+        tasks.register(
                 BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.dependsOn(buildPool);
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
-                    task.getDomain().convention(getExtension().getDomain().getName());
-                    task.getPort().convention(getExtension().getHost().getCallbackPort());
-                    task.getXmlDescription().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME).getOutputFile());
+                    task.getDomain().convention(domain.getName());
+                    task.getPort().convention(host.getCallbackPort());
+                    task.getXmlDescription().convention(domainDescription);
 
                     task.getKnownHostsFile().convention(extension.getRunDirectory()
                             .file(TestbedExtension.DEFAULT_KNOWN_HOSTS_FILE_NAME));
 
-                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
+                    task.getDomainOperations().set(domain.getDomainOperations());
                 });
     }
 

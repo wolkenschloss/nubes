@@ -1,6 +1,7 @@
 package wolkenschloss.pool;
 
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.services.BuildServiceRegistry;
 
@@ -8,7 +9,9 @@ import java.io.Serializable;
 
 public abstract class PoolExtension implements Serializable {
 
-    public void initialize(BuildServiceRegistry sharedServices, DirectoryProperty buildDirectory) {
+    public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+
+    public void initialize(BuildServiceRegistry sharedServices, DirectoryProperty buildDirectory, DirectoryProperty runDirectory) {
         getRootImageName().convention("root.qcow2");
         getCidataImageName().convention("cidata.img");
         getName().convention("testbed");
@@ -19,6 +22,7 @@ public abstract class PoolExtension implements Serializable {
                 spec -> spec.getParameters().getPoolName().set(getName())));
 
         getPoolDirectory().set(buildDirectory.dir("pool"));
+        getRootImageMd5File().set(runDirectory.file(DEFAULT_RUN_FILE_NAME));
     }
 
     public abstract Property<String> getName();
@@ -30,4 +34,6 @@ public abstract class PoolExtension implements Serializable {
     public abstract Property<PoolOperations> getPoolOperations();
 
     abstract public DirectoryProperty getPoolDirectory();
+
+    abstract public RegularFileProperty getRootImageMd5File();
 }

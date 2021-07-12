@@ -31,7 +31,7 @@ public abstract class TestbedExtension  {
         getTransformation().initialize(layout);
         getUser().initialize();
         getHost().initialize();
-        getPool().initialize(sharedServices, buildDirectory);
+        getPool().initialize(sharedServices, buildDirectory, getRunDirectory());
         getBaseImage().initialize();
 
         var domainOperations = getDomain().initialize(sharedServices);
