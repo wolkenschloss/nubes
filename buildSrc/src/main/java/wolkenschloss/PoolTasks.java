@@ -17,6 +17,12 @@ public class PoolTasks {
         this.pool = pool;
     }
 
+    public static void register(TaskContainer tasks, PoolTasks poolTasks) {
+        poolTasks.registerBuildDataSourceImageTask(tasks, Registrar.BUILD_GROUP_NAME);
+        poolTasks.registerBuildRootImageTask(tasks);
+        poolTasks.registerBuildPoolTask(tasks);
+    }
+
     public void registerBuildPoolTask(TaskContainer tasks) {
 
         var buildDataSourceImage = tasks.findByName(Registrar.BUILD_DATA_SOURCE_IMAGE_TASK_NAME);

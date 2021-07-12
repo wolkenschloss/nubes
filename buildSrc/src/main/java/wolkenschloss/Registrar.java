@@ -56,7 +56,7 @@ public class Registrar {
 
         PoolExtension pool = getExtension().getPool();
         PoolTasks poolTasks = new PoolTasks(pool);
-        register(tasks, poolTasks);
+        PoolTasks.register(tasks, poolTasks);
 
         DomainExtension domain = getExtension().getDomain();
         HostExtension host = getExtension().getHost();
@@ -79,12 +79,6 @@ public class Registrar {
                 });
 
         registerDestroyTask(getProject().getTasks());
-    }
-
-    private void register(TaskContainer tasks, PoolTasks poolTasks) {
-        poolTasks.registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME);
-        poolTasks.registerBuildRootImageTask(tasks);
-        poolTasks.registerBuildPoolTask(tasks);
     }
 
     private void registerDestroyTask(TaskContainer tasks) {
