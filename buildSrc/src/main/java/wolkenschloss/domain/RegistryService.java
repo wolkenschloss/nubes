@@ -1,4 +1,4 @@
-package wolkenschloss.status;
+package wolkenschloss.domain;
 
 import com.google.cloud.tools.jib.api.*;
 import com.jayway.jsonpath.DocumentContext;
@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import org.gradle.api.provider.Property;
-import wolkenschloss.domain.DomainOperations;
 
 public abstract class RegistryService implements BuildService<RegistryService.Params> {
 

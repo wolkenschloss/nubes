@@ -9,9 +9,9 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 import org.libvirt.DomainInfo;
 
-import wolkenschloss.domain.SecureShellService;
 import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.domain.DomainOperations;
+import wolkenschloss.domain.RegistryService;
 
 import javax.inject.Inject;
 import java.nio.file.Files;
