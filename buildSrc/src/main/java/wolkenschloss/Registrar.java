@@ -47,17 +47,21 @@ public class Registrar {
                 .registerTransformationTasks(extension.getTransformation());
 
         TaskContainer tasks = getProject().getTasks();
+
+        BaseImageExtension baseImage = getExtension().getBaseImage();
+        registerDownloadDistributionTask(tasks, baseImage);
+
         PoolExtension pool = getExtension().getPool();
         registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME, pool);
-        registerDownloadDistributionTask(tasks, getExtension().getBaseImage());
         registerBuildRootImageTask(tasks, pool);
         registerBuildPoolTask(tasks, pool);
 
         DomainExtension domain = getExtension().getDomain();
         HostExtension host = getExtension().getHost();
+        Provider<RegularFile> kubeConfig = getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME);
 
         registerBuildDomainTask(tasks, domain, host);
-        registerReadKubeConfig(tasks, domain, getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
+        registerReadKubeConfig(tasks, domain, kubeConfig);
         registerStatusTask(tasks, domain);
 
         getProject().getTasks().withType(Transform.class).configureEach(
@@ -71,22 +75,25 @@ public class Registrar {
                     task.dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME));
                 });
 
-        registerDestroyTask();
+        registerDestroyTask(getProject().getTasks());
     }
 
     <S extends Task> S findTask(Class<S> type, String name) {
         return getProject().getTasks().withType(type).getByName(name);
     }
 
-    private void registerDestroyTask() {
-        getProject().getTasks().register(
+    private void registerDestroyTask(TaskContainer tasks) {
+        var poolRunFile = tasks.named(BUILD_POOL_TASK_NAME, BuildPool.class)
+                .map(t -> t.getPoolRunFile().get());
+
+        tasks.register(
                 DESTROY_TASK_NAME,
                 Destroy.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
                     task.getDomain().convention(getExtension().getDomain().getName());
-                    task.getPoolRunFile().convention(findTask(BuildPool.class, BUILD_POOL_TASK_NAME).getPoolRunFile());
+                    task.getPoolRunFile().convention(poolRunFile);
                     task.getBuildDir().convention(getProject().getLayout().getBuildDirectory());
                     task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                 });
