@@ -7,6 +7,7 @@ import wolkenschloss.pool.BuildDataSourceImage;
 import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.BuildRootImage;
 import wolkenschloss.pool.DownloadDistribution;
+import wolkenschloss.status.Status;
 import wolkenschloss.transformation.TaskRegistrar;
 
 public class Registrar {
@@ -31,6 +32,8 @@ public class Registrar {
 
     public static final String DEFAULT_IMAGE_SIZE = "20G";
     public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
+    public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
+    public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
     private final Project project;
     private final TestbedExtension extension;
@@ -42,6 +45,36 @@ public class Registrar {
 
     private static String templateFilename(String filename) {
         return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
+    }
+
+    public TaskProvider<CopyKubeConfig> getCopyKubeConfigTaskProvider(TaskProvider<BuildDomain> buildDomain) {
+        var readKubeConfig = getProject().getTasks().register(
+                READ_KUBE_CONFIG_TASK_NAME,
+                CopyKubeConfig.class,
+                task -> {
+                    task.getDomainName().convention(getExtension().getDomain().getName());
+                    task.getKubeConfigFile().convention(getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
+                    task.getKnownHostsFile().convention(buildDomain.get().getKnownHostsFile());
+                    task.getSecureShellService().set(getExtension().getSecureShellService());
+                });
+
+        getProject().getTasks().register(
+                TestbedPlugin.STATUS_TASK_NAME,
+                Status.class,
+                task -> {
+                    task.getPoolOperations().set(getExtension().getPoolOperations());
+                    task.getDomainOperations().set(getExtension().getDomainOperations());
+                    task.getRegistryService().set(getExtension().getRegistryService());
+                    task.getSecureShellService().set(getExtension().getSecureShellService());
+                    task.getDomainName().convention(getExtension().getDomain().getName());
+                    task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
+                    task.getKnownHostsFile().convention(buildDomain.get().getKnownHostsFile());
+                    task.getDistributionName().convention(getExtension().getBaseImage().getName());
+                    task.getDownloadDir().convention(getExtension().getBaseImage().getDownloadDir());
+                    task.getDistributionDir().convention(getExtension().getBaseImage().getDistributionDir());
+                    task.getBaseImageFile().convention(getExtension().getBaseImage().getBaseImageFile());
+                });
+        return readKubeConfig;
     }
 
     TaskProvider<BuildPool> getBuildPoolTaskProvider(TaskProvider<BuildDataSourceImage> buildDataSourceImage, TaskProvider<BuildRootImage> buildRootImage) {
