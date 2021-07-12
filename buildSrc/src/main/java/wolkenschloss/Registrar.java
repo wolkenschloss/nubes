@@ -156,7 +156,7 @@ public class Registrar {
                     task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
 
                     task.getRootImage().convention(
-                            getExtension().getPoolDirectory()
+                            getExtension().getPool().getPoolDirectory()
                             .file(getExtension().getPool().getRootImageName()));
 
                     task.getRootImageMd5File().convention(getExtension().getRunDirectory().file(DEFAULT_RUN_FILE_NAME));
@@ -189,7 +189,7 @@ public class Registrar {
                     task.getUserData().convention(transformUserData.get().getOutputFile());
 
                     task.getDataSourceImage().convention(
-                            getExtension().getPoolDirectory()
+                            getExtension().getPool().getPoolDirectory()
                                     .file(getExtension().getPool().getCidataImageName()));
                 });
     }

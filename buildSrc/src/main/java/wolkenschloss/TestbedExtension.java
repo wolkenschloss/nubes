@@ -24,7 +24,7 @@ public abstract class TestbedExtension {
         var layout = project.getLayout();
         var buildDirectory = layout.getBuildDirectory();
 
-        getPoolDirectory().set(buildDirectory.dir("pool"));
+
         getRunDirectory().set(buildDirectory.dir("run"));
         getGeneratedCloudInitDirectory().set(buildDirectory.dir("cloud-init"));
         getGeneratedVirshConfigDirectory().set(buildDirectory.dir("config"));
@@ -36,7 +36,7 @@ public abstract class TestbedExtension {
 
         var sharedServices = project.getGradle().getSharedServices();
 
-        getPool().initialize(sharedServices);
+        getPool().initialize(sharedServices, buildDirectory);
         getBaseImage().initialize();
 
         var domainOperations = getDomain().initialize(sharedServices);
@@ -110,13 +110,11 @@ public abstract class TestbedExtension {
 
         var pool = objects.mapProperty(String.class, Object.class);
         pool.put("name", getPool().getName());
-        pool.put("directory", getPoolDirectory());
+        pool.put("directory", getPool().getPoolDirectory());
         property.put("pool", pool);
 
         return property;
     }
-
-    abstract public DirectoryProperty getPoolDirectory();
 
     abstract public DirectoryProperty getRunDirectory();
 
