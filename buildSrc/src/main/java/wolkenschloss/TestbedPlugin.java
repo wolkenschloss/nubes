@@ -21,9 +21,9 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
     public static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
 
-    public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "cidata";
+    public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
-    public static final String BUILD_ROOT_IMAGE_TASK_NAME = "root";
+    public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
@@ -40,6 +40,8 @@ public class TestbedPlugin implements Plugin<Project> {
     public static final String DEFAULT_IMAGE_SIZE = "20G";
     public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
+
+    public static final String BUILD_GROUP_NAME = "build";
 
     @Override
     public void apply(Project project) {
@@ -89,6 +91,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
                 task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
                     task.getNetworkConfig().convention(transformNetworkConfig.get().getOutputFile());
                     task.getUserData().convention(transformUserData.get().getOutputFile());
                     task.getDataSourceImage().convention(extension.getPoolDirectory().file(extension.getPool().getCidataImageName()));
@@ -109,6 +112,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 BUILD_ROOT_IMAGE_TASK_NAME,
                 BuildRootImage.class,
                 task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
                     task.getSize().convention(DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistribution.get().getBaseImage());
                     task.getRootImage().convention(extension.getPoolDirectory().file(extension.getPool().getRootImageName()));
@@ -124,6 +128,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 BUILD_POOL_TASK_NAME,
                 BuildPool.class,
                 task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
                     task.getPoolOperations().set(poolOperations);
                     task.getPoolDescriptionFile().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(extension.getRunDirectory().file("pool.run"));
@@ -139,6 +144,7 @@ public class TestbedPlugin implements Plugin<Project> {
                 BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
                 task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
                     task.dependsOn(buildPool);
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
                     task.getDomain().convention(extension.getDomain().getName());
@@ -181,12 +187,16 @@ public class TestbedPlugin implements Plugin<Project> {
         project.getTasks().register(
                 START_TASK_NAME,
                 DefaultTask.class,
-                task -> task.dependsOn(readKubeConfig));
+                task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
+                    task.dependsOn(readKubeConfig);
+                });
 
         project.getTasks().register(
                 DESTROY_TASK_NAME,
                 Destroy.class,
                 task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
                     task.getPoolOperations().set(poolOperations);
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
