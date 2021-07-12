@@ -84,7 +84,7 @@ public class Registrar {
                 });
     }
 
-    public TaskProvider<CopyKubeConfig> getCopyKubeConfigTaskProvider(TaskProvider<BuildDomain> buildDomain) {
+    private TaskProvider<CopyKubeConfig> getCopyKubeConfigTaskProvider(TaskProvider<BuildDomain> buildDomain) {
         var readKubeConfig = getProject().getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
@@ -114,7 +114,7 @@ public class Registrar {
         return readKubeConfig;
     }
 
-    TaskProvider<BuildPool> getBuildPoolTaskProvider(TaskProvider<BuildDataSourceImage> buildDataSourceImage, TaskProvider<BuildRootImage> buildRootImage) {
+    private TaskProvider<BuildPool> getBuildPoolTaskProvider(TaskProvider<BuildDataSourceImage> buildDataSourceImage, TaskProvider<BuildRootImage> buildRootImage) {
         var transformPoolDescription = TaskRegistrar.create()
                 .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -135,7 +135,7 @@ public class Registrar {
                 });
     }
 
-    TaskProvider<BuildRootImage> getBuildRootImageTaskProvider() {
+    private TaskProvider<BuildRootImage> getBuildRootImageTaskProvider() {
         var downloadDistribution = getProject().getTasks().register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
@@ -163,7 +163,7 @@ public class Registrar {
                 });
     }
 
-    TaskProvider<BuildDataSourceImage> getBuildDataSourceImageTaskProvider() {
+    private TaskProvider<BuildDataSourceImage> getBuildDataSourceImageTaskProvider() {
         var transformNetworkConfig = TaskRegistrar.create()
                 .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -194,7 +194,7 @@ public class Registrar {
                 });
     }
 
-    TaskProvider<BuildDomain> getBuildDomainTaskProvider(TaskProvider<BuildPool> buildPool) {
+    private TaskProvider<BuildDomain> getBuildDomainTaskProvider(TaskProvider<BuildPool> buildPool) {
         var transformDomainDescription = TaskRegistrar.create()
                 .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -221,11 +221,11 @@ public class Registrar {
                 });
     }
 
-    public Project getProject() {
+    private Project getProject() {
         return project;
     }
 
-    public TestbedExtension getExtension() {
+    private TestbedExtension getExtension() {
         return extension;
     }
 }
