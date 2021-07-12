@@ -1,10 +1,8 @@
 package wolkenschloss;
 
 import org.gradle.api.Action;
-import org.gradle.api.GradleScriptException;
 import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -15,10 +13,6 @@ import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.remote.SecureShellService;
 import wolkenschloss.status.RegistryService;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 public abstract class TestbedExtension {
@@ -37,10 +31,7 @@ public abstract class TestbedExtension {
 
         getSourceDirectory().set(layout.getProjectDirectory().dir("src"));
 
-        getUser().getSshKeyFile().convention(() -> Path.of(System.getenv("HOME"), ".ssh", "id_rsa.pub").toFile());
-        getUser().getSshKey().convention(getUser().getSshKeyFile().map(TestbedExtension::readSshKey));
-        getUser().getName().convention(System.getenv("USER"));
-
+        getUser().initialize();
         getHost().initialize();
 
         var sharedServices = project.getGradle().getSharedServices();
@@ -81,17 +72,14 @@ public abstract class TestbedExtension {
 
     @Nested
     abstract public DomainExtension getDomain();
-
     public void domain(Action<? super DomainExtension> action) {action.execute(getDomain());}
 
     @Nested
     abstract public PoolExtension getPool();
-
     public void pool(Action<? super PoolExtension> action) {action.execute(getPool());}
 
     @Nested
     abstract public BaseImageExtension getBaseImage();
-
     public void base(Action<? super BaseImageExtension> action) {
         action.execute(getBaseImage());
     }
@@ -138,23 +126,7 @@ public abstract class TestbedExtension {
 
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 
-
-
-
-
     abstract public Property<SecureShellService> getSecureShellService();
 
     abstract public Property<RegistryService> getRegistryService();
-
-    @Nonnull
-    public static String readSshKey(RegularFile sshKeyFile) {
-
-        var file = sshKeyFile.getAsFile();
-
-        try {
-            return Files.readString(file.toPath()).trim();
-        } catch (IOException e) {
-            throw new GradleScriptException("Can not read public ssh key", e);
-        }
-    }
 }
