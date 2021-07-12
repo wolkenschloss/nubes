@@ -54,7 +54,7 @@ public class Registrar {
         HostExtension host = getExtension().getHost();
         registerBuildDomainTask(tasks, domain, host);
 
-        var readKubeConfig = getCopyKubeConfigTaskProvider();
+        getCopyKubeConfigTaskProvider(getProject().getTasks());
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
@@ -64,7 +64,7 @@ public class Registrar {
                 DefaultTask.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.dependsOn(readKubeConfig);
+                    task.dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME));
                 });
 
         registerDestroyTask();
@@ -92,23 +92,23 @@ public class Registrar {
                 });
     }
 
-    private TaskProvider<CopyKubeConfig> getCopyKubeConfigTaskProvider() {
+    private void getCopyKubeConfigTaskProvider(TaskContainer tasks) {
 
-        var buildDomain = getProject().getTasks()
-                .withType(BuildDomain.class)
-                .getByName(BUILD_DOMAIN_TASK_NAME);
+        var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
+                .map(t -> t.getKnownHostsFile())
+                .get();
 
-        var readKubeConfig = getProject().getTasks().register(
+        var readKubeConfig = tasks.register(
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
                     task.getDomainName().convention(getExtension().getDomain().getName());
                     task.getKubeConfigFile().convention(getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
-                    task.getKnownHostsFile().convention(buildDomain.getKnownHostsFile());
+                    task.getKnownHostsFile().convention(knownHostsFile);
                     task.getSecureShellService().set(getExtension().getSecureShellService());
                 });
 
-        getProject().getTasks().register(
+        tasks.register(
                 STATUS_TASK_NAME,
                 Status.class,
                 task -> {
@@ -118,14 +118,12 @@ public class Registrar {
                     task.getSecureShellService().set(getExtension().getSecureShellService());
                     task.getDomainName().convention(getExtension().getDomain().getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
-                    task.getKnownHostsFile().convention(buildDomain.getKnownHostsFile());
+                    task.getKnownHostsFile().convention(knownHostsFile);
                     task.getDistributionName().convention(getExtension().getBaseImage().getName());
                     task.getDownloadDir().convention(getExtension().getBaseImage().getDownloadDir());
                     task.getDistributionDir().convention(getExtension().getBaseImage().getDistributionDir());
                     task.getBaseImageFile().convention(getExtension().getBaseImage().getBaseImageFile());
                 });
-
-        return readKubeConfig;
     }
 
     public static void registerBuildPoolTask(TaskContainer tasks, PoolExtension pool) {
