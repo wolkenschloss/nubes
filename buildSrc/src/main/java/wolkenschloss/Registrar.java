@@ -1,5 +1,6 @@
 package wolkenschloss;
 
+import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.BuildDomain;
@@ -9,6 +10,7 @@ import wolkenschloss.pool.BuildRootImage;
 import wolkenschloss.pool.DownloadDistribution;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.TaskRegistrar;
+import wolkenschloss.transformation.Transform;
 
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
@@ -35,6 +37,10 @@ public class Registrar {
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
+    public static final String STATUS_TASK_NAME = "status";
+    public static final String START_TASK_NAME = "start";
+    public static final String DESTROY_TASK_NAME = "destroy";
+
     private final Project project;
     private final TestbedExtension extension;
 
@@ -45,6 +51,37 @@ public class Registrar {
 
     private static String templateFilename(String filename) {
         return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
+    }
+
+    public void register() {
+        var buildDataSourceImage = getBuildDataSourceImageTaskProvider();
+        var buildRootImage = getBuildRootImageTaskProvider();
+        var buildPool = getBuildPoolTaskProvider(buildDataSourceImage, buildRootImage);
+        var buildDomain = getBuildDomainTaskProvider(buildPool);
+        var readKubeConfig = getCopyKubeConfigTaskProvider(buildDomain);
+
+        getProject().getTasks().withType(Transform.class).configureEach(
+                task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
+
+        getProject().getTasks().register(
+                START_TASK_NAME,
+                DefaultTask.class,
+                task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
+                    task.dependsOn(readKubeConfig);
+                });
+
+        getProject().getTasks().register(
+                DESTROY_TASK_NAME,
+                Destroy.class,
+                task -> {
+                    task.setGroup(BUILD_GROUP_NAME);
+                    task.getPoolOperations().set(getExtension().getPoolOperations());
+                    task.getDomain().convention(getExtension().getDomain().getName());
+                    task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
+                    task.getBuildDir().convention(getProject().getLayout().getBuildDirectory());
+                    task.getDomainOperations().set(getExtension().getDomainOperations());
+                });
     }
 
     public TaskProvider<CopyKubeConfig> getCopyKubeConfigTaskProvider(TaskProvider<BuildDomain> buildDomain) {
@@ -59,7 +96,7 @@ public class Registrar {
                 });
 
         getProject().getTasks().register(
-                TestbedPlugin.STATUS_TASK_NAME,
+                STATUS_TASK_NAME,
                 Status.class,
                 task -> {
                     task.getPoolOperations().set(getExtension().getPoolOperations());
