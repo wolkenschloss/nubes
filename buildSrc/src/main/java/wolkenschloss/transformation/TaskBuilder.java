@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskProvider;
 import java.util.function.Function;
 
 // Seems to be over designed.
-public class TaskRegistrar implements Nameable, Groupable, Templatable, Outputable, Registrable, Descriptionable {
+public class TaskBuilder implements Nameable, Groupable, Templatable, Outputable, Registrable, Descriptionable {
 
     private final TransformationExtension extension;
     private Provider<RegularFile> template;
@@ -18,12 +18,12 @@ public class TaskRegistrar implements Nameable, Groupable, Templatable, Outputab
     private String group;
     private String description;
 
-    private TaskRegistrar(TransformationExtension extension) {
+    private TaskBuilder(TransformationExtension extension) {
         this.extension = extension;
     }
 
     public static Nameable create(TransformationExtension extension) {
-        return new TaskRegistrar(extension);
+        return new TaskBuilder(extension);
     }
 
     @Override

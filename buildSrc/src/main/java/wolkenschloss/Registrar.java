@@ -10,18 +10,11 @@ import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.BuildRootImage;
 import wolkenschloss.pool.DownloadDistribution;
 import wolkenschloss.status.Status;
-import wolkenschloss.transformation.TaskRegistrar;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.transformation.TransformationExtension;
+import wolkenschloss.transformation.TransformationTasksRegistrar;
 
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
-
-    public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformNetworkConfig";
-    public static final String TRANSFORM_USER_DATA_TASK_NAME = "transformUserData";
-    public static final String TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME = "transformDomainDescription";
-    public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
-    public static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
 
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
@@ -29,10 +22,6 @@ public class Registrar {
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
 
-    public static final String NETWORK_CONFIG_FILE_NAME = "network-config";
-    public static final String USER_DATA_FILE_NAME = "user-data";
-    public static final String POOL_DESCRIPTION_FILE_NAME = "pool.xml";
-    public static final String DOMAIN_DESCRIPTION_FILE_NAME = "domain.xml";
 
     public static final String DEFAULT_IMAGE_SIZE = "20G";
     public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
@@ -51,20 +40,17 @@ public class Registrar {
         this.extension = extension;
     }
 
-    private static String templateFilename(String filename) {
-        return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
-    }
-
     public void register() {
-
-        var transformExtension = extension.getTransformation();
-        registerTransformationTasks(project, transformExtension);
+        new TransformationTasksRegistrar(project, BUILD_GROUP_NAME)
+                .registerTransformationTasks(extension.getTransformation());
 
         registerBuildDataSourceImageTask();
         registerBuildRootImageTask();
         registerBuildPoolTask();
 
+
         registerBuildDomainTask();
+
         var readKubeConfig = getCopyKubeConfigTaskProvider();
 
         getProject().getTasks().withType(Transform.class).configureEach(
@@ -79,13 +65,6 @@ public class Registrar {
                 });
 
         registerDestroyTask();
-    }
-
-    public static void registerTransformationTasks(Project project, TransformationExtension transformExtension) {
-        registerTransformUserDataTask(project, transformExtension);
-        registerTransformNetworkConfigTask(project, transformExtension);
-        registerTransformPoolDescriptionTask(project, transformExtension);
-        registerTransformDomainDescriptionTask(project, transformExtension);
     }
 
     <S extends Task> S findTask(Class<S> type, String name) {
@@ -156,7 +135,7 @@ public class Registrar {
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
-                    task.getPoolDescriptionFile().convention(findTransformTask(TRANSFORM_POOL_DESCRIPTION_TASK_NAME).getOutputFile());
+                    task.getPoolDescriptionFile().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_POOL_DESCRIPTION_TASK_NAME).getOutputFile());
                     task.getPoolRunFile().convention(getExtension().getRunDirectory().file("pool.run"));
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
@@ -196,8 +175,8 @@ public class Registrar {
                 BuildDataSourceImage.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getNetworkConfig().convention(findTransformTask(TRANSFORM_NETWORK_CONFIG_TASK_NAME).getOutputFile());
-                    task.getUserData().convention(findTransformTask(TRANSFORM_USER_DATA_TASK_NAME).getOutputFile());
+                    task.getNetworkConfig().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_NETWORK_CONFIG_TASK_NAME).getOutputFile());
+                    task.getUserData().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_USER_DATA_TASK_NAME).getOutputFile());
                     task.getDataSourceImage().convention(
                             getExtension().getPool().getPoolDirectory()
                                     .file(getExtension().getPool().getCidataImageName()));
@@ -218,53 +197,13 @@ public class Registrar {
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
                     task.getDomain().convention(getExtension().getDomain().getName());
                     task.getPort().convention(getExtension().getHost().getCallbackPort());
-                    task.getXmlDescription().convention(findTransformTask(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME).getOutputFile());
+                    task.getXmlDescription().convention(findTransformTask(TransformationTasksRegistrar.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME).getOutputFile());
 
                     task.getKnownHostsFile().convention(extension.getRunDirectory()
                             .file(TestbedExtension.DEFAULT_KNOWN_HOSTS_FILE_NAME));
 
                     task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
                 });
-    }
-
-    public static void registerTransformPoolDescriptionTask(Project project, TransformationExtension extension) {
-        TaskRegistrar.create(extension)
-                .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms pool.xml template")
-                .template(src -> src.file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
-                .outputDescription(dst -> dst.file(POOL_DESCRIPTION_FILE_NAME))
-                .register(project);
-    }
-
-    public static void registerTransformDomainDescriptionTask(Project project, TransformationExtension extension) {
-        TaskRegistrar.create(extension)
-                .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms domain.xml")
-                .template(src -> src.file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
-                .outputDescription(dst -> dst.file(DOMAIN_DESCRIPTION_FILE_NAME))
-                .register(project);
-    }
-
-    public static void registerTransformUserDataTask(Project project, TransformationExtension extension) {
-        TaskRegistrar.create(extension)
-                .name(TRANSFORM_USER_DATA_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms user-data template")
-                .template(src -> src.file(templateFilename(USER_DATA_FILE_NAME)))
-                .outputCloudConfig(dst -> dst.file(USER_DATA_FILE_NAME))
-                .register(project);
-    }
-
-    public static void registerTransformNetworkConfigTask(Project project, TransformationExtension extension) {
-        TaskRegistrar.create(extension)
-                .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
-                .group(BUILD_GROUP_NAME)
-                .description("Transforms network-config template")
-                .template(src -> src.file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
-                .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
-                .register(project);
     }
 
     private Project getProject() {
