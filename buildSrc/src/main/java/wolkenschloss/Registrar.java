@@ -47,7 +47,7 @@ public class Registrar {
         return String.format("%s.%s", filename, TEMPLATE_FILENAME_EXTENSION);
     }
 
-    TaskProvider<BuildPool> getBuildPoolTaskProvider(Provider<PoolOperations> poolOperations, TaskProvider<BuildDataSourceImage> buildDataSourceImage, TaskProvider<BuildRootImage> buildRootImage) {
+    TaskProvider<BuildPool> getBuildPoolTaskProvider(TaskProvider<BuildDataSourceImage> buildDataSourceImage, TaskProvider<BuildRootImage> buildRootImage) {
         var transformPoolDescription = TaskRegistrar.create()
                 .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -61,7 +61,7 @@ public class Registrar {
                 BuildPool.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(poolOperations);
+                    task.getPoolOperations().set(getExtension().getPoolOperations());
                     task.getPoolDescriptionFile().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(getExtension().getRunDirectory().file("pool.run"));
                     task.dependsOn(buildRootImage, buildDataSourceImage);

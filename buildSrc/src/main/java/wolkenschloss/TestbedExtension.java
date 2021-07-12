@@ -2,15 +2,19 @@ package wolkenschloss;
 
 import org.gradle.api.Action;
 import org.gradle.api.GradleScriptException;
+import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import wolkenschloss.domain.DomainExtension;
+import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.pool.BaseImageExtension;
 import wolkenschloss.pool.PoolExtension;
+import wolkenschloss.pool.PoolOperations;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -22,7 +26,7 @@ public abstract class TestbedExtension {
 
     public static final int DEFAULT_CALLBACK_PORT = 9191;
 
-    public TestbedExtension configure(ProjectLayout layout) {
+    public TestbedExtension configure(Project project, ProjectLayout layout) {
         // Set build directories
         var buildDirectory = layout.getBuildDirectory();
         getPoolDirectory().set(buildDirectory.dir("pool"));
@@ -48,6 +52,16 @@ public abstract class TestbedExtension {
         getPool().getName().convention("testbed");
 
         getBaseImage().initialize();
+
+        getPoolOperations().set(project.getGradle().getSharedServices().registerIfAbsent(
+                "poolops",
+                PoolOperations.class,
+                spec -> spec.getParameters().getPoolName().set(getPool().getName())));
+
+        getDomainOperations().set(project.getGradle().getSharedServices().registerIfAbsent(
+                "domainops",
+                DomainOperations.class,
+                spec -> spec.getParameters().getDomainName().set(getDomain().getName())));
 
         return this;
     }
@@ -123,6 +137,10 @@ public abstract class TestbedExtension {
 
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 
+    abstract public Property<PoolOperations> getPoolOperations();
+
+    abstract public Property<DomainOperations> getDomainOperations();
+    
     @Nonnull
     public static String readSshKey(RegularFile sshKeyFile) {
 

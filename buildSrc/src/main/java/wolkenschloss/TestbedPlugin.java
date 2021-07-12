@@ -3,13 +3,6 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.tasks.TaskProvider;
-import wolkenschloss.domain.DomainOperations;
-import wolkenschloss.domain.BuildDomain;
-import wolkenschloss.pool.BuildDataSourceImage;
-import wolkenschloss.pool.BuildPool;
-import wolkenschloss.pool.BuildRootImage;
-import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.remote.SecureShellService;
 import wolkenschloss.status.RegistryService;
 import wolkenschloss.status.Status;
@@ -37,44 +30,37 @@ public class TestbedPlugin implements Plugin<Project> {
 
         TestbedExtension extension = project.getExtensions()
                 .create(TESTBED_EXTENSION_NAME, TestbedExtension.class)
-                .configure(project.getLayout());
+                .configure(project, project.getLayout());
 
         var sharedServices = project.getGradle().getSharedServices();
 
-        var domainOperations = sharedServices.registerIfAbsent(
-                "domainops",
-                DomainOperations.class,
-                spec -> spec.getParameters().getDomainName().set(extension.getDomain().getName()));
+
 
         var secureShellService = sharedServices.registerIfAbsent(
                 "sshservice",
                 SecureShellService.class,
                 spec -> {
                     var parameters = spec.getParameters();
-                    parameters.getDomainOperations().set(domainOperations);
+                    parameters.getDomainOperations().set(extension.getDomainOperations());
                     parameters.getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
                 });
 
-        var poolOperations = sharedServices.registerIfAbsent(
-                "poolops",
-                PoolOperations.class,
-                spec -> spec.getParameters().getPoolName().set(extension.getPool().getName()));
+
 
         var registryService = sharedServices.registerIfAbsent(
                 "registryService",
                 RegistryService.class,
-                spec -> spec.getParameters().getDomainOperations().set(domainOperations));
+                spec -> spec.getParameters().getDomainOperations().set(extension.getDomainOperations()));
 
         var registrar = new Registrar(project, extension);
 
-        TaskProvider<BuildDataSourceImage> buildDataSourceImage = registrar.getBuildDataSourceImageTaskProvider();
+        var buildDataSourceImage = registrar.getBuildDataSourceImageTaskProvider();
 
-        TaskProvider<BuildRootImage> buildRootImage = registrar.getBuildRootImageTaskProvider();
+        var buildRootImage = registrar.getBuildRootImageTaskProvider();
 
-        TaskProvider<BuildPool> buildPool = registrar.getBuildPoolTaskProvider(poolOperations, buildDataSourceImage, buildRootImage);
+        var buildPool = registrar.getBuildPoolTaskProvider(buildDataSourceImage, buildRootImage);
 
-
-        TaskProvider<BuildDomain> buildDomain = registrar.getBuildDomainTaskProvider(domainOperations, buildPool);
+        var buildDomain = registrar.getBuildDomainTaskProvider(extension.getDomainOperations(), buildPool);
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
@@ -90,8 +76,8 @@ public class TestbedPlugin implements Plugin<Project> {
                 STATUS_TASK_NAME,
                 Status.class,
                 task -> {
-                    task.getPoolOperations().set(poolOperations);
-                    task.getDomainOperations().set(domainOperations);
+                    task.getPoolOperations().set(extension.getPoolOperations());
+                    task.getDomainOperations().set(extension.getDomainOperations());
                     task.getRegistryService().set(registryService);
                     task.getSecureShellService().set(secureShellService);
                     task.getDomainName().convention(extension.getDomain().getName());
@@ -119,11 +105,11 @@ public class TestbedPlugin implements Plugin<Project> {
                 Destroy.class,
                 task -> {
                     task.setGroup(Registrar.BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(poolOperations);
+                    task.getPoolOperations().set(extension.getPoolOperations());
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
                     task.getBuildDir().convention(project.getLayout().getBuildDirectory());
-                    task.getDomainOperations().set(domainOperations);
+                    task.getDomainOperations().set(extension.getDomainOperations());
                 });
     }
 
