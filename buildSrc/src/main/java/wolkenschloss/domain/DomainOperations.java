@@ -28,7 +28,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         this.connection = new Connect("qemu:///system");
     }
 
-    public String getTestbedHostAddress() throws LibvirtException, InterruptedException {
+    public String getIpAddress() throws LibvirtException, InterruptedException {
 
                 String result = getInterfaces(10);
 
@@ -151,7 +151,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
     }
 
     public SecureShellService getShell(ExecOperations execOperations) throws Throwable {
-        var ip = getTestbedHostAddress();
+        var ip = getIpAddress();
         return new SecureShellService(execOperations, ip, getParameters().getKnownHostsFile());
     }
 
@@ -159,7 +159,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         return (Consumer<SecureShellService> fn) -> {
             SecureShellService shell = null;
             try {
-                shell = new SecureShellService(execOperations, getTestbedHostAddress(), getParameters().getKnownHostsFile());
+                shell = new SecureShellService(execOperations, getIpAddress(), getParameters().getKnownHostsFile());
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }
@@ -169,7 +169,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
 
     public RegistryService getRegistry() {
         try {
-            return new RegistryService(getTestbedHostAddress());
+            return new RegistryService(getIpAddress());
         } catch (Throwable throwable) {
             throw new RuntimeException("Can not create registry service", throwable);
         }

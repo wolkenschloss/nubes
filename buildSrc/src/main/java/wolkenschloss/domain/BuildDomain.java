@@ -69,7 +69,7 @@ abstract public class BuildDomain extends DefaultTask {
     public void updateKnownHosts(String serverKey) throws IOException, LibvirtException, InterruptedException {
         DomainOperations domainOperations = getDomainOperations().get();
 
-        var ip = domainOperations.getTestbedHostAddress();
+        var ip = domainOperations.getIpAddress();
 
         var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
         var attributes = PosixFilePermissions.asFileAttribute(permissions);

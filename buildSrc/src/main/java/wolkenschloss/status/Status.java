@@ -55,7 +55,7 @@ public abstract class Status extends DefaultTask {
 
         check("Testbed", domainOperations::withDomain, (Consumer<DomainOperations>) domain -> {
 
-            info("IP Address", domain::getTestbedHostAddress);
+            info("IP Address", domain::getIpAddress);
 
             check("Secure Shell", domain.withShell(getExecOperations()), shell -> {
                 check("ssh uname", shell.withCommand("uname", "-norm"), result -> {
