@@ -23,7 +23,6 @@ import java.util.Map;
 
 public abstract class TestbedExtension {
 
-    public static final int DEFAULT_CALLBACK_PORT = 9191;
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
     public TestbedExtension configure(Project project) {
@@ -42,8 +41,7 @@ public abstract class TestbedExtension {
         getUser().getSshKey().convention(getUser().getSshKeyFile().map(TestbedExtension::readSshKey));
         getUser().getName().convention(System.getenv("USER"));
 
-        getHost().getHostAddress().convention(IpUtil.getHostAddress());
-        getHost().getCallbackPort().set(DEFAULT_CALLBACK_PORT);
+        getHost().initialize();
 
         var sharedServices = project.getGradle().getSharedServices();
 
