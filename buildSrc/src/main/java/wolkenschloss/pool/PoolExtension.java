@@ -11,4 +11,6 @@ public interface PoolExtension extends Serializable {
     Property<String> getRootImageName();
 
     Property<String> getCidataImageName();
+
+    Property<PoolOperations> getPoolOperations();
 }

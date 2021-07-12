@@ -76,7 +76,7 @@ public class Registrar {
                 Destroy.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(getExtension().getPoolOperations());
+                    task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
                     task.getDomain().convention(getExtension().getDomain().getName());
                     task.getPoolRunFile().convention(buildPool.get().getPoolRunFile());
                     task.getBuildDir().convention(getProject().getLayout().getBuildDirectory());
@@ -99,7 +99,7 @@ public class Registrar {
                 STATUS_TASK_NAME,
                 Status.class,
                 task -> {
-                    task.getPoolOperations().set(getExtension().getPoolOperations());
+                    task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
                     task.getDomainOperations().set(getExtension().getDomainOperations());
                     task.getRegistryService().set(getExtension().getRegistryService());
                     task.getSecureShellService().set(getExtension().getSecureShellService());
@@ -128,7 +128,7 @@ public class Registrar {
                 BuildPool.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(getExtension().getPoolOperations());
+                    task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
                     task.getPoolDescriptionFile().convention(transformPoolDescription.get().getOutputFile());
                     task.getPoolRunFile().convention(getExtension().getRunDirectory().file("pool.run"));
                     task.dependsOn(buildRootImage, buildDataSourceImage);

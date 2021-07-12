@@ -57,9 +57,9 @@ public abstract class TestbedExtension {
 
         getBaseImage().initialize();
 
-        BuildServiceRegistry sharedServices = project.getGradle().getSharedServices();
+        var sharedServices = project.getGradle().getSharedServices();
 
-        getPoolOperations().set(sharedServices.registerIfAbsent(
+        getPool().getPoolOperations().set(sharedServices.registerIfAbsent(
                 "poolops",
                 PoolOperations.class,
                 spec -> spec.getParameters().getPoolName().set(getPool().getName())));
@@ -157,7 +157,7 @@ public abstract class TestbedExtension {
 
     abstract public DirectoryProperty getGeneratedVirshConfigDirectory();
 
-    abstract public Property<PoolOperations> getPoolOperations();
+
 
     abstract public Property<DomainOperations> getDomainOperations();
 
