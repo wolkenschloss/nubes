@@ -15,6 +15,8 @@ import wolkenschloss.domain.DomainOperations;
 import wolkenschloss.pool.BaseImageExtension;
 import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.pool.PoolOperations;
+import wolkenschloss.remote.SecureShellService;
+import wolkenschloss.status.RegistryService;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.Map;
 public abstract class TestbedExtension {
 
     public static final int DEFAULT_CALLBACK_PORT = 9191;
+    public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
 
     public TestbedExtension configure(Project project, ProjectLayout layout) {
         // Set build directories
@@ -62,6 +65,20 @@ public abstract class TestbedExtension {
                 "domainops",
                 DomainOperations.class,
                 spec -> spec.getParameters().getDomainName().set(getDomain().getName())));
+
+        getSecureShellService().set(project.getGradle().getSharedServices().registerIfAbsent(
+                "sshservice",
+                SecureShellService.class,
+                spec -> {
+                    var parameters = spec.getParameters();
+                    parameters.getDomainOperations().set(getDomainOperations());
+                    parameters.getKnownHostsFile().set(getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                }));
+
+        getRegistryService().set(project.getGradle().getSharedServices().registerIfAbsent(
+                "registryService",
+                RegistryService.class,
+                spec -> spec.getParameters().getDomainOperations().set(getDomainOperations())));
 
         return this;
     }
@@ -140,7 +157,11 @@ public abstract class TestbedExtension {
     abstract public Property<PoolOperations> getPoolOperations();
 
     abstract public Property<DomainOperations> getDomainOperations();
-    
+
+    abstract public Property<SecureShellService> getSecureShellService();
+
+    abstract public Property<RegistryService> getRegistryService();
+
     @Nonnull
     public static String readSshKey(RegularFile sshKeyFile) {
 

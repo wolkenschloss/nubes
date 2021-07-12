@@ -3,8 +3,6 @@ package wolkenschloss;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import wolkenschloss.remote.SecureShellService;
-import wolkenschloss.status.RegistryService;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 
@@ -21,8 +19,6 @@ public class TestbedPlugin implements Plugin<Project> {
 
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
-    public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
-
 
 
     @Override
@@ -36,31 +32,12 @@ public class TestbedPlugin implements Plugin<Project> {
 
 
 
-        var secureShellService = sharedServices.registerIfAbsent(
-                "sshservice",
-                SecureShellService.class,
-                spec -> {
-                    var parameters = spec.getParameters();
-                    parameters.getDomainOperations().set(extension.getDomainOperations());
-                    parameters.getKnownHostsFile().set(extension.getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
-                });
-
-
-
-        var registryService = sharedServices.registerIfAbsent(
-                "registryService",
-                RegistryService.class,
-                spec -> spec.getParameters().getDomainOperations().set(extension.getDomainOperations()));
-
         var registrar = new Registrar(project, extension);
 
         var buildDataSourceImage = registrar.getBuildDataSourceImageTaskProvider();
-
         var buildRootImage = registrar.getBuildRootImageTaskProvider();
-
         var buildPool = registrar.getBuildPoolTaskProvider(buildDataSourceImage, buildRootImage);
-
-        var buildDomain = registrar.getBuildDomainTaskProvider(extension.getDomainOperations(), buildPool);
+        var buildDomain = registrar.getBuildDomainTaskProvider(buildPool);
 
         var readKubeConfig = project.getTasks().register(
                 READ_KUBE_CONFIG_TASK_NAME,
@@ -69,7 +46,7 @@ public class TestbedPlugin implements Plugin<Project> {
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(extension.getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
                     task.getKnownHostsFile().convention(buildDomain.get().getKnownHostsFile());
-                    task.getSecureShellService().set(secureShellService);
+                    task.getSecureShellService().set(extension.getSecureShellService());
                 });
 
         project.getTasks().register(
@@ -78,8 +55,8 @@ public class TestbedPlugin implements Plugin<Project> {
                 task -> {
                     task.getPoolOperations().set(extension.getPoolOperations());
                     task.getDomainOperations().set(extension.getDomainOperations());
-                    task.getRegistryService().set(registryService);
-                    task.getSecureShellService().set(secureShellService);
+                    task.getRegistryService().set(extension.getRegistryService());
+                    task.getSecureShellService().set(extension.getSecureShellService());
                     task.getDomainName().convention(extension.getDomain().getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(buildDomain.get().getKnownHostsFile());

@@ -9,7 +9,6 @@ import wolkenschloss.pool.BuildDataSourceImage;
 import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.BuildRootImage;
 import wolkenschloss.pool.DownloadDistribution;
-import wolkenschloss.pool.PoolOperations;
 import wolkenschloss.transformation.TaskRegistrar;
 
 public class Registrar {
@@ -127,7 +126,7 @@ public class Registrar {
                 });
     }
 
-    TaskProvider<BuildDomain> getBuildDomainTaskProvider(Provider<DomainOperations> domainOperations, TaskProvider<BuildPool> buildPool) {
+    TaskProvider<BuildDomain> getBuildDomainTaskProvider(TaskProvider<BuildPool> buildPool) {
         var transformDomainDescription = TaskRegistrar.create()
                 .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
                 .group(BUILD_GROUP_NAME)
@@ -146,8 +145,11 @@ public class Registrar {
                     task.getDomain().convention(getExtension().getDomain().getName());
                     task.getPort().convention(getExtension().getHost().getCallbackPort());
                     task.getXmlDescription().convention(transformDomainDescription.get().getOutputFile());
-                    task.getKnownHostsFile().convention(getExtension().getRunDirectory().file(TestbedPlugin.DEFAULT_KNOWN_HOSTS_FILE_NAME));
-                    task.getDomainOperations().set(domainOperations);
+
+                    task.getKnownHostsFile().convention(extension.getRunDirectory()
+                            .file(TestbedExtension.DEFAULT_KNOWN_HOSTS_FILE_NAME));
+
+                    task.getDomainOperations().set(getExtension().getDomainOperations());
                 });
     }
 
