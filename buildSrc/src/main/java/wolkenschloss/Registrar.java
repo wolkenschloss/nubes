@@ -4,7 +4,6 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.tasks.TaskContainer;
-import org.gradle.api.tasks.TaskProvider;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.*;
@@ -56,7 +55,7 @@ public class Registrar {
         HostExtension host = getExtension().getHost();
         registerBuildDomainTask(tasks, domain, host);
 
-        getCopyKubeConfigTaskProvider(getProject().getTasks());
+        getCopyKubeConfigTaskProvider(getProject().getTasks(), getExtension().getDomain());
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
@@ -76,10 +75,6 @@ public class Registrar {
         return getProject().getTasks().withType(type).getByName(name);
     }
 
-    Transform findTransformTask(String name) {
-        return findTask(Transform.class, name);
-    }
-
     private void registerDestroyTask() {
         getProject().getTasks().register(
                 DESTROY_TASK_NAME,
@@ -94,7 +89,7 @@ public class Registrar {
                 });
     }
 
-    private void getCopyKubeConfigTaskProvider(TaskContainer tasks) {
+    private void getCopyKubeConfigTaskProvider(TaskContainer tasks, DomainExtension domain) {
 
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
@@ -104,26 +99,30 @@ public class Registrar {
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
-                    task.getDomainName().convention(getExtension().getDomain().getName());
+                    task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
                     task.getKnownHostsFile().convention(knownHostsFile);
-                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
+                    task.getDomainOperations().set(domain.getDomainOperations());
                 });
+
+        var downloadDistribution = tasks.named(
+                DOWNLOAD_DISTRIBUTION_TASK_NAME,
+                DownloadDistribution.class);
+
+        var distributionDir = downloadDistribution.map(d -> d.getDistributionDir().get());
 
         tasks.register(
                 STATUS_TASK_NAME,
                 Status.class,
                 task -> {
                     task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
-                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
+                    task.getDomainOperations().set(domain.getDomainOperations());
                     task.getRegistryService().set(getExtension().getRegistryService());
-                    task.getDomainName().convention(getExtension().getDomain().getName());
+                    task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
-                    task.getDistributionName().convention(getExtension().getBaseImage().getName());
-                    task.getDownloadDir().convention(getExtension().getBaseImage().getDownloadDir());
-                    task.getDistributionDir().convention(getExtension().getBaseImage().getDistributionDir());
-                    task.getBaseImageFile().convention(getExtension().getBaseImage().getBaseImageFile());
+                    task.getDownloadDir().convention(distributionDir);
+                    task.getBaseImageFile().convention(downloadDistribution.map(d -> d.getBaseImage().get()));
                 });
     }
 

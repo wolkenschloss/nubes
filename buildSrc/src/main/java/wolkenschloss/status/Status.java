@@ -27,13 +27,7 @@ public abstract class Status extends DefaultTask {
     abstract public Property<String> getDomainName();
 
     @Internal
-    abstract public Property<String> getDistributionName();
-
-    @Internal
     abstract public  DirectoryProperty getDownloadDir();
-
-    @Internal
-    abstract public  DirectoryProperty getDistributionDir();
 
     @Internal
     abstract public  RegularFileProperty getBaseImageFile();
