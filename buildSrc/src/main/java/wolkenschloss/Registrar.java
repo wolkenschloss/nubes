@@ -55,9 +55,10 @@ public class Registrar {
         downloadTasks.register(baseImage);
 
         PoolExtension pool = getExtension().getPool();
-        registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME, pool);
-        registerBuildRootImageTask(tasks, pool);
-        registerBuildPoolTask(tasks, pool);
+        PoolTasks poolTasks = new PoolTasks(pool);
+        poolTasks.registerBuildDataSourceImageTask(tasks, BUILD_GROUP_NAME);
+        PoolTasks.registerBuildRootImageTask(tasks, pool);
+        PoolTasks.registerBuildPoolTask(tasks, pool);
 
         DomainExtension domain = getExtension().getDomain();
         HostExtension host = getExtension().getHost();
@@ -143,66 +144,6 @@ public class Registrar {
                 });
     }
 
-    public static void registerBuildPoolTask(TaskContainer tasks, PoolExtension pool) {
-        var buildDataSourceImage = tasks.findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
-        var buildRootImage = tasks.findByName(BUILD_ROOT_IMAGE_TASK_NAME);
-
-        var transformPoolDescriptionTask = tasks.named(
-                TransformationTasksRegistrar.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
-                Transform.class);
-
-        tasks.register(
-                BUILD_POOL_TASK_NAME,
-                BuildPool.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(pool.getPoolOperations());
-                    task.getPoolDescriptionFile().convention(transformPoolDescriptionTask.get().getOutputFile());
-                    task.getPoolRunFile().convention(pool.getPoolRunFile());
-                    task.dependsOn(buildRootImage, buildDataSourceImage);
-                });
-    }
-
-    public static void registerBuildRootImageTask(TaskContainer tasks, PoolExtension pool) {
-        var downloadDistributionTask = tasks.named(
-                DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
-
-        tasks.register(
-                BUILD_ROOT_IMAGE_TASK_NAME,
-                BuildRootImage.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.getSize().convention(DEFAULT_IMAGE_SIZE);
-                    task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
-                    task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
-                    task.getRootImageMd5File().convention(pool.getRootImageMd5File());
-
-                });
-    }
-
-
-
-    public static void registerBuildDataSourceImageTask(TaskContainer tasks, String group, PoolExtension poolExtension) {
-        var transformNetworkConfigTask =  tasks.named(
-                TransformationTasksRegistrar.TRANSFORM_NETWORK_CONFIG_TASK_NAME,
-                Transform.class);
-
-        var transformUserDataTask = tasks.named(
-                TransformationTasksRegistrar.TRANSFORM_USER_DATA_TASK_NAME,
-                Transform.class);
-
-        tasks.register(
-                BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
-                BuildDataSourceImage.class,
-                task -> {
-                    task.setGroup(group);
-                    task.getNetworkConfig().convention(transformNetworkConfigTask.get().getOutputFile());
-                    task.getUserData().convention(transformUserDataTask.get().getOutputFile());
-                    task.getDataSourceImage().convention(
-                            poolExtension.getPoolDirectory()
-                                    .file(poolExtension.getCidataImageName()));
-                });
-    }
 
     public static void registerBuildDomainTask(TaskContainer tasks, DomainExtension domain, HostExtension host) {
         var buildPool = tasks.findByName(BUILD_POOL_TASK_NAME);
