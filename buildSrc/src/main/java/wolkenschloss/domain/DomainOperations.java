@@ -103,10 +103,11 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
             } catch (LibvirtException exception) {
                 throw new RuntimeException("Can not lookup domain", exception);
             } finally {
-                domain.free();
+                if (domain != null) {
+                    domain.free();
+                }
             }
         } catch (LibvirtException exception) {
-
             throw new RuntimeException("Can not free domain", exception);
         }
     }
