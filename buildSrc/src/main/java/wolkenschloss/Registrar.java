@@ -65,7 +65,7 @@ public class Registrar {
         DomainTasks domainTasks = new DomainTasks(domain, kubeConfig, port);
 
         domainTasks.registerBuildDomainTask(tasks);
-        registerReadKubeConfig(tasks, domain, kubeConfig, domainTasks);
+        registerReadKubeConfig(tasks, domainTasks);
 
         registerStatusTask(tasks, domain, pool);
 
@@ -100,7 +100,7 @@ public class Registrar {
                 });
     }
 
-    private void registerReadKubeConfig(TaskContainer tasks, DomainExtension domain, Provider<RegularFile> kubeConfig, DomainTasks domainTasks) {
+    private void registerReadKubeConfig(TaskContainer tasks, DomainTasks domainTasks) {
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
@@ -109,10 +109,10 @@ public class Registrar {
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
-                    task.getDomainName().convention(domain.getName());
-                    task.getKubeConfigFile().convention(kubeConfig);
+                    task.getDomainName().convention(domainTasks.domain.getName());
+                    task.getKubeConfigFile().convention(domainTasks.kubeConfig);
                     task.getKnownHostsFile().convention(knownHostsFile);
-                    task.getDomainOperations().set(domain.getDomainOperations());
+                    task.getDomainOperations().set(domainTasks.domain.getDomainOperations());
                 });
     }
 
