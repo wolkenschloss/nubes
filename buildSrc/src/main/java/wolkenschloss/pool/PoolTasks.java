@@ -39,7 +39,7 @@ public class PoolTasks {
                 BUILD_POOL_TASK_NAME,
                 BuildPool.class,
                 task -> {
-                    task.setGroup(Registrar.BUILD_GROUP_NAME);
+                    task.setGroup(GROUP_NAME);
                     task.getPoolOperations().set(pool.getPoolOperations());
                     task.getPoolDescriptionFile().convention(transformPoolDescriptionTask.get().getOutputFile());
                     task.getPoolRunFile().convention(pool.getPoolRunFile());
