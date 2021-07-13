@@ -1,14 +1,17 @@
-package wolkenschloss;
+package wolkenschloss.status;
 
 import org.gradle.api.tasks.TaskContainer;
+import wolkenschloss.CopyKubeConfig;
+import wolkenschloss.DomainTasks;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.download.DownloadDistribution;
 import wolkenschloss.download.DownloadTasks;
 import wolkenschloss.pool.PoolExtension;
-import wolkenschloss.status.Status;
 
 public class StatusTasks {
+    public static final String STATUS_TASK_NAME = "status";
+
     public final DomainExtension domain;
     public final PoolExtension pool;
 
@@ -32,9 +35,10 @@ public class StatusTasks {
         var distributionDir = downloadDistribution.map(d -> d.getDistributionDir().get());
 
         tasks.register(
-                Registrar.STATUS_TASK_NAME,
+                STATUS_TASK_NAME,
                 Status.class,
                 task -> {
+                    task.setDescription("Performs tests to ensure the function of the test bench.");
                     task.getPoolOperations().set(pool.getPoolOperations());
                     task.getDomainOperations().set(domain.getDomainOperations());
                     task.getDomainName().convention(domain.getName());

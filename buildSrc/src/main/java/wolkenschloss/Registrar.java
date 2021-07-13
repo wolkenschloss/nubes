@@ -10,11 +10,12 @@ import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 import wolkenschloss.download.DownloadTasks;
 import wolkenschloss.download.BaseImageExtension;
+import wolkenschloss.status.StatusTasks;
 
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
 
-    public static final String STATUS_TASK_NAME = "status";
+
     public static final String DESTROY_TASK_NAME = "destroy";
 
     private final Project project;
