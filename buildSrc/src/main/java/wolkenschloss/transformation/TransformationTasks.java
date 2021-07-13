@@ -1,6 +1,5 @@
 package wolkenschloss.transformation;
 
-import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskContainer;
 
 public class TransformationTasks {
@@ -21,7 +20,7 @@ public class TransformationTasks {
     private final TaskContainer tasks;
 
     public TransformationTasks(TaskContainer tasks, String group) {
-        this.group = group;
+        this.group = "transformation";
         this.tasks = tasks;
     }
 
