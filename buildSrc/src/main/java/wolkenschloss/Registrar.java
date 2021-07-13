@@ -32,6 +32,9 @@ public class Registrar {
 
         var transformationTasks = new TransformationTasks(tasks);
         transformationTasks.register(extension.getTransformation());
+        var values = extension.asPropertyMap(project.getObjects());
+        tasks.withType(Transform.class).configureEach(
+                task -> task.getScope().convention(values));
 
         BaseImageExtension baseImage = extension.getBaseImage();
         var downloadTasks = new DownloadTasks(tasks);
@@ -49,9 +52,6 @@ public class Registrar {
 
         StatusTasks statusTasks = new StatusTasks(domain, pool);
         statusTasks.register(tasks);
-
-        tasks.withType(Transform.class).configureEach(
-                task -> task.getScope().convention(extension.asPropertyMap(project.getObjects())));
 
         registerDestroyTask(tasks);
     }
