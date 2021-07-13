@@ -4,7 +4,7 @@ import org.gradle.api.tasks.TaskContainer;
 
 public class DownloadTasksRegistrar {
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
-    public static final String GROUP_NAME = "download";
+    private static final String GROUP_NAME = "download";
 
     private final TaskContainer tasks;
 
