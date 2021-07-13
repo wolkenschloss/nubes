@@ -1,7 +1,6 @@
 package wolkenschloss.pool;
 
 import org.gradle.api.tasks.TaskContainer;
-import wolkenschloss.Registrar;
 import wolkenschloss.download.DownloadDistribution;
 import wolkenschloss.download.DownloadTasksRegistrar;
 import wolkenschloss.transformation.Transform;
@@ -11,6 +10,8 @@ public class PoolTasks {
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
+
+    private  static final String DEFAULT_IMAGE_SIZE = "20G";
 
     private static final String GROUP_NAME = "pool";
 
@@ -58,7 +59,7 @@ public class PoolTasks {
                 task -> {
                     task.setGroup(GROUP_NAME);
                     task.setDescription("Creates the root image for the later domain from a downloaded base image.");
-                    task.getSize().convention(Registrar.DEFAULT_IMAGE_SIZE);
+                    task.getSize().convention(DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
                     task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
                     task.getRootImageMd5File().convention(pool.getRootImageMd5File());

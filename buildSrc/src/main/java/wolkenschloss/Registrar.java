@@ -23,7 +23,7 @@ public class Registrar {
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
 
 
-    public static final String DEFAULT_IMAGE_SIZE = "20G";
+
 
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
 
