@@ -16,7 +16,7 @@ public class TransformationTasks {
     public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
 
 
-    private static final String group = "transformation";
+    private static final String GROUP_NAME = "transformation";
     private final TaskContainer tasks;
 
     public TransformationTasks(TaskContainer tasks) {
@@ -26,7 +26,7 @@ public class TransformationTasks {
     public void registerTransformPoolDescriptionTask(TransformationExtension extension) {
         TaskBuilder.create(extension)
                 .name(TRANSFORM_POOL_DESCRIPTION_TASK_NAME)
-                .group(group)
+                .group(GROUP_NAME)
                 .description("Transforms pool.xml template")
                 .template(src -> src.file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
                 .outputDescription(dst -> dst.file(POOL_DESCRIPTION_FILE_NAME))
@@ -36,7 +36,7 @@ public class TransformationTasks {
     public void registerTransformDomainDescriptionTask(TransformationExtension extension) {
         TaskBuilder.create(extension)
                 .name(TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME)
-                .group(group)
+                .group(GROUP_NAME)
                 .description("Transforms domain.xml")
                 .template(src -> src.file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
                 .outputDescription(dst -> dst.file(DOMAIN_DESCRIPTION_FILE_NAME))
@@ -46,7 +46,7 @@ public class TransformationTasks {
     public void registerTransformUserDataTask(TransformationExtension extension) {
         TaskBuilder.create(extension)
                 .name(TRANSFORM_USER_DATA_TASK_NAME)
-                .group(group)
+                .group(GROUP_NAME)
                 .description("Transforms user-data template")
                 .template(src -> src.file(templateFilename(USER_DATA_FILE_NAME)))
                 .outputCloudConfig(dst -> dst.file(USER_DATA_FILE_NAME))
@@ -56,7 +56,7 @@ public class TransformationTasks {
     public void registerTransformNetworkConfigTask(TransformationExtension extension) {
         TaskBuilder.create(extension)
                 .name(TRANSFORM_NETWORK_CONFIG_TASK_NAME)
-                .group(group)
+                .group(GROUP_NAME)
                 .description("Transforms network-config template")
                 .template(src -> src.file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
                 .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
