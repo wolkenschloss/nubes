@@ -43,10 +43,10 @@ public class Registrar {
     }
 
     public void register() {
-        var transformationTasks = new TransformationTasks(project.getTasks());
-        transformationTasks.register(extension.getTransformation());
-
         TaskContainer tasks = getProject().getTasks();
+
+        var transformationTasks = new TransformationTasks(tasks);
+        transformationTasks.register(extension.getTransformation());
 
         BaseImageExtension baseImage = getExtension().getBaseImage();
         var downloadTasks = new DownloadTasksRegistrar(tasks);
