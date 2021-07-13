@@ -2,7 +2,6 @@ package wolkenschloss.transformation;
 
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
-import wolkenschloss.TestbedExtension;
 
 import java.util.Map;
 
@@ -27,12 +26,11 @@ public class TransformationTasks {
         this.tasks = tasks;
     }
 
-    public void register2(Provider<Map<String, Object>> values, TestbedExtension extension) {
-        register(extension.getTransformation());
-        setValues(values);
-    }
-
-    public void setValues(Provider<Map<String, Object>> values) {
+    public void register(Provider<Map<String, Object>> values, TransformationExtension extension) {
+        registerTransformUserDataTask(extension);
+        registerTransformNetworkConfigTask(extension);
+        registerTransformPoolDescriptionTask(extension);
+        registerTransformDomainDescriptionTask(extension);
 
         tasks.withType(Transform.class).configureEach(
                 task -> task.getScope().convention(values));
@@ -76,13 +74,6 @@ public class TransformationTasks {
                 .template(src -> src.file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
                 .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
                 .register(tasks);
-    }
-
-    public void register(TransformationExtension extension) {
-        registerTransformUserDataTask(extension);
-        registerTransformNetworkConfigTask(extension);
-        registerTransformPoolDescriptionTask(extension);
-        registerTransformDomainDescriptionTask(extension);
     }
 
     private static String templateFilename(String filename) {

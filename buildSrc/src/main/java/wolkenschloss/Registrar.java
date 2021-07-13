@@ -32,7 +32,7 @@ public class Registrar {
         var transformationTasks = new TransformationTasks(tasks);
         var values = extension.asPropertyMap(project.getObjects());
 
-        transformationTasks.register2(values, extension);
+        transformationTasks.register(values, extension.getTransformation());
 
         BaseImageExtension baseImage = extension.getBaseImage();
         var downloadTasks = new DownloadTasks(tasks);
