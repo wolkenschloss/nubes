@@ -1,6 +1,5 @@
 package wolkenschloss;
 
-import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
@@ -17,7 +16,6 @@ public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
 
     public static final String STATUS_TASK_NAME = "status";
-    public static final String START_TASK_NAME = "start";
     public static final String DESTROY_TASK_NAME = "destroy";
 
 
@@ -50,24 +48,12 @@ public class Registrar {
         DomainTasks domainTasks = new DomainTasks(domain, port);
         domainTasks.register(tasks);
 
-        registerStartTask(tasks);
-
         registerStatusTask(tasks, domain, pool);
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
 
         registerDestroyTask(getProject().getTasks());
-    }
-
-    private void registerStartTask(TaskContainer tasks) {
-        getProject().getTasks().register(
-                START_TASK_NAME,
-                DefaultTask.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.dependsOn(tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME));
-                });
     }
 
     private void registerDestroyTask(TaskContainer tasks) {

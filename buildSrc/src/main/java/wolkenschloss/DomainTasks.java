@@ -1,5 +1,6 @@
 package wolkenschloss;
 
+import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
@@ -12,6 +13,7 @@ public class DomainTasks {
 
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
+    public static final String START_TASK_NAME = "start";
 
     private static final String GROUP_NAME = "domain";
 
@@ -24,9 +26,21 @@ public class DomainTasks {
         this.port = port;
     }
 
+    public static void registerStartTask(TaskContainer tasks) {
+        tasks.register(
+                START_TASK_NAME,
+                DefaultTask.class,
+                task -> {
+                    task.setGroup(GROUP_NAME);
+                    task.setDescription("The all in one lifecycle start task. Have a cup of coffee.");
+                    task.dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME));
+                });
+    }
+
     void register(TaskContainer tasks) {
         registerBuildDomainTask(tasks);
         registerReadKubeConfig(tasks);
+        registerStartTask(tasks);
     }
 
     public void registerReadKubeConfig(TaskContainer tasks) {
