@@ -34,7 +34,7 @@ public class TransformationTasks {
                 .description("Transforms pool.xml template")
                 .template(src -> src.file(templateFilename(POOL_DESCRIPTION_FILE_NAME)))
                 .outputDescription(dst -> dst.file(POOL_DESCRIPTION_FILE_NAME))
-                .register(project.getTasks());
+                .register(tasks);
     }
 
     public void registerTransformDomainDescriptionTask(TransformationExtension extension) {
@@ -44,7 +44,7 @@ public class TransformationTasks {
                 .description("Transforms domain.xml")
                 .template(src -> src.file(templateFilename(DOMAIN_DESCRIPTION_FILE_NAME)))
                 .outputDescription(dst -> dst.file(DOMAIN_DESCRIPTION_FILE_NAME))
-                .register(project.getTasks());
+                .register(tasks);
     }
 
     public void registerTransformUserDataTask(TransformationExtension extension) {
@@ -54,7 +54,7 @@ public class TransformationTasks {
                 .description("Transforms user-data template")
                 .template(src -> src.file(templateFilename(USER_DATA_FILE_NAME)))
                 .outputCloudConfig(dst -> dst.file(USER_DATA_FILE_NAME))
-                .register(project.getTasks());
+                .register(tasks);
     }
 
     public void registerTransformNetworkConfigTask(TransformationExtension extension) {
@@ -64,7 +64,7 @@ public class TransformationTasks {
                 .description("Transforms network-config template")
                 .template(src -> src.file(templateFilename(NETWORK_CONFIG_FILE_NAME)))
                 .outputCloudConfig(dst -> dst.file(NETWORK_CONFIG_FILE_NAME))
-                .register(project.getTasks());
+                .register(tasks);
     }
 
     public void register(TransformationExtension extension) {
