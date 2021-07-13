@@ -1,6 +1,9 @@
 package wolkenschloss.transformation;
 
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
+
+import java.util.Map;
 
 public class TransformationTasks {
     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformNetworkConfig";
@@ -21,6 +24,12 @@ public class TransformationTasks {
 
     public TransformationTasks(TaskContainer tasks) {
         this.tasks = tasks;
+    }
+
+    public void setValues(Provider<Map<String, Object>> values) {
+
+        tasks.withType(Transform.class).configureEach(
+                task -> task.getScope().convention(values));
     }
 
     public void registerTransformPoolDescriptionTask(TransformationExtension extension) {
