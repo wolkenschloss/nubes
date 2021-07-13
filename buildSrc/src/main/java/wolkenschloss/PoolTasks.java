@@ -8,7 +8,7 @@ import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.BuildRootImage;
 import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.transformation.TransformationTasksRegistrar;
+import wolkenschloss.transformation.TransformationTasks;
 
 public class PoolTasks {
     private final PoolExtension pool;
@@ -29,7 +29,7 @@ public class PoolTasks {
         var buildRootImage = tasks.findByName(Registrar.BUILD_ROOT_IMAGE_TASK_NAME);
 
         var transformPoolDescriptionTask = tasks.named(
-                TransformationTasksRegistrar.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
+                TransformationTasks.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
                 Transform.class);
 
         tasks.register(
@@ -64,11 +64,11 @@ public class PoolTasks {
     public void registerBuildDataSourceImageTask(TaskContainer tasks, String group) {
 
         var transformNetworkConfigTask =  tasks.named(
-                TransformationTasksRegistrar.TRANSFORM_NETWORK_CONFIG_TASK_NAME,
+                TransformationTasks.TRANSFORM_NETWORK_CONFIG_TASK_NAME,
                 Transform.class);
 
         var transformUserDataTask = tasks.named(
-                TransformationTasksRegistrar.TRANSFORM_USER_DATA_TASK_NAME,
+                TransformationTasks.TRANSFORM_USER_DATA_TASK_NAME,
                 Transform.class);
 
         tasks.register(

@@ -2,7 +2,7 @@ package wolkenschloss.transformation;
 
 import org.gradle.api.Project;
 
-public class TransformationTasksRegistrar {
+public class TransformationTasks {
     public static final String NETWORK_CONFIG_FILE_NAME = "network-config";
     public static final String USER_DATA_FILE_NAME = "user-data";
     public static final String POOL_DESCRIPTION_FILE_NAME = "pool.xml";
@@ -19,7 +19,7 @@ public class TransformationTasksRegistrar {
     private final Project project;
     private final String group;
 
-    public TransformationTasksRegistrar(Project project, String group) {
+    public TransformationTasks(Project project, String group) {
         this.project = project;
         this.group = group;
     }

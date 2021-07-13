@@ -1,12 +1,11 @@
 package wolkenschloss;
 
-import org.gradle.api.file.RegularFile;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.transformation.TransformationTasksRegistrar;
+import wolkenschloss.transformation.TransformationTasks;
 
 public class DomainTasks {
 
@@ -46,7 +45,7 @@ public class DomainTasks {
 
         var domainDescription = tasks
                 .named(
-                    TransformationTasksRegistrar.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
+                    TransformationTasks.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
                     Transform.class)
                 .map(Transform::getOutputFile)
                 .get();

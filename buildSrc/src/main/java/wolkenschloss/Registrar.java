@@ -2,15 +2,13 @@ package wolkenschloss;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
-import org.gradle.api.file.RegularFile;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.*;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
-import wolkenschloss.transformation.TransformationTasksRegistrar;
+import wolkenschloss.transformation.TransformationTasks;
 import wolkenschloss.download.DownloadTasksRegistrar;
 import wolkenschloss.download.BaseImageExtension;
 import wolkenschloss.download.DownloadDistribution;
@@ -45,7 +43,7 @@ public class Registrar {
     }
 
     public void register() {
-        var transformationTasks = new TransformationTasksRegistrar(project, BUILD_GROUP_NAME);
+        var transformationTasks = new TransformationTasks(project, BUILD_GROUP_NAME);
         transformationTasks.registerTransformationTasks(extension.getTransformation());
 
         TaskContainer tasks = getProject().getTasks();
