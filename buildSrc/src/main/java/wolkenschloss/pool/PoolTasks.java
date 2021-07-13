@@ -40,6 +40,7 @@ public class PoolTasks {
                 BuildPool.class,
                 task -> {
                     task.setGroup(GROUP_NAME);
+                    task.setDescription("Defines a virtlib storage pool based on the transformed description file containing a root image and a cloud-init data source volume.");
                     task.getPoolOperations().set(pool.getPoolOperations());
                     task.getPoolDescriptionFile().convention(transformPoolDescriptionTask.get().getOutputFile());
                     task.getPoolRunFile().convention(pool.getPoolRunFile());
@@ -56,6 +57,7 @@ public class PoolTasks {
                 BuildRootImage.class,
                 task -> {
                     task.setGroup(GROUP_NAME);
+                    task.setDescription("Creates the root image for the later domain from a downloaded base image.");
                     task.getSize().convention(Registrar.DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
                     task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
@@ -79,6 +81,7 @@ public class PoolTasks {
                 BuildDataSourceImage.class,
                 task -> {
                     task.setGroup(GROUP_NAME);
+                    task.setDescription("Generates a cloud-init data source volume containing the transformed network-config and user-data files.");
                     task.getNetworkConfig().convention(transformNetworkConfigTask.get().getOutputFile());
                     task.getUserData().convention(transformUserDataTask.get().getOutputFile());
                     task.getDataSourceImage().convention(
