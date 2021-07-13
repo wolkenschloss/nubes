@@ -4,7 +4,9 @@ import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
-import wolkenschloss.pool.*;
+import wolkenschloss.pool.BuildPool;
+import wolkenschloss.pool.PoolExtension;
+import wolkenschloss.pool.PoolTasks;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
@@ -17,8 +19,6 @@ public class Registrar {
 
     public static final String STATUS_TASK_NAME = "status";
     public static final String DESTROY_TASK_NAME = "destroy";
-
-
 
     private final Project project;
     private final TestbedExtension extension;
@@ -73,7 +73,7 @@ public class Registrar {
                 });
     }
 
-    public void registerStatusTask(TaskContainer tasks, DomainExtension domain, PoolExtension pool) {
+    public static void registerStatusTask(TaskContainer tasks, DomainExtension domain, PoolExtension pool) {
 
         var readKubeConfig = tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
