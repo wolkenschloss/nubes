@@ -21,9 +21,9 @@ public class DomainTasks {
         this.port = port;
     }
 
-    static void register(TaskContainer tasks, DomainTasks domainTasks) {
-        domainTasks.registerBuildDomainTask(tasks);
-        domainTasks.registerReadKubeConfig(tasks);
+    void register(TaskContainer tasks) {
+        registerBuildDomainTask(tasks);
+        registerReadKubeConfig(tasks);
     }
 
     public void registerReadKubeConfig(TaskContainer tasks) {

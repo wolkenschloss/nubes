@@ -63,8 +63,7 @@ public class Registrar {
         Provider<RegularFile> kubeConfig = getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME);
 
         DomainTasks domainTasks = new DomainTasks(domain, kubeConfig, port);
-
-        DomainTasks.register(tasks, domainTasks);
+        domainTasks.register(tasks);
 
         registerStatusTask(tasks, domain, pool);
 
