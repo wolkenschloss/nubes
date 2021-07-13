@@ -10,6 +10,7 @@ import wolkenschloss.transformation.TransformationTasks;
 public class PoolTasks {
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
     public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
+    public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
 
     private static final String GROUP_NAME = "pool";
 
@@ -27,7 +28,7 @@ public class PoolTasks {
 
     public void registerBuildPoolTask(TaskContainer tasks) {
 
-        var buildDataSourceImage = tasks.findByName(Registrar.BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
+        var buildDataSourceImage = tasks.findByName(PoolTasks.BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
         var buildRootImage = tasks.findByName(PoolTasks.BUILD_ROOT_IMAGE_TASK_NAME);
 
         var transformPoolDescriptionTask = tasks.named(
@@ -74,7 +75,7 @@ public class PoolTasks {
                 Transform.class);
 
         tasks.register(
-                Registrar.BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
+                BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
                 task -> {
                     task.setGroup(group);

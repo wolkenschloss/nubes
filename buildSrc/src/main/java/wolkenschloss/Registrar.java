@@ -16,7 +16,7 @@ import wolkenschloss.download.DownloadDistribution;
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
 
-    public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
+
 
 
 
