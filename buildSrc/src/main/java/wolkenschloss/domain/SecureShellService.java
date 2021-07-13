@@ -1,13 +1,10 @@
 package wolkenschloss.domain;
 
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.provider.Property;
-import org.gradle.api.services.BuildService;
 import org.gradle.process.ExecOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.function.Consumer;
