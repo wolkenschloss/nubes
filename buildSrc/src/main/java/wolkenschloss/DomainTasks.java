@@ -21,7 +21,7 @@ public class DomainTasks {
         this.port = port;
     }
 
-    public static void registerReadKubeConfig(TaskContainer tasks, DomainTasks domainTasks) {
+    public void registerReadKubeConfig(TaskContainer tasks) {
         var knownHostsFile = tasks.named(Registrar.BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
@@ -30,10 +30,10 @@ public class DomainTasks {
                 Registrar.READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
-                    task.getDomainName().convention(domainTasks.domain.getName());
-                    task.getKubeConfigFile().convention(domainTasks.kubeConfig);
+                    task.getDomainName().convention(domain.getName());
+                    task.getKubeConfigFile().convention(kubeConfig);
                     task.getKnownHostsFile().convention(knownHostsFile);
-                    task.getDomainOperations().set(domainTasks.domain.getDomainOperations());
+                    task.getDomainOperations().set(domain.getDomainOperations());
                 });
     }
 

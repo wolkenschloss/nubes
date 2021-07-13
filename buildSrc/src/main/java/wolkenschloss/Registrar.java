@@ -65,7 +65,7 @@ public class Registrar {
         DomainTasks domainTasks = new DomainTasks(domain, kubeConfig, port);
 
         domainTasks.registerBuildDomainTask(tasks);
-        DomainTasks.registerReadKubeConfig(tasks, domainTasks);
+        domainTasks.registerReadKubeConfig(tasks);
 
         registerStatusTask(tasks, domain, pool);
 
