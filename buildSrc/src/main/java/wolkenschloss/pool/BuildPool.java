@@ -49,8 +49,6 @@ abstract public class BuildPool extends DefaultTask {
             var runFileContent = getProviderFactory().fileContents(getPoolRunFile());
             if (runFile.exists()) {
 
-                var str = runFileContent.getAsText().get();
-
                 @SuppressWarnings("NullableProblems")
                 var oldPoolUuid = runFileContent.getAsText().map(UUID::fromString).get();
 
@@ -61,7 +59,7 @@ abstract public class BuildPool extends DefaultTask {
             }
 
             if (poolOperations.exists()) {
-                @SuppressWarnings("UnstableApiUsage")
+                @SuppressWarnings({"UnstableApiUsage", "SpellCheckingInspection"})
                 var message = String.format(
                         "Der Pool %1$s existiert bereits, aber die Markierung-Datei %2$s ist nicht vorhanden.%n" +
                         "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1$s && virsh "+

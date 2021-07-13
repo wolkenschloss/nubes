@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnstableApiUsage")
 public abstract class PoolOperations implements BuildService<PoolOperations.Params>, AutoCloseable {
 
     private final Connect connection;
@@ -84,7 +85,7 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
                 pool = connection.storagePoolLookupByName(getParameters().getPoolName().get());
                 consumer.accept(pool);
             } catch (LibvirtException exception) {
-                throw new RuntimeException("Unkown storage pool", exception);
+                throw new RuntimeException("Unknown storage pool", exception);
             } finally {
                 if (pool != null) {
                     pool.free();

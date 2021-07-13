@@ -11,14 +11,16 @@ public abstract class PoolExtension implements Serializable {
 
     public static final String DEFAULT_RUN_FILE_NAME = "root.md5";
     public static final String DEFAULT_POOL_RUN_FILE = "pool.run";
+    public static final String POOL_OPERATIONS = "pool-operations";
 
+    @SuppressWarnings("UnstableApiUsage")
     public void initialize(BuildServiceRegistry sharedServices, DirectoryProperty buildDirectory, DirectoryProperty runDirectory) {
         getRootImageName().convention("root.qcow2");
         getCidataImageName().convention("cidata.img");
         getName().convention("testbed");
 
         getPoolOperations().set(sharedServices.registerIfAbsent(
-                "poolops",
+                POOL_OPERATIONS,
                 PoolOperations.class,
                 spec -> spec.getParameters().getPoolName().set(getName())));
 
