@@ -17,7 +17,7 @@ public class StatusTasks {
         this.pool = pool;
     }
 
-    public void registerStatusTask(TaskContainer tasks) {
+    public void register(TaskContainer tasks) {
 
         var readKubeConfig = tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
