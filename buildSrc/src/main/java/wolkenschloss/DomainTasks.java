@@ -13,6 +13,8 @@ public class DomainTasks {
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
 
+    private static final String GROUP_NAME = "domain";
+
     public final DomainExtension domain;
     public final Provider<Integer> port;
 
@@ -36,6 +38,7 @@ public class DomainTasks {
                 READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
+                    task.setGroup(GROUP_NAME);
                     task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(domain.getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
@@ -58,7 +61,7 @@ public class DomainTasks {
                 BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
                 task -> {
-                    task.setGroup(Registrar.BUILD_GROUP_NAME);
+                    task.setGroup(GROUP_NAME);
                     task.dependsOn(buildPool);
                     task.setDescription("Starts the libvirt domain and waits for the callback.");
                     task.getDomain().convention(domain.getName());
