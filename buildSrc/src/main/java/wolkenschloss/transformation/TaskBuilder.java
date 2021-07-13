@@ -64,8 +64,8 @@ public class TaskBuilder implements Nameable, Groupable, Templatable, Outputable
     }
 
     @Override
-    public TaskProvider<Transform> register(Project project, TaskContainer tasks) {
-        return tasks.register(name, Transform.class, task -> {
+    public void register(TaskContainer tasks) {
+        tasks.register(name, Transform.class, task -> {
             task.setGroup(this.group);
             task.setDescription(this.description);
             task.getTemplate().convention(template);
