@@ -82,7 +82,7 @@ public class Registrar {
         registerDestroyTask(getProject().getTasks());
     }
 
-    private void register(TaskContainer tasks, DomainTasks domainTasks) {
+    private static void register(TaskContainer tasks, DomainTasks domainTasks) {
         domainTasks.registerBuildDomainTask(tasks);
         domainTasks.registerReadKubeConfig(tasks);
     }
