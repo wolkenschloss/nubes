@@ -2,7 +2,7 @@ package wolkenschloss.pool;
 
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.download.DownloadDistribution;
-import wolkenschloss.download.DownloadTasksRegistrar;
+import wolkenschloss.download.DownloadTasks;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 
@@ -53,7 +53,7 @@ public class PoolTasks {
 
     public void registerBuildRootImageTask(TaskContainer tasks) {
         var downloadDistributionTask = tasks.named(
-                DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME,
+                DownloadTasks.DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class);
 
         var baseImage = downloadDistributionTask.map(t -> t.getBaseImage().get());

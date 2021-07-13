@@ -2,13 +2,13 @@ package wolkenschloss.download;
 
 import org.gradle.api.tasks.TaskContainer;
 
-public class DownloadTasksRegistrar {
+public class DownloadTasks {
     public static final String DOWNLOAD_DISTRIBUTION_TASK_NAME = "download";
     private static final String GROUP_NAME = "download";
 
     private final TaskContainer tasks;
 
-    public DownloadTasksRegistrar(TaskContainer tasks) {
+    public DownloadTasks(TaskContainer tasks) {
         this.tasks = tasks;
     }
 

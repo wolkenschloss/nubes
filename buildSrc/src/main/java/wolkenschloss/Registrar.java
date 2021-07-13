@@ -9,7 +9,7 @@ import wolkenschloss.pool.*;
 import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
-import wolkenschloss.download.DownloadTasksRegistrar;
+import wolkenschloss.download.DownloadTasks;
 import wolkenschloss.download.BaseImageExtension;
 import wolkenschloss.download.DownloadDistribution;
 
@@ -49,7 +49,7 @@ public class Registrar {
         transformationTasks.register(extension.getTransformation());
 
         BaseImageExtension baseImage = getExtension().getBaseImage();
-        var downloadTasks = new DownloadTasksRegistrar(tasks);
+        var downloadTasks = new DownloadTasks(tasks);
         downloadTasks.register(baseImage);
 
         PoolExtension pool = getExtension().getPool();
@@ -104,7 +104,7 @@ public class Registrar {
                 .get();
 
         var downloadDistribution = tasks.named(
-                DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME,
+                DownloadTasks.DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class);
 
         var distributionDir = downloadDistribution.map(d -> d.getDistributionDir().get());
