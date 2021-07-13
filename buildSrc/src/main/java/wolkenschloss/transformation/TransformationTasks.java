@@ -3,12 +3,12 @@ package wolkenschloss.transformation;
 import org.gradle.api.tasks.TaskContainer;
 
 public class TransformationTasks {
-    public static final String NETWORK_CONFIG_FILE_NAME = "network-config";
-    public static final String USER_DATA_FILE_NAME = "user-data";
-    public static final String POOL_DESCRIPTION_FILE_NAME = "pool.xml";
-    public static final String DOMAIN_DESCRIPTION_FILE_NAME = "domain.xml";
+    private static final String NETWORK_CONFIG_FILE_NAME = "network-config";
+    private static final String USER_DATA_FILE_NAME = "user-data";
+    private static final String POOL_DESCRIPTION_FILE_NAME = "pool.xml";
+    private static final String DOMAIN_DESCRIPTION_FILE_NAME = "domain.xml";
 
-    public static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
+    private static final String TEMPLATE_FILENAME_EXTENSION = "mustache";
 
     public static final String TRANSFORM_NETWORK_CONFIG_TASK_NAME = "transformNetworkConfig";
     public static final String TRANSFORM_USER_DATA_TASK_NAME = "transformUserData";
