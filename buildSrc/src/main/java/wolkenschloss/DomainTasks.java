@@ -10,6 +10,8 @@ import wolkenschloss.transformation.TransformationTasks;
 
 public class DomainTasks {
 
+    public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
+
     public final DomainExtension domain;
     public final Provider<Integer> port;
 
@@ -25,7 +27,7 @@ public class DomainTasks {
     }
 
     public void registerReadKubeConfig(TaskContainer tasks) {
-        var knownHostsFile = tasks.named(Registrar.BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
+        var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
 
@@ -52,7 +54,7 @@ public class DomainTasks {
                 .get();
 
         tasks.register(
-                Registrar.BUILD_DOMAIN_TASK_NAME,
+                BUILD_DOMAIN_TASK_NAME,
                 BuildDomain.class,
                 task -> {
                     task.setGroup(Registrar.BUILD_GROUP_NAME);

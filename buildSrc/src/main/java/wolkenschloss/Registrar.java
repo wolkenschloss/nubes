@@ -20,7 +20,7 @@ public class Registrar {
 
 
 
-    public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
+
 
 
 
@@ -99,7 +99,7 @@ public class Registrar {
 
         var readKubeConfig = tasks.named(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
-        var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
+        var knownHostsFile = tasks.named(DomainTasks.BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
 
