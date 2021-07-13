@@ -4,10 +4,6 @@ import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.Registrar;
 import wolkenschloss.download.DownloadDistribution;
 import wolkenschloss.download.DownloadTasksRegistrar;
-import wolkenschloss.pool.BuildDataSourceImage;
-import wolkenschloss.pool.BuildPool;
-import wolkenschloss.pool.BuildRootImage;
-import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 
