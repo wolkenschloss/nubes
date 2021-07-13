@@ -37,7 +37,7 @@ public class Registrar {
         var values = extension.asPropertyMap(project.getObjects());
 
         transformationTasks.register(extension.getTransformation());
-        setValues(tasks, values);
+        setValues(values, transformationTasks);
 
         BaseImageExtension baseImage = extension.getBaseImage();
         var downloadTasks = new DownloadTasks(tasks);
@@ -59,8 +59,9 @@ public class Registrar {
         registerDestroyTask(tasks);
     }
 
-    private static void setValues(TaskContainer tasks, Provider<Map<String, Object>> values) {
-        tasks.withType(Transform.class).configureEach(
+    private static void setValues(Provider<Map<String, Object>> values, TransformationTasks transformationTasks) {
+
+        transformationTasks.tasks.withType(Transform.class).configureEach(
                 task -> task.getScope().convention(values));
     }
 

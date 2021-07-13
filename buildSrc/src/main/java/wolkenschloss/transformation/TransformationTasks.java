@@ -17,7 +17,7 @@ public class TransformationTasks {
 
     private static final String GROUP_NAME = "transformation";
 
-    private final TaskContainer tasks;
+    public final TaskContainer tasks;
 
     public TransformationTasks(TaskContainer tasks) {
         this.tasks = tasks;
