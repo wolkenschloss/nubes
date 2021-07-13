@@ -70,41 +70,39 @@ public abstract class Status extends DefaultTask {
                 check("Virtual CPU's", info.nrVirtCpu, n -> n > 1);
             });
 
-                evaluate2("K8s config", () -> getKubeConfigFile().getAsFile().get().toPath(),
-                        status -> status.check(Files::exists)
-                                .ok(Path::toString)
-                                .error("missing"));
-
-                var poolOperations = getPoolOperations().get();
-                check("Pool", poolOperations::run, p -> {
-                    info("Pool Name", p::getName);
-                    info("Pool Autostart", p::getAutostart);
-                    info("Pool isActive", p::isActive);
-                    evaluate2("Pool Volumes", p::listVolumes,
-                            status -> status.check(vols -> Arrays.asList(vols).contains("root.qcow2") && Arrays.asList(vols).contains("cidata.img"))
-                                    .ok(vols -> String.join(", ", vols))
-                                    .error("Nicht genau drei Volumes")
-                    );
-                });
-
-                RegistryService registryService = domain.getRegistry();
-                check("Registry", registryService::withRegistry, (RegistryService registry) -> {
-                    info("Address", registry::getAddress);
-                    info("Upload Image", () -> registry.uploadImage("hello-world:latest"));
-                    evaluate2("Catalogs", registry::listCatalogs,
-                            status -> status.check(catalogs -> catalogs.contains("hello-world"))
-                                    .ok(catalogs -> String.join(", ", catalogs))
-                                    .error("missing catalog hello-world")
-                    );
-                });
-            });
-
-            info("XDG_DATA_HOME", () -> getDownloadDir().get().getAsFile().toPath());
-            evaluate2("Base image", () -> getBaseImageFile().getAsFile().get().toPath(),
+            evaluate2("K8s config", () -> getKubeConfigFile().getAsFile().get().toPath(),
                     status -> status.check(Files::exists)
                             .ok(Path::toString)
                             .error("missing"));
 
+            var poolOperations = getPoolOperations().get();
+            check("Pool", poolOperations::run, p -> {
+                info("Pool Name", p::getName);
+                info("Pool Autostart", p::getAutostart);
+                info("Pool isActive", p::isActive);
+                evaluate2("Pool Volumes", p::listVolumes,
+                        status -> status.check(vols -> Arrays.asList(vols).contains("root.qcow2") && Arrays.asList(vols).contains("cidata.img"))
+                                .ok(vols -> String.join(", ", vols))
+                                .error("Nicht genau drei Volumes"));
+            });
+
+            RegistryService registryService = domain.getRegistry();
+            check("Registry", registryService::withRegistry, (RegistryService registry) -> {
+                info("Address", registry::getAddress);
+                info("Upload Image", () -> registry.uploadImage("hello-world:latest"));
+                evaluate2("Catalogs", registry::listCatalogs,
+                        status -> status.check(catalogs -> catalogs.contains("hello-world"))
+                                .ok(catalogs -> String.join(", ", catalogs))
+                                .error("missing catalog hello-world")
+                );
+            });
+        });
+
+        info("XDG_DATA_HOME", () -> getDownloadDir().get().getAsFile().toPath());
+        evaluate2("Base image", () -> getBaseImageFile().getAsFile().get().toPath(),
+                status -> status.check(Files::exists)
+                        .ok(Path::toString)
+                        .error("missing"));
     }
 
     private <T> void check(String label, T value, Predicate<T> requiredCondition) {

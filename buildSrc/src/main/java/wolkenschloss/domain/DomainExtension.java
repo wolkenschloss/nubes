@@ -8,7 +8,8 @@ import org.gradle.api.services.BuildServiceRegistry;
 
 abstract public class DomainExtension {
 
-    public Provider<DomainOperations> initialize(BuildServiceRegistry sharedServices,
+    @SuppressWarnings("UnstableApiUsage")
+    public void initialize(BuildServiceRegistry sharedServices,
                                                  Provider<RegularFile> knownHostsFile,
                                                  Provider<RegularFile> kubeConfig)  {
         getName().convention("testbed");
@@ -24,8 +25,6 @@ abstract public class DomainExtension {
                     spec.getParameters().getDomainName().set(getName());
                     spec.getParameters().getKnownHostsFile().set(getKnownHostsFile());
                 }));
-
-        return getDomainOperations();
     }
 
     abstract public Property<String> getName();

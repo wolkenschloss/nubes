@@ -15,12 +15,14 @@ import org.libvirt.LibvirtException;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+@SuppressWarnings("UnstableApiUsage")
 public abstract class DomainOperations implements BuildService<DomainOperations.Params>, AutoCloseable {
 
     private final Connect connection;
 
     public interface Params extends BuildServiceParameters {
         Property<String> getDomainName();
+
         RegularFileProperty getKnownHostsFile();
     }
 
@@ -30,27 +32,24 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
 
     public String getIpAddress() throws LibvirtException, InterruptedException {
 
-                String result = getInterfaces(10);
+        String result = getInterfaces(10);
 
-                // Parse Result
-                var interfaceName = "enp1s0";
+        var interfaceName = "enp1s0";
+        var path = String.format("$.return[?(@.name==\"%s\")].ip-addresses[?(@.ip-address-type==\"ipv4\")].ip-address", interfaceName);
 
-                var path = String.format("$.return[?(@.name==\"%s\")].ip-addresses[?(@.ip-address-type==\"ipv4\")].ip-address", interfaceName);
+        ArrayList<String> ipAddresses = JsonPath.parse(result).read(path);
 
-                ArrayList<String> ipAddresses = JsonPath.parse(result).read(path);
-
-                if (ipAddresses.size() != 1) {
-                    throw new GradleException(
-                            String.format("Interface %s has %d IP-Addresses. I do not know what to do now.",
-                                    interfaceName,
-                                    ipAddresses.size()));
-                }
-
-                return ipAddresses.stream()
-                        .findFirst()
-                        .orElseThrow(() -> new GradleException("IP Adresse des Prüfstandes kann nicht ermittelt werden."));
-
+        if (ipAddresses.size() != 1) {
+            throw new GradleException(
+                    String.format("Interface %s has %d IP-Addresses. I do not know what to do now.",
+                            interfaceName,
+                            ipAddresses.size()));
         }
+
+        return ipAddresses.stream()
+                .findFirst()
+                .orElseThrow(() -> new GradleException("IP Adresse des Prüfstandes kann nicht ermittelt werden."));
+    }
 
     // Erfordert die Installation des Paketes qemu-guest-agent in der VM.
     // Gebe 30 Sekunden Timeout. Der erste Start könnte etwas länger dauern.
