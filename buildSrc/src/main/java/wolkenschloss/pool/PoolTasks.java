@@ -8,6 +8,8 @@ import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 
 public class PoolTasks {
+    public static final String BUILD_POOL_TASK_NAME = "buildPool";
+
     private static final String GROUP_NAME = "pool";
 
     private final PoolExtension pool;
@@ -32,7 +34,7 @@ public class PoolTasks {
                 Transform.class);
 
         tasks.register(
-                Registrar.BUILD_POOL_TASK_NAME,
+                BUILD_POOL_TASK_NAME,
                 BuildPool.class,
                 task -> {
                     task.setGroup(Registrar.BUILD_GROUP_NAME);

@@ -19,7 +19,7 @@ public class Registrar {
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
 
     public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
-    public static final String BUILD_POOL_TASK_NAME = "buildPool";
+
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
 
 
@@ -79,7 +79,7 @@ public class Registrar {
     }
 
     private void registerDestroyTask(TaskContainer tasks) {
-        var poolRunFile = tasks.named(BUILD_POOL_TASK_NAME, BuildPool.class)
+        var poolRunFile = tasks.named(PoolTasks.BUILD_POOL_TASK_NAME, BuildPool.class)
                 .map(t -> t.getPoolRunFile().get());
 
         tasks.register(

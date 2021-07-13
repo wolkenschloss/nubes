@@ -4,6 +4,7 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
+import wolkenschloss.pool.PoolTasks;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 
@@ -41,7 +42,7 @@ public class DomainTasks {
 
     public void registerBuildDomainTask(TaskContainer tasks) {
 
-        var buildPool = tasks.findByName(Registrar.BUILD_POOL_TASK_NAME);
+        var buildPool = tasks.findByName(PoolTasks.BUILD_POOL_TASK_NAME);
 
         var domainDescription = tasks
                 .named(
