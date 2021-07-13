@@ -28,21 +28,21 @@ public class Registrar {
     }
 
     public void register() {
-        TaskContainer tasks = getProject().getTasks();
+        TaskContainer tasks = project.getTasks();
 
         var transformationTasks = new TransformationTasks(tasks);
         transformationTasks.register(extension.getTransformation());
 
-        BaseImageExtension baseImage = getExtension().getBaseImage();
+        BaseImageExtension baseImage = extension.getBaseImage();
         var downloadTasks = new DownloadTasks(tasks);
         downloadTasks.register(baseImage);
 
-        PoolExtension pool = getExtension().getPool();
+        PoolExtension pool = extension.getPool();
         PoolTasks poolTasks = new PoolTasks(pool);
         poolTasks.register(tasks);
 
-        DomainExtension domain = getExtension().getDomain();
-        var port = getExtension().getHost().getCallbackPort();
+        DomainExtension domain = extension.getDomain();
+        var port = extension.getHost().getCallbackPort();
 
         DomainTasks domainTasks = new DomainTasks(domain, port);
         domainTasks.register(tasks);
@@ -50,10 +50,10 @@ public class Registrar {
         StatusTasks statusTasks = new StatusTasks(domain, pool);
         statusTasks.register(tasks);
 
-        getProject().getTasks().withType(Transform.class).configureEach(
-                task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
+        tasks.withType(Transform.class).configureEach(
+                task -> task.getScope().convention(extension.asPropertyMap(project.getObjects())));
 
-        registerDestroyTask(getProject().getTasks());
+        registerDestroyTask(tasks);
     }
 
     private void registerDestroyTask(TaskContainer tasks) {
@@ -65,20 +65,11 @@ public class Registrar {
                 Destroy.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.getPoolOperations().set(getExtension().getPool().getPoolOperations());
-                    task.getDomain().convention(getExtension().getDomain().getName());
+                    task.getPoolOperations().set(extension.getPool().getPoolOperations());
+                    task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(poolRunFile);
-                    task.getBuildDir().convention(getProject().getLayout().getBuildDirectory());
-                    task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
+                    task.getBuildDir().convention(project.getLayout().getBuildDirectory());
+                    task.getDomainOperations().set(extension.getDomain().getDomainOperations());
                 });
-    }
-
-
-    private Project getProject() {
-        return project;
-    }
-
-    private TestbedExtension getExtension() {
-        return extension;
     }
 }
