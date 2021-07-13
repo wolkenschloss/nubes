@@ -29,8 +29,8 @@ public class PoolTasks {
 
     public void registerBuildPoolTask(TaskContainer tasks) {
 
-        var buildDataSourceImage = tasks.findByName(PoolTasks.BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
-        var buildRootImage = tasks.findByName(PoolTasks.BUILD_ROOT_IMAGE_TASK_NAME);
+        var buildDataSourceImage = tasks.findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
+        var buildRootImage = tasks.findByName(BUILD_ROOT_IMAGE_TASK_NAME);
 
         var transformPoolDescriptionTask = tasks.named(
                 TransformationTasks.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
