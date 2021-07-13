@@ -48,7 +48,9 @@ public class Registrar {
         DomainTasks domainTasks = new DomainTasks(domain, port);
         domainTasks.register(tasks);
 
-        registerStatusTask(tasks, domain, pool);
+        StatusTasks statusTasks = new StatusTasks(domain, pool);
+
+        registerStatusTask(statusTasks, tasks);
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
@@ -73,7 +75,7 @@ public class Registrar {
                 });
     }
 
-    public static void registerStatusTask(TaskContainer tasks, DomainExtension domain, PoolExtension pool) {
+    public static void registerStatusTask(StatusTasks statusTasks, TaskContainer tasks) {
 
         var readKubeConfig = tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
@@ -91,9 +93,9 @@ public class Registrar {
                 STATUS_TASK_NAME,
                 Status.class,
                 task -> {
-                    task.getPoolOperations().set(pool.getPoolOperations());
-                    task.getDomainOperations().set(domain.getDomainOperations());
-                    task.getDomainName().convention(domain.getName());
+                    task.getPoolOperations().set(statusTasks.pool.getPoolOperations());
+                    task.getDomainOperations().set(statusTasks.domain.getDomainOperations());
+                    task.getDomainName().convention(statusTasks.domain.getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
                     task.getDownloadDir().convention(distributionDir);
