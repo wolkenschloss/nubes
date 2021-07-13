@@ -7,8 +7,6 @@ import org.junit.platform.commons.logging.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import org.libvirt.Connect;
-import org.libvirt.LibvirtException;
 
 public class GetIpAddressTest {
 
