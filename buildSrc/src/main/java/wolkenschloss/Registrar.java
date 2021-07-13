@@ -25,7 +25,7 @@ public class Registrar {
 
 
 
-    public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
+
 
 
     public static final String STATUS_TASK_NAME = "status";
@@ -72,7 +72,7 @@ public class Registrar {
                 DefaultTask.class,
                 task -> {
                     task.setGroup(BUILD_GROUP_NAME);
-                    task.dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME));
+                    task.dependsOn(tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME));
                 });
 
         registerDestroyTask(getProject().getTasks());
@@ -97,7 +97,7 @@ public class Registrar {
 
     public void registerStatusTask(TaskContainer tasks, DomainExtension domain, PoolExtension pool) {
 
-        var readKubeConfig = tasks.named(READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
+        var readKubeConfig = tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
         var knownHostsFile = tasks.named(DomainTasks.BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)

@@ -11,6 +11,7 @@ import wolkenschloss.transformation.TransformationTasks;
 public class DomainTasks {
 
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
+    public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
 
     public final DomainExtension domain;
     public final Provider<Integer> port;
@@ -32,7 +33,7 @@ public class DomainTasks {
                 .get();
 
         tasks.register(
-                Registrar.READ_KUBE_CONFIG_TASK_NAME,
+                READ_KUBE_CONFIG_TASK_NAME,
                 CopyKubeConfig.class,
                 task -> {
                     task.getDomainName().convention(domain.getName());
