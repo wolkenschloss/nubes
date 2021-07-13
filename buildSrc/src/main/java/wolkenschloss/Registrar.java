@@ -100,7 +100,7 @@ public class Registrar {
                 });
     }
 
-    private void registerReadKubeConfig(TaskContainer tasks, DomainTasks domainTasks) {
+    public static void registerReadKubeConfig(TaskContainer tasks, DomainTasks domainTasks) {
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
