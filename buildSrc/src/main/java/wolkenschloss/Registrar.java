@@ -18,7 +18,7 @@ public class Registrar {
 
     public static final String BUILD_DATA_SOURCE_IMAGE_TASK_NAME = "buildDataSourceImage";
 
-    public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
+
 
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
 

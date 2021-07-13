@@ -9,6 +9,7 @@ import wolkenschloss.transformation.TransformationTasks;
 
 public class PoolTasks {
     public static final String BUILD_POOL_TASK_NAME = "buildPool";
+    public static final String BUILD_ROOT_IMAGE_TASK_NAME = "buildRootImage";
 
     private static final String GROUP_NAME = "pool";
 
@@ -27,7 +28,7 @@ public class PoolTasks {
     public void registerBuildPoolTask(TaskContainer tasks) {
 
         var buildDataSourceImage = tasks.findByName(Registrar.BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
-        var buildRootImage = tasks.findByName(Registrar.BUILD_ROOT_IMAGE_TASK_NAME);
+        var buildRootImage = tasks.findByName(PoolTasks.BUILD_ROOT_IMAGE_TASK_NAME);
 
         var transformPoolDescriptionTask = tasks.named(
                 TransformationTasks.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
@@ -50,7 +51,7 @@ public class PoolTasks {
                 DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
 
         tasks.register(
-                Registrar.BUILD_ROOT_IMAGE_TASK_NAME,
+                BUILD_ROOT_IMAGE_TASK_NAME,
                 BuildRootImage.class,
                 task -> {
                     task.setGroup(Registrar.BUILD_GROUP_NAME);
