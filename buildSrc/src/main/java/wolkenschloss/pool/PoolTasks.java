@@ -1,5 +1,7 @@
 package wolkenschloss.pool;
 
+import org.gradle.api.file.RegularFile;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.download.DownloadDistribution;
 import wolkenschloss.download.DownloadTasksRegistrar;
@@ -55,6 +57,9 @@ public class PoolTasks {
         var downloadDistributionTask = tasks.named(
                 DownloadTasksRegistrar.DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution.class);
 
+        var baseImage = downloadDistributionTask.map(t -> t.getBaseImage().get());
+        var rootImage = pool.getPoolDirectory().file(pool.getRootImageName());
+
         tasks.register(
                 BUILD_ROOT_IMAGE_TASK_NAME,
                 BuildRootImage.class,
@@ -62,8 +67,8 @@ public class PoolTasks {
                     task.setGroup(GROUP_NAME);
                     task.setDescription("Creates the root image for the later domain from a downloaded base image.");
                     task.getSize().convention(DEFAULT_IMAGE_SIZE);
-                    task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
-                    task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
+                    task.getBaseImage().convention(baseImage);
+                    task.getRootImage().convention(rootImage);
                     task.getRootImageMd5File().convention(pool.getRootImageMd5File());
 
                 });
