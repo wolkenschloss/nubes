@@ -1,6 +1,7 @@
-package wolkenschloss;
+package wolkenschloss.pool;
 
 import org.gradle.api.tasks.TaskContainer;
+import wolkenschloss.Registrar;
 import wolkenschloss.download.DownloadDistribution;
 import wolkenschloss.download.DownloadTasksRegistrar;
 import wolkenschloss.pool.BuildDataSourceImage;
