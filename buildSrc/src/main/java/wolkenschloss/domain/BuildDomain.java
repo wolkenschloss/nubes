@@ -10,6 +10,7 @@ import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -40,6 +41,7 @@ abstract public class BuildDomain extends DefaultTask {
     abstract protected ExecOperations getExecOperations();
 
     @OutputFile
+    @Nonnull
     abstract public RegularFileProperty getKnownHostsFile();
 
     @Internal

@@ -52,11 +52,6 @@ public class RegistryService {
         return tag;
     }
 
-    public URI getUri() {
-        //noinspection HttpUrlsUsage
-        return URI.create(String.format("http://%s", name));
-    }
-
     public <T> void withRegistry(Consumer<RegistryService> method) {
         method.accept(this);
     }

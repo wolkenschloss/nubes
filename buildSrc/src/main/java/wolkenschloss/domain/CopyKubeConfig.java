@@ -38,9 +38,7 @@ public abstract class CopyKubeConfig extends DefaultTask {
         var domain = getDomainOperations().get();
 
         var shell = domain.getShell(getExecOperations());
-        var command = shell.command("microk8s", "config");
-
-        command.execute(result -> {
+        shell.command("microk8s", "config").execute(result -> {
             var permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
             var attributes = PosixFilePermissions.asFileAttribute(permissions);
             var path = getKubeConfigFile().get().getAsFile().toPath();

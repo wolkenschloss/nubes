@@ -10,8 +10,8 @@ abstract public class DomainExtension {
 
     @SuppressWarnings("UnstableApiUsage")
     public void initialize(BuildServiceRegistry sharedServices,
-                                                 Provider<RegularFile> knownHostsFile,
-                                                 Provider<RegularFile> kubeConfig)  {
+                           Provider<RegularFile> knownHostsFile,
+                           Provider<RegularFile> kubeConfig) {
         getName().convention("testbed");
         getFqdn().convention("testbed.wolkenschloss.local");
         getLocale().convention(System.getenv("LANG"));

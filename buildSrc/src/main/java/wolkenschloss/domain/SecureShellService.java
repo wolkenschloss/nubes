@@ -64,12 +64,10 @@ public class SecureShellService {
 
             try (var stdout = new ByteArrayOutputStream()) {
                 try (var stderr = new ByteArrayOutputStream()) {
-                    var result = execOperations.exec(spec -> {
-                        spec.commandLine("ssh")
-                                .args(arguments)
-                                .setStandardOutput(stdout)
-                                .setErrorOutput(stderr);
-                    }).assertNormalExitValue();
+                    var result = execOperations.exec(spec -> spec.commandLine("ssh")
+                            .args(arguments)
+                            .setStandardOutput(stdout)
+                            .setErrorOutput(stderr)).assertNormalExitValue();
 
                     consumer.accept(new Result(
                             stdout.toString().trim(),
@@ -83,38 +81,6 @@ public class SecureShellService {
     }
 
     public Consumer<Consumer<Result>> withCommand(Object... args) {
-        return (Consumer<Result> consumer) -> {
-            command(args).execute(consumer);
-        };
+        return (Consumer<Result> consumer) -> command(args).execute(consumer);
     }
-
-//    public Consumer<Consumer<Result>> execute(ExecOperations execOperations, Object... args) {
-//
-//        return (Consumer<Result> consumer) -> {
-//
-//            var arguments = new Vector<>();
-//            arguments.addAll(Arrays.asList("-o",
-//                    String.format("UserKnownHostsFile=%s", knownHostsFile),
-//                    ip));
-//            arguments.addAll(Arrays.asList(args));
-//
-//            try (var stdout = new ByteArrayOutputStream()) {
-//                try (var stderr = new ByteArrayOutputStream()) {
-//                    var result = execOperations.exec(spec -> {
-//                        spec.commandLine("ssh")
-//                                .args(arguments)
-//                                .setStandardOutput(stdout)
-//                                .setErrorOutput(stderr);
-//                    }).assertNormalExitValue();
-//
-//                    consumer.accept(new Result(
-//                            stdout.toString().trim(),
-//                            stderr.toString().trim(),
-//                            result.getExitValue()));
-//                }
-//            } catch (IOException exception) {
-//                throw new RuntimeException("Can not create streams.", exception);
-//            }
-//        };
-//    }
 }

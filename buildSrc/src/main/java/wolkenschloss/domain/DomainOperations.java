@@ -156,7 +156,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
 
     public Consumer<Consumer<SecureShellService>> withShell(ExecOperations execOperations) {
         return (Consumer<SecureShellService> fn) -> {
-            SecureShellService shell = null;
+            SecureShellService shell;
             try {
                 shell = new SecureShellService(execOperations, getIpAddress(), getParameters().getKnownHostsFile());
             } catch (Throwable throwable) {

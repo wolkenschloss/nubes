@@ -10,6 +10,7 @@ import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.tasks.*;
 
+import javax.annotation.Nonnull;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,6 +43,7 @@ public abstract class Transform extends DefaultTask {
      * @return Eine Datei, in welche die Ausgabe geschrieben wird.
      */
     @OutputFile
+    @Nonnull
     public abstract RegularFileProperty getOutputFile();
 
     @TaskAction
