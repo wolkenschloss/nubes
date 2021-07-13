@@ -19,7 +19,7 @@ public class TransformationTasks {
     private final String group;
     private final TaskContainer tasks;
 
-    public TransformationTasks(TaskContainer tasks, String group) {
+    public TransformationTasks(TaskContainer tasks) {
         this.group = "transformation";
         this.tasks = tasks;
     }
