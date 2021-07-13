@@ -2,17 +2,14 @@ package wolkenschloss;
 
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskContainer;
-import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.pool.PoolTasks;
-import wolkenschloss.status.Status;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 import wolkenschloss.download.DownloadTasks;
 import wolkenschloss.download.BaseImageExtension;
-import wolkenschloss.download.DownloadDistribution;
 
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
@@ -50,7 +47,7 @@ public class Registrar {
 
         StatusTasks statusTasks = new StatusTasks(domain, pool);
 
-        registerStatusTask(statusTasks, tasks);
+        StatusTasks.registerStatusTask(statusTasks, tasks);
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
@@ -72,34 +69,6 @@ public class Registrar {
                     task.getPoolRunFile().convention(poolRunFile);
                     task.getBuildDir().convention(getProject().getLayout().getBuildDirectory());
                     task.getDomainOperations().set(getExtension().getDomain().getDomainOperations());
-                });
-    }
-
-    public static void registerStatusTask(StatusTasks statusTasks, TaskContainer tasks) {
-
-        var readKubeConfig = tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
-
-        var knownHostsFile = tasks.named(DomainTasks.BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
-                .map(BuildDomain::getKnownHostsFile)
-                .get();
-
-        var downloadDistribution = tasks.named(
-                DownloadTasks.DOWNLOAD_DISTRIBUTION_TASK_NAME,
-                DownloadDistribution.class);
-
-        var distributionDir = downloadDistribution.map(d -> d.getDistributionDir().get());
-
-        tasks.register(
-                STATUS_TASK_NAME,
-                Status.class,
-                task -> {
-                    task.getPoolOperations().set(statusTasks.pool.getPoolOperations());
-                    task.getDomainOperations().set(statusTasks.domain.getDomainOperations());
-                    task.getDomainName().convention(statusTasks.domain.getName());
-                    task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
-                    task.getKnownHostsFile().convention(knownHostsFile);
-                    task.getDownloadDir().convention(distributionDir);
-                    task.getBaseImageFile().convention(downloadDistribution.map(d -> d.getBaseImage().get()));
                 });
     }
 
