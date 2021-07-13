@@ -64,7 +64,7 @@ public class TransformationTasks {
                 .register(project);
     }
 
-    public void registerTransformationTasks(TransformationExtension extension) {
+    public void register(TransformationExtension extension) {
         registerTransformUserDataTask(extension);
         registerTransformNetworkConfigTask(extension);
         registerTransformPoolDescriptionTask(extension);

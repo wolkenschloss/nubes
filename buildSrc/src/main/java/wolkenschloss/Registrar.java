@@ -44,7 +44,7 @@ public class Registrar {
 
     public void register() {
         var transformationTasks = new TransformationTasks(project, BUILD_GROUP_NAME);
-        transformationTasks.registerTransformationTasks(extension.getTransformation());
+        transformationTasks.register(extension.getTransformation());
 
         TaskContainer tasks = getProject().getTasks();
 
