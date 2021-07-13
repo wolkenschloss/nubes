@@ -21,7 +21,7 @@ public class PoolTasks {
     }
 
     public void register(TaskContainer tasks) {
-        registerBuildDataSourceImageTask(tasks, GROUP_NAME);
+        registerBuildDataSourceImageTask(tasks);
         registerBuildRootImageTask(tasks);
         registerBuildPoolTask(tasks);
     }
@@ -64,7 +64,7 @@ public class PoolTasks {
                 });
     }
 
-    public void registerBuildDataSourceImageTask(TaskContainer tasks, String group) {
+    public void registerBuildDataSourceImageTask(TaskContainer tasks) {
 
         var transformNetworkConfigTask =  tasks.named(
                 TransformationTasks.TRANSFORM_NETWORK_CONFIG_TASK_NAME,
@@ -78,7 +78,7 @@ public class PoolTasks {
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
                 BuildDataSourceImage.class,
                 task -> {
-                    task.setGroup(group);
+                    task.setGroup(GROUP_NAME);
                     task.getNetworkConfig().convention(transformNetworkConfigTask.get().getOutputFile());
                     task.getUserData().convention(transformUserDataTask.get().getOutputFile());
                     task.getDataSourceImage().convention(
