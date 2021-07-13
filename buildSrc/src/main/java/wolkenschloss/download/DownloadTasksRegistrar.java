@@ -13,7 +13,7 @@ public class DownloadTasksRegistrar {
     }
 
     public void register(BaseImageExtension baseImage) {
-        getTasks().register(
+        tasks.register(
                 DOWNLOAD_DISTRIBUTION_TASK_NAME,
                 DownloadDistribution.class,
                 task -> {
@@ -25,9 +25,4 @@ public class DownloadTasksRegistrar {
                     task.getDistributionDir().convention(baseImage.getDistributionDir());
                 });
     }
-
-    public TaskContainer getTasks() {
-        return tasks;
-    }
-
 }
