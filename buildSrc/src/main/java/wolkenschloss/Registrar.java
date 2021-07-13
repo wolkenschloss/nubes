@@ -59,13 +59,12 @@ public class Registrar {
         poolTasks.register(tasks);
 
         DomainExtension domain = getExtension().getDomain();
-        HostExtension host = getExtension().getHost();
         var port = getExtension().getHost().getCallbackPort();
         Provider<RegularFile> kubeConfig = getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME);
 
         DomainTasks domainTasks = new DomainTasks(domain, kubeConfig, port);
 
-        registerBuildDomainTask(tasks, domainTasks);
+        DomainTasks.registerBuildDomainTask(tasks, domainTasks);
         registerReadKubeConfig(tasks, domain, kubeConfig);
 
         registerStatusTask(tasks, domain, pool);
@@ -145,32 +144,6 @@ public class Registrar {
                 });
     }
 
-
-    public static void registerBuildDomainTask(TaskContainer tasks, DomainTasks domainTasks) {
-
-        var buildPool = tasks.findByName(BUILD_POOL_TASK_NAME);
-
-        var domainDescription = tasks
-                .named(
-                    TransformationTasksRegistrar.TRANSFORM_DOMAIN_DESCRIPTION_TASK_NAME,
-                    Transform.class)
-                .map(Transform::getOutputFile)
-                .get();
-
-        tasks.register(
-                BUILD_DOMAIN_TASK_NAME,
-                BuildDomain.class,
-                task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
-                    task.dependsOn(buildPool);
-                    task.setDescription("Starts the libvirt domain and waits for the callback.");
-                    task.getDomain().convention(domainTasks.domain.getName());
-                    task.getPort().convention(domainTasks.port);
-                    task.getXmlDescription().convention(domainDescription);
-                    task.getKnownHostsFile().convention(domainTasks.domain.getKnownHostsFile());
-                    task.getDomainOperations().set(domainTasks.domain.getDomainOperations());
-                });
-    }
 
     private Project getProject() {
         return project;
