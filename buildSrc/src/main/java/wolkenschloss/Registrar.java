@@ -29,10 +29,10 @@ public class Registrar {
     public void register() {
         TaskContainer tasks = project.getTasks();
 
-        var transformationTasks = new TransformationTasks(tasks);
         var values = extension.asPropertyMap(project.getObjects());
-
-        transformationTasks.register(values, extension.getTransformation());
+        var transformation = extension.getTransformation();
+        var transformationTasks = new TransformationTasks(tasks);
+        transformationTasks.register(values, transformation);
 
         BaseImageExtension baseImage = extension.getBaseImage();
         var downloadTasks = new DownloadTasks(tasks);
