@@ -21,6 +21,7 @@ public abstract class TestbedExtension  {
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
+    @SuppressWarnings("UnstableApiUsage")
     public TestbedExtension configure(Project project) {
         // Set build directories
         var layout = project.getLayout();

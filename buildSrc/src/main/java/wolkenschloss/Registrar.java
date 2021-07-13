@@ -13,9 +13,6 @@ import wolkenschloss.download.BaseImageExtension;
 import wolkenschloss.status.StatusTasks;
 
 public class Registrar {
-    public static final String BUILD_GROUP_NAME = "build";
-
-
     public static final String DESTROY_TASK_NAME = "destroy";
 
     private final Project project;
@@ -62,7 +59,7 @@ public class Registrar {
                 DESTROY_TASK_NAME,
                 Destroy.class,
                 task -> {
-                    task.setGroup(BUILD_GROUP_NAME);
+                    task.setDescription("Destroy testbed and delete all files.");
                     task.getPoolOperations().set(extension.getPool().getPoolOperations());
                     task.getDomain().convention(extension.getDomain().getName());
                     task.getPoolRunFile().convention(poolRunFile);
