@@ -11,6 +11,8 @@ import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
 
 public class PoolTasks {
+    private static final String GROUP_NAME = "pool";
+
     private final PoolExtension pool;
 
     public PoolTasks(PoolExtension pool) {
@@ -18,7 +20,7 @@ public class PoolTasks {
     }
 
     public void register(TaskContainer tasks) {
-        registerBuildDataSourceImageTask(tasks, Registrar.BUILD_GROUP_NAME);
+        registerBuildDataSourceImageTask(tasks, GROUP_NAME);
         registerBuildRootImageTask(tasks);
         registerBuildPoolTask(tasks);
     }
