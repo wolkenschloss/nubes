@@ -32,9 +32,11 @@ public class PoolTasks {
         var buildDataSourceImage = tasks.findByName(BUILD_DATA_SOURCE_IMAGE_TASK_NAME);
         var buildRootImage = tasks.findByName(BUILD_ROOT_IMAGE_TASK_NAME);
 
-        var transformPoolDescriptionTask = tasks.named(
+        var transformPoolDescription = tasks.named(
                 TransformationTasks.TRANSFORM_POOL_DESCRIPTION_TASK_NAME,
                 Transform.class);
+
+        var poolDescriptionFile = transformPoolDescription.map(t -> t.getOutputFile().get());
 
         tasks.register(
                 BUILD_POOL_TASK_NAME,
@@ -43,7 +45,7 @@ public class PoolTasks {
                     task.setGroup(GROUP_NAME);
                     task.setDescription("Defines a virtlib storage pool based on the transformed description file containing a root image and a cloud-init data source volume.");
                     task.getPoolOperations().set(pool.getPoolOperations());
-                    task.getPoolDescriptionFile().convention(transformPoolDescriptionTask.get().getOutputFile());
+                    task.getPoolDescriptionFile().convention(poolDescriptionFile);
                     task.getPoolRunFile().convention(pool.getPoolRunFile());
                     task.dependsOn(buildRootImage, buildDataSourceImage);
                 });
