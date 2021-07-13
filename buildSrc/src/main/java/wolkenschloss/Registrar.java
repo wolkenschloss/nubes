@@ -1,6 +1,7 @@
 package wolkenschloss;
 
 import org.gradle.api.Project;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.domain.DomainTasks;
@@ -12,6 +13,8 @@ import wolkenschloss.transformation.TransformationTasks;
 import wolkenschloss.download.DownloadTasks;
 import wolkenschloss.download.BaseImageExtension;
 import wolkenschloss.status.StatusTasks;
+
+import java.util.Map;
 
 public class Registrar {
     public static final String BUILD_GROUP_NAME = "build";
@@ -31,10 +34,10 @@ public class Registrar {
         TaskContainer tasks = project.getTasks();
 
         var transformationTasks = new TransformationTasks(tasks);
-        transformationTasks.register(extension.getTransformation());
         var values = extension.asPropertyMap(project.getObjects());
-        tasks.withType(Transform.class).configureEach(
-                task -> task.getScope().convention(values));
+
+        transformationTasks.register(extension.getTransformation());
+        setValues(tasks, values);
 
         BaseImageExtension baseImage = extension.getBaseImage();
         var downloadTasks = new DownloadTasks(tasks);
@@ -54,6 +57,11 @@ public class Registrar {
         statusTasks.register(tasks);
 
         registerDestroyTask(tasks);
+    }
+
+    private static void setValues(TaskContainer tasks, Provider<Map<String, Object>> values) {
+        tasks.withType(Transform.class).configureEach(
+                task -> task.getScope().convention(values));
     }
 
     private void registerDestroyTask(TaskContainer tasks) {
