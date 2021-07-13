@@ -16,11 +16,10 @@ public class TransformationTasks {
     public static final String TRANSFORM_POOL_DESCRIPTION_TASK_NAME = "transformPoolDescription";
 
 
-    private final String group;
+    private static final String group = "transformation";
     private final TaskContainer tasks;
 
     public TransformationTasks(TaskContainer tasks) {
-        this.group = "transformation";
         this.tasks = tasks;
     }
 
