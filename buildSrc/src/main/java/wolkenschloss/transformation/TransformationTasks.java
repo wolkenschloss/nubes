@@ -2,6 +2,7 @@ package wolkenschloss.transformation;
 
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
+import wolkenschloss.TestbedExtension;
 
 import java.util.Map;
 
@@ -24,6 +25,11 @@ public class TransformationTasks {
 
     public TransformationTasks(TaskContainer tasks) {
         this.tasks = tasks;
+    }
+
+    public void register2(Provider<Map<String, Object>> values, TestbedExtension extension) {
+        register(extension.getTransformation());
+        setValues(values);
     }
 
     public void setValues(Provider<Map<String, Object>> values) {
