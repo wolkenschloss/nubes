@@ -3,6 +3,7 @@ package wolkenschloss;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskContainer;
 import wolkenschloss.domain.DomainExtension;
+import wolkenschloss.domain.DomainTasks;
 import wolkenschloss.pool.BuildPool;
 import wolkenschloss.pool.PoolExtension;
 import wolkenschloss.pool.PoolTasks;

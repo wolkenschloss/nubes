@@ -1,8 +1,8 @@
 package wolkenschloss.status;
 
 import org.gradle.api.tasks.TaskContainer;
-import wolkenschloss.CopyKubeConfig;
-import wolkenschloss.DomainTasks;
+import wolkenschloss.domain.CopyKubeConfig;
+import wolkenschloss.domain.DomainTasks;
 import wolkenschloss.domain.BuildDomain;
 import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.download.DownloadDistribution;

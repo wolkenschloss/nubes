@@ -1,10 +1,8 @@
-package wolkenschloss;
+package wolkenschloss.domain;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
-import wolkenschloss.domain.BuildDomain;
-import wolkenschloss.domain.DomainExtension;
 import wolkenschloss.pool.PoolTasks;
 import wolkenschloss.transformation.Transform;
 import wolkenschloss.transformation.TransformationTasks;
@@ -37,7 +35,7 @@ public class DomainTasks {
                 });
     }
 
-    void register(TaskContainer tasks) {
+    public void register(TaskContainer tasks) {
         registerBuildDomainTask(tasks);
         registerReadKubeConfig(tasks);
         registerStartTask(tasks);
