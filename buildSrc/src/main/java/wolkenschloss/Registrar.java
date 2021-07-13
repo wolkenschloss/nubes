@@ -28,7 +28,7 @@ public class Registrar {
     public static final String DEFAULT_IMAGE_SIZE = "20G";
 
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
-    public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
+
 
     public static final String STATUS_TASK_NAME = "status";
     public static final String START_TASK_NAME = "start";
@@ -60,9 +60,8 @@ public class Registrar {
 
         DomainExtension domain = getExtension().getDomain();
         var port = getExtension().getHost().getCallbackPort();
-        Provider<RegularFile> kubeConfig = getExtension().getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME);
 
-        DomainTasks domainTasks = new DomainTasks(domain, kubeConfig, port);
+        DomainTasks domainTasks = new DomainTasks(domain, port);
         domainTasks.register(tasks);
 
         registerStatusTask(tasks, domain, pool);

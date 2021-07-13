@@ -19,6 +19,7 @@ import java.util.Map;
 public abstract class TestbedExtension  {
 
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
+    public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
     public TestbedExtension configure(Project project) {
         // Set build directories
@@ -36,7 +37,8 @@ public abstract class TestbedExtension  {
 
         getDomain().initialize(
                 sharedServices,
-                getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME));
+                getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME),
+                getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
 
         return this;
     }

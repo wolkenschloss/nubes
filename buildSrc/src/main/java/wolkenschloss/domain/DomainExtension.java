@@ -8,11 +8,14 @@ import org.gradle.api.services.BuildServiceRegistry;
 
 abstract public class DomainExtension {
 
-    public Provider<DomainOperations> initialize(BuildServiceRegistry sharedServices, Provider<RegularFile> knownHostsFile) {
+    public Provider<DomainOperations> initialize(BuildServiceRegistry sharedServices,
+                                                 Provider<RegularFile> knownHostsFile,
+                                                 Provider<RegularFile> kubeConfig)  {
         getName().convention("testbed");
         getFqdn().convention("testbed.wolkenschloss.local");
         getLocale().convention(System.getenv("LANG"));
         getKnownHostsFile().convention(knownHostsFile);
+        getKubeConfigFile().convention(kubeConfig);
 
         getDomainOperations().set(sharedServices.registerIfAbsent(
                 "domainops",
@@ -32,6 +35,8 @@ abstract public class DomainExtension {
     public abstract Property<String> getFqdn();
 
     abstract public RegularFileProperty getKnownHostsFile();
+
+    abstract public RegularFileProperty getKubeConfigFile();
 
     abstract public Property<DomainOperations> getDomainOperations();
 }

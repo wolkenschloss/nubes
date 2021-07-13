@@ -11,13 +11,11 @@ import wolkenschloss.transformation.TransformationTasksRegistrar;
 public class DomainTasks {
 
     public final DomainExtension domain;
-    public final Provider<RegularFile> kubeConfig;
     public final Provider<Integer> port;
 
-    public DomainTasks(DomainExtension domain, Provider<RegularFile> kubeConfig, Provider<Integer> port) {
+    public DomainTasks(DomainExtension domain,  Provider<Integer> port) {
 
         this.domain = domain;
-        this.kubeConfig = kubeConfig;
         this.port = port;
     }
 
@@ -36,7 +34,7 @@ public class DomainTasks {
                 CopyKubeConfig.class,
                 task -> {
                     task.getDomainName().convention(domain.getName());
-                    task.getKubeConfigFile().convention(kubeConfig);
+                    task.getKubeConfigFile().convention(domain.getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
                     task.getDomainOperations().set(domain.getDomainOperations());
                 });
