@@ -15,16 +15,15 @@ public class DomainTasks {
 
     private static final String GROUP_NAME = "domain";
 
-    public final DomainExtension domain;
-    public final Provider<Integer> port;
+    private final DomainExtension domain;
+    private final Provider<Integer> port;
 
     public DomainTasks(DomainExtension domain,  Provider<Integer> port) {
-
         this.domain = domain;
         this.port = port;
     }
 
-    public static void registerStartTask(TaskContainer tasks) {
+    private static void registerStartTask(TaskContainer tasks) {
         tasks.register(
                 START_TASK_NAME,
                 DefaultTask.class,
@@ -41,7 +40,7 @@ public class DomainTasks {
         registerStartTask(tasks);
     }
 
-    public void registerReadKubeConfig(TaskContainer tasks) {
+    private void registerReadKubeConfig(TaskContainer tasks) {
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
@@ -59,7 +58,7 @@ public class DomainTasks {
                 });
     }
 
-    public void registerBuildDomainTask(TaskContainer tasks) {
+    private void registerBuildDomainTask(TaskContainer tasks) {
 
         var buildPool = tasks.findByName(PoolTasks.BUILD_POOL_TASK_NAME);
 

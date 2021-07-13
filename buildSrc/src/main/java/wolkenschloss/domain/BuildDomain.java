@@ -66,7 +66,7 @@ abstract public class BuildDomain extends DefaultTask {
         updateKnownHosts(serverKey);
     }
 
-    public void updateKnownHosts(String serverKey) throws IOException, LibvirtException, InterruptedException {
+    private void updateKnownHosts(String serverKey) throws IOException, LibvirtException, InterruptedException {
         DomainOperations domainOperations = getDomainOperations().get();
 
         var ip = domainOperations.getIpAddress();
@@ -82,7 +82,7 @@ abstract public class BuildDomain extends DefaultTask {
                 StandardOpenOption.WRITE);
     }
 
-    public String waitForCallback() {
+    private String waitForCallback() {
         try {
             var executor = Executors.newSingleThreadExecutor();
             BlockingQueue<String> serverKeyResult = new SynchronousQueue<>();

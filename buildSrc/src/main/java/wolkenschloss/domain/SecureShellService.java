@@ -15,7 +15,7 @@ public class SecureShellService {
     private final String ip;
     private final RegularFileProperty knownHostsFile;
 
-    public SecureShellService(ExecOperations execOperations, String ip, RegularFileProperty knownHostsFile) throws Throwable {
+    public SecureShellService(ExecOperations execOperations, String ip, RegularFileProperty knownHostsFile) {
         this.execOperations = execOperations;
         this.ip = ip;
         this.knownHostsFile = knownHostsFile;
