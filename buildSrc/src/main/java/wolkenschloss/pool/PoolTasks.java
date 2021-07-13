@@ -55,7 +55,7 @@ public class PoolTasks {
                 BUILD_ROOT_IMAGE_TASK_NAME,
                 BuildRootImage.class,
                 task -> {
-                    task.setGroup(Registrar.BUILD_GROUP_NAME);
+                    task.setGroup(GROUP_NAME);
                     task.getSize().convention(Registrar.DEFAULT_IMAGE_SIZE);
                     task.getBaseImage().convention(downloadDistributionTask.get().getBaseImage());
                     task.getRootImage().convention(pool.getPoolDirectory().file(pool.getRootImageName()));
