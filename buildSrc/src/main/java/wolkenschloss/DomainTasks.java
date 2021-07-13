@@ -39,6 +39,7 @@ public class DomainTasks {
                 CopyKubeConfig.class,
                 task -> {
                     task.setGroup(GROUP_NAME);
+                    task.setDescription("Copies the Kubernetes client configuration to the localhost for further use by kubectl.");
                     task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(domain.getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
