@@ -17,7 +17,7 @@ public class StatusTasks {
         this.pool = pool;
     }
 
-    public static void registerStatusTask(StatusTasks statusTasks, TaskContainer tasks) {
+    public void registerStatusTask(TaskContainer tasks) {
 
         var readKubeConfig = tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig.class);
 
@@ -35,9 +35,9 @@ public class StatusTasks {
                 Registrar.STATUS_TASK_NAME,
                 Status.class,
                 task -> {
-                    task.getPoolOperations().set(statusTasks.pool.getPoolOperations());
-                    task.getDomainOperations().set(statusTasks.domain.getDomainOperations());
-                    task.getDomainName().convention(statusTasks.domain.getName());
+                    task.getPoolOperations().set(pool.getPoolOperations());
+                    task.getDomainOperations().set(domain.getDomainOperations());
+                    task.getDomainName().convention(domain.getName());
                     task.getKubeConfigFile().convention(readKubeConfig.get().getKubeConfigFile());
                     task.getKnownHostsFile().convention(knownHostsFile);
                     task.getDownloadDir().convention(distributionDir);

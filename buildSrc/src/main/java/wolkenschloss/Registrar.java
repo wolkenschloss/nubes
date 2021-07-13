@@ -47,7 +47,7 @@ public class Registrar {
 
         StatusTasks statusTasks = new StatusTasks(domain, pool);
 
-        StatusTasks.registerStatusTask(statusTasks, tasks);
+        statusTasks.registerStatusTask(tasks);
 
         getProject().getTasks().withType(Transform.class).configureEach(
                 task -> task.getScope().convention(getExtension().asPropertyMap(getProject().getObjects())));
