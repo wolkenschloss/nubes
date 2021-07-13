@@ -64,7 +64,7 @@ public class Registrar {
 
         DomainTasks domainTasks = new DomainTasks(domain, kubeConfig, port);
 
-        register(tasks, domainTasks);
+        DomainTasks.register(tasks, domainTasks);
 
         registerStatusTask(tasks, domain, pool);
 
@@ -80,11 +80,6 @@ public class Registrar {
                 });
 
         registerDestroyTask(getProject().getTasks());
-    }
-
-    private static void register(TaskContainer tasks, DomainTasks domainTasks) {
-        domainTasks.registerBuildDomainTask(tasks);
-        domainTasks.registerReadKubeConfig(tasks);
     }
 
     private void registerDestroyTask(TaskContainer tasks) {

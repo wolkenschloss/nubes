@@ -21,6 +21,11 @@ public class DomainTasks {
         this.port = port;
     }
 
+    static void register(TaskContainer tasks, DomainTasks domainTasks) {
+        domainTasks.registerBuildDomainTask(tasks);
+        domainTasks.registerReadKubeConfig(tasks);
+    }
+
     public void registerReadKubeConfig(TaskContainer tasks) {
         var knownHostsFile = tasks.named(Registrar.BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
