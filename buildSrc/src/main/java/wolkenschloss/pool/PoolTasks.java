@@ -76,13 +76,17 @@ public class PoolTasks {
 
     public void registerBuildDataSourceImageTask(TaskContainer tasks) {
 
-        var transformNetworkConfigTask =  tasks.named(
+        var transformNetworkConfigTask = tasks.named(
                 TransformationTasks.TRANSFORM_NETWORK_CONFIG_TASK_NAME,
                 Transform.class);
+        var networkConfig = transformNetworkConfigTask.map(t -> t.getOutputFile().get());
 
         var transformUserDataTask = tasks.named(
                 TransformationTasks.TRANSFORM_USER_DATA_TASK_NAME,
                 Transform.class);
+        var userData = transformUserDataTask.map(t -> t.getOutputFile().get());
+
+        var dataSourceImage = pool.getPoolDirectory().file(pool.getCidataImageName());
 
         tasks.register(
                 BUILD_DATA_SOURCE_IMAGE_TASK_NAME,
@@ -90,11 +94,9 @@ public class PoolTasks {
                 task -> {
                     task.setGroup(GROUP_NAME);
                     task.setDescription("Generates a cloud-init data source volume containing the transformed network-config and user-data files.");
-                    task.getNetworkConfig().convention(transformNetworkConfigTask.get().getOutputFile());
-                    task.getUserData().convention(transformUserDataTask.get().getOutputFile());
-                    task.getDataSourceImage().convention(
-                            pool.getPoolDirectory()
-                                    .file(pool.getCidataImageName()));
+                    task.getNetworkConfig().convention(networkConfig);
+                    task.getUserData().convention(userData);
+                    task.getDataSourceImage().convention(dataSourceImage);
                 });
     }
 }
