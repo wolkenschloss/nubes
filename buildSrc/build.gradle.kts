@@ -14,6 +14,7 @@ buildscript {
 }
 
 plugins {
+    groovy
     `groovy-gradle-plugin`
     `java-gradle-plugin`
     java
@@ -34,8 +35,6 @@ repositories {
 }
 
 dependencies {
-//    implementation gradleApi()
-    implementation("gradle.plugin.io.quarkus:quarkus-gradle-plugin:1.13.7.Final")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")
     implementation("net.java.dev.jna:jna:5.8.0")
@@ -43,8 +42,9 @@ dependencies {
 
     implementation("com.jayway.jsonpath:json-path:2.6.0")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.spockframework:spock-core:2.0-groovy-3.0") {
+        exclude(group = "org.codehaus.groovy")
+    }
 }
 
 tasks.withType<Test> {

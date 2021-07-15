@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
  * Keys and values are URL Encoded. You will get this Body from an
  * HttpExchange.getRequestBody() method call.
  */
-class FormData {
+public class FormData {
     private final String requestBody;
 
     public FormData(String requestBody) {
