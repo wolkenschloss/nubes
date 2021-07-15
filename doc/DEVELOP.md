@@ -1,117 +1,71 @@
 # Develop
 
-Install (Ubuntu 20.04):
+Dieser Artikel beschreibt die Voraussetzungen zur Mitarbeit an
+*Wolkenschloss/mycloud*. Diese Beschreibung setzt voraus, dass Du Ubuntu 20.04
+Desktop verwendest. Benutzt Du etwas anderes, bist Du auf Dich allein gestellt.
 
-Eine Entwicklungsumgebung erstellen:
+## Entwicklungsumgebung
 
-```bash
-sudo apt update
-sudo apt upgrade
-sudo apt install qemu-guest-agent
-sudo apt install openjdk-11-jdk
-sudo apt remove docker docker.io containerd runc
-sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+### SSH Schlüsselpaar
 
-echo   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt update
-sudo apt-get install docker-ce docker-ce-cli containerd.io
-
-// Docker Rootless
-sudo apt install uidmap
-sudo systemctl disable --now docker.service docker.socket
-dockerd-rootless-setuptool.sh install
-
-systemctl --user start docker
-systemctl --user enable docker
-
-# Installation des Ubuntu GPG Schlüssels zur Überprüfung der Prüfsummen-Datei
-gpg --keyid-format long --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0x1A5D6C4C7DB87C81
-
-git clone https://github.com/wolkenschloss/mycloud.git
-./gradlew build
-```
-
-Überprüfung des Schlüssels ist möglich auf der Seite
-[FAQ des Ubuntu Security Team](https://wiki.ubuntu.com/SecurityTeam/FAQ#GPG_Keys_used_by_Ubuntu)
-
-## GPG Bug
-
-Bei einigen Ubuntu Versionen kommt es zu einem Fehler, wenn man einen
-GPG Schlüssel zu seinem Schlüsselbund hinzufügen möchte:
-
-```bash
-sudo chown -R $(id -u):$(id -g) $HOME/.gnupg/crls.d
-```
-
-Links:
-
-* [GnuPrivacyGuardHowto](https://help.ubuntu.com/community/GnuPrivacyGuardHowto)
-* [How to verify your Ubuntu download](https://ubuntu.com/tutorials/how-to-verify-ubuntu#1-overview)
-* [The GNU Privacy Handbook](https://www.gnupg.org/gph/en/manual.html)
-
-Testbed zum Laufen kriegen:
+Du benötigst ein SSH Schlüsselpaar für deinen Github Account und den
+[Prüfstand][testbed]. Wenn du noch kein SSH Schlüsselpaar besitzt, erzeuge
+einen:
 
 ```bash
 ssh-keygen
-sudo apt install cloud-image-utils
-sudo apt install cpu-checker
-kvm-ok
-sudo apt install qemu-kvm libvirt-daemon-system
-sudo adduser $USER libvirt
-(relogin)
 ```
 
-## Konvention
+Weitere Hinweise dazu findest du unter [Authentifizierung über Public-Keys][ssh]
 
-Jedes Teilprojekt besteht mindestens aus einem Backend und einem Frontend.
-Die Bezeichnungen sind jeweils:
+### GitHub Account
 
-* Backend: service
-* Frontend: webapp
-* Business Core: core
+Du benötigst einen [GitHub] Account.
 
-In der Entwicklungsumgebung werden manchmal mehrere Services und Frontends
-gestartet. Ein Service Discovery für die Entwicklungsumgebung ist nicht
-vorgesehen. Damit es nicht zu Kollisionen bei der Verwendung der Ports
-kommt, gibt es folgende Konvention:
+#### Öffentlichen SSH Schlüssel hinterlegen
 
-Alle Ports sind vierstellig: z. B. 8080
+Hinterlege Deinen öffentlichen SSH Schlüssel in den
+[SSH and GPG keys][github-keys] Einstellungen Deines Github Profils. Deinen
+öffentlichen SSH Schlüssel findest Du in der Datei `$HOME/.ssh/id_rsa.pub`.
 
-Jedes Teilprojekt bekommt eine eigenes zweistelliges Projektpräfix. Z. B. 
+Weitere Informationen findest Du im Artikel
+[Connecting to GitHub with SSH][github-ssh].
 
-* blog: 80
-* cookbook: 81
-* dashboard: 82
+#### E-Mail Einstellungen
 
-Frontend und Backend erhalten Standardports:
+In den [Emails][github-email] Einstellungen solltest Du die Optionen `Keep my
+email addresses private` und `Block command line pushes that expose my email`
+einschalten. Du findest hier auch eine E-Mail-Adresse, die Du für Git
+commits verwenden solltest.
 
-* Frontend: 81
-* Backend: 80
+Weitere Informationen findest du im Artikel
+[Setting your commit email address][github-commit-email]
 
-Den Standardports ist der Präfix voranzustellen:
+Wolkenschloss verwendet [Gradle] als Build-Tool. Um Gradle starten zu können 
+brauchst du eine Java Runtime (JRE) oder Development Kit (JDK). 
 
-* blog/webapp: 8081
-* blog/service: 8080
-* cookbook/webapp: 8181
-* cookbook/service: 8180
-* dashboard/webapp: 8281
-* dashboard/service: 8280
+```bash
+sudo apt install openjdk-11-jdk
+```
+Zur Einrichtung des Prüfstandes folge den Anweisungen in
+[README.md][testbed]
 
-Erstmal schauen, ob das funktioniert :-)
+### Git
 
-## Frontend
+Um Beiträge im Repository zu veröffentlichen, musst du die E-Mail-Adresse in 
+Git konfigurieren. Folge dazu den Anweisungen auf 
+[Setting your commit email address in Git][gea].
 
-- [Node Version Manager (nvm)](https://github.com/nvm-sh/nvm)
-- [Node Package Manager (npm)](https://www.npmjs.com/)
+### Frontend
+
+- [Node Version Manager (nvm)][nvm]
+- [Node Package Manager (npm)][npm]
     - [Documentation](https://docs.npmjs.com/)
         - [Configuring your local environment](https://docs.npmjs.com/getting-started/configuring-your-local-environment/)
 - [Vue CLI](https://cli.vuejs.org/)
     - [Getting Started](https://cli.vuejs.org/guide/)
     - [Installation](https://cli.vuejs.org/guide/installation.html)
-- [Vue.js](https://v3.vuejs.org/)
+- [Vue.js][vue]
 
 Installation des Node Version Managers:
 
@@ -149,97 +103,108 @@ vue add bootstrap-vue
 
 Sie dazu auch [Getting Started](https://bootstrap-vue.org/docs#vue-cli-3-plugin)
 
+
+## Konventionen
+
+Jeder Microservice besteht aus drei Unterprojekten, für die jeweils eine 
+Gradle Build Konvention existiert.
+
+| Verzeichnisname | Konvention          | Zweck                                |
+| ----------------|---------------------|--------------------------------------|
+| webapp          | webapp-conventions  | Webbasierte Benutzeroberfläche       |
+| service         | service-conventions | HTTP oder gRPC Kommunikationsendpunkt|
+| core            | core-conventions    | Implementierung der Domäne           |
+
+Die Projekte *service* und *core* folgen der 
+[Zwiebelschalen-Architektur][onion].
+
+Die Artefakte des *webapp* Projekts werden als statische Ressourcen in den 
+Klassenpfad der *service* Anwendung gelegt. Damit wird die CORS Header 
+Problematik umgangen und kein zusätzlicher Webserver für die Auslieferung 
+der Webanwendung benötigt.
+
 ## Build Prozess
 
-- [Gradle] Multi-Projekt
-
 **Das Projekt muss gleichermaßen mit [Gradle] in der Kommandozeile und
-[IntelliJ] gebaut und getestet werden können. Dazu ist es erforderlich, dass
-in beiden Fällen exakt die gleiche JDK Version verwendet wird.**
+[IntelliJ] gebaut und getestet werden können.**
 
-Empfehlung ist: **Adopt OpenJDK 11 (HotSpot)** `(jdk-11.0.11+9)`
+## Organisatorische Konventionen
 
-### Kommandozeile
+### Pull-Requests
+* Es dürfen nur Pull-Requests angenommen werden, deren Tests erfolgreich 
+  durchlaufen wurden. (Gradle Build Action ist grün)
+* Es dürfen nur Pull-Requests angenommen werden, die durch Tests eine neue 
+  Funktionalität spezifizieren.
+  * Ausnahme: Pull Requests, in denen ausschließlich Dokumentationen 
+    geändert oder hinzugefügt werden.
+* Alle Pull-Requests durchlaufen einen Review-Prozess.
 
-Wenn der Build von der Kommandozeile gestartet wird, verwendet Gradle die
-durch `$JAVA_HOME` spezifizierte JVM oder, falls diese vorhanden ist, oder
-die JVM die auf im aktuellen Pfad der Konsole gefunden werden kann (`which
-java`). Gradle begnügt sich dabei mit einem JRE.
+### Arbeitsabläufe
 
-Bei einer Standard-Ubuntu Installation muss das OpenJDK 11 installiert sein.
-Dazu ist folgendes Paket zu installieren:
+#### Issues bearbeiten
 
-    sudo apt install openjdk-11-jre
+1. Ein Issue im Projekt in den Status *in progress* setzen.
+2. Auf dem Entwicklungsrechner einen neuen Feature-Branch anlegen. Der Name des 
+   Branches soll der Konvention `mycloud-#` folgen, wobei *#* 
+   der Nummer des Issues aus Schritt 1 entspricht. In IntelliJ kannst Du 
+   `Tools -> Tasks & Contexts -> Open Task` verwenden, wenn Du IntelliJ 
+   entsprechend eingerichtet hast.
+3. Änderungen mit `git commit` und `git push` regelmäßig sichern und 
+   synchronisieren. Für Commit Nachrichten 
+   [Conventional Commit Messages][conventional commits] verwenden.
+4. Pull-Request erstellen und den Pull-Request mit dem bearbeiteten Issue 
+   und Projekt verlinken. Der Pull-Request soll den Feature-Branch 
+   *mycloud-#* inden *master* Branch zusammenführen.
+5. Review des Pull-Requests. Den Pull-Request in den Status *Review 
+   in Progress* setzen. 
+6. Anmerkungen ggf. Nacharbeiten und Änderungen einchecken.
+7. Der Reviewer setzt den Pull-Request in den Status *Reviewer approved*.
+8. Auf Github die Änderungen durch einen *Squash-Merge* in den *master* Branch 
+   zusammenführen.
+9. Auf Github den Feature-Branch löschen.
+10. Im Github Projekt Issue und Pull-Request in den Status *Done* setzen
+11. Auf dem Entwicklungsrechner den *master* Branch aktualisieren, auschecken 
+   und den Feature-Branch löschen.
 
-### IntelliJ
+Die Bearbeitung eines Issues soll einen Tag nicht überschreiten. Wenn ein 
+Issue in diesem Zeitraum nicht bearbeitet werden kann, sollen weitere 
+Issues erstellt werden, in denen die Restarbeiten dokumentiert sind.
 
-Im Menü `File -> New Project Settings -> Structure for New Projects` den
-Dialog `Platform Settings -> SDKs` öffnen. Falls das Ubuntu OpenJDK 11
-nicht installiert ist, mit dem Button `(+) Add JDK ` den Pfad zum Ubuntu
-OpenJDK 11 auswählen: `/usr/lib/jvm/java-11-openjdk-amd64` und einen
-sprechenden Namen vergeben.
+#### Planung
 
-Alternativ kann im Dialog `Platform Settings -> SDKs` mit `[+] Download JDK`
-das `AdoptOpenJDK (HotSpot) 11.0.11` heruntergeladen werden.
+Der Zeitraum eines Meilensteins beträgt ein Monat und hat ein festgelegtes, 
+dokumentiertes Ziel. Der Name des Meilensteins folgt der Konvention *M#*, 
+wobei *#* eine fortlaufende Zahl ist.
 
-Nach der Installation von Ubuntu OpenJDK 11 oder AdoptOpenJDK (HotSpot) 11.0.
-11 kann im Dialog `Project Structure for New Projects` unter `Project
-Settings -> Project` im Feld `Project SDK` eines der beiden JDKs ausgewählt
-werden. Alle Projekte, die danach neu erstellt werden, erhalten dieses JDK
-als Voreinstellung.
+Zum Ende des Zeitraums wird der nächste Meilenstein unter Beachtung der 
+folgenden Punkte geplant:
 
-Weil das Projekt `mycloud` ohne IntelliJ Projekteinstellungen in der
-Quellcodeverwaltung abgelegt ist, verwendet IntelliJ künftig das zuvor
-festgelegte JDK als Vorgabe.
+1. Neuen Meilenstein in Github anlegen.
+2. Das Ziel des Meilensteins benennen.
+3. Issues auswählen, die relevant für die Zielerreichung sind und dem 
+   Meilenstein zuordnen.
+4. Issues priorisieren
+5. Aufwand der einzelnen Issues abschätzen.
 
-Bei der Erstellung mit Gradle ist zu berücksichtigen, dass das JDK, mit dem
-Gradle gestartet wird und das JDK, mit dem Gradle den Build durchführt,
-unterschiedlich sein können (und in der Regel auch sind)
-
-### Adopt OpenJ9-16
-Die Integration von Gradle mit IntelliJ scheint für adopt-openj9-16 **nicht
-richtig zu funktionieren**. Bei der Ausführung der Tests erscheint die
-Fehlermeldung:
-
-    Cause: cannot assign instance of java.util.Collections$EmptyList to field 
-    java.lang.StackTraceElement.moduleVersion of type java.lang.String in 
-    instance of java.lang.StackTraceElement
-
-### Gradle Daemons
-
-Bei der ganzen Umstellung der JDK, sollte man darauf achten, dass die von Gradle
-gestarteten Daemons auch mal getötet werden sollten:
-
-Den Status der Gradle Daemons gibt folgende Kommando aus:
-
-``sh 
-./gradlew --status 
-``
-
-### gradle.properties
-
-Die Datei `/gradle.properties` wird von IntelliJ nur teilweise berücksichtigt.
-Alle Properties, die einen Punkt enthalten scheinen von IntelliJ ignoriert zu
-werden. Eigene Properties ohne Punkt im Bezeichner funktionieren.
-
-Um den Debug Level bei Builds durch IntelliJ zu beeinflussen, muss Gradle eine
-der Optionen `--quiet`, `--warn`, `--info` oder `--debug` als Argument in der
-Run Konfiguration übergeben werden.
-
-Die Einstellungen in der Datei `idea.properties` vorzunehmen zeigt ebenfalls
-keine Wirkung.
-
-Dazu gibt es
-bei [IDEs Support (IntelliJ Platform) | JetBrains](https://intellij-support.jetbrains.com/hc/en-us)
-einen
-Support-Eintrag [How to see debug logging when running gradle inside IntelliJ?](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360000420140-How-to-see-debug-logging-when-running-gradle-inside-IntelliJ-)
+## Referenzen
 
 ### Badges
 
 Dokumentation zu den Build Badges in GitHub:
-https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge
-
+<https://docs.github.com/en/actions/managing-workflow-runs/adding-a-workflow-status-badge>
 
 [Gradle]: https://gradle.org/
-
 [IntelliJ]: https://www.jetbrains.com/de-de/idea/
+[GitHub]: https://github.com/
+[conventional commits]: https://www.conventionalcommits.org/de/v1.0.0/
+[ssh]: https://wiki.ubuntuusers.de/SSH/#Authentifizierung-ueber-Public-Keys
+[testbed]: /testbed/README.md
+[github-ssh]: https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh
+[github-email]: https://github.com/settings/emails
+[github-commit-email]: https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address
+[github-keys]: https://github.com/settings/keys
+[onion]: https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/
+[nvm]: https://github.com/nvm-sh/nvm
+[npm]: https://www.npmjs.com/
+[vue]: https://v3.vuejs.org/
+[gea]: https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address#setting-your-commit-email-address-in-git
