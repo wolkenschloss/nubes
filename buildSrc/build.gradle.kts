@@ -14,6 +14,7 @@ buildscript {
 }
 
 plugins {
+    groovy
     `groovy-gradle-plugin`
     `java-gradle-plugin`
     java
@@ -43,8 +44,13 @@ dependencies {
 
     implementation("com.jayway.jsonpath:json-path:2.6.0")
 
+    testImplementation("org.spockframework:spock-core:2.0-groovy-3.0") {
+        exclude(group = "org.codehaus.groovy")
+    }
+
+
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
 }
 
 tasks.withType<Test> {
