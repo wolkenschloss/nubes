@@ -1,5 +1,6 @@
 plugins {
     java
+    id("wolkenschloss.core-conventions")
 }
 
 group = "family.haschka.mycloud.cookbook"
