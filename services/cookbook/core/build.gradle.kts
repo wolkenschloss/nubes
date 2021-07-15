@@ -1,5 +1,4 @@
 plugins {
-    java
     id("wolkenschloss.core-conventions")
 }
 
