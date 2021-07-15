@@ -9,10 +9,17 @@ public class CoreConventionTest {
 
     @Test
     public void coreConventionExists() {
-        Project project = org.gradle.testfixtures.ProjectBuilder.builder().build();
+        Project project = ProjectBuilder.builder().build();
         project.getPluginManager().apply("wolkenschloss.core-conventions");
 
-        project.getPluginManager().hasPlugin("wolkenschloss.core-conventions");
         Assertions.assertTrue(project.getPluginManager().hasPlugin("wolkenschloss.core-conventions"));
+    }
+
+    @Test
+    public void shouldProvideJavaLibraryPlugin() {
+        Project project = ProjectBuilder.builder().build();
+        project.getPluginManager().apply("wolkenschloss.core-conventions");
+
+        Assertions.assertTrue(project.getPluginManager().hasPlugin("java-library"));
     }
 }
