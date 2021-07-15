@@ -113,7 +113,7 @@ Gradle Build Konvention existiert.
 | ----------------|---------------------|--------------------------------------|
 | webapp          | webapp-conventions  | Webbasierte Benutzeroberfläche       |
 | service         | service-conventions | HTTP oder gRPC Kommunikationsendpunkt|
-| core            | core-conventions    | Implementierung der Domäne           |
+| core            | wolkenschloss.conventions.core | Implementierung der Domäne           |
 
 Die Projekte *service* und *core* folgen der 
 [Zwiebelschalen-Architektur][onion].

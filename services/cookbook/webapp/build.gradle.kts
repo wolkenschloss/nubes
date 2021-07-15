@@ -63,13 +63,8 @@ tasks.register<NpxTask>("generateVueApp") {
     outputs.dir(destination)
 
     doFirst {
-        println("doFirst generateVueApp")
         val path = System.getenv("PATH")
-        println("PATH = $path")
-    }
-
-    doLast {
-        println("doLast generateVueApp")
+        logger.info("PATH = $path")
     }
 }
 

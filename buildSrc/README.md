@@ -1,3 +1,22 @@
+# Core Convention Plugin
+
+Das Core Convention Plugin enthält die gemeinsamen Voreinstellungen für 
+Projekte, die ein Domänen-Modell entsprechend der Zwiebelschalen Architektur 
+implementieren.
+
+Gradle Projekte, die dieses Plugin anwenden erhalten folgende Eigenschaften:
+
+* Java 11
+* JUnit 5
+
+Verwendung des Plugins in `build.gradle.kts`
+
+```kotlin
+plugins {
+    id("wolkenschloss.conventions.core")
+}
+```
+
 # Testbed Gradle Plugin
 
 Das Plugin dient dazu ein Gradle Projekt zu unterstützen, mit dem ein Prüfstand
