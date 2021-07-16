@@ -1,3 +1,70 @@
+# Webapp Convention Plugin
+
+Mit dem *Webapp Convention Plugin* werden die auf `npm` basierenden 
+Erstellungsprozesse von Unterprojekten mit webbasierten Benutzeroberflächen in 
+den Gradle Multi-Projekt Erstellungsprozess integriert. 
+
+Um eine neue Webanwendung als Unterprojekt hinzuzufügen, gehe folgendermaßen 
+vor:
+
+1. Wechsle in das Service Verzeichnis, zu dem die Weboberfläche gehören soll.
+2. Erstelle das Webprojekt mit vue-cli: `vue create webapp`
+3. Wechsle in das Verzeichnis webapp und erstelle eine Gradle Build Datei 
+   `gradle.build.kts`:
+   ```kotlin
+   plugin {
+        id ("wolkenschloss.conventions.webapp")
+   }
+
+    tasks {
+        named<NpxTask>("vue") {
+            inputs.files("babel.config.js")
+        }
+    }
+   ```
+
+Die Dateien `package.json` und `package.json.lock` sind bereits als 
+Abhängigkeiten vom Plugin voreingestellt. Weitere Abhängigkeiten können bei 
+Bedarf, wie oben gezeigt, hinzugefügt werden.
+
+Die Ausgabe erfolgt im Verzeichnis 
+`build/classes/java/main/META-INF/resources` damit Quarkus Services die 
+Artefakte als statische Ressourcen über ihr Webinterface verteilen können. 
+Dazu muss im Quarkus Projekt lediglich eine Projektabhängigkeit zum `webapp` 
+Projekt hinzugefügt werden.
+
+```kotlin
+// Dieser Hack erlaubt es, im Quarkus Development Mode das
+// Frontend als eingebettete Resource zu starten:
+//
+// ./gradlew :services:cookbook:service:quarkusDev
+//
+// Startet das Backend unter 0.0.0.0:8181. Das Frontend
+// ist dann über http://0.0.0.0:8181/index.html erreichbar.
+//
+// Damit hat das Frontend dieselbe Adresse, wie das Backend.
+// CORS muss nicht konfiguriert werden. Allerdings werden
+// Änderungen, die am Quelltext des Frontends vorgenommen
+// werden nicht sofort wirksam. Dazu muss der Quarkus
+// Entwicklungsserver erste neu gebaut werden. Im
+// Entwicklungsmodus berücksichtigt Quarkus die Jars der
+// abhängigen Projekte nicht, sondern legt die Ausgabe des
+// Build Verzeichnisses direkt in den Classpath. Mit diesem
+// Hack wird das Build Ergebnis des Frontendprojekts auf den
+// Classpath kopiert.
+//
+// Die Alternative besteht darin, das Frontend mit
+// npm run serve zu starten und die Anfragen des Frontends
+// an das Backend durch einen Proxy zu leiten, der alle
+// Anfrage von 0.0.0.0:8080 auf 0.0.0.0:8181 umleitet.
+// Bei dieser Lösung gibt es für jeden Microservice einen
+// Port für das Backend und einen Port für das Frontend.
+// Die Konfiguration kann auf lange Sicht umständlich sein.
+// Ferner ist in der Entwicklung immer darauf zu achten,
+// das Frontend und Backend gestartet werden.
+
+
+```
 # Core Convention Plugin
 
 Das Core Convention Plugin enthält die gemeinsamen Voreinstellungen für 

@@ -1,0 +1,38 @@
+import com.github.gradle.node.npm.task.NpxTask
+import com.github.gradle.node.npm.task.NpmInstallTask
+
+plugins {
+    id 'mycloud.java-conventions'
+    id 'com.github.node-gradle.node'
+}
+
+var destination = "$buildDir/classes/java/main/META-INF/resources"
+
+node {
+    version = "14.17.1"
+    download = true
+}
+
+sourceSets {
+    main {
+        output.dir destination, builtBy: ["vue"]
+    }
+}
+
+def vue = tasks.register("vue", NpxTask) {
+
+    def npmInstall = tasks.named NpmInstallTask.NAME
+    dependsOn npmInstall
+    group = "build"
+    description = "build vue application"
+    command = "vue-cli-service"
+    args = ["build", "--dest", destination]
+    // , "babel.config.js"
+    inputs.files "package.json", "package-lock.json", "vue.config.js"
+    inputs.dir "src"
+    outputs.dir destination
+}
+
+tasks.named("build").configure({
+    dependsOn vue
+})

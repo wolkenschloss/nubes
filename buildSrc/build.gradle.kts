@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
     }
     dependencies {
@@ -10,6 +11,7 @@ buildscript {
         classpath("org.libvirt:libvirt:0.5.2")
         classpath("net.java.dev.jna:jna:5.8.0")
         classpath("com.jayway.jsonpath:json-path:2.6.0")
+        classpath("com.github.node-gradle:gradle-node-plugin:3.1.0")
     }
 }
 
@@ -35,6 +37,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.github.node-gradle:gradle-node-plugin:3.1.0")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")
     implementation("net.java.dev.jna:jna:5.8.0")
