@@ -11,7 +11,6 @@ buildscript {
         classpath("org.libvirt:libvirt:0.5.2")
         classpath("net.java.dev.jna:jna:5.8.0")
         classpath("com.jayway.jsonpath:json-path:2.6.0")
-        classpath("com.github.node-gradle:gradle-node-plugin:3.1.0")
     }
 }
 
