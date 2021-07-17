@@ -3,7 +3,6 @@ package wolkenschloss.conventions
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Specification
-import spock.lang.TempDir
 
 class WebappPluginTest extends Specification {
 
@@ -11,11 +10,11 @@ class WebappPluginTest extends Specification {
 
 
     def setup() {
-        testProjectDir = new File("../fx")
+        testProjectDir = new File("./fixture")
     }
 
     def cleanup() {
-       assert new File(testProjectDir, "build").deleteDir() == true
+       assert new File(testProjectDir, "build").deleteDir()
     }
 
     def "build task should build jar file"() {
