@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit --reporters='default' --reporters='jest-junit'",
+    "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "clean": "rm -Rf dist build",
     "test": "true"
@@ -17,9 +18,9 @@
     "vue-router": "^3.2.0"
   },
   "devDependencies": {
-    "jest-junit": "^12.2.0",
     "@babel/polyfill": "^7.11.5",
     "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-e2e-cypress": "^4.5.13",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-unit-jest": "^4.5.13",
@@ -30,6 +31,7 @@
     "bootstrap": "^4.5.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "jest-junit": "^12.2.0",
     "mutationobserver-shim": "^0.3.7",
     "popper.js": "^1.16.1",
     "portal-vue": "^2.1.7",

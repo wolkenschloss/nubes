@@ -3,3 +3,4 @@ build/
 !.idea/
 .idea/*
 !.idea/externalDependencies.xml
+/services/cookbook/webapp/tests/e2e/videos/*.mp4
