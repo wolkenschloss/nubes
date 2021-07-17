@@ -43,6 +43,16 @@ def unit = tasks.register("unit", NpxTask) {
     inputs.dir "tests/unit"
 }
 
+def e2e = tasks.register("e2e", NpxTask) {
+    group = "verification"
+    description = "run e2e tests"
+    command = "vue-cli-service"
+    args = ["test:e2e", "--headless"]
+    inputs.files "package.json", "package-lock.json", "vue.config.js"
+    inputs.dir "src"
+    inputs.dir "tests/e2e"
+}
+
 tasks.named("build").configure({
     dependsOn vue
 })

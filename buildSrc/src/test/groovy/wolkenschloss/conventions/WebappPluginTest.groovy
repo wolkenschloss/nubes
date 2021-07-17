@@ -68,4 +68,16 @@ class WebappPluginTest extends Specification {
         then: "the outcome of task test is SUCCESS"
         result.task(":unit").outcome == TaskOutcome.SUCCESS
     }
+
+    def "e2e task should run e2e tests"() {
+        when: "running gradle :e2e"
+        def result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("e2e")
+            .withPluginClasspath()
+            .build()
+
+        then: "the outcome of task e2e is SUCCESS"
+        result.task(":e2e").outcome == TaskOutcome.SUCCESS
+    }
 }
