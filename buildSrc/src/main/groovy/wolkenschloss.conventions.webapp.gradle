@@ -46,3 +46,7 @@ def unit = tasks.register("unit", NpxTask) {
 tasks.named("build").configure({
     dependsOn vue
 })
+
+tasks.named("check").configure({
+    dependsOn(unit)
+})
