@@ -1,4 +1,11 @@
+# webapp projects
 build/
+dist/
+**/e2e/videos/
+**/e2e/reports/
+chromedriver.log
+node_modules/
+
 .gradle/
 !.idea/
 .idea/*
