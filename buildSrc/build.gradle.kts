@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
     repositories {
-        gradlePluginPortal()
+//        gradlePluginPortal()
         mavenCentral()
     }
     dependencies {

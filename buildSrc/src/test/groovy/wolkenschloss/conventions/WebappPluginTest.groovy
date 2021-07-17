@@ -31,9 +31,6 @@ class WebappPluginTest extends Specification {
         and: "the outcome of task :vue is SUCCESS"
         result.task(':vue').outcome == TaskOutcome.SUCCESS
 
-        and: "the outcome of task :unit is SUCCESS"
-        result.task(':unit').outcome == TaskOutcome.SUCCESS
-
         and: "webapp-example.jar exists"
         def jar = new File(testProjectDir, "build/libs/webapp-example.jar")
         jar.exists()

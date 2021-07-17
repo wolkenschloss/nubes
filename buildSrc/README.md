@@ -1,14 +1,54 @@
 # Webapp Convention Plugin
 
-Mit dem *Webapp Convention Plugin* werden die auf `npm` basierenden 
-Erstellungsprozesse von Unterprojekten mit webbasierten Benutzeroberflächen in 
-den Gradle Multi-Projekt Erstellungsprozess integriert. 
+Mit dem *Webapp Convention Plugin* werden die auf [npm] basierenden 
+Erstellungsprozesse von Unterprojekten mit webbasierten Benutzeroberflächen, 
+die as [Vue.js] Framework verwenden, den Gradle Multi-Projekt 
+Erstellungsprozess integriert. 
 
-Um eine neue Webanwendung als Unterprojekt hinzuzufügen, gehe folgendermaßen 
+Das *Webapp Convention Plugin* ergänzt die Projekte, in denen es verwendet 
+wird um folgende Aufgaben:
+
+| Gradle Task | vue-cli-service Kommando              | Gradle Lifecycle Task |
+|-------------|---------------------------------------|------------------------|
+| `vue`       | `vue-cli-service build --dest ...`    | `build` |
+| `unit`      | `vue-cli-service test:unit`           | `check` |
+| `e2e`       | `vue-cli-service test:e2e --headless` | `check` |
+
+Um eine neue Webanwendung als Unterprojekt hinzuzufügen, gehe folgendermaßen
 vor:
 
-1. Wechsle in das Service Verzeichnis, zu dem die Weboberfläche gehören soll.
-2. Erstelle das Webprojekt mit vue-cli: `vue create webapp`
+1. Wechsle in das Microservice Verzeichnis. In diesem Verzeichnis befinden 
+   sich alle Unterprojekte, die zu dem Microservice gehören. Um ein Webapp 
+   Projekt für den Microservice *cookbook* zu erstellen, wechsle also in das 
+   Verzeichnis `services/cookbook`.
+2. Erstelle das Webprojekt mit [Vue CLI]: `vue create --no-git webapp`. Das 
+   erstellt im Ordner *webapp* eine [Vue.js] Anwendung. Für die Integration in 
+   den Gradle Erstellungsprozess muss das *webapp* Projekt *Unit Testing* und 
+   *E2E Testing* Features unterstützen und die entsprechenden Erweiterungen 
+   installiert sein. Alle angebotenen Unit Testing und E2E Testing Features 
+   kannst du verwenden. 
+   ```
+   Vue CLI v4.5.13
+   ? Please pick a preset:
+   Default ([Vue 2] babel, eslint)
+   Default (Vue 3) ([Vue 3] babel, eslint)
+   ❯ Manually select features
+   ```
+   ```
+    Vue CLI v4.5.13
+    ? Please pick a preset: Manually select features
+    ? Check the features needed for your project:
+    ◉ Choose Vue version
+    ◯ Babel
+    ◯ TypeScript
+    ◯ Progressive Web App (PWA) Support
+    ◯ Router
+    ◯ Vuex
+    ◯ CSS Pre-processors
+    ◯ Linter / Formatter
+    ◉ Unit Testing
+    ❯◉ E2E Testing   
+   ```
 3. Wechsle in das Verzeichnis webapp und erstelle eine Gradle Build Datei 
    `gradle.build.kts`:
    ```kotlin
@@ -23,48 +63,22 @@ vor:
     }
    ```
 
-Die Dateien `package.json` und `package.json.lock` sind bereits als 
-Abhängigkeiten vom Plugin voreingestellt. Weitere Abhängigkeiten können bei 
-Bedarf, wie oben gezeigt, hinzugefügt werden.
+Die Dateien `package.json`, `package.json.lock` und `vue.config.js` sind 
+bereits als Abhängigkeiten vom Plugin voreingestellt. Weitere Abhängigkeiten 
+können bei Bedarf, wie oben gezeigt, hinzugefügt werden.
 
-Die Ausgabe erfolgt im Verzeichnis 
+Die Ausgabe der `vue` Aufgabe erfolgt in das Verzeichnis 
 `build/classes/java/main/META-INF/resources` damit Quarkus Services die 
 Artefakte als statische Ressourcen über ihr Webinterface verteilen können. 
 Dazu muss im Quarkus Projekt lediglich eine Projektabhängigkeit zum `webapp` 
-Projekt hinzugefügt werden.
+Projekt hinzugefügt werden: 
 
 ```kotlin
-// Dieser Hack erlaubt es, im Quarkus Development Mode das
-// Frontend als eingebettete Resource zu starten:
-//
-// ./gradlew :services:cookbook:service:quarkusDev
-//
-// Startet das Backend unter 0.0.0.0:8181. Das Frontend
-// ist dann über http://0.0.0.0:8181/index.html erreichbar.
-//
-// Damit hat das Frontend dieselbe Adresse, wie das Backend.
-// CORS muss nicht konfiguriert werden. Allerdings werden
-// Änderungen, die am Quelltext des Frontends vorgenommen
-// werden nicht sofort wirksam. Dazu muss der Quarkus
-// Entwicklungsserver erste neu gebaut werden. Im
-// Entwicklungsmodus berücksichtigt Quarkus die Jars der
-// abhängigen Projekte nicht, sondern legt die Ausgabe des
-// Build Verzeichnisses direkt in den Classpath. Mit diesem
-// Hack wird das Build Ergebnis des Frontendprojekts auf den
-// Classpath kopiert.
-//
-// Die Alternative besteht darin, das Frontend mit
-// npm run serve zu starten und die Anfragen des Frontends
-// an das Backend durch einen Proxy zu leiten, der alle
-// Anfrage von 0.0.0.0:8080 auf 0.0.0.0:8181 umleitet.
-// Bei dieser Lösung gibt es für jeden Microservice einen
-// Port für das Backend und einen Port für das Frontend.
-// Die Konfiguration kann auf lange Sicht umständlich sein.
-// Ferner ist in der Entwicklung immer darauf zu achten,
-// das Frontend und Backend gestartet werden.
-
-
+dependencies {
+    implementation(project(":webapp"))
+}
 ```
+
 # Core Convention Plugin
 
 Das Core Convention Plugin enthält die gemeinsamen Voreinstellungen für 
@@ -331,3 +345,6 @@ angefügt.
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 [ssh]: https://wiki.ubuntuusers.de/SSH/#Authentifizierung-ueber-Public-Keys
 [gpg]: https://ubuntu.com/tutorials/how-to-verify-ubuntu#4-retrieve-the-correct-signature-key
+[Vue.js]: https://vuejs.org/
+[npm]: https://www.npmjs.com/
+[Vue CLI]: https://cli.vuejs.org/

@@ -8,8 +8,7 @@
     "test:unit": "vue-cli-service test:unit --reporters='default' --reporters='jest-junit'",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "clean": "rm -Rf dist build",
-    "test": "true"
+    "clean": "rm -Rf dist build"
   },
   "dependencies": {
     "bootstrap-vue": "^2.17.3",
