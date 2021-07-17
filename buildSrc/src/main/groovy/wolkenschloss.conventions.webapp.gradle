@@ -58,5 +58,5 @@ tasks.named("build").configure({
 })
 
 tasks.named("check").configure({
-    dependsOn(unit)
+    dependsOn unit, e2e
 })

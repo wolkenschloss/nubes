@@ -39,6 +39,24 @@ class WebappPluginTest extends Specification {
         jar.exists()
     }
 
+    def "run unit and e2e task when calling check"() {
+        when: "running gradle :check task"
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("check")
+                .withPluginClasspath()
+                .build()
+
+        then: "the outcome of task :build is SUCCESS"
+        result.task(':unit').outcome == TaskOutcome.SUCCESS
+
+        and: "the outcome of task :vue is SUCCESS"
+        result.task(':e2e').outcome == TaskOutcome.SUCCESS
+
+        and: "the outcome of task :unit is SUCCESS"
+        result.task(':check').outcome == TaskOutcome.SUCCESS
+    }
+
     def "vue task should build the vue app"() {
         when: "running gradle :build task"
         def result = GradleRunner.create()
