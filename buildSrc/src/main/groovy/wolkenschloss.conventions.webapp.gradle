@@ -33,6 +33,16 @@ def vue = tasks.register("vue", NpxTask) {
     outputs.dir destination
 }
 
+def unit = tasks.register("unit", NpxTask) {
+    group = "verification"
+    description = "run jest unit tests"
+    command = "vue-cli-service"
+    args = ["test:unit"]
+    inputs.files "package.json", "package-lock.json", "vue.config.js", "jest.config.js"
+    inputs.dir "src"
+    inputs.dir "tests/unit"
+}
+
 tasks.named("build").configure({
     dependsOn vue
 })

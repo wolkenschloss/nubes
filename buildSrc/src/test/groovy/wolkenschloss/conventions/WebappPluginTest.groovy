@@ -7,83 +7,15 @@ import spock.lang.TempDir
 
 class WebappPluginTest extends Specification {
 
-    @TempDir File testProjectDir
-    File settingsFile
-    File buildFile
-    File packageJsonFile
-    File mainJsFile
-    File indexHtmlFile
-    File appVueFile
+    File testProjectDir
+
 
     def setup() {
-        settingsFile = new File(testProjectDir, 'settings.gradle')
-        buildFile = new File(testProjectDir, 'build.gradle')
+        testProjectDir = new File("../fx")
+    }
 
-        packageJsonFile = new File(testProjectDir, "package.json")
-        packageJsonFile << '''\
-        {
-          "name": "webapp",
-          "version": "0.1.0",
-          "private": true,
-          "scripts": {
-            "serve": "vue-cli-service serve",
-            "build": "vue-cli-service build"
-          },
-          "dependencies": {
-            "vue": "^2.6.11"
-          },
-          "devDependencies": {
-            "@vue/cli-service": "~4.5.0",
-            "vue-template-compiler": "^2.6.11"
-          }
-        }
-        '''
-
-
-        indexHtmlFile = new File(testProjectDir, "public/index.html")
-        indexHtmlFile.parentFile.mkdirs()
-        indexHtmlFile << """\
-        <!DOCTYPE html>
-        <html>
-          <body>
-            <div id="app"></div>
-          </body>
-        </html>
-        """
-
-        mainJsFile = new File(testProjectDir, "src/main.js")
-        mainJsFile.parentFile.mkdirs()
-        mainJsFile << '''\
-            import Vue from 'vue'
-            import App from './App.vue'
-            
-            new Vue({
-              render: h => h(App),
-            }).$mount('#app')
-        '''
-
-        appVueFile = new File(testProjectDir, "src/App.vue")
-        appVueFile << """\
-            <template>
-              <div id="app">Hello World</div>
-            </template>
-            
-            <script>
-            export default {
-              name: 'App',
-            }
-            </script>
-        """
-
-        setup: "create gradle project"
-        settingsFile << "rootProject.name = 'webapp-example'"
-
-        given: "a build file using core-conventions Plugin"
-        buildFile << """
-        plugins {
-          id 'wolkenschloss.conventions.webapp'
-        }
-        """
+    def cleanup() {
+       assert new File(testProjectDir, "build").deleteDir() == true
     }
 
     def "build task should build jar file"() {
@@ -121,5 +53,17 @@ class WebappPluginTest extends Specification {
         dir.exists()
         new File(dir, "index.html").isFile()
         new File(dir, "js").isDirectory()
+    }
+
+    def "unit task should run unit tests"() {
+        when: "running gradle:test"
+        def result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("unit")
+            .withPluginClasspath()
+            .build()
+
+        then: "the outcome of task test is SUCCESS"
+        result.task(":unit").outcome == TaskOutcome.SUCCESS
     }
 }
