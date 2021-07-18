@@ -7,17 +7,8 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'kochbuch',
-    components: {
-      default: Home,
-    }
-  },
-  {
-    path: '/wochenplan',
-    name: 'wochenplan',
-    components: {
-      default: Home,
-    }
+    name: 'Home',
+    component: Home
   },
   {
     path: '/about',
@@ -25,37 +16,30 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    components: {
-      default: () => import('@/views/About.vue'),
-    }
-  },
-  {
-    path: '/details/:id',
-    name: 'details',
-    components: {
-       default: () => import('@/views/Details.vue'),
-    },
-    // Look at here
-    // https://github.com/vuejs/vue-router/issues/1183#issuecomment-281618659
-    props: {
-      default: true,
-    }
-  },
-  {
-    path: '/edit/:id',
-    name: 'edit',
-    components: {
-      default: () => import('@/views/Edit.vue'),
-    },
-    props: {
-      default: true,
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/About.vue')
     }
   },
   {
     path: '/create',
-    components: {
-      default: () => import('@/views/Create.vue'),
+    name: 'Create',
+    component: function () {
+      return import(/* webpackChunkName: "create" */ '../views/Create.vue')
     }
+  },
+  {
+    path: "/recipe/:id",
+    name: "details",
+    props: {default: true },
+    components: {default: () =>
+       import(/* webpackChunkName: "recipe" */ '../views/Recipe.vue')
+    }
+  },
+  {
+    path: "/edit/:id",
+    name: "edit",
+    props: {default: true},
+    components: { default: () => import(/*webpackChungName: 'edit' */ "../views/Edit.vue")}
   }
 ]
 

@@ -1,23 +1,20 @@
 <template>
-<div>
-  <h2>Rezept bearbeiten</h2>
-  <b-form @submit.prevent="onSubmit">
-    <editor v-bind:recipe="this.$data.recipe"></editor>
-    <hr/>
-    <b-button-toolbar aria-label="Edit Recipe Actions" key-nav>
-      <b-button-group>
-        <b-button type="submit" variant="primary">
-          <b-icon></b-icon>Änderungen speichern</b-button>&nbsp;
-        <b-button :to="{name: 'details', params: {id: this.$props.id}}" variant="secondary" >Cancel</b-button>
-      </b-button-group>
-    </b-button-toolbar>
-  </b-form>
-</div>
+  <v-container>
+    <v-card>
+      <v-card-title>Rezept bearbeiten</v-card-title>
+      <v-form @submit.prevent="onSubmit">
+        <editor v-bind:recipe="this.$data.recipe"></editor>
+        <v-btn text type="submit" class="success mt-3 mr-3">Save</v-btn>
+        <v-btn text class="secondary mr-3 mt-3" :to="{name: 'details', params: {id: this.$props.id}}">Cancel</v-btn>
+      </v-form>
+    </v-card>
+  </v-container>
+
 </template>
 
 <script>
+import Editor from "../components/Editor";
 import axios from "axios";
-import Editor from "@/components/recipe/editor";
 
 export default {
   name: "Edit",
@@ -35,30 +32,25 @@ export default {
     load() {
       let url = "/recipe/" + this.$props.id;
       axios.get(url)
-      .then(response => {
-        this.recipe = response.data
-      })
-      .catch(error => {
-        alert(error)
-      })
+          .then(response => {
+            this.recipe = response.data
+          })
+          .catch(error => {
+            alert(error)
+          })
     },
     onSubmit() {
       let url = '/recipe/' + this.$props.id;
       axios.put(url, this.recipe)
-      .then(response => {
-        this.$bvToast.toast('Änderungen gespeichert', {
-          title: 'Rezept',
-          variant: 'success',
-          toaster: 'b-toaster-bottom-full',
-          appendToast: true
-        })
-        this.recipe = response.data
-        this.$router.push({name: 'details', params: { id: this.$props.id }})
-      })
-      .catch(error => {alert(error)})
+          .then(response => {
+            this.recipe = response.data
+            this.$router.push({name: 'details', params: { id: this.$props.id }})
+          })
+          .catch(error => {alert(error)})
     }
   }
 }
+
 </script>
 
 <style scoped>

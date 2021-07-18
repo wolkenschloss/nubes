@@ -3,6 +3,7 @@ build/
 dist/
 **/e2e/videos/
 **/e2e/reports/
+**/e2e/screenshots/
 chromedriver.log
 node_modules/
 
