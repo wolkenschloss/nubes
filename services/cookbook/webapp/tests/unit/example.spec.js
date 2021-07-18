@@ -1,12 +1,26 @@
-import { shallowMount } from '@vue/test-utils'
-import HelloWorld from '@/components/HelloWorld.vue'
+import {createLocalVue, mount, shallowMount} from '@vue/test-utils'
+import App from '@/App.vue'
+import Vuetify from "vuetify";
+import VueRouter from "vue-router";
 
-describe('HelloWorld.vue', () => {
-  it('renders props.msg when passed', () => {
-    const msg = 'new message'
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
+describe('App.vue', () => {
+
+  const localVue = createLocalVue()
+  const router = new VueRouter()
+  localVue.use(VueRouter)
+  let vuetify
+
+  beforeEach(() => {
+    vuetify = new Vuetify()
+  })
+
+  it('renders app title', () => {
+    const wrapper = mount(App, {
+      localVue,
+      vuetify,
+      router
     })
-    expect(wrapper.text()).toMatch(msg)
+    const appTitle = wrapper.find('[data-cy=app-title]')
+    expect(appTitle.text()).toMatch("Wolkenschloss")
   })
 })

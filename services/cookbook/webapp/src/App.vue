@@ -1,10 +1,11 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dark>
-      <v-app-bar-title id="title">Wolkenschloss</v-app-bar-title>
+      <v-app-bar-title data-cy="app-title">Wolkenschloss</v-app-bar-title>
     </v-app-bar>
 
     <v-main>
+      <h1 id="title">Wolkenschloss</h1>
       <router-view/>
     </v-main>
   </v-app>
