@@ -1,14 +1,27 @@
 <template>
-  <v-container>
-    <v-sheet>
-      <h2>Neues Rezept eingeben</h2>
-      <v-form @submit.prevent="onSubmit">
-        <editor v-bind:recipe="this.$data.recipe"></editor>
-        <v-btn text type="submit">Save</v-btn>
-        <v-btn text to="/"><v-icon>mdi-close</v-icon></v-btn>
-      </v-form>
-    </v-sheet>
-  </v-container>
+  <v-row justify="center">
+    <v-dialog v-model="dialog" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
+      <template v-slot:activator="{on, attrs}">
+        <v-btn color="primary" elevation="2" fab bottom left fixed v-bind="attrs" v-on="on">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </template>
+
+    <v-card>
+      <v-toolbar dark color="primary" class="flex-grow-0">
+        <v-btn icon @click="closeDialog">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <v-toolbar-title>New Recipe</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items>
+          <v-btn dark text @click="save">Save</v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <editor v-bind:recipe="this.$data.recipe"></editor>
+    </v-card>
+    </v-dialog>
+  </v-row>
 </template>
 
 <script>
@@ -20,18 +33,25 @@ export default {
   components: {Editor},
   data() {
     return {
-      recipe: {}
+      recipe: {},
+      dialog: false
     }
   },
 
   methods: {
-    onSubmit() {
+    closeDialog() {
+      console.log("Close Dialog")
+      this.dialog = false
+    },
+    save() {
+      console.log("Save Recipe")
       axios.post("/recipe", this.recipe)
       .then(() => {
-        this.$router.push("/")
+        this.closeDialog()
       })
       .catch(error => alert(error))
-    }
+    },
+
   }
 }
 

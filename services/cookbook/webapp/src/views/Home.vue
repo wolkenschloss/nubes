@@ -4,10 +4,7 @@
         <list v-bind:recipes="this.$data.recipes" v-if="recipes"></list>
         <v-skeleton-loader v-else type="list"></v-skeleton-loader>
 
-          <v-btn color="primary" elevation="2" fab bottom left fixed to="/create">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-
+        <create/>
       </v-card>
     </v-container>
 </template>
@@ -18,11 +15,13 @@
 
   import HelloWorld from '../components/HelloWorld'
   import List from "../components/List";
+  import Create from "@/views/Create";
 
   export default {
     name: 'Home',
 
     components: {
+      Create,
       List,
       HelloWorld,
     },
