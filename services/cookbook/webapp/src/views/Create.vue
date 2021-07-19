@@ -18,7 +18,7 @@
           <v-btn dark text @click="save">Save</v-btn>
         </v-toolbar-items>
       </v-toolbar>
-      <editor v-bind:recipe="this.$data.recipe"></editor>
+      <editor v-bind:recipe="this.$data.recipe" class="pa-6"></editor>
     </v-card>
     </v-dialog>
   </v-row>
@@ -40,18 +40,19 @@ export default {
 
   methods: {
     closeDialog() {
-      console.log("Close Dialog")
       this.dialog = false
     },
     save() {
       console.log("Save Recipe")
       axios.post("/recipe", this.recipe)
-      .then(() => {
+      .then(response => {
+        const recipeWithId = response.data
+        this.$emit('created', recipeWithId)
+        this.recipe = {}
         this.closeDialog()
       })
       .catch(error => alert(error))
     },
-
   }
 }
 
