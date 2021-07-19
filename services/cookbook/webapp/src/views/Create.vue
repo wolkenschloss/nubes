@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
+    <v-dialog v-model="dialog" fullscreen hide-overlay scrollable transition="none">
       <template v-slot:activator="{on, attrs}">
         <v-btn color="primary" elevation="2" fab bottom left fixed v-bind="attrs" v-on="on">
           <v-icon>mdi-plus</v-icon>
