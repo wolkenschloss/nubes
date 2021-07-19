@@ -19,7 +19,7 @@ public class RecipeRessource {
 
     @GET
     @Produces(APPLICATION_JSON)
-    public List<Recipe> get() {
+    public List<Recipe> get() throws InterruptedException {
         return service.list();
     }
 
