@@ -1,13 +1,12 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" fullscreen hide-overlay scrollable transition="none">
+    <v-dialog v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile" scrollable max-width="560px" max-height="560px">
       <template v-slot:activator="{on, attrs}">
         <v-btn color="primary" elevation="2" fab bottom left fixed v-bind="attrs" v-on="on">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </template>
-
-    <v-card>
+    <v-card class="mx-auto">
       <v-toolbar dark color="primary" class="flex-grow-0">
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>

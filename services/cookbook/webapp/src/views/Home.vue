@@ -1,6 +1,6 @@
 <template>
     <v-container >
-      <v-card min-height="30vh">
+      <v-card min-height="30vh" class="pa-6">
         <list v-bind:recipes="this.$data.recipes" v-if="recipes && !loading"></list>
         <v-skeleton-loader  color="grey lighten-4" type="list-item" elevation="2" v-for="n in 4" v-if="loading"></v-skeleton-loader>
         <create v-on:created="created"/>
