@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <v-form>
     <v-text-field label="Rezeptname" v-model="recipe.title" prepend-icon="mdi-folder"></v-text-field>
-    <v-textarea solo label="Rezeptzubereitung" v-model="recipe.preparation" prepend-icon="mdi-pencil"></v-textarea>
-  </div>
+    <v-textarea label="Rezeptzubereitung" v-model="recipe.preparation" prepend-icon="mdi-pencil"></v-textarea>
+  </v-form>
 </template>
 
 <script>
