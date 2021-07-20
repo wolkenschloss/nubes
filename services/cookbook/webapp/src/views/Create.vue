@@ -1,9 +1,8 @@
 <template>
-  <v-row justify="center">
     <v-dialog v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile" scrollable max-width="560px" max-height="560px">
       <template v-slot:activator="{on, attrs}">
         <v-btn color="primary" elevation="2" fab bottom left fixed v-bind="attrs" v-on="on">
-          <v-icon>mdi-plus</v-icon>
+          <v-icon>{{fabIcon}}</v-icon>
         </v-btn>
       </template>
     <v-card class="mx-auto">
@@ -11,16 +10,15 @@
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-        <v-toolbar-title>New Recipe</v-toolbar-title>
+        <v-toolbar-title>{{title}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
           <v-btn dark text @click="save">Save</v-btn>
         </v-toolbar-items>
       </v-toolbar>
-      <editor v-bind:recipe="this.$data.recipe" class="pa-6"></editor>
+      <editor v-model="value" class="pa-6"></editor>
     </v-card>
     </v-dialog>
-  </v-row>
 </template>
 
 <script>
@@ -29,28 +27,22 @@ import Editor from "../components/Editor";
 
 export default {
   name: "Create",
+  props: ['fabIcon', 'title', 'value'],
   components: {Editor},
   data() {
     return {
-      recipe: {},
-      dialog: false
+      dialog: false,
+      editable: this.$props.value || {}
     }
   },
-
   methods: {
     closeDialog() {
+      this.$emit('cancel')
       this.dialog = false
     },
     save() {
-      console.log("Save Recipe")
-      axios.post("/recipe", this.recipe)
-      .then(response => {
-        const recipeWithId = response.data
-        this.$emit('created', recipeWithId)
-        this.recipe = {}
-        this.closeDialog()
-      })
-      .catch(error => alert(error))
+      this.$emit('change', this.value)
+      this.dialog = false;
     },
   }
 }

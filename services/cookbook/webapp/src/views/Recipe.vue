@@ -1,26 +1,29 @@
 <template>
-  <v-container>
-  <v-card>
+  <v-card class="ma-8">
     <v-card-title v-text="recipe.title"></v-card-title>
-
     <v-card-text v-text="recipe.preparation"></v-card-text>
     <v-card-actions>
-      <v-btn text class="primary" :to="{name: 'edit', params: {id:this.$props.id}}">Edit</v-btn>
-      <v-btn test class="secondary" v-on:click="remove">Delete</v-btn>
+      <v-btn text v-on:click="remove" >
+        <v-icon>mdi-delete</v-icon>
+        Delete
+      </v-btn>
     </v-card-actions>
+    <create fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"></create>
   </v-card>
-  </v-container>
 </template>
 
 <script>
 import axios from "axios";
+import Create from "@/views/Create";
 
 export default {
   name: "Recipe",
+  components: {Create},
   props: {id: String},
   data() {
     return {
-      recipe: {}
+      recipe: {},
+      copy: {}
     }
   },
   mounted() {
@@ -33,6 +36,7 @@ export default {
       axios.get(url)
       .then(response => {
         this.recipe = response.data
+        this.copy = {...response.data}
       })
       .catch(error => {
         alert(error)
@@ -47,6 +51,19 @@ export default {
           .catch(error => {
             alert(error)
           })
+    },
+    async save(r) {
+      this.recipe = r
+      let url = "/recipe/" + this.$props.id
+      try {
+        await axios.put(url, r)
+        this.recipe = {...r}
+      } catch (error) {
+        alert(error)
+      }
+    },
+    cancel() {
+      this.copy = {...this.recipe}
     }
   }
 }
