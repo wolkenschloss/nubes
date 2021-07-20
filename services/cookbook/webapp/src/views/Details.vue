@@ -1,15 +1,17 @@
 <template>
-  <v-card class="ma-8">
-    <v-card-title v-text="recipe.title"></v-card-title>
-    <v-card-text v-text="recipe.preparation"></v-card-text>
-    <v-card-actions>
-      <v-btn text v-on:click="remove" >
-        <v-icon>mdi-delete</v-icon>
-        Delete
-      </v-btn>
-    </v-card-actions>
-    <edit fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"/>
-  </v-card>
+  <v-expand-transition>
+    <v-card class="ma-8">
+      <v-card-title v-text="recipe.title"></v-card-title>
+      <v-card-text v-text="recipe.preparation"></v-card-text>
+      <v-card-actions>
+        <v-btn text v-on:click="remove">
+          <v-icon>mdi-delete</v-icon>
+          Delete
+        </v-btn>
+      </v-card-actions>
+      <edit fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"/>
+    </v-card>
+  </v-expand-transition>
 </template>
 
 <script>

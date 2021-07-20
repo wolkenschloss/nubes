@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile" scrollable max-width="560px" max-height="560px">
       <template v-slot:activator="{on, attrs}">
-        <v-btn color="primary" elevation="2" fab bottom left fixed v-bind="attrs" v-on="on">
+        <v-btn color="primary" elevation="2" fab bottom left fixed v-on="on">
           <v-icon>{{fabIcon}}</v-icon>
         </v-btn>
       </template>
