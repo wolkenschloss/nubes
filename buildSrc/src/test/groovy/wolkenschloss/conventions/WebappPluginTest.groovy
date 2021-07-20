@@ -115,4 +115,18 @@ class WebappPluginTest extends Specification {
         ! new File(testProjectDir, "build").exists()
         ! new File(testProjectDir, "dist").exists()
     }
+
+
+    def "should not disable optimizations"() {
+
+        when:
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("clean", "build")
+                .withPluginClasspath()
+                .build()
+
+        then:
+        ! result.output.contains("Execution optimizations have been disabled")
+    }
 }
