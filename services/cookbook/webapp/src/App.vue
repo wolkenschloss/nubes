@@ -5,7 +5,9 @@
     </v-app-bar>
 
     <v-main>
-      <router-view/>
+      <v-scale-transition>
+        <router-view/>
+      </v-scale-transition>
     </v-main>
   </v-app>
 </template>

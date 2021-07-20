@@ -21,25 +21,12 @@ const routes = [
     }
   },
   {
-    path: '/create',
-    name: 'Create',
-    component: function () {
-      return import(/* webpackChunkName: "create" */ '../views/Create.vue')
-    }
-  },
-  {
     path: "/recipe/:id",
     name: "details",
     props: {default: true },
     components: {default: () =>
-       import(/* webpackChunkName: "recipe" */ '../views/Recipe.vue')
+       import(/* webpackChunkName: "recipe" */ '../views/Details.vue')
     }
-  },
-  {
-    path: "/edit/:id",
-    name: "edit",
-    props: {default: true},
-    components: { default: () => import(/*webpackChungName: 'edit' */ "../views/Edit.vue")}
   }
 ]
 
