@@ -95,4 +95,38 @@ class WebappPluginTest extends Specification {
         then: "the outcome of task e2e is SUCCESS"
         result.task(":e2e").outcome == TaskOutcome.SUCCESS
     }
+
+    def "should clean build directories"() {
+        given: "run gradle build"
+        GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("build")
+                .withPluginClasspath()
+                .build()
+
+        when:
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("clean")
+                .withPluginClasspath()
+                .build()
+
+        then:
+        ! new File(testProjectDir, "build").exists()
+        ! new File(testProjectDir, "dist").exists()
+    }
+
+
+    def "should not disable optimizations"() {
+
+        when:
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("clean", "build")
+                .withPluginClasspath()
+                .build()
+
+        then:
+        ! result.output.contains("Execution optimizations have been disabled")
+    }
 }

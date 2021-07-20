@@ -51,7 +51,7 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-
+    enabled = true
     testLogging {
         // options for log level LIFECYCLE.
         // LIFECYCLE is gradle's default log level.
