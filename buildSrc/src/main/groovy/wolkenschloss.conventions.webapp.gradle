@@ -11,6 +11,7 @@ var destination = "$buildDir/classes/java/main/META-INF/resources"
 node {
     version = "14.17.1"
     download = true
+    npmInstallCommand = "ci"
 }
 
 sourceSets {
@@ -21,13 +22,13 @@ sourceSets {
 
 def vue = tasks.register("vue", NpxTask) {
 
-    def npmInstall = tasks.named NpmInstallTask.NAME
-    dependsOn npmInstall
     group = "build"
     description = "build vue application"
+
+    dependsOn tasks.named(NpmInstallTask.NAME)
+
     command = "vue-cli-service"
     args = ["build", "--dest", destination]
-    // , "babel.config.js"
     inputs.files "package.json", "package-lock.json", "vue.config.js"
     inputs.dir "src"
     outputs.dir destination
@@ -59,10 +60,5 @@ def e2e = tasks.register("e2e", NpxTask) {
     inputs.dir "tests/e2e"
 }
 
-tasks.named("build").configure({
-    dependsOn vue
-})
-
-tasks.named("check").configure({
-    dependsOn unit, e2e
-})
+build.dependsOn vue
+check.dependsOn unit, e2e

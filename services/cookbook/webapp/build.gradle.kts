@@ -11,7 +11,7 @@ tasks {
 }
 
 tasks {
-    named<NpxTask>("vue") {
-        inputs.files("cypress.config.js", "jest.config.json")
+    named<NpxTask>("e2e") {
+        inputs.files("cypress.config.js")
     }
 }
