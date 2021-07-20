@@ -11,6 +11,7 @@ var destination = "$buildDir/classes/java/main/META-INF/resources"
 node {
     version = "14.17.1"
     download = true
+    npmInstallCommand = "ci"
 }
 
 sourceSets {
