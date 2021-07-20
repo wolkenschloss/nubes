@@ -1,53 +1,49 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title>Rezept bearbeiten</v-card-title>
-      <v-form @submit.prevent="onSubmit">
-        <editor v-bind:recipe="this.$data.recipe"></editor>
-        <v-btn text type="submit" class="success mt-3 mr-3">Save</v-btn>
-        <v-btn text class="secondary mr-3 mt-3" :to="{name: 'details', params: {id: this.$props.id}}">Cancel</v-btn>
-      </v-form>
+    <v-dialog v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile" scrollable max-width="560px" max-height="560px">
+      <template v-slot:activator="{on, attrs}">
+        <v-btn color="primary" elevation="2" fab bottom left fixed v-bind="attrs" v-on="on">
+          <v-icon>{{fabIcon}}</v-icon>
+        </v-btn>
+      </template>
+    <v-card class="mx-auto">
+      <v-toolbar dark color="primary" class="flex-grow-0">
+        <v-btn icon @click="closeDialog">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <v-toolbar-title>{{title}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items>
+          <v-btn dark text @click="save">Save</v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <editor v-model="value" class="pa-6"></editor>
     </v-card>
-  </v-container>
-
+    </v-dialog>
 </template>
 
 <script>
-import Editor from "../components/Editor";
 import axios from "axios";
+import Editor from "../components/Editor";
 
 export default {
   name: "Edit",
+  props: ['fabIcon', 'title', 'value'],
   components: {Editor},
-  props: {id: String},
   data() {
     return {
-      recipe: {}
+      dialog: false,
+      editable: this.$props.value || {}
     }
-  },
-  mounted() {
-    this.load()
   },
   methods: {
-    load() {
-      let url = "/recipe/" + this.$props.id;
-      axios.get(url)
-          .then(response => {
-            this.recipe = response.data
-          })
-          .catch(error => {
-            alert(error)
-          })
+    closeDialog() {
+      this.$emit('cancel')
+      this.dialog = false
     },
-    onSubmit() {
-      let url = '/recipe/' + this.$props.id;
-      axios.put(url, this.recipe)
-          .then(response => {
-            this.recipe = response.data
-            this.$router.push({name: 'details', params: { id: this.$props.id }})
-          })
-          .catch(error => {alert(error)})
-    }
+    save() {
+      this.$emit('change', this.value)
+      this.dialog = false;
+    },
   }
 }
 

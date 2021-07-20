@@ -8,17 +8,17 @@
         Delete
       </v-btn>
     </v-card-actions>
-    <create fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"></create>
+    <edit fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"/>
   </v-card>
 </template>
 
 <script>
 import axios from "axios";
-import Create from "@/views/Create";
+import Edit from "@/views/Edit";
 
 export default {
   name: "Recipe",
-  components: {Create},
+  components: {Edit},
   props: {id: String},
   data() {
     return {

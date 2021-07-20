@@ -2,7 +2,7 @@
   <v-container>
     <list v-bind:recipes="this.$data.recipes" v-if="recipes && !loading"></list>
     <v-skeleton-loader color="lighten-4" type="list-item" elevation="2" v-for="n in 10"  v-if="loading"/>
-    <create fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel"/>
+    <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel"/>
   </v-container>
 </template>
 
@@ -12,13 +12,13 @@ import axios from "axios";
 
 import HelloWorld from '../components/HelloWorld'
 import List from "../components/List";
-import Create from "@/views/Create";
+import Edit from "@/views/Edit";
 
 export default {
   name: 'Home',
 
   components: {
-    Create,
+    Edit,
     List,
     HelloWorld,
   },
