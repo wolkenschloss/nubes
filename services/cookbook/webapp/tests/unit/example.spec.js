@@ -23,4 +23,8 @@ describe('App.vue', () => {
     const appTitle = wrapper.find('[data-cy=app-title]')
     expect(appTitle.text()).toMatch("Wolkenschloss")
   })
+
+  describe('inner describe', () => {
+    it('should be something', () => {})
+  })
 })
