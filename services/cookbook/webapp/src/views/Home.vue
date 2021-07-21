@@ -9,10 +9,9 @@
 <script>
 
 import axios from "axios";
-
-import HelloWorld from '../components/HelloWorld'
-import List from "../components/List";
 import Edit from "@/views/Edit";
+
+import List from "../components/List";
 
 export default {
   name: 'Home',
@@ -20,7 +19,6 @@ export default {
   components: {
     Edit,
     List,
-    HelloWorld,
   },
 
   data() {
