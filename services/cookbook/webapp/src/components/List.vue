@@ -7,7 +7,7 @@
               <v-list-item-title v-text="recipe.title"></v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-        <v-divider v-if="index < recipes.length -1" :key="index"></v-divider>
+        <v-divider v-if="index < recipes.length -1"></v-divider>
       </template>
     </v-list-item-group>
   </v-list>

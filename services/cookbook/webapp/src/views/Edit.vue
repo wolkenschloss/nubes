@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import axios from "axios";
+
 import Editor from "../components/Editor";
 
 export default {
