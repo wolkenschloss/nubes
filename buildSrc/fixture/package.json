@@ -18,6 +18,7 @@
     "@vue/test-utils": "^1.0.3",
     "chromedriver": "91",
     "geckodriver": "^1.20.0",
+    "jest-junit": "^12.2.0",
     "vue-template-compiler": "^2.6.11"
   },
   "browserslist": [
@@ -26,6 +27,14 @@
     "not dead"
   ],
   "jest": {
-    "preset": "@vue/cli-plugin-unit-jest/presets/no-babel"
+    "preset": "@vue/cli-plugin-unit-jest/presets/no-babel",
+    "reporters": [
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "build/reports/tests/unit"
+        }
+      ]
+    ]
   }
 }

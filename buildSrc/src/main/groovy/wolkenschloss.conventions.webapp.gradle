@@ -29,9 +29,18 @@ def vue = tasks.register("vue", NpxTask) {
 
     command = "vue-cli-service"
     args = ["build", "--dest", destination]
-    inputs.files "package.json", "package-lock.json", "vue.config.js"
-    inputs.dir "src"
-    outputs.dir destination
+
+    inputs.files("package.json", "package-lock.json", "vue.config.js")
+        .withPropertyName("configFiles")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.dir("src")
+        .withPropertyName("scripts")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    outputs.cacheIf { true }
+    outputs.dir(destination)
+        .withPropertyName("resources")
 }
 
 def unit = tasks.register("unit", NpxTask) {
@@ -42,9 +51,21 @@ def unit = tasks.register("unit", NpxTask) {
 
     command = "vue-cli-service"
     args = ["test:unit"]
-    inputs.files "package.json", "package-lock.json", "vue.config.js", "jest.config.js"
-    inputs.dir "src"
-    inputs.dir "tests/unit"
+    inputs.files("package.json", "package-lock.json", "vue.config.js", "jest.config.js")
+            .withPropertyName("configFiles")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.dir("src")
+            .withPropertyName("scripts")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.dir("tests/unit")
+            .withPropertyName("tests")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    outputs.cacheIf { true }
+    outputs.dir("$buildDir/reports/tests/unit")
+            .withPropertyName("reports")
 }
 
 def e2e = tasks.register("e2e", NpxTask) {
@@ -55,9 +76,22 @@ def e2e = tasks.register("e2e", NpxTask) {
 
     command = "vue-cli-service"
     args = ["test:e2e", "--headless"]
-    inputs.files "package.json", "package-lock.json", "vue.config.js"
-    inputs.dir "src"
-    inputs.dir "tests/e2e"
+    inputs.files("package.json", "package-lock.json", "vue.config.js")
+            .withPropertyName("configFiles")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.dir("src")
+            .withPropertyName("scripts")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    inputs.dir("tests/e2e")
+            .withPropertyName("tests")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    outputs.cacheIf { true }
+    outputs.dir("$buildDir/reports/tests/e2e")
+        .withPropertyName("reports")
+
 }
 
 build.dependsOn vue

@@ -82,6 +82,8 @@ class WebappPluginTest extends Specification {
 
         then: "the outcome of task test is SUCCESS"
         result.task(":unit").outcome == TaskOutcome.SUCCESS
+        new File(testProjectDir, "build/reports/tests/unit").exists()
+        new File(testProjectDir, "build/reports/tests/unit/junit.xml").exists()
     }
 
     def "e2e task should run e2e tests"() {
@@ -94,6 +96,12 @@ class WebappPluginTest extends Specification {
 
         then: "the outcome of task e2e is SUCCESS"
         result.task(":e2e").outcome == TaskOutcome.SUCCESS
+
+
+        and: "report dir should exists and contain two files"
+        def reportDir = new File(testProjectDir, "build/reports/tests/e2e")
+        reportDir.exists()
+        reportDir.list().length == 2
     }
 
     def "should clean build directories"() {
@@ -110,6 +118,8 @@ class WebappPluginTest extends Specification {
                 .withArguments("clean")
                 .withPluginClasspath()
                 .build()
+
+        result.task(":clean").outcome == TaskOutcome.SUCCESS
 
         then:
         ! new File(testProjectDir, "build").exists()
