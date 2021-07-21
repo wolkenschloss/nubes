@@ -6,16 +6,11 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import org.apache.http.HttpStatus;
-import org.bson.types.ObjectId;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -52,7 +47,7 @@ public class RecipeTests {
     }
 
     @Test
-    void postRecipeTest() throws URISyntaxException {
+    void postRecipeTest() {
 
         var recipe = new Recipe("Schrankmuscheleintopf", "Das gibt es nicht");
         var id = UUID.randomUUID();
@@ -73,34 +68,5 @@ public class RecipeTests {
 
         Mockito.verify(service, Mockito.times(1)).save(Mockito.any(Recipe.class));
         Mockito.verifyNoMoreInteractions(service);
-    }
-
-
-    private static class UriMatcher extends TypeSafeMatcher<URI> {
-
-        private final URI expected;
-
-        public UriMatcher(URI expected) {
-            this.expected = expected;
-        }
-
-        public static UriMatcher matchesLocation(URL baseUri, ObjectId id) throws URISyntaxException {
-            var expected = UriBuilder
-                    .fromUri(baseUri.toURI())
-                    .path(id.toString())
-                    .build();
-
-            return new UriMatcher(expected);
-        }
-
-        @Override
-        protected boolean matchesSafely(URI item) {
-            return item.equals(expected);
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendValue(expected);
-        }
     }
 }
