@@ -17,14 +17,14 @@ public class RecipeServiceTest {
     RecipeRepository recipeRepository;
 
     @Inject
-    RecipeService recipeService;
+    RecipeService subjectUnderTest;
 
-    Recipe subjectUnderTest = null;
+    Recipe recipe = null;
 
     @BeforeEach
     public void recipeWithNoIngredients() {
-        subjectUnderTest = new Recipe("Luft", "Zum Leben brauche ich nur Luft und Liebe.");
-        subjectUnderTest.recipeId = UUID.randomUUID();
+        recipe = new Recipe("Luft", "Zum Leben brauche ich nur Luft und Liebe.");
+        recipe.recipeId = UUID.randomUUID();
     }
 
     @AfterEach
@@ -35,21 +35,21 @@ public class RecipeServiceTest {
     @DisplayName("'get' should return value if exists")
     public void testNewRecipe() {
 
-        Assertions.assertNotNull(subjectUnderTest);
-        Assertions.assertNotNull(subjectUnderTest.recipeId);
+        Assertions.assertNotNull(recipe);
+        Assertions.assertNotNull(recipe.recipeId);
 
 
-        Mockito.when(recipeRepository.findById(subjectUnderTest.recipeId))
-                .thenReturn(subjectUnderTest);
+        Mockito.when(recipeRepository.findById(recipe.recipeId))
+                .thenReturn(recipe);
 
 
-         var recipe = recipeService
-                .get(subjectUnderTest.recipeId)
+         var recipe = subjectUnderTest
+                .get(this.recipe.recipeId)
                 .orElseThrow(AssertionFailedError::new);
 
-         Assertions.assertEquals(recipe, subjectUnderTest);
+         Assertions.assertEquals(recipe, this.recipe);
 
-        Mockito.verify(recipeRepository, Mockito.times(1)).findById(subjectUnderTest.recipeId);
+        Mockito.verify(recipeRepository, Mockito.times(1)).findById(this.recipe.recipeId);
 
     }
 
@@ -57,8 +57,8 @@ public class RecipeServiceTest {
     @DisplayName("'get' should not return value if missing'")
     public void testNewRecipe2() {
 
-        Assertions.assertNotNull(subjectUnderTest);
-        Assertions.assertNotNull(subjectUnderTest.recipeId);
+        Assertions.assertNotNull(recipe);
+        Assertions.assertNotNull(recipe.recipeId);
 
         var anotherId = UUID.randomUUID();
 
@@ -66,24 +66,30 @@ public class RecipeServiceTest {
                 .thenReturn(null);
 
 
-        var recipe = recipeService
+        var recipe = subjectUnderTest
                 .get(anotherId);
 
-        Assertions.assertEquals(recipe.isPresent(), false);
+        Assertions.assertFalse(recipe.isPresent());
 
         Mockito.verify(recipeRepository, Mockito.times(1)).findById(anotherId);
     }
 
     @Test
+    @DisplayName("'save' should persist recipe Entity")
     public void testShouldSaveRecipeWithoutIngredients() {
-        var recipe = new Recipe();
         try {
-            recipeService.save(recipe);
+            subjectUnderTest.save(recipe);
             Assertions.assertTrue(true);
         } catch (Exception e) {
             Assertions.fail();
         }
 
         Mockito.verify(recipeRepository, Mockito.times(1)).persist(recipe);
+    }
+
+    @Test
+    @DisplayName("'save' can throw exception")
+    public void testCanThrowException() {
+
     }
 }

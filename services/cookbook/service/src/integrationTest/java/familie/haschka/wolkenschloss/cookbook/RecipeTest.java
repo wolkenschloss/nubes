@@ -6,13 +6,27 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
+import javax.ws.rs.core.UriBuilder;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -20,9 +34,9 @@ import static org.hamcrest.Matchers.*;
 @QuarkusIntegrationTest
 @QuarkusTestResource(value = MongoDbResource.class, restrictToAnnotatedClass = true)
 @DisplayName("Recipe CRUD Operations")
-public class FirstIntegrationTest {
+public class RecipeTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(FirstIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RecipeTest.class);
 
     @Test
     public void checkDefaultHttpPort() {
@@ -51,38 +65,78 @@ public class FirstIntegrationTest {
     }
 
     @BeforeEach
-    public void createRecipe() {
+    public void createRecipe() throws URISyntaxException, IOException {
+        var str = readFixture("fixtures/schlammkrabbeneintopf.json");
 
-        var recipe = "{\"title\": \"Schlammkrabbeneintopf\", \"preparation\": \"Bekannt.\"}";
-
+        // POST /recipe valid data
         response = RestAssured
                 .given()
-                    .body(recipe)
-                    .contentType(ContentType.JSON)
-                    .log().all()
+                .body(str)
+                .contentType(ContentType.JSON)
+                .log().all()
                 .when()
-                    .post(getUrl())
+                .post(getUrl())
                 .then()
-                    .statusCode(HttpStatus.SC_CREATED)
+                .statusCode(HttpStatus.SC_CREATED)
                     .header("Location", response -> equalTo(getUrl() + "/" + response.path("recipeId")));
     }
 
     @Test
-    @DisplayName("Read Recipe")
+    @DisplayName("POST /recipe invalid data => 400")
+    public void testCreateInvalid() throws URISyntaxException, IOException {
+        var str = readFixture("fixtures/invalid.json");
+
+        RestAssured
+                .given()
+                .body(str)
+                .contentType(ContentType.JSON)
+                .log().all()
+                .when()
+                .post(getUrl())
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    @DisplayName("GET /recipe/:id")
     public void readRecipe() {
 
         RestAssured
                 .given()
+                .log().all()
                 .when()
-                    .get(response.extract().header("Location"))
+                .get(response.extract().header("Location"))
                 .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .body("title", equalTo("Schlammkrabbeneintopf"))
+                .statusCode(HttpStatus.SC_OK)
+                .body("title", equalTo("Schlammkrabbeneintopf"))
+                .body("ingredients", hasItems("Schlammkrabbenchitin", "Pfeffer", "Salz", "Frostmirriam"))
                     .body("preparation", equalTo("Bekannt."));
     }
 
     @Test
-    @DisplayName("Read all Recipes")
+    @DisplayName("GET /recipe/:id invalid id")
+    public void readRecipeInvalidId() {
+
+        var url = URI.create(getUrl());
+
+        // UriBuild.path ersetzt nicht, sondern fügt hinzu
+        var uriWithInvalidId = UriBuilder.fromUri(url)
+                .path(UUID.randomUUID().toString())
+                .build();
+
+        Assertions.assertFalse(uriWithInvalidId.toString().startsWith("http://localhost:8081/recipe/recipe"));
+
+        RestAssured
+                .given()
+                .log().all()
+                .when()
+                .get(uriWithInvalidId)
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("GET /recipe")
     public void listRecipes() {
 
         String id = response.extract().path("recipeId");
@@ -145,7 +199,7 @@ public class FirstIntegrationTest {
     }
 
     @Test
-    @DisplayName("Patch Recipe")
+    @DisplayName("PATCH /recipe/:id - change title")
     public void patchRecipe() {
 
         String location = response.extract().header("Location");
@@ -176,11 +230,22 @@ public class FirstIntegrationTest {
         // des Rezept erhalten.
         RestAssured
                 .given()
-                    .accept(ContentType.JSON)
+                .accept(ContentType.JSON)
                 .when()
-                    .get(location)
+                .get(location)
                 .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .body("title", equalTo("Schneebeeren-Crostata"));
+                .statusCode(HttpStatus.SC_OK)
+                .body("title", equalTo("Schneebeeren-Crostata"));
+    }
+
+    private String readFixture(String resourceFileName) throws URISyntaxException, IOException {
+        URL resource = getClass().getClassLoader().getResource(resourceFileName);
+
+        if (resource == null) {
+            throw new FileNotFoundException(resourceFileName);
+        }
+
+        File file = new File(resource.toURI());
+        return Files.readString(file.toPath());
     }
 }
