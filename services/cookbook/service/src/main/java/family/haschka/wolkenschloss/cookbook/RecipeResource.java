@@ -12,7 +12,7 @@ import java.util.UUID;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/recipe")
-public class RecipeRessource {
+public class RecipeResource {
 
     @Inject
     RecipeService service;

@@ -19,12 +19,12 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
-public class RecipeTests {
+public class RecipeResourceTest {
 
     @InjectMock
     RecipeService service;
 
-    @TestHTTPEndpoint(RecipeRessource.class)
+    @TestHTTPEndpoint(RecipeResource.class)
     @TestHTTPResource
     URL url;
 
