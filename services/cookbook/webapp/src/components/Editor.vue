@@ -2,8 +2,7 @@
   <v-form>
     <v-text-field label="Rezeptname" v-model="model.title" prepend-icon="mdi-folder"></v-text-field>
     <v-textarea label="Rezeptzubereitung" v-model="model.preparation" prepend-icon="mdi-pencil"></v-textarea>
-    <!--suppress JSUnusedLocalSymbols -->
-    <v-text-field v-for="(ingredient, index) in model.ingredients" :key="index" v-model="model.ingredients[index]">
+    <v-text-field v-for="index in Object.keys(model.ingredients || {}).length" :key="index" v-model="model.ingredients[index - 1]">
       <template v-slot:append>
         <v-btn text icon @click="deleteIngredient(index)">
           <v-icon>mdi-delete</v-icon>
