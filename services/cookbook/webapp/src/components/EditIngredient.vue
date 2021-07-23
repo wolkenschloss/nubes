@@ -1,36 +1,20 @@
 <template>
-  <v-dialog v-model="value.active" :fullscreen="$vuetify.breakpoint.mobile" scrollable max-width="560px" max-height="560px">
-    <v-card>
-      <v-toolbar dark color="primary" class="flex-grow-0">
-        <v-btn icon @click="cancel">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>Edit Ingredient</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-toolbar-items @click="save">
-          <v-btn dark text>Save</v-btn>
-        </v-toolbar-items>
-      </v-toolbar>
-        <v-card-title>Edit Ingredient</v-card-title>
-
-      <v-card-text>
-        <v-row>
-          <v-col>
-        <v-text-field label="Quantity" v-model="value.ingredient.quantity"></v-text-field>
-          </v-col>
-          <v-col>
-        <v-select :items="units" label="Unit" v-model="value.ingredient.unit">
-          <template v-slot:selection="{item}">
-            <span>{{item.value}}</span>
-          </template>
-        </v-select>
-          </v-col>
-        </v-row>
-        <v-text-field label="Ingredient" persistent-hint v-model="value.ingredient.name">
-        </v-text-field>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <v-row class="mt-1">
+    <v-col cols="2">
+  <v-text-field dense label="Quantity" v-model="value.quantity"></v-text-field>
+    </v-col>
+    <v-col cols="2">
+      <v-select dense :items="units" label="Unit" v-model="value.unit">
+        <template v-slot:selection="{item}">
+          <span>{{ item.value }}</span>
+        </template>
+      </v-select>
+    </v-col>
+    <v-col>
+      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name">
+      </v-text-field>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
