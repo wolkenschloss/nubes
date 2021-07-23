@@ -1,6 +1,6 @@
 <template>
-  <v-expand-transition>
-    <v-card class="ma-8 pa-8">
+
+    <v-card class="ma-4 pa-4" flat>
       <v-card-title v-text="recipe.title"></v-card-title>
       <v-card-text v-text="recipe.preparation"></v-card-text>
 
@@ -30,7 +30,7 @@
       </v-card-actions>
       <edit fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"/>
     </v-card>
-  </v-expand-transition>
+
 </template>
 
 <script>
