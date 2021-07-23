@@ -1,6 +1,8 @@
 package family.haschka.wolkenschloss.cookbook;
 
 
+import org.jboss.logging.Logger;
+
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -15,11 +17,14 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class RecipeResource {
 
     @Inject
+    Logger logger;
+
+    @Inject
     RecipeService service;
 
     @GET
     @Produces(APPLICATION_JSON)
-    public List<Recipe> get() throws InterruptedException {
+    public List<Recipe> get() {
         return service.list();
     }
 
@@ -27,6 +32,7 @@ public class RecipeResource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response post(Recipe recipe, @Context UriInfo uriInfo) {
+        logger.infov("POST /recipe {0}", recipe);
         recipe.recipeId = UUID.randomUUID();
         service.save(recipe);
 

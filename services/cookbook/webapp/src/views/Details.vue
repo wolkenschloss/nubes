@@ -14,7 +14,9 @@
           </template>
           <v-list-item v-for="(ingredient, index) in recipe.ingredients" :key="index">
             <v-list-item-content>
-              <v-list-item-title v-text="ingredient"></v-list-item-title>
+              <v-list-item-title>
+                {{ingredient.quantity}} {{ingredient.unit}} {{ingredient.name}}
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>

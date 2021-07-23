@@ -25,7 +25,7 @@ export default {
     return {
       recipes: {},
       loading: true,
-      recipe: {}
+      recipe: {ingredients: []}
     }
   },
   async mounted() {
@@ -33,14 +33,14 @@ export default {
   },
   methods: {
     cancel() {
-      this.recipe = {}
+      this.recipe = {ingredients: []}
     },
     async created(recipe) {
       let uri = "/recipe"
       try {
         await axios.post(uri, recipe)
         await this.loadRecipes();
-        this.recipe = {}
+        this.recipe = {ingredients: []}
       } catch (error) {
         alert(error)
       }

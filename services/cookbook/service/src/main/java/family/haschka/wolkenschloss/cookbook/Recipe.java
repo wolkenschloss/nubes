@@ -13,7 +13,7 @@ public class Recipe {
 
     public String title;
     public String preparation;
-    public List<String> ingredients = NoIngredients;
+    public List<Ingredient> ingredients = NoIngredients;
 
     protected Recipe() {}
 
@@ -23,5 +23,5 @@ public class Recipe {
         this.preparation = preparation;
     }
 
-    static List<String> NoIngredients = List.of();
+    static List<Ingredient> NoIngredients = List.of();
 }
