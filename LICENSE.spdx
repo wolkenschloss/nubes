@@ -1,6 +1,6 @@
 SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
-PackageName: family.haschka.wolkenschloss.mycloud
+PackageName: family.haschka.wolkenschloss.nubes
 PackageOriginator: Matthias Haschka
-PackageHomePage: https://github.com/wolkenschloss/mycloud
+PackageHomePage: https://github.com/wolkenschloss/nubes
 PackageLicenseDeclared: Apache-2.0

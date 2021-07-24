@@ -8,6 +8,6 @@ buildscript {
 }
 
 allprojects {
-    group = "family.haschka.mycloud"
+    group = "family.haschka.nubes"
     version = "0.0.1-SNAPSHOT"
 }

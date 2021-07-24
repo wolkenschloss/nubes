@@ -1,5 +1,5 @@
 plugins {
-    id 'mycloud.java-conventions'
+    id 'wolkenschloss.conventions.java'
     id 'java-library'
 }
 

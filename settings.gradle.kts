@@ -1,4 +1,4 @@
-rootProject.name = "mycloud"
+rootProject.name = "nubes"
 
 include ("services:cookbook:service",
         "services:cookbook:webapp",

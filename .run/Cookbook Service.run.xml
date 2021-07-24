@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Cookbook Service" type="QuarkusRunConfigurationType" factoryName="Quarkus">
-    <module name="mycloud.services.cookbook.service.main" />
+    <module name="nubes.services.cookbook.service.main" />
     <QsGradleRunConfiguration>
       <ExternalSystemSettings>
         <option name="executionName" />

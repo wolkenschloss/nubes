@@ -1,1 +1,1 @@
-rootProject.name = "wolkenschloss-conventions"
+rootProject.name = "conventions"

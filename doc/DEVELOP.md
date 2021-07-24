@@ -1,7 +1,7 @@
 # Develop
 
 Dieser Artikel beschreibt die Voraussetzungen zur Mitarbeit an
-*Wolkenschloss/mycloud*. Diese Beschreibung setzt voraus, dass Du Ubuntu 20.04
+*Wolkenschloss/nubes*. Diese Beschreibung setzt voraus, dass Du Ubuntu 20.04
 Desktop verwendest. Benutzt Du etwas anderes, bist Du auf Dich allein gestellt.
 
 ## Entwicklungsumgebung
@@ -145,7 +145,7 @@ der Webanwendung benötigt.
 
 1. Ein Issue im Projekt in den Status *in progress* setzen.
 2. Auf dem Entwicklungsrechner einen neuen Feature-Branch anlegen. Der Name des 
-   Branches soll der Konvention `mycloud-#` folgen, wobei *#* 
+   Branches soll der Konvention `nubes-#` folgen, wobei *#* 
    der Nummer des Issues aus Schritt 1 entspricht. In IntelliJ kannst Du 
    `Tools -> Tasks & Contexts -> Open Task` verwenden, wenn Du IntelliJ 
    entsprechend eingerichtet hast.
@@ -154,7 +154,7 @@ der Webanwendung benötigt.
    [Conventional Commit Messages][conventional commits] verwenden.
 4. Pull-Request erstellen und den Pull-Request mit dem bearbeiteten Issue 
    und Projekt verlinken. Der Pull-Request soll den Feature-Branch 
-   *mycloud-#* inden *master* Branch zusammenführen.
+   *nubes-#* inden *master* Branch zusammenführen.
 5. Review des Pull-Requests. Den Pull-Request in den Status *Review 
    in Progress* setzen. 
 6. Anmerkungen ggf. Nacharbeiten und Änderungen einchecken.

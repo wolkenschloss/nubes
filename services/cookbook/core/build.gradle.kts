@@ -2,4 +2,4 @@ plugins {
     id("wolkenschloss.conventions.core")
 }
 
-group = "family.haschka.mycloud.cookbook"
+group = "family.haschka.nubes.cookbook"

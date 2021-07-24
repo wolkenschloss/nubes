@@ -1,5 +1,5 @@
 plugins {
-    id("mycloud.service-conventions")
+    id("wolkenschloss.conventions.service")
 }
 
 dependencies {
