@@ -5,6 +5,35 @@ Dieser Artikel beschreibt die Voraussetzungen zur Mitarbeit an
 Desktop verwendest. Benutzt Du etwas anderes, bist Du auf Dich allein gestellt.
 
 ## Entwicklungsumgebung
+### Testumgebung
+* E2E Tests (cypress): sudo apt install -y xvfb libxss1
+* QuarkusTest (): sudo apt install 
+
+```bash
+sudo apt install -y xvfb libxss1
+
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
+
+# ggf. alte Docker Version entfernen
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+# Docker installieren
+sudo apt update
+sudo apt upgrade
+sudo apt-get install     apt-transport-https     ca-certificates     curl     gnupg     lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   
+sudo apt update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo usermod -aG docker $USER
+
+sudo reboot
+docker info
+```
 
 ### SSH Schlüsselpaar
 
