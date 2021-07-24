@@ -15,6 +15,9 @@ quarkus:
         level: WARN
       "io.quarkus.deployment.**":
         level: ERROR
+resteasy:
+  patchfilter:
+    legacy: true
 
 "%dev":
    quarkus:

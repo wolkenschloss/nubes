@@ -71,7 +71,6 @@ public class RecipeTest {
                 .given()
                 .body(str)
                 .contentType(ContentType.JSON)
-                .log().all()
                 .when()
                 .post(getUrl())
                 .then()
@@ -88,7 +87,6 @@ public class RecipeTest {
                 .given()
                 .body(str)
                 .contentType(ContentType.JSON)
-                .log().all()
                 .when()
                 .post(getUrl())
                 .then()
@@ -101,7 +99,6 @@ public class RecipeTest {
 
         RestAssured
                 .given()
-                .log().all()
                 .when()
                 .get(response.extract().header("Location"))
                 .then()
@@ -126,7 +123,6 @@ public class RecipeTest {
 
         RestAssured
                 .given()
-                .log().all()
                 .when()
                 .get(uriWithInvalidId)
                 .then()
