@@ -1,4 +1,4 @@
-package wolkenschloss.cookbook.core;
+package family.haschka.nubes.cookbook.core;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
