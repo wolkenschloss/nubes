@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.jboss.logging.Logger;
+
 @ApplicationScoped
 public class RecipeService {
+
+    @Inject
+    Logger logger;
 
     @Inject
     RecipeRepository recipeRepository;

@@ -3,6 +3,7 @@ package family.haschka.wolkenschloss.cookbook;
 import io.quarkus.mongodb.panache.MongoEntity;
 import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.util.List;
 import java.util.UUID;
 
 @MongoEntity
@@ -12,6 +13,7 @@ public class Recipe {
 
     public String title;
     public String preparation;
+    public List<Ingredient> ingredients = NoIngredients;
 
     protected Recipe() {}
 
@@ -20,4 +22,6 @@ public class Recipe {
         this.title = title;
         this.preparation = preparation;
     }
+
+    static List<Ingredient> NoIngredients = List.of();
 }
