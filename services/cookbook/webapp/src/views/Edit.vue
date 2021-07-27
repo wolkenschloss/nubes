@@ -14,7 +14,7 @@
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
-          <v-btn dark text @click="save">Save</v-btn>
+          <v-btn dark text @click="save" v-bind:disabled="!valid">Save</v-btn>
         </v-toolbar-items>
         <template v-slot:extension>
           <v-tabs v-model="tab" fixed-tabs>
@@ -34,11 +34,12 @@
 
       </v-toolbar>
       <v-card-title>Edit Recipe</v-card-title>
-      <v-card-title></v-card-title>
       <v-card-text style="height: 560px" class="mt-6">
+        data.valid = {{valid}}
+        <v-form v-model="valid">
         <v-tabs-items v-model="tab">
           <v-tab-item key="0">
-            <v-text-field label="Title" v-model="value.title"></v-text-field>
+            <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
           </v-tab-item>
           <v-tab-item key="1">
             <v-expansion-panels class="pa-2" v-model="ingredientPanel">
@@ -63,6 +64,7 @@
             <v-textarea label="Preparation" v-model="value.preparation" prepend-icon="mdi-pencil"></v-textarea>
           </v-tab-item>
         </v-tabs-items>
+        </v-form>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -95,7 +97,11 @@ export default {
       ingredientPanel: null,
       tab: null,
       dialog: false,
-      editable: this.$props.value || {}
+      editable: this.$props.value || {},
+      titleRules: [
+          v => !!v || "Title is required"
+      ],
+      valid: false
     }
   },
   methods: {
