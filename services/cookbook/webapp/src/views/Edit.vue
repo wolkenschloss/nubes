@@ -35,7 +35,6 @@
       </v-toolbar>
       <v-card-title>Edit Recipe</v-card-title>
       <v-card-text style="height: 560px" class="mt-6">
-        data.valid = {{valid}}
         <v-form v-model="valid">
         <v-tabs-items v-model="tab">
           <v-tab-item key="0">
@@ -55,7 +54,10 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <edit-ingredient v-model="value.ingredients[index]"></edit-ingredient>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
                   <v-btn text color="secondary" @click="removeIngredient(index)">Remove Item</v-btn>
+                  </v-card-actions>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
