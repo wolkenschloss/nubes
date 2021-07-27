@@ -5,9 +5,8 @@
         <v-icon>{{ fabIcon }}</v-icon>
       </v-btn>
     </template>
-
-    <v-card class="fab-container">
-      <v-toolbar dark color="primary" extended>
+    <v-card class="fab-container" height="560px">
+      <v-toolbar dark color="primary">
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -33,15 +32,14 @@
         </template>
 
       </v-toolbar>
-      <v-card-title>Edit Recipe</v-card-title>
-      <v-card-text style="height: 560px" class="mt-6">
+        <v-card-text  class="mt-6 fullscreen" >
         <v-form v-model="valid">
         <v-tabs-items v-model="tab">
           <v-tab-item key="0">
             <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
           </v-tab-item>
           <v-tab-item key="1">
-            <v-expansion-panels class="pa-2" v-model="ingredientPanel">
+            <v-expansion-panels class="pa-1" v-model="ingredientPanel">
               <v-expansion-panel v-for="(ingredient, index) in value.ingredients" :key="index">
                 <v-expansion-panel-header>
                   <template v-slot:default="{open}">
@@ -132,4 +130,8 @@ export default {
 .fab-container {
   position: relative;
 }
+.fullscreen {
+  height: 100vh;
+}
+
 </style>

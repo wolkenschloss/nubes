@@ -16,14 +16,13 @@
     </v-col>
   </v-row>
 </template>
-
 <script>
+
 export default {
   name: "EditIngredient",
   props: ['value'],
   data() {
     return {
-      valid: false,
       // https://en.wikibooks.org/wiki/Cookbook:Units_of_measurement
       units: [
 
@@ -60,7 +59,7 @@ export default {
       ],
       quantityRules: [
           v => (!this.$props.value.unit || !!v) || "Unit requires quantity",
-          v => /^([1-9][0-9]*)*$/g.test(v) || "Value should be a number greater than 0"
+          v =>  /^([1-9][0-9]*)*$/g.test(v || "") || "Value should be a number greater than 0"
       ]
     }
   },
@@ -76,7 +75,6 @@ export default {
   },
   methods: {
     cancel() {
-      console.log("EditIngredients cancel")
       this.value.active = false
     },
     save() {
