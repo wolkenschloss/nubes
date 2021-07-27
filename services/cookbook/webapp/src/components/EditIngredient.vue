@@ -59,9 +59,8 @@ export default {
           v => !!v || 'Name is required'
       ],
       quantityRules: [
-          v => {
-            return (!this.$props.value.unit || !!v) || "Quantity required"
-          }
+          v => (!this.$props.value.unit || !!v) || "Unit requires quantity",
+          v => /^([1-9][0-9]*)*$/g.test(v) || "Value should be a number greater than 0"
       ]
     }
   },
