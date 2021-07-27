@@ -6,7 +6,7 @@
       </v-btn>
     </template>
 
-    <v-card style="position: relative">
+    <v-card class="fab-container">
       <v-toolbar dark color="primary" extended>
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
@@ -57,25 +57,14 @@
                   <v-btn text color="secondary" @click="removeIngredient(index)">Remove Item</v-btn>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-
             </v-expansion-panels>
-
           </v-tab-item>
           <v-tab-item key="2">
             <v-textarea label="Preparation" v-model="value.preparation" prepend-icon="mdi-pencil"></v-textarea>
           </v-tab-item>
         </v-tabs-items>
       </v-card-text>
-
-      <!--      <v-card-actions>-->
-      <!--        <v-btn text>Close</v-btn>-->
-      <!--        {{ JSON.stringify(tab) }}-->
-      <!--        {{ ingredientPanel }}-->
-      <!--      </v-card-actions>-->
-
-
     </v-card>
-
   </v-dialog>
 </template>
 
@@ -132,7 +121,7 @@ export default {
 </script>
 
 <style scoped>
-/*.v-window-item {*/
-/*  min-height: 100vh;*/
-/*}*/
+.fab-container {
+  position: relative;
+}
 </style>
