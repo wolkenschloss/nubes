@@ -1,10 +1,9 @@
 <template>
-  <v-form v-model="valid" ref="ingredientForm">
   <v-row class="mt-1">
     <v-col cols="2">
       <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="inputQuantity"></v-text-field>
     </v-col>
-    <v-col cols="2">
+    <v-col cols="3">
       <v-select dense :items="units" label="Unit" v-model="value.unit" clearable>
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
@@ -15,11 +14,7 @@
       <v-text-field dense label="Ingredient" persistent-hint v-model="value.name" :rules="nameRules" required>
       </v-text-field>
     </v-col>
-    <v-col>
-      {{ ((!value.unit || !!value.quantity)) || "Q fehlt" }}
-    </v-col>
   </v-row>
-  </v-form>
 </template>
 
 <script>
@@ -65,7 +60,6 @@ export default {
       ],
       quantityRules: [
           v => {
-            console.log("validating quantity")
             return (!this.$props.value.unit || !!v) || "Quantity required"
           }
       ]
@@ -74,11 +68,10 @@ export default {
   watch: {
     "value.unit": {
       deep: false,
+      immediate: true,
       async handler()  {
         await this.$nextTick()
-        console.log("changing unit")
         this.$refs.inputQuantity.validate();
-        //this.$refs.ingredientForm.validate();
       }
     }
   },
@@ -86,11 +79,8 @@ export default {
     cancel() {
       console.log("EditIngredients cancel")
       this.value.active = false
-      //this.$emit("input", this.value)
     },
     save() {
-      console.log("EditIngredients save")
-      console.log(JSON.stringify(this.value))
       this.value.active = false
       this.$emit("input", this.value)
     }
