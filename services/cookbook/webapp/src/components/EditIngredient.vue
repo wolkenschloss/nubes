@@ -1,20 +1,25 @@
 <template>
+  <v-form v-model="valid" ref="ingredientForm">
   <v-row class="mt-1">
     <v-col cols="2">
-      <v-text-field dense label="Quantity" v-model="value.quantity"></v-text-field>
+      <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="inputQuantity"></v-text-field>
     </v-col>
     <v-col cols="2">
-      <v-select dense :items="units" label="Unit" v-model="value.unit">
+      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable>
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
         </template>
       </v-select>
     </v-col>
     <v-col>
-      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name">
+      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name" :rules="nameRules" required>
       </v-text-field>
     </v-col>
+    <v-col>
+      {{ ((!value.unit || !!value.quantity)) || "Q fehlt" }}
+    </v-col>
   </v-row>
+  </v-form>
 </template>
 
 <script>
@@ -23,6 +28,7 @@ export default {
   props: ['value'],
   data() {
     return {
+      valid: false,
       // https://en.wikibooks.org/wiki/Cookbook:Units_of_measurement
       units: [
 
@@ -53,7 +59,27 @@ export default {
         {value: "cm", text: "centimeter"},
         {value: "m", text: "meter"},
         {value: "in", text: "inch"}
+      ],
+      nameRules: [
+          v => !!v || 'Name is required'
+      ],
+      quantityRules: [
+          v => {
+            console.log("validating quantity")
+            return (!this.$props.value.unit || !!v) || "Quantity required"
+          }
       ]
+    }
+  },
+  watch: {
+    "value.unit": {
+      deep: false,
+      async handler()  {
+        await this.$nextTick()
+        console.log("changing unit")
+        this.$refs.inputQuantity.validate();
+        //this.$refs.ingredientForm.validate();
+      }
     }
   },
   methods: {
