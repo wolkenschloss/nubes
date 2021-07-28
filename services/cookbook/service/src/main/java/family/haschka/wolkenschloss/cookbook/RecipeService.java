@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.jboss.logging.Logger;
 
@@ -22,8 +23,10 @@ public class RecipeService {
         recipeRepository.persist(recipe);
     }
 
-    public List<Recipe> list() {
-        return recipeRepository.listAll();
+    public List<BriefDescription> list() {
+        return recipeRepository.listAll().stream()
+                .map(recipe -> new BriefDescription(recipe.recipeId, recipe.title))
+                .collect(Collectors.toList());
     }
 
     public Optional<Recipe> get(UUID id) {

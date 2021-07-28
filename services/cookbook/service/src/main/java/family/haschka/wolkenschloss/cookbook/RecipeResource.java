@@ -26,7 +26,7 @@ public class RecipeResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Recipe> get() {
+    public List<BriefDescription> get() {
         return service.list();
     }
 
