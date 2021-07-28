@@ -33,16 +33,17 @@ public class RecipeResourceTest {
 
         var recipes = new ArrayList<BriefDescription>();
         recipes.add(new BriefDescription(UUID.randomUUID(), "Blaukraut"));
+        var toc = new TableOfContents(1, recipes);
 
-        Mockito.when(service.list()).thenReturn(recipes);
+        Mockito.when(service.list(0, 4)).thenReturn(toc);
 
         RestAssured.given()
                 .when().get(url)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .body("size()", is(recipes.size()));
+                .body("contents.size()", is(recipes.size()));
 
-        Mockito.verify(service, Mockito.times(1)).list();
+        Mockito.verify(service, Mockito.times(1)).list(0, 4);
         Mockito.verifyNoMoreInteractions(service);
     }
 

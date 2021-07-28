@@ -1,33 +1,29 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.List;
 import java.util.UUID;
+
+import org.jboss.logging.Logger;
 
 @Path("/recipe")
 public class RecipeResource {
+
+    @Inject
+    Logger logger;
 
     @Inject
     RecipeService service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BriefDescription> get() {
-        return service.list();
+    public TableOfContents get(@QueryParam("from") int from, @QueryParam("to") int to) {
+        logger.infov("GET /recipe?from={0}&to={1}", from, to);
+        return service.list(from, to);
     }
 
     @POST
