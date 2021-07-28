@@ -1,23 +1,23 @@
 <template>
   <v-row class="mt-1">
     <v-col cols="2">
-      <v-text-field dense label="Quantity" v-model="value.quantity"></v-text-field>
+      <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" ></v-text-field>
     </v-col>
-    <v-col cols="2">
-      <v-select dense :items="units" label="Unit" v-model="value.unit">
+    <v-col cols="3">
+      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged">
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
         </template>
       </v-select>
     </v-col>
     <v-col>
-      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name">
+      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name" :rules="nameRules" required ref="editName">
       </v-text-field>
     </v-col>
   </v-row>
 </template>
-
 <script>
+
 export default {
   name: "EditIngredient",
   props: ['value'],
@@ -53,18 +53,24 @@ export default {
         {value: "cm", text: "centimeter"},
         {value: "m", text: "meter"},
         {value: "in", text: "inch"}
+      ],
+      nameRules: [
+          v => !!v || 'Name is required'
+      ],
+      quantityRules: [
+          v => (!this.$props.value.unit || !!v) || "Unit requires quantity",
+          v =>  /^([1-9][0-9]*)*$/g.test(v || "") || "Value should be a number greater than 0"
       ]
     }
   },
   methods: {
+    unitChanged() {
+      this.$refs.editQuantity.validate(true);
+    },
     cancel() {
-      console.log("EditIngredients cancel")
       this.value.active = false
-      //this.$emit("input", this.value)
     },
     save() {
-      console.log("EditIngredients save")
-      console.log(JSON.stringify(this.value))
       this.value.active = false
       this.$emit("input", this.value)
     }

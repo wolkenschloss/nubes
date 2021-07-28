@@ -5,16 +5,15 @@
         <v-icon>{{ fabIcon }}</v-icon>
       </v-btn>
     </template>
-
-    <v-card style="position: relative">
-      <v-toolbar dark color="primary" extended>
+    <v-card class="fab-container" height="560px">
+      <v-toolbar dark color="primary">
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
-          <v-btn dark text @click="save">Save</v-btn>
+          <v-btn dark text @click="save" v-bind:disabled="!valid">Save</v-btn>
         </v-toolbar-items>
         <template v-slot:extension>
           <v-tabs v-model="tab" fixed-tabs>
@@ -33,15 +32,14 @@
         </template>
 
       </v-toolbar>
-      <v-card-title>Edit Recipe</v-card-title>
-      <v-card-title></v-card-title>
-      <v-card-text style="height: 560px" class="mt-6">
+        <v-card-text class="mt-6 fullscreen" >
+        <v-form v-model="valid">
         <v-tabs-items v-model="tab">
           <v-tab-item key="0">
-            <v-text-field label="Title" v-model="value.title"></v-text-field>
+            <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
           </v-tab-item>
           <v-tab-item key="1">
-            <v-expansion-panels class="pa-2" v-model="ingredientPanel">
+            <v-expansion-panels class="pa-1" v-model="ingredientPanel">
               <v-expansion-panel v-for="(ingredient, index) in value.ingredients" :key="index">
                 <v-expansion-panel-header>
                   <template v-slot:default="{open}">
@@ -54,40 +52,32 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <edit-ingredient v-model="value.ingredients[index]"></edit-ingredient>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
                   <v-btn text color="secondary" @click="removeIngredient(index)">Remove Item</v-btn>
+                  </v-card-actions>
                 </v-expansion-panel-content>
               </v-expansion-panel>
-
             </v-expansion-panels>
-
           </v-tab-item>
           <v-tab-item key="2">
             <v-textarea label="Preparation" v-model="value.preparation" prepend-icon="mdi-pencil"></v-textarea>
           </v-tab-item>
         </v-tabs-items>
+        </v-form>
       </v-card-text>
-
-      <!--      <v-card-actions>-->
-      <!--        <v-btn text>Close</v-btn>-->
-      <!--        {{ JSON.stringify(tab) }}-->
-      <!--        {{ ingredientPanel }}-->
-      <!--      </v-card-actions>-->
-
-
     </v-card>
-
   </v-dialog>
 </template>
 
 <script>
 
-import Editor from "../components/Editor";
 import EditIngredient from "@/components/EditIngredient";
 
 export default {
   name: "Edit",
   props: ['fabIcon', 'title', 'value'],
-  components: {EditIngredient, Editor},
+  components: {EditIngredient},
   computed: {
     // Bestimmt, ob eine neue Zutat hinzugefügt werden kann.
     // Besser wäre zu prüfen, ob die Eingabe der letzten Zutat
@@ -106,7 +96,11 @@ export default {
       ingredientPanel: null,
       tab: null,
       dialog: false,
-      editable: this.$props.value || {}
+      editable: this.$props.value || {},
+      titleRules: [
+          v => !!v || "Title is required"
+      ],
+      valid: false
     }
   },
   methods: {
@@ -119,7 +113,7 @@ export default {
       this.dialog = false;
     },
     addIngredient() {
-      this.value.ingredients.push({})
+      this.value.ingredients.push({quantity: null, unit: null, name: null})
       this.ingredientPanel = this.value.ingredients.length - 1
     },
     removeIngredient(index) {
@@ -132,7 +126,11 @@ export default {
 </script>
 
 <style scoped>
-/*.v-window-item {*/
-/*  min-height: 100vh;*/
-/*}*/
+.fab-container {
+  position: relative;
+}
+.fullscreen {
+  height: 100vh;
+}
+
 </style>
