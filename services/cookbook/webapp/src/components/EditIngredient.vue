@@ -1,17 +1,17 @@
 <template>
   <v-row class="mt-1">
     <v-col cols="2">
-      <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="inputQuantity"></v-text-field>
+      <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" ></v-text-field>
     </v-col>
     <v-col cols="3">
-      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable>
+      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged">
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
         </template>
       </v-select>
     </v-col>
     <v-col>
-      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name" :rules="nameRules" required>
+      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name" :rules="nameRules" required ref="editName">
       </v-text-field>
     </v-col>
   </v-row>
@@ -63,17 +63,10 @@ export default {
       ]
     }
   },
-  watch: {
-    "value.unit": {
-      deep: false,
-      immediate: true,
-      async handler()  {
-        await this.$nextTick()
-        this.$refs.inputQuantity.validate();
-      }
-    }
-  },
   methods: {
+    unitChanged() {
+      this.$refs.editQuantity.validate(true);
+    },
     cancel() {
       this.value.active = false
     },

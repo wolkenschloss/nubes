@@ -32,7 +32,7 @@
         </template>
 
       </v-toolbar>
-        <v-card-text  class="mt-6 fullscreen" >
+        <v-card-text class="mt-6 fullscreen" >
         <v-form v-model="valid">
         <v-tabs-items v-model="tab">
           <v-tab-item key="0">
@@ -72,13 +72,12 @@
 
 <script>
 
-import Editor from "../components/Editor";
 import EditIngredient from "@/components/EditIngredient";
 
 export default {
   name: "Edit",
   props: ['fabIcon', 'title', 'value'],
-  components: {EditIngredient, Editor},
+  components: {EditIngredient},
   computed: {
     // Bestimmt, ob eine neue Zutat hinzugefügt werden kann.
     // Besser wäre zu prüfen, ob die Eingabe der letzten Zutat
@@ -114,7 +113,7 @@ export default {
       this.dialog = false;
     },
     addIngredient() {
-      this.value.ingredients.push({})
+      this.value.ingredients.push({quantity: null, unit: null, name: null})
       this.ingredientPanel = this.value.ingredients.length - 1
     },
     removeIngredient(index) {
