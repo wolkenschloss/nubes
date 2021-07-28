@@ -31,8 +31,8 @@ public class RecipeResourceTest {
     @Test
     void searchTest() {
 
-        var recipes = new ArrayList<Recipe>();
-        recipes.add(new Recipe("Blaukraut", "Glück gehabt. Das gibt es wirklich"));
+        var recipes = new ArrayList<BriefDescription>();
+        recipes.add(new BriefDescription(UUID.randomUUID(), "Blaukraut"));
 
         Mockito.when(service.list()).thenReturn(recipes);
 

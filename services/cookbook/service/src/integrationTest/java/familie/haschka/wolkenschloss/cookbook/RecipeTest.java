@@ -3,6 +3,7 @@ package familie.haschka.wolkenschloss.cookbook;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
@@ -22,9 +23,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -143,6 +143,30 @@ public class RecipeTest {
                 .statusCode(HttpStatus.SC_OK)
                 .body("size()", greaterThan(0))
                 .body("find {it.recipeId == \"" + id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
+    }
+
+    @Test
+    @DisplayName("GET /recipe minimal data")
+    public void listRecipesMinimal() {
+        String id = response.extract().path("recipeId");
+
+        var result = RestAssured.given()
+                .when()
+                .get(getUrl())
+                .as(new TypeRef<List<Map<String, Object>>>() {});
+
+        var allKeys = result.stream()
+                .map(Map::keySet)
+                .reduce(RecipeTest::mergeSet).orElseThrow();
+
+        Assertions.assertEquals(allKeys, new HashSet<>(Arrays.asList("recipeId", "title")));
+    }
+
+    private static Set<String> mergeSet(Set<String> a, Set<String> b) {
+        Set<String> result = new HashSet<>();
+        Stream.of(a, b).forEach(result::addAll);
+
+        return result;
     }
 
     @Test
