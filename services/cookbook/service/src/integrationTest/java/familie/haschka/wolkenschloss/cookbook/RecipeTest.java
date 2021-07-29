@@ -3,13 +3,9 @@ package familie.haschka.wolkenschloss.cookbook;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
-import io.restassured.matcher.ResponseAwareMatcher;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -136,7 +132,7 @@ public class RecipeTest {
 
     @Test
     @DisplayName("GET /recipe")
-    public void listRecipes() throws MalformedURLException {
+    public void listRecipes() {
 
         String id = response.extract().path("recipeId");
 
