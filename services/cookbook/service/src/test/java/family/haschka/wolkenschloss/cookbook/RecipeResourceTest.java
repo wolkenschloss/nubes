@@ -37,7 +37,7 @@ public class RecipeResourceTest {
         recipes.add(new BriefDescription(UUID.randomUUID(), "Blaukraut"));
         var toc = new TableOfContents(1, recipes);
 
-        Mockito.when(service.list(0, 4)).thenReturn(toc);
+        Mockito.when(service.list(0, 4, null)).thenReturn(toc);
 
         var query = UriBuilder.fromUri(url.toURI())
                 .queryParam("from", 0)
@@ -52,7 +52,7 @@ public class RecipeResourceTest {
                 .statusCode(HttpStatus.SC_OK)
                 .body("content.size()", is(recipes.size()));
 
-        Mockito.verify(service, Mockito.times(1)).list(0, 4);
+        Mockito.verify(service, Mockito.times(1)).list(0, 4, null);
         Mockito.verifyNoMoreInteractions(service);
     }
 

@@ -1,12 +1,13 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import io.quarkus.mongodb.panache.PanacheQuery;
+import org.jboss.logging.Logger;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class RecipeService {
@@ -22,8 +23,22 @@ public class RecipeService {
         recipeRepository.persist(recipe);
     }
 
-    public TableOfContents list(int from, int to) {
-        var query = recipeRepository.findAll();
+    private PanacheQuery<Recipe> getQuery(String search) {
+        if (search == null || search.equals("")) {
+            logger.infov("Empty search criteria");
+            return recipeRepository.findAll();
+        }
+
+        logger.infov("searching for >{0}<", search);
+        return recipeRepository.find("title like ?1}",  search);
+
+        // Das ist eine genaue Suche, und die funktioniert
+        // return recipeRepository.find("{'title': ?1}",  search);
+    }
+
+    public TableOfContents list(int from, int to, String search) {
+
+        var query = getQuery(search);
         var total = query.count();
 
         query.range(from, to);
