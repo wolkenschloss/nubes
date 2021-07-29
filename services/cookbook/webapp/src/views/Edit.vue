@@ -1,9 +1,11 @@
 <template>
   <v-dialog scrollable max-width="560px" v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile">
     <template v-slot:activator="{on, attrs}">
-      <v-btn color="primary" elevation="2" fab bottom right fixed v-on="on">
-        <v-icon>{{ fabIcon }}</v-icon>
-      </v-btn>
+      <slot v-bind="{on, attrs}" name="activator">
+        <v-btn color="primary" elevation="2" fab bottom fixed right v-on="on" v-bind="attrs">
+          <v-icon>{{ fabIcon }}</v-icon>
+        </v-btn>
+      </slot>
     </template>
     <v-card class="fab-container" height="560px">
       <v-toolbar dark color="primary">

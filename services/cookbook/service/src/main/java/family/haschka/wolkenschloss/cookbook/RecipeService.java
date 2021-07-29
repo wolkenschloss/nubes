@@ -2,7 +2,6 @@ package family.haschka.wolkenschloss.cookbook;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,10 +22,18 @@ public class RecipeService {
         recipeRepository.persist(recipe);
     }
 
-    public List<BriefDescription> list() {
-        return recipeRepository.listAll().stream()
+    public TableOfContents list(int from, int to) {
+        var query = recipeRepository.findAll();
+        var total = query.count();
+
+        query.range(from, to);
+        var range = query.list();
+
+        var content = range.stream()
                 .map(recipe -> new BriefDescription(recipe.recipeId, recipe.title))
                 .collect(Collectors.toList());
+
+        return new TableOfContents(total, content);
     }
 
     public Optional<Recipe> get(UUID id) {

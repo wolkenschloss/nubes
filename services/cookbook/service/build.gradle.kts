@@ -16,5 +16,5 @@ dependencies {
     integrationTestImplementation("org.testcontainers:testcontainers")
     integrationTestImplementation("org.testcontainers:junit-jupiter")
     integrationTestImplementation("org.testcontainers:mongodb")
-    integrationTestImplementation("io.rest-assured:rest-assured")
+    integrationTestImplementation("io.rest-assured:rest-assured:4.4.0")
 }

@@ -11,6 +11,8 @@ import org.mockito.Mockito;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -29,20 +31,28 @@ public class RecipeResourceTest {
     URL url;
 
     @Test
-    void searchTest() {
+    void searchTest() throws URISyntaxException, MalformedURLException {
 
         var recipes = new ArrayList<BriefDescription>();
         recipes.add(new BriefDescription(UUID.randomUUID(), "Blaukraut"));
+        var toc = new TableOfContents(1, recipes);
 
-        Mockito.when(service.list()).thenReturn(recipes);
+        Mockito.when(service.list(0, 4)).thenReturn(toc);
 
+        var query = UriBuilder.fromUri(url.toURI())
+                .queryParam("from", 0)
+                        .queryParam("to", 4)
+                                .build().toURL();
         RestAssured.given()
-                .when().get(url)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("size()", is(recipes.size()));
+                .log().all()
+                .when().get(query)
 
-        Mockito.verify(service, Mockito.times(1)).list();
+                .then()
+                .log().all()
+                .statusCode(HttpStatus.SC_OK)
+                .body("content.size()", is(recipes.size()));
+
+        Mockito.verify(service, Mockito.times(1)).list(0, 4);
         Mockito.verifyNoMoreInteractions(service);
     }
 
