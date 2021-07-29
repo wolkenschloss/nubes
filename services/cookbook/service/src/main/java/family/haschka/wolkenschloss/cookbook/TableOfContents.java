@@ -7,7 +7,6 @@ public class TableOfContents {
     public long total;
 
     public TableOfContents(long total, List<BriefDescription> content) {
-
         this.total = total;
         this.content = content;
     }

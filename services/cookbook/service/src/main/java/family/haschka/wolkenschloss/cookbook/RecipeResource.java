@@ -1,5 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import org.jboss.logging.Logger;
+
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -7,8 +9,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.UUID;
-
-import org.jboss.logging.Logger;
 
 @Path("/recipe")
 public class RecipeResource {
@@ -21,7 +21,9 @@ public class RecipeResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public TableOfContents get(@QueryParam("from") int from, @QueryParam("to") int to) {
+    public TableOfContents get(
+            @DefaultValue("0") @QueryParam("from") int from,
+            @DefaultValue("-1") @QueryParam("to") int to) {
         logger.infov("GET /recipe?from={0}&to={1}", from, to);
         return service.list(from, to);
     }

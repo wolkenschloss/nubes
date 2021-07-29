@@ -5,8 +5,11 @@ import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
+import io.restassured.matcher.ResponseAwareMatcher;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +22,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -26,6 +30,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static io.restassured.RestAssured.withArgs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -131,7 +136,7 @@ public class RecipeTest {
 
     @Test
     @DisplayName("GET /recipe")
-    public void listRecipes() {
+    public void listRecipes() throws MalformedURLException {
 
         String id = response.extract().path("recipeId");
 
@@ -140,9 +145,13 @@ public class RecipeTest {
                 .when()
                 .get(getUrl())
                 .then()
+                .log().all()
                 .statusCode(HttpStatus.SC_OK)
-                .body("size()", greaterThan(0))
-                .body("find {it.recipeId == \"" + id + "\"}.title", equalTo("Schlammkrabbeneintopf"));
+                .body("content.size()", greaterThan(0))
+                .body("content.size()", response -> equalTo(response.getBody().jsonPath().<Integer>get("total")))
+                .body("content.find {it.recipeId == '%s'}.title",
+                        withArgs(id),
+                        equalTo("Schlammkrabbeneintopf"));
     }
 
     @Test
@@ -150,10 +159,11 @@ public class RecipeTest {
     public void listRecipesMinimal() {
         String id = response.extract().path("recipeId");
 
-        var result = RestAssured.given()
+        ArrayList<Map<String, Object>> result = RestAssured.given()
                 .when()
                 .get(getUrl())
-                .as(new TypeRef<List<Map<String, Object>>>() {});
+                .jsonPath()
+                .get("content");
 
         var allKeys = result.stream()
                 .map(Map::keySet)
