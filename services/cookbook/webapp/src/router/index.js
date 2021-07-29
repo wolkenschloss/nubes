@@ -6,17 +6,13 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: {name: 'Home'}
-    // name: 'Home',
-    // components: {
-    //   default: () => import(/* webpackChunkName: "home" */ '../views/Home')
-    // }
+    redirect: {name: 'contents'}
   },
   {
     path: '/contents',
-    name: 'Home',
+    name: 'contents',
     components: {
-      default: () => import(/* webpackChunkName: "home" */ '../views/Home')
+      default: () => import(/* webpackChunkName: "contents" */ '../views/Contents')
     },
     props: {
       default: route => ({first: route.query.first || 0, last: route.query.last || 4})
