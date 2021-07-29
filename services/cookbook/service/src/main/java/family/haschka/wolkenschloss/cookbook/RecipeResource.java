@@ -23,9 +23,10 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public TableOfContents get(
             @DefaultValue("0") @QueryParam("from") int from,
-            @DefaultValue("-1") @QueryParam("to") int to) {
-        logger.infov("GET /recipe?from={0}&to={1}", from, to);
-        return service.list(from, to);
+            @DefaultValue("-1") @QueryParam("to") int to,
+            @QueryParam("q") String search) {
+        logger.infov("GET /recipe?from={0}&to={1}&q={2}", from, to, search);
+        return service.list(from, to, search);
     }
 
     @POST

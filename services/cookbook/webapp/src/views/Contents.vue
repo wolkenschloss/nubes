@@ -1,5 +1,11 @@
 <template>
   <v-container>
+    <v-text-field v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+    />
     <v-data-table
         hide-default-header
         :items-per-page="$vuetify.breakpoint.mobile ? 5 : 10"
@@ -26,6 +32,7 @@
 
 import axios from "axios";
 import Edit from "@/views/Edit";
+import {debounce} from "lodash";
 
 export default {
   name: 'Contents',
@@ -33,13 +40,17 @@ export default {
   watch: {
     options: {
       handler() {
-        this.loadRecipes()
+        this.loadRecipes(this.search)
       },
       deep: true
-    }
+    },
+    search: debounce(function(val)  {
+      this.loadRecipes(val)
+    }, 500),
   },
   data() {
     return {
+      search: null,
       options: {},
       total: null,
       recipes: [],
@@ -70,18 +81,22 @@ export default {
         alert(error)
       }
     },
-    async loadRecipes() {
+    async loadRecipes(query) {
+
       this.loading = true;
 
       const {sortBy, sortDesc, page, itemsPerPage} = this.options
       const from = (page - 1)  * itemsPerPage;
       const to = from + itemsPerPage - 1;
-      const uri = `/recipe?from=${from}&to=${to}`
+
+      console.log(`load recipe from ${from} to ${to} search '${query || ''}'`)
+      const uri = `/recipe?from=${from}&to=${to}&q=${query || ''}`
 
       try {
         const response = await axios.get(uri)
         this.recipes = response.data.content
         this.total = response.data.total
+        console.log(`got ${this.total} items`)
         this.loading = false
       } catch (error) {
         this.loading = false
