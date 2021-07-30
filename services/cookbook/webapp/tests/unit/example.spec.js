@@ -1,4 +1,4 @@
-import {createLocalVue, mount, shallowMount} from '@vue/test-utils'
+import {createLocalVue, mount} from '@vue/test-utils'
 import App from '@/App.vue'
 import Vuetify from "vuetify";
 import VueRouter from "vue-router";
@@ -21,7 +21,7 @@ describe('App.vue', () => {
       router
     })
     const appTitle = wrapper.find('[data-cy=app-title]')
-    expect(appTitle.text()).toMatch("Wolkenschloss")
+    expect(appTitle.text()).toMatch("Cookbook")
   })
 
   describe('inner describe', () => {
