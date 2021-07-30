@@ -17,12 +17,13 @@
         item-key="recipeId"
         @click:row="onItemClick"
     >
+      <!--suppress HtmlUnknownAttribute -->
       <template v-slot:footer.prepend>
-      <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
-        <template v-slot:activator="{on, attrs}">
-          <v-btn text color="secondary" v-on="on" v-bind="attrs">New Recipe</v-btn>
-        </template>
-      </edit>
+        <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
+          <template v-slot:activator="{on, attrs}">
+            <v-btn text color="secondary" v-on="on" v-bind="attrs">New Recipe</v-btn>
+          </template>
+        </edit>
       </template>
     </v-data-table>
   </v-container>
@@ -36,7 +37,7 @@ import {debounce} from "lodash";
 
 export default {
   name: 'Contents',
-  components: { Edit },
+  components: {Edit},
   watch: {
     options: {
       handler() {
@@ -44,7 +45,7 @@ export default {
       },
       deep: true
     },
-    search: debounce(function(val)  {
+    search: debounce(function (val) {
       this.loadRecipes(val)
     }, 500),
   },
@@ -66,7 +67,7 @@ export default {
   },
   methods: {
     onItemClick(item) {
-      this.$router.push({name: 'details', params: {id: item.recipeId}})
+        this.$router.push({name: 'details', params: {id: item['recipeId']}})
     },
     cancel() {
       this.recipe = {ingredients: []}
@@ -77,6 +78,7 @@ export default {
         await axios.post(uri, recipe)
         await this.loadRecipes();
         this.recipe = {ingredients: []}
+        this.options.page = 1
       } catch (error) {
         alert(error)
       }
@@ -85,8 +87,8 @@ export default {
 
       this.loading = true;
 
-      const {sortBy, sortDesc, page, itemsPerPage} = this.options
-      const from = (page - 1)  * itemsPerPage;
+      const {page, itemsPerPage} = this.options
+      const from = (page - 1) * itemsPerPage;
       const to = from + itemsPerPage - 1;
 
       console.log(`load recipe from ${from} to ${to} search '${query || ''}'`)
