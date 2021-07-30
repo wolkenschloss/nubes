@@ -17,6 +17,7 @@
         item-key="recipeId"
         @click:row="onItemClick"
     >
+      <!--suppress HtmlUnknownAttribute -->
       <template v-slot:footer.prepend>
       <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
         <template v-slot:activator="{on, attrs}">
@@ -77,6 +78,7 @@ export default {
         await axios.post(uri, recipe)
         await this.loadRecipes();
         this.recipe = {ingredients: []}
+        this.options.page = 1
       } catch (error) {
         alert(error)
       }
@@ -85,7 +87,7 @@ export default {
 
       this.loading = true;
 
-      const {sortBy, sortDesc, page, itemsPerPage} = this.options
+      const {page, itemsPerPage} = this.options
       const from = (page - 1)  * itemsPerPage;
       const to = from + itemsPerPage - 1;
 

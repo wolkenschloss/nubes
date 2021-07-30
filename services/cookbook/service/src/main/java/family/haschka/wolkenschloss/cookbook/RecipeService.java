@@ -1,7 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import io.quarkus.mongodb.panache.PanacheQuery;
-import org.jboss.logging.Logger;
+import io.quarkus.panache.common.Sort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
 public class RecipeService {
 
     @Inject
-    Logger logger;
-
-    @Inject
     RecipeRepository recipeRepository;
 
     public void save(Recipe recipe) {
@@ -25,15 +22,10 @@ public class RecipeService {
 
     private PanacheQuery<Recipe> getQuery(String search) {
         if (search == null || search.equals("")) {
-            logger.infov("Empty search criteria");
-            return recipeRepository.findAll();
+            return recipeRepository.findAll(Sort.by("title"));
         }
 
-        logger.infov("searching for >{0}<", search);
-        return recipeRepository.find("title like ?1}",  search);
-
-        // Das ist eine genaue Suche, und die funktioniert
-        // return recipeRepository.find("{'title': ?1}",  search);
+        return recipeRepository.find("title like ?1}",  search, Sort.by("title"));
     }
 
     public TableOfContents list(int from, int to, String search) {
