@@ -24,7 +24,7 @@
       <template v-slot:footer.prepend>
         <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
           <template v-slot:activator="{on, attrs}">
-            <v-btn text v-on="on" v-bind="attrs">New Recipe</v-btn>
+            <v-btn v-on="on" v-bind="attrs" color="secondary">New Recipe</v-btn>
           </template>
         </edit>
       </template>

@@ -4,9 +4,13 @@
       <v-app-bar-title data-cy="app-title">Cookbook</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-switch
-        v-model="$vuetify.theme.dark"
-        hide-details
-        title="toggle light and dark theme">
+          color="secondary"
+          v-model="$vuetify.theme.dark"
+          hide-details
+          title="toggle light and dark theme">
+        <template v-slot:label>
+          <v-icon>mdi-brightness-6</v-icon>
+        </template>
       </v-switch>
     </v-app-bar>
     <v-main>

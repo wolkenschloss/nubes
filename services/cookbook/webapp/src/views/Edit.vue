@@ -15,7 +15,7 @@
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
-          <v-btn text @click="save" v-bind:disabled="!valid">Save</v-btn>
+          <v-btn plain @click="save" v-bind:disabled="!valid" >Save</v-btn>
         </v-toolbar-items>
         <template v-slot:extension>
           <v-tabs v-model="tab" fixed-tabs>
@@ -26,7 +26,7 @@
           </v-tabs>
           <v-fab-transition>
             <v-btn :disabled="isLastIngredientEmpty" absolute fab small bottom left elevation="4"
-                   color="green"
+                   color="primary"
                    v-if="tab === 1"
                    @click="addIngredient">
               <v-icon>mdi-plus</v-icon>
