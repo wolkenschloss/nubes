@@ -5,10 +5,13 @@
                   label="Search"
                   single-line
                   hide-details
+                  clearable
     />
     <v-data-table
+        class="mt-4"
         hide-default-header
         :items-per-page="$vuetify.breakpoint.mobile ? 5 : 10"
+        :footer-props="{'items-per-page-options': [5, 10, 15, 20]}"
         :loading="loading"
         :items="recipes"
         :headers="headers"
@@ -21,7 +24,7 @@
       <template v-slot:footer.prepend>
         <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
           <template v-slot:activator="{on, attrs}">
-            <v-btn text color="secondary" v-on="on" v-bind="attrs">New Recipe</v-btn>
+            <v-btn v-on="on" v-bind="attrs" color="secondary">New Recipe</v-btn>
           </template>
         </edit>
       </template>

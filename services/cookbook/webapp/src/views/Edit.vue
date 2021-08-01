@@ -8,14 +8,14 @@
       </slot>
     </template>
     <v-card class="fab-container" height="560px">
-      <v-toolbar dark color="primary">
+      <v-toolbar>
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
-          <v-btn dark text @click="save" v-bind:disabled="!valid">Save</v-btn>
+          <v-btn plain @click="save" v-bind:disabled="!valid" >Save</v-btn>
         </v-toolbar-items>
         <template v-slot:extension>
           <v-tabs v-model="tab" fixed-tabs>
@@ -25,7 +25,8 @@
             <v-tab key="2">Preparation</v-tab>
           </v-tabs>
           <v-fab-transition>
-            <v-btn :disabled="isLastIngredientEmpty" dark absolute fab small bottom left color="green" elevation="2"
+            <v-btn :disabled="isLastIngredientEmpty" absolute fab small bottom left elevation="4"
+                   color="primary"
                    v-if="tab === 1"
                    @click="addIngredient">
               <v-icon>mdi-plus</v-icon>
