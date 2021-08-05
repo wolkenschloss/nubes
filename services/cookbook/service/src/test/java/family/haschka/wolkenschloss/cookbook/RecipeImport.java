@@ -7,6 +7,10 @@ public class RecipeImport {
     }
 
     public List<Recipe> extract() {
-        return null;
+        var recipe = new Recipe();
+        recipe.recipeId = null;
+        recipe.title = "Lasagne";
+
+        return List.of(recipe);
     }
 }
