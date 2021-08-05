@@ -4,20 +4,18 @@ quarkus:
   mongodb:
     database: cookbook
     connection-string: mongodb://localhost:27017/?uuidRepresentation=STANDARD
+    devservices:
+      enabled: false
   log:
     level: INFO
     console:
       enable: true
       format: "%d{HH:mm:ss} %-5p [%c] %s%e%n"
-      color: true
     category:
       "org.mongodb.driver":
         level: WARN
       "io.quarkus.deployment.**":
         level: ERROR
-resteasy:
-  patchfilter:
-    legacy: true
 
 "%dev":
    quarkus:
@@ -26,6 +24,8 @@ resteasy:
    mongodb:
      database: cookbook
      connection-string: mongodb:localhost:27017/?uuidRepresentation=STANDARD
+
+
 "%test":
   quarkus:
     http:

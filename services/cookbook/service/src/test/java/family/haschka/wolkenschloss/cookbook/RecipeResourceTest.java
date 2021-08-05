@@ -5,6 +5,7 @@ import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
+import io.restassured.mapper.ObjectMapperType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -67,7 +68,7 @@ public class RecipeResourceTest {
             return null;
         }).when(service).save(any(Recipe.class));
 
-        RestAssured.given().body(recipe).contentType(MediaType.APPLICATION_JSON)
+        RestAssured.given().body(recipe, ObjectMapperType.JSONB).contentType(MediaType.APPLICATION_JSON)
                 .when().post(url)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED)
