@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-resteasy-jackson")
+    implementation("io.quarkus:quarkus-resteasy-jsonb")
     implementation("io.quarkus:quarkus-mongodb-panache")
 
     implementation(project(":services:cookbook:webapp"))
