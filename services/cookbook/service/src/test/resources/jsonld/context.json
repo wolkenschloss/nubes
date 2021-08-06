@@ -1,0 +1,6 @@
+{
+  "@context": {
+    "@base": "http://schema.org/",
+    "name": "http://schema.org//name"
+  }
+}
