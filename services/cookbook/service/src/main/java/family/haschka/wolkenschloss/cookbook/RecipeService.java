@@ -2,9 +2,15 @@ package family.haschka.wolkenschloss.cookbook;
 
 import io.quarkus.mongodb.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
+import org.jboss.logging.Logger;
+
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,6 +20,9 @@ public class RecipeService {
 
     @Inject
     RecipeRepository recipeRepository;
+
+    @Inject
+    Logger log;
 
     public void save(Recipe recipe) {
 
@@ -54,5 +63,34 @@ public class RecipeService {
 
     public void update(Recipe recipe) {
         recipeRepository.update(recipe);
+    }
+
+    @Inject
+    Event<JobCompletedEvent> completed;
+
+    @Inject
+    ResourceParser parser;
+    public void steal(@ObservesAsync JobReceivedEvent event) throws IOException {
+        try {
+            log.info("RecipeService.steal");
+            var thief = new RecipeImport(parser);
+            log.info("Thief created");
+            log.info(event);
+            var recipes = thief.extract(event.source);
+            log.info("recipes extracted");
+            recipes.get(0).recipeId = UUID.randomUUID();
+            recipeRepository.persist(recipes.get(0));
+
+            System.out.println(recipes.get(0));
+            var done = new JobCompletedEvent();
+            done.error = Optional.empty();
+            done.jobId = event.jobId;
+            done.location = Optional.of(UriBuilder.fromUri("/recipe").path(recipes.get(0).recipeId.toString()).build());
+
+            completed.fire(done);
+        } catch (Exception e) {
+            log.warn("Can not steal recipe", e);
+        }
+
     }
 }

@@ -8,23 +8,24 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RecipeImport {
-    private final ResourceHtmlReader reader;
+    private final ResourceParser reader;
 
-    public RecipeImport(ResourceHtmlReader reader) {
+    public RecipeImport(ResourceParser reader) {
         this.reader = reader;
     }
 
-    public List<Recipe> extract() throws IOException {
+    public List<Recipe> extract(URI source) throws IOException {
         var config = new JsonbConfig()
                 .withAdapters(new RecipeAdapter());
 
         var jsonb = JsonbBuilder.create(config);
 
-        return reader.read().stream()
+        return reader.readData(source).stream()
                 .filter(this::isRecipe)
                 .map(s -> jsonb.fromJson(s, Recipe.class))
                 .collect(Collectors.toList());

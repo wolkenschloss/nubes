@@ -5,19 +5,21 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ResourceHtmlReader {
-    private final String filename;
+@ApplicationScoped
+public class ResourceHtmlParser implements ResourceParser {
 
-    public ResourceHtmlReader(String filename) {
-        this.filename = filename;
+    public ResourceHtmlParser() {
     }
 
-    List<String> read() throws IOException {
-        try (var input = this.getClass().getClassLoader().getResourceAsStream(this.filename)) {
+    @Override
+    public List<String> readData(URI source) throws IOException {
+        try (var input = this.getClass().getClassLoader().getResourceAsStream(source.getPath())) {
             Document dom = Jsoup.parse(input, "UTF-8", "");
             Elements scripts = dom.select("script[type=application/ld+json]");
             return scripts.stream()

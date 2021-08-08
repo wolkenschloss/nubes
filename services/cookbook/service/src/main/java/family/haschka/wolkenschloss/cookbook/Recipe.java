@@ -2,7 +2,6 @@ package family.haschka.wolkenschloss.cookbook;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
-import javax.json.bind.annotation.JsonbProperty;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +20,16 @@ public class Recipe {
 
         this.title = title;
         this.preparation = preparation;
+    }
+
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "recipeId=" + recipeId +
+                ", title='" + title + '\'' +
+                ", preparation='" + preparation + '\'' +
+                ", ingredients=" + ingredients +
+                '}';
     }
 
     static List<Ingredient> NoIngredients = List.of();

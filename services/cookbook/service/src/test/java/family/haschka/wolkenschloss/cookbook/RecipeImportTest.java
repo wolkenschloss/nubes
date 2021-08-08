@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 public class RecipeImportTest {
@@ -27,9 +28,9 @@ public class RecipeImportTest {
     @EnumSource
     @DisplayName("should convert ld+json script to recipe")
     public void xxx(Testcase testcase) throws IOException {
-        var reader = new ResourceHtmlReader(testcase.filename);
+        var reader = new ResourceHtmlParser();
         var importer = new RecipeImport(reader);
-        List<Recipe> recipes = importer.extract();
+        List<Recipe> recipes = importer.extract(URI.create(testcase.filename));
 
         Assertions.assertEquals(1, recipes.size());
         Assertions.assertEquals(testcase.name, recipes.get(0).title);
