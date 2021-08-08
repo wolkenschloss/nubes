@@ -16,4 +16,13 @@ public class Ingredient {
     public String unit;
 
     public Long quantity;
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "name='" + name + '\'' +
+                ", unit='" + unit + '\'' +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

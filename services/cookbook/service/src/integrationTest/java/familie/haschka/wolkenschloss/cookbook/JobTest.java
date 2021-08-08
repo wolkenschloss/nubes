@@ -1,5 +1,7 @@
 package familie.haschka.wolkenschloss.cookbook;
 
+import familie.haschka.wolkenschloss.cookbook.testing.MongoDbResource;
+import familie.haschka.wolkenschloss.cookbook.testing.WiremockRecipes;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
@@ -18,8 +20,8 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
 @QuarkusIntegrationTest
-@QuarkusTestResource(value = MongoDbResource.class, restrictToAnnotatedClass = true)
-@QuarkusTestResource(WiremockRecipes.class)
+@QuarkusTestResource(value = MongoDbResource.class)
+@QuarkusTestResource(value = WiremockRecipes.class)
 public class JobTest {
 
     @Test
@@ -29,6 +31,7 @@ public class JobTest {
         var job_url = String.format("%s/lasagne.html", mock_url);
         var port = System.getProperty("quarkus.http.port");
         var url = String.format("http://localhost:%s/job", port);
+
         var response = RestAssured
                 .given()
                 .body(createJob(job_url))

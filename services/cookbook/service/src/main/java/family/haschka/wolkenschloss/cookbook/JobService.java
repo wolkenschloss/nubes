@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
-public class JobService {
+public class JobService implements IJobService {
     @Inject
     Event<JobReceivedEvent> received;
 
@@ -28,6 +28,7 @@ public class JobService {
     @Inject
     ManagedExecutor executor;
 
+    @Override
     public CompletionStage<JobReceivedEvent> addJob(ImportJob job) {
         log.info("JobService.addJob start");
         repository.persist(job);
@@ -40,16 +41,20 @@ public class JobService {
         return received.fireAsync(event, NotificationOptions.ofExecutor(executor));
     }
 
+    @Override
     public Optional<ImportJob> get(UUID id) {
         return repository.findByIdOptional(id);
     }
 
-    public void jobCompleted(@Observes JobCompletedEvent completed) {
+    @Override
+    public void jobCompleted(JobCompletedEvent completed) {
+        log.info("handle job completed event");
         var job = repository.findByIdOptional(completed.jobId).orElseThrow(NotFoundException::new);
         job.setState(ImportJob.State.COMPLETED);
         job.setLocation(completed.location.orElse(null));
         job.setError(completed.error.map(e -> e.getMessage()).orElse(null));
 
         repository.update(job);
+        log.info("updated job");
     }
 }

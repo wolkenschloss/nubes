@@ -14,7 +14,7 @@ import java.util.UUID;
 public class JobResource {
 
     @Inject
-    JobService service;
+    IJobService service;
 
     @Inject
     Logger log;

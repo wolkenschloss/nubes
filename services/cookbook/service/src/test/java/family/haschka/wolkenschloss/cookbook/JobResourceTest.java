@@ -26,7 +26,7 @@ public class JobResourceTest {
 
     public static final String JOB_URL = "http://meinkochbuch.local/lasagne.html";
     @InjectMock
-    JobService service;
+    IJobService service;
 
     @TestHTTPEndpoint(JobResource.class)
     @TestHTTPResource
@@ -38,12 +38,12 @@ public class JobResourceTest {
         var id = UUID.randomUUID();
 
         Mockito.doAnswer(x -> {
-            x.getArgument(0, ImportJob.class).jobId = id;
+            x.getArgument(0, ImportJob.class).setJobId(id);
             return null;
         }).when(service).addJob(any(ImportJob.class));
 
         ImportJob job = new ImportJob();
-        job.url = JOB_URL;
+        job.setUrl(JOB_URL);
 
         RestAssured.given()
                 .body(job, ObjectMapperType.JSONB).contentType(MediaType.APPLICATION_JSON)
@@ -82,8 +82,8 @@ public class JobResourceTest {
         var location = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
 
         var job = new ImportJob();
-        job.jobId = id;
-        job.url = JOB_URL;
+        job.setJobId(id);
+        job.setUrl(JOB_URL);
 
         Mockito.when(service.get(id)).thenReturn(Optional.of(job));
 

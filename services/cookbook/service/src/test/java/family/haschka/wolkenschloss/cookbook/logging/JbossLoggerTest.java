@@ -10,7 +10,7 @@ import javax.inject.Inject;
 /**
  * Dieser Test erzeugt keine Ausgabe, wenn er alleine ausgeführt wird. Das ist ein Fehler.
  * Bevor du jetzt alles umkonfigurierst, denke daran, dass ich drei Tage benötigt habe,
- * Um die Konfiguration herzustellen. Es kann nur schlechter werden. Wenn du keine Ahnung
+ * um die Konfiguration herzustellen. Es kann nur schlechter werden. Wenn du keine Ahnung
  * von JbossLogger, Slf4j und JUL hast, lass die Finger weg!
  *
  * Wenn der Test zusammen mit den anderen Tests ausgeführt wird, sieht die Protokollausgabe
@@ -30,8 +30,6 @@ import javax.inject.Inject;
  */
 @QuarkusTest
 public class JbossLoggerTest {
-
-    //  private static final Logger logger = Logger.getLogger(JbossLoggerTest.class);
 
     // Ein JBoss Logger kann per CDI direkt in den Test geimpft werden.
     @Inject

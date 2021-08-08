@@ -1,6 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,13 +24,17 @@ import java.util.concurrent.ExecutionException;
 import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
+//@TestProfile(MockRecipeServiceProfile.class)
 public class JobServiceTest {
 
     @InjectMock
     ImportJobRepository respository;
 
+    @InjectMock
+    RecipeService recipeService;
+
     @Inject
-    JobService sut;
+    IJobService sut;
 
     @Inject
     JobReceivedObserver observer;
@@ -41,13 +46,13 @@ public class JobServiceTest {
 
         // Mongo DB setzt die ID, wenn die Entität persistiert wird.
         Mockito.doAnswer(x -> {
-            x.getArgument(0, ImportJob.class).jobId = id;
+            x.getArgument(0, ImportJob.class).setJobId(id);
             return null;
         }).when(respository).persist(any(ImportJob.class));
 
         var job = new ImportJob();
-        job.url = "https://meinerezepte.local/lasagen";
-        job.jobId = id;
+        job.setUrl("https://meinerezepte.local/lasagen");
+        job.setJobId(id);
 
         var future = sut.addJob(job);
 
@@ -57,6 +62,7 @@ public class JobServiceTest {
 //            Assertions.assertEquals(1, observer.getEvents().size());
             var expected = new JobReceivedEvent();
             expected.jobId = event.jobId;
+            expected.source = URI.create(job.getUrl());
 
             Assertions.assertEquals(expected, event);
 
@@ -78,33 +84,31 @@ public class JobServiceTest {
         event.error = Optional.empty();
 
         var jobBeforeCompletion = new ImportJob();
-        jobBeforeCompletion.jobId = id;
-        jobBeforeCompletion.state = ImportJob.State.IN_PROGRESS;
-        jobBeforeCompletion.location = Optional.empty();
+        jobBeforeCompletion.setJobId(id);
+        jobBeforeCompletion.setState(ImportJob.State.IN_PROGRESS);
+        jobBeforeCompletion.setLocation(null);
 
         var jobAfterCompletion = new ImportJob();
-        jobAfterCompletion.jobId = id;
-        jobAfterCompletion.state = ImportJob.State.COMPLETED;
-        jobAfterCompletion.location = event.location;
+        jobAfterCompletion.setJobId(id);
+        jobAfterCompletion.setState(ImportJob.State.COMPLETED);
+        jobAfterCompletion.setLocation(event.location.orElse(null));
 
         Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
         Mockito.doAnswer(x -> null).when(respository).update(jobAfterCompletion);
 
         Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
 
-        var future = completed.fireAsync(event);
+        completed.fire(event);
 
-        future.thenAccept(e -> {
-            var j = sut.get(e.jobId);
+            var j = sut.get(event.jobId);
             var expected = new ImportJob();
-            expected.jobId = id;
-            expected.state = ImportJob.State.COMPLETED;
-            expected.location = event.location;
-            expected.error = Optional.empty();
+            expected.setJobId(id);
+            expected.setState(ImportJob.State.COMPLETED);
+            expected.setLocation(event.location.orElse(null));
+            expected.setError(null);
 
             Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
 
-        }).toCompletableFuture().get();
 
         Mockito.verify(respository, Mockito.times(2)).findByIdOptional(any());
         Mockito.verify(respository, Mockito.times(1)).update(any(ImportJob.class));
@@ -117,35 +121,36 @@ public class JobServiceTest {
         var event = new JobCompletedEvent();
         event.jobId = id;
         event.error = Optional.of(new FileNotFoundException());
+        event.location = Optional.of(URI.create("https://meinerezepte.local.lasagne.html"));
 
         var jobBeforeCompletion = new ImportJob();
-        jobBeforeCompletion.jobId = id;
-        jobBeforeCompletion.state = ImportJob.State.IN_PROGRESS;
-        jobBeforeCompletion.error = Optional.empty();
+        jobBeforeCompletion.setJobId(id);
+        jobBeforeCompletion.setState(ImportJob.State.IN_PROGRESS);
+        jobBeforeCompletion.setError(null);
 
         var jobAfterCompletion = new ImportJob();
-        jobAfterCompletion.jobId = id;
-        jobAfterCompletion.state = ImportJob.State.COMPLETED;
-        jobAfterCompletion.error = event.error;
+        jobAfterCompletion.setJobId(id);
+        jobAfterCompletion.setState(ImportJob.State.COMPLETED);
+        jobAfterCompletion.setError(event.error.map(e -> e.getMessage()).orElse(null));
 
         Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
         Mockito.doAnswer(x -> null).when(respository).update(jobAfterCompletion);
 
         Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
 
-        var future = completed.fireAsync(event);
+        completed.fire(event);
 
-        future.thenAccept(e -> {
-            var j = sut.get(e.jobId);
+                    var j = sut.get(event.jobId);
             var expected = new ImportJob();
-            expected.jobId = id;
-            expected.state = ImportJob.State.COMPLETED;
-            expected.error = event.error;
+            expected.setJobId(id);
+            expected.setState(ImportJob.State.COMPLETED);
+            expected.setError(event.error.map(err -> err.getMessage()).orElse(null));
+            expected.setLocation(event.location.orElse(null));
 
             Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
-            Assertions.assertEquals(expected.error, j.orElseThrow(AssertionFailedError::new).error);
+            Assertions.assertEquals(expected.getError(), j.orElseThrow(AssertionFailedError::new).getError());
 
-        }).toCompletableFuture().get();
+
 
         Mockito.verify(respository, Mockito.times(2)).findByIdOptional(any());
         Mockito.verify(respository, Mockito.times(1)).update(jobAfterCompletion);

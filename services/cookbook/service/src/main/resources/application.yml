@@ -27,5 +27,9 @@ quarkus:
   quarkus:
     http:
       port: 0
+      test-port: 9292
     log:
       level: INFO
+    mongodb:
+      devservices:
+        enabled: false

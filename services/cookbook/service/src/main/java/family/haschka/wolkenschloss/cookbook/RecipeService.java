@@ -80,14 +80,16 @@ public class RecipeService {
             log.info("recipes extracted");
             recipes.get(0).recipeId = UUID.randomUUID();
             recipeRepository.persist(recipes.get(0));
-
-            System.out.println(recipes.get(0));
+            log.info("recipe persisted");
+            log.info(recipes.get(0));
             var done = new JobCompletedEvent();
             done.error = Optional.empty();
             done.jobId = event.jobId;
             done.location = Optional.of(UriBuilder.fromUri("/recipe").path(recipes.get(0).recipeId.toString()).build());
 
+            log.info("sending completed event");
             completed.fire(done);
+            log.info("send completed event");
         } catch (Exception e) {
             log.warn("Can not steal recipe", e);
         }

@@ -33,8 +33,11 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response post(Recipe recipe, @Context UriInfo uriInfo) {
+        logger.info("POST /recipe");
+        logger.infov("recipe: {0}", recipe);
         recipe.recipeId = UUID.randomUUID();
         service.save(recipe);
+        logger.info("recipe persisted");
 
         var location = uriInfo.getAbsolutePathBuilder()
                 .path(recipe.recipeId.toString())

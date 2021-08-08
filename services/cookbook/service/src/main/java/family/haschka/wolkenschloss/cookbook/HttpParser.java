@@ -30,8 +30,9 @@ public class HttpParser implements ResourceParser {
         var request =HttpRequest.newBuilder().GET().uri(source).build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            log.infov("Response Status: {0}", response.statusCode());
+            log.infov("X-Files-Root: {0}", response.headers().firstValue("X-Files-Root"));
             log.info(response.body());
-
             Document dom = Jsoup.parse(response.body());
             Elements scripts = dom.select("script[type=application/ld+json]");
             var result = scripts.stream()
