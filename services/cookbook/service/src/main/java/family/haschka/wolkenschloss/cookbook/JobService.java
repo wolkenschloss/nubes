@@ -52,7 +52,7 @@ public class JobService implements IJobService {
         var job = repository.findByIdOptional(completed.jobId).orElseThrow(NotFoundException::new);
         job.setState(ImportJob.State.COMPLETED);
         job.setLocation(completed.location.orElse(null));
-        job.setError(completed.error.map(e -> e.getMessage()).orElse(null));
+        job.setError(completed.error.orElse(null));
 
         repository.update(job);
         log.info("updated job");

@@ -120,7 +120,7 @@ public class JobServiceTest {
         var id = UUID.randomUUID();
         var event = new JobCompletedEvent();
         event.jobId = id;
-        event.error = Optional.of(new FileNotFoundException());
+        event.error = Optional.of("The data source cannot be read");
         event.location = Optional.of(URI.create("https://meinerezepte.local.lasagne.html"));
 
         var jobBeforeCompletion = new ImportJob();
@@ -131,7 +131,7 @@ public class JobServiceTest {
         var jobAfterCompletion = new ImportJob();
         jobAfterCompletion.setJobId(id);
         jobAfterCompletion.setState(ImportJob.State.COMPLETED);
-        jobAfterCompletion.setError(event.error.map(e -> e.getMessage()).orElse(null));
+        jobAfterCompletion.setError(event.error.orElse(null));
 
         Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
         Mockito.doAnswer(x -> null).when(respository).update(jobAfterCompletion);
@@ -144,7 +144,7 @@ public class JobServiceTest {
             var expected = new ImportJob();
             expected.setJobId(id);
             expected.setState(ImportJob.State.COMPLETED);
-            expected.setError(event.error.map(err -> err.getMessage()).orElse(null));
+            expected.setError(event.error.orElse(null));
             expected.setLocation(event.location.orElse(null));
 
             Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));

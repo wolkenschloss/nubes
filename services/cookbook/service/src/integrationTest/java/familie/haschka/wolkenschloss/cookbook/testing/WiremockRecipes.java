@@ -30,6 +30,11 @@ public class WiremockRecipes implements QuarkusTestResourceLifecycleManager {
                         .withHeader("X-Files-Root", wireMockServer.getOptions().filesRoot().getPath())
                         .withBodyFile("lasagne.html")));
 
+        stubFor(get(urlEqualTo("/news.html"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html")
+                        .withBodyFile("news.html")));
 
         return Collections.singletonMap("family.haschka.wiremock.recipes", wireMockServer.baseUrl());
     }

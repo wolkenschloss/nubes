@@ -10,9 +10,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,26 +23,13 @@ public class HttpParser implements ResourceParser {
         log.infov("HttpParser.readData {0}", source.toString());
 
 
-        var client = HttpClient.newHttpClient();
-        var request =HttpRequest.newBuilder().GET().uri(source).build();
-        try {
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            log.infov("Response Status: {0}", response.statusCode());
-            log.infov("X-Files-Root: {0}", response.headers().firstValue("X-Files-Root"));
-            log.info(response.body());
-            Document dom = Jsoup.parse(response.body());
-            Elements scripts = dom.select("script[type=application/ld+json]");
-            var result = scripts.stream()
-                    .map(Element::data)
-                    .collect(Collectors.toList());
+        Document dom = Jsoup.parse(source.toURL(), 10000);
+        Elements scripts = dom.select("script[type=application/ld+json]");
+        var result = scripts.stream()
+                .map(Element::data)
+                .collect(Collectors.toList());
 
-            log.infov("Result: {0}", result);
-            return result;
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        throw new RuntimeException("Not implemented");
+        log.infov("Result: {0}", result);
+        return result;
     }
 }

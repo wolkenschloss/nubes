@@ -78,6 +78,11 @@ public class RecipeService {
             log.info(event);
             var recipes = thief.extract(event.source);
             log.info("recipes extracted");
+
+            if (recipes.size() == 0) {
+                throw new RecipeParseException("The data source does not contain an importable recipe");
+            }
+
             recipes.get(0).recipeId = UUID.randomUUID();
             recipeRepository.persist(recipes.get(0));
             log.info("recipe persisted");
@@ -90,8 +95,27 @@ public class RecipeService {
             log.info("sending completed event");
             completed.fire(done);
             log.info("send completed event");
-        } catch (Exception e) {
+        } catch (IOException e) {
+            var done = new JobCompletedEvent();
+            done.error = Optional.of("The data source cannot be read");
+            done.jobId = event.jobId;
+            done.location = Optional.empty();
+
             log.warn("Can not steal recipe", e);
+            log.warn("sending completed event");
+            completed.fire(done);
+            log.warn("send completed event");
+        } catch (RecipeParseException e) {
+            var done = new JobCompletedEvent();
+            done.error = Optional.of(e.getMessage());
+            done.jobId = event.jobId;
+            done.location = Optional.empty();
+
+            log.warn("Can not steal recipe", e);
+            log.warn("sending completed event");
+            completed.fire(done);
+            log.warn("send completed event");
+
         }
 
     }

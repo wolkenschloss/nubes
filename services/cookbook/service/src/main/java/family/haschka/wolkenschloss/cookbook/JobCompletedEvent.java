@@ -8,7 +8,7 @@ import java.util.UUID;
 public class JobCompletedEvent {
     public UUID jobId;
     public Optional<URI> location;
-    public Optional<Exception> error;
+    public Optional<String> error;
 
     @Override
     public String toString() {
