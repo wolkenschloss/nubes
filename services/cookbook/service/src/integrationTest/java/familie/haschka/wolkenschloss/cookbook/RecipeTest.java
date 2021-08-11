@@ -68,17 +68,14 @@ public class RecipeTest {
     public static class PostRecipeTestcase {
         private final String fixture;
         private final int status;
-        private final ThrowingConsumer<ValidatableResponse> then_fn;
+        private final ThrowingConsumer<ValidatableResponse> assertions;
         private final String name;
 
-        public PostRecipeTestcase(String name, String fixture, int status, ThrowingConsumer<ValidatableResponse> then_fn) {
+        public PostRecipeTestcase(String name, String fixture, int status, ThrowingConsumer<ValidatableResponse> assertions) {
             this.name = name;
             this.fixture = fixture;
             this.status = status;
-            this.then_fn = then_fn;
-        }
-
-        public static void doNothing(ValidatableResponse response) {
+            this.assertions = assertions;
         }
     }
 
@@ -110,15 +107,15 @@ public class RecipeTest {
 
     public static class GetRecipeTestcase {
 
-        public GetRecipeTestcase(String name, String recipeId, ThrowingConsumer<ValidatableResponse> when_fn) {
+        public GetRecipeTestcase(String name, String recipeId, ThrowingConsumer<ValidatableResponse> assertions) {
             this.name = name;
             this.recipeId = recipeId;
-            this.when_fn = when_fn;
+            this.assertions = assertions;
         }
 
         String name;
         String recipeId;
-        ThrowingConsumer<ValidatableResponse> when_fn;
+        ThrowingConsumer<ValidatableResponse> assertions;
     }
 
     @TestFactory
@@ -145,7 +142,7 @@ public class RecipeTest {
                     .get(testcase.recipeId)
                     .then();
 
-            testcase.when_fn.accept(response);
+            testcase.assertions.accept(response);
         }));
     }
 

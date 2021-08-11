@@ -16,7 +16,7 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotated> {
     public Recipe adaptFromJson(RecipeAnnotated obj) {
         Recipe recipe = new Recipe();
         recipe.title = obj.name;
-        recipe.preparation = obj.description;
+        recipe.preparation = obj.instruction;
         if (obj.ingredients != null) {
             recipe.ingredients = obj.ingredients.stream()
                     .map(ingredient -> new Ingredient(null, null, ingredient))
