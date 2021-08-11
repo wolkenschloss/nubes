@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.job.*;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 
@@ -22,6 +21,7 @@ public class JobService implements IJobService {
     @Inject
     ImportJobRepository repository;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger log;
 

@@ -8,9 +8,9 @@ import java.net.URI;
 
 public class UriCodecProvider implements CodecProvider {
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
         if (clazz == URI.class) {
-            //noinspection unchecked
             return (Codec<T>) new UriCodec();
         }
 

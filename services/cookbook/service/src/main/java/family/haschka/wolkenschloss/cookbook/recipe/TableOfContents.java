@@ -1,7 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import family.haschka.wolkenschloss.cookbook.recipe.BriefDescription;
-
 import java.util.List;
 
 public class TableOfContents {

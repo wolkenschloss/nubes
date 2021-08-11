@@ -15,8 +15,6 @@ public class ImportJob {
     private URI location;
     private String error;
 
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

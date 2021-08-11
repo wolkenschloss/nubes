@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import family.haschka.wolkenschloss.cookbook.recipe.ResourceParser;
 import org.jboss.logging.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

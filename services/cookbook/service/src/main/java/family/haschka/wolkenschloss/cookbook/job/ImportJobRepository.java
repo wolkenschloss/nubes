@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.job.ImportJob;
 import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
 
 import javax.enterprise.context.ApplicationScoped;

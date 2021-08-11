@@ -11,6 +11,7 @@ public class JobEventHandler {
     @Inject
     IJobService service;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger log;
 

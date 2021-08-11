@@ -1,7 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.job.IJobService;
-import family.haschka.wolkenschloss.cookbook.job.ImportJob;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
@@ -20,6 +18,7 @@ public class JobResource {
     @Inject
     IJobService service;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger log;
 
