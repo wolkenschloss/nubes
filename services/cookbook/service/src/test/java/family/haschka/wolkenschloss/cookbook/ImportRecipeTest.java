@@ -1,15 +1,20 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import io.quarkus.test.junit.QuarkusMock;
+import family.haschka.wolkenschloss.cookbook.job.IJobService;
+import family.haschka.wolkenschloss.cookbook.job.ImportJobRepository;
+import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
+import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeService;
+import family.haschka.wolkenschloss.cookbook.recipe.ResourceParser;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 
 import javax.annotation.PostConstruct;
@@ -64,9 +69,6 @@ public class ImportRecipeTest {
         event.source = URI.create("http://meinerezepte.local/lasagne.html");
 
         var recipeId = UUID.randomUUID();
-        var lasagne = new Recipe();
-        lasagne.recipeId = null;
-        lasagne.title = "Lasagne";
 
         var localParser = new ResourceHtmlParser();
         var data = localParser.readData(URI.create("lasagne.html"));

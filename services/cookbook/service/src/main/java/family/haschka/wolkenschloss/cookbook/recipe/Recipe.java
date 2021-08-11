@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.recipe;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
@@ -17,7 +17,7 @@ public class Recipe {
     protected Recipe() {}
 
     public Recipe(String title, String preparation) {
-
+        this.recipeId = null;
         this.title = title;
         this.preparation = preparation;
     }

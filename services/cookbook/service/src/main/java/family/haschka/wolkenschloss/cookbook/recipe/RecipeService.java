@@ -1,9 +1,10 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.recipe;
 
+import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
+import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import io.quarkus.mongodb.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import org.jboss.logging.Logger;
-
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -34,7 +35,7 @@ public class RecipeService {
             return recipeRepository.findAll(Sort.by("title"));
         }
 
-        return recipeRepository.find("title like ?1}",  search, Sort.by("title"));
+        return recipeRepository.find("title like ?1}", search, Sort.by("title"));
     }
 
     public TableOfContents list(int from, int to, String search) {
@@ -70,6 +71,7 @@ public class RecipeService {
 
     @Inject
     ResourceParser parser;
+
     public void steal(@ObservesAsync JobReceivedEvent event) throws IOException {
         try {
             log.info("RecipeService.steal");
@@ -115,8 +117,6 @@ public class RecipeService {
             log.warn("sending completed event");
             completed.fire(done);
             log.warn("send completed event");
-
         }
-
     }
 }

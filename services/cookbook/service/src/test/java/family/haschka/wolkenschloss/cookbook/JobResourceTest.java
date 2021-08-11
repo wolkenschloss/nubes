@@ -1,5 +1,8 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.job.IJobService;
+import family.haschka.wolkenschloss.cookbook.job.ImportJob;
+import family.haschka.wolkenschloss.cookbook.job.JobResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;

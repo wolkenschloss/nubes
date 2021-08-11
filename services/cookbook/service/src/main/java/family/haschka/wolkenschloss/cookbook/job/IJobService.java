@@ -1,6 +1,5 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.job;
 
-import javax.enterprise.event.Observes;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;

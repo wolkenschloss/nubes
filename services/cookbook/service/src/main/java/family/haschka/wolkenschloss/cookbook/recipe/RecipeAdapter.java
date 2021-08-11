@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.recipe;
 
 import com.arjuna.ats.jta.exceptions.NotImplementedException;
 
@@ -14,9 +14,8 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotated> {
 
     @Override
     public Recipe adaptFromJson(RecipeAnnotated obj) {
-        Recipe recipe = new Recipe();
-        recipe.title = obj.name;
-        recipe.preparation = obj.instruction;
+        Recipe recipe = new Recipe(obj.name, obj.instruction);
+
         if (obj.ingredients != null) {
             recipe.ingredients = obj.ingredients.stream()
                     .map(ingredient -> new Ingredient(null, null, ingredient))

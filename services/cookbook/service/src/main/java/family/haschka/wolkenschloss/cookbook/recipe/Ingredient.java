@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.recipe;
 
 public class Ingredient {
 
@@ -10,7 +10,6 @@ public class Ingredient {
         this.unit = unit;
         this.quantity = quantity;
     }
-
 
     public String name;
     public String unit;

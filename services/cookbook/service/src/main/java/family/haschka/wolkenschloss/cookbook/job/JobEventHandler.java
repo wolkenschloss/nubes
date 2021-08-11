@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.job;
 
 import org.jboss.logging.Logger;
 

@@ -1,7 +1,8 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.job.*;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeService;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;

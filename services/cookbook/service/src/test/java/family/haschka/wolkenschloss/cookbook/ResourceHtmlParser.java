@@ -1,5 +1,6 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.recipe.ResourceParser;
 import io.quarkus.arc.AlternativePriority;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

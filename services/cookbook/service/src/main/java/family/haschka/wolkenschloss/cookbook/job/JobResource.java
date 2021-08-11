@@ -1,12 +1,16 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.job;
 
+import family.haschka.wolkenschloss.cookbook.job.IJobService;
+import family.haschka.wolkenschloss.cookbook.job.ImportJob;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 @Path("job")
 public class JobResource {
@@ -30,8 +34,7 @@ public class JobResource {
         job.setJobId(UUID.randomUUID());
         job.setState(ImportJob.State.IN_PROGRESS);
 
-         service.addJob(job);
-
+        service.addJob(job);
 
         var location = uriInfo.getAbsolutePathBuilder()
                 .path(GET_PATH)

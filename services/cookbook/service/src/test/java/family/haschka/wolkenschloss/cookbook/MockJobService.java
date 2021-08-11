@@ -1,9 +1,12 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.job.IJobService;
+import family.haschka.wolkenschloss.cookbook.job.ImportJob;
+import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
+import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import java.util.Optional;

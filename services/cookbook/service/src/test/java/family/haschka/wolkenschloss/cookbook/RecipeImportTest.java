@@ -1,5 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeImport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

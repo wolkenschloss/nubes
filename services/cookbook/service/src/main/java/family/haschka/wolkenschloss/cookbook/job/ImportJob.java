@@ -1,10 +1,9 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.job;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.net.URI;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 public class ImportJob {

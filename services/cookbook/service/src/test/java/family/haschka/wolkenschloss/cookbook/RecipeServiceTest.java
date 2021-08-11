@@ -1,26 +1,17 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.core.UriBuilder;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
 

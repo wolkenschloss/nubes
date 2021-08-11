@@ -1,12 +1,12 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.job;
 
+import family.haschka.wolkenschloss.cookbook.job.*;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.NotificationOptions;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.net.URI;
