@@ -1,13 +1,9 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import family.haschka.wolkenschloss.cookbook.job.IJobService;
-import family.haschka.wolkenschloss.cookbook.job.ImportJobRepository;
 import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
 import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
-import family.haschka.wolkenschloss.cookbook.recipe.RecipeService;
-import family.haschka.wolkenschloss.cookbook.recipe.ResourceParser;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
@@ -25,7 +21,6 @@ import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -38,23 +33,10 @@ import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
 @TestProfile(MockJobServiceProfile.class)
-public class ImportRecipeTest {
-
-//    @InjectMock
-//    ResourceParser parser;
-
-
-    @Inject
-    IJobService jobService;
+public class JobReceivedEventTest {
 
     @InjectMock
     RecipeRepository recipeRepository;
-
-    @InjectMock
-    ImportJobRepository jobRepository;
-
-    @Inject
-    RecipeService subjectUnderTest;
 
     @Inject
     Event<JobReceivedEvent> received;
@@ -64,46 +46,37 @@ public class ImportRecipeTest {
 
     @Test
     @DisplayName("should import recipe from url")
-    public void testImportRecipe() throws ExecutionException, InterruptedException, IOException, URISyntaxException {
+    public void testImportRecipe() throws ExecutionException, InterruptedException, URISyntaxException {
 
         var lasagneUrl = this.getClass().getClassLoader().getResource("lasagne.html");
         var lasagneUri = lasagneUrl.toURI();
 
         var event = new JobReceivedEvent();
         event.jobId = UUID.randomUUID();
-
         event.source = lasagneUri;
 
         var recipeId = UUID.randomUUID();
-
-        var localParser = new ResourceHtmlParser();
-
-        //var data = localParser.readData(URI.create("lasagne.html"));
-
-        //Mockito.when(parser.readData(event.source)).thenReturn(data);
 
         Mockito.doAnswer(recipe -> {
             recipe.getArgument(0, Recipe.class).recipeId = recipeId;
             return null;
         }).when(recipeRepository).persist(any(Recipe.class));
 
+        received.fireAsync(event, NotificationOptions.ofExecutor(executor))
+                .thenAccept(e -> {
+                    var expectedEvent = new JobCompletedEvent();
+                    var expectedUri = UriBuilder.fromUri("/recipe/{id}").build(recipeId);
 
-        var future = received.fireAsync(event, NotificationOptions.ofExecutor(executor));
-        future.thenAccept(e -> {
-            var expected = new JobCompletedEvent();
-            expected.error = Optional.empty();
-            expected.jobId = e.jobId;
-            expected.location = Optional.of(UriBuilder.fromUri(URI.create("/recipe"))
-                    .path(recipeId.toString()).build());
+                    expectedEvent.error = Optional.empty();
+                    expectedEvent.jobId = e.jobId;
+                    expectedEvent.location = Optional.of(expectedUri);
 
-            Assertions.assertTrue(observer.getEvents().contains(expected));
+                    Assertions.assertTrue(observer.getEvents().contains(expectedEvent));
 
-        }).toCompletableFuture().get();
+                })
+                .toCompletableFuture().get();
 
-//        Mockito.verify(parser, Mockito.times(1)).readData(event.source);
         Mockito.verify(recipeRepository, Mockito.times(1)).persist(any(Recipe.class));
-
-//        Mockito.verifyNoMoreInteractions(parser);
         Mockito.verifyNoMoreInteractions(recipeRepository);
     }
 

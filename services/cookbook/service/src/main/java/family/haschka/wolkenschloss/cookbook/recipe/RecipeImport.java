@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class RecipeImport {
-    private final ResourceParser reader;
+    private final HttpParser reader;
 
-    public RecipeImport(ResourceParser reader) {
+    public RecipeImport(HttpParser reader) {
         this.reader = reader;
     }
 

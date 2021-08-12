@@ -14,18 +14,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class HttpParser implements ResourceParser {
+public class HttpParser {
 
-    @Override
     public List<String> readData(URI source) throws IOException {
 
         Document dom = Jsoup.parse(download(source));
         Elements scripts = dom.select("script[type=application/ld+json]");
-        var result = scripts.stream()
+
+        return scripts.stream()
                 .map(Element::data)
                 .collect(Collectors.toList());
-
-        return result;
     }
 
     private String download(URI source) throws IOException {
