@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
 

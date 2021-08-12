@@ -5,7 +5,8 @@ quarkus:
     database: cookbook
     connection-string: mongodb://localhost:27017/?uuidRepresentation=STANDARD
     devservices:
-      enabled: false
+      properties:
+        uuidRepresentation: STANDARD
   log:
     level: INFO
     console:
@@ -21,14 +22,14 @@ quarkus:
    quarkus:
      http:
        port: 8180
-   mongodb:
-     database: cookbook
-     connection-string: mongodb:localhost:27017/?uuidRepresentation=STANDARD
-
 
 "%test":
   quarkus:
     http:
       port: 0
+      test-port: 9292
     log:
       level: INFO
+    mongodb:
+      devservices:
+        enabled: false

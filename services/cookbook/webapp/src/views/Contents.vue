@@ -1,12 +1,22 @@
 <template>
   <v-container>
-    <v-text-field v-model="search"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                  clearable
-    />
+    <v-toolbar elevation="0">
+      <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
+        <template v-slot:activator="{on, attrs}">
+          <v-btn v-on="on" v-bind="attrs" color="secondary">New Recipe</v-btn>
+        </template>
+      </edit>
+      &nbsp;
+      <import-dialog/>
+      <v-text-field v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                    clearable
+      />
+    </v-toolbar>
+
     <v-data-table
         class="mt-4"
         hide-default-header
@@ -22,11 +32,8 @@
     >
       <!--suppress HtmlUnknownAttribute -->
       <template v-slot:footer.prepend>
-        <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="created" v-bind:value="recipe" v-on:cancel="cancel">
-          <template v-slot:activator="{on, attrs}">
-            <v-btn v-on="on" v-bind="attrs" color="secondary">New Recipe</v-btn>
-          </template>
-        </edit>
+
+
       </template>
     </v-data-table>
   </v-container>
@@ -37,10 +44,11 @@
 import axios from "axios";
 import Edit from "@/views/Edit";
 import {debounce} from "lodash";
+import ImportDialog from "@/components/ImportDialog";
 
 export default {
   name: 'Contents',
-  components: {Edit},
+  components: {ImportDialog, Edit},
   watch: {
     options: {
       handler() {

@@ -1,25 +1,19 @@
 package familie.haschka.wolkenschloss.cookbook;
 
+import familie.haschka.wolkenschloss.cookbook.testing.MongoDbResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import javax.json.Json;
-import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -31,52 +25,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @QuarkusIntegrationTest
-@QuarkusTestResource(value = MongoDbResource.class, restrictToAnnotatedClass = true)
+@QuarkusTestResource(value = MongoDbResource.class)
 @DisplayName("Recipe CRUD Operations")
 public class RecipeTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(RecipeTest.class);
 
     @Test
     public void checkDefaultHttpPort() {
         var port = System.getProperty("quarkus.http.port");
-        logger.info("quarkus.http.port = {}", port);
-        Assertions.assertEquals("8081", port);
+        Assertions.assertEquals("9292", port);
     }
 
     @Test
     @DisplayName("Verbindungszeichenfolge erfordert UUID Konfiguration")
     public void checkMongoDbConnectionString() {
         var host = System.getProperty("quarkus.mongodb.connection-string");
-        logger.warn("quarkus.mongodb.hosts = {}", host);
         Assertions.assertNotNull(host);
         assertThat(host, containsString("uuidRepresentation=STANDARD"));
-    }
-
-    private ValidatableResponse response;
-
-    private String getPort() {
-        return System.getProperty("quarkus.http.port");
-    }
-
-    private String getUrl() {
-        return "http://localhost:" + getPort() + "/recipe";
-    }
-
-    @BeforeEach
-    public void createRecipe() throws URISyntaxException, IOException {
-        var str = readFixture("fixtures/schlammkrabbeneintopf.json");
-
-        // POST /recipe valid data
-        response = RestAssured
-                .given()
-                .body(str)
-                .contentType(ContentType.JSON)
-                .when()
-                .post(getUrl())
-                .then()
-                .statusCode(HttpStatus.SC_CREATED)
-                .header("Location", response -> equalTo(getUrl() + "/" + response.path("recipeId")));
     }
 
     @Test
@@ -94,47 +58,99 @@ public class RecipeTest {
                 .statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
-    @Test
-    @DisplayName("GET /recipe/:id")
-    public void readRecipe() {
+    public static class PostRecipeTestcase {
+        private final String fixture;
+        private final int status;
+        private final ThrowingConsumer<ValidatableResponse> assertions;
+        private final String name;
 
-        RestAssured
-                .given()
-                .when()
-                .get(response.extract().header("Location"))
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("title", equalTo("Schlammkrabbeneintopf"))
-                .body("ingredients.size", equalTo(4))
-                .body("preparation", equalTo("Bekannt."));
+        public PostRecipeTestcase(
+                String name,
+                String fixture,
+                int status,
+                @SuppressWarnings("CdiInjectionPointsInspection") ThrowingConsumer<ValidatableResponse> assertions) {
+            this.name = name;
+            this.fixture = fixture;
+            this.status = status;
+            this.assertions = assertions;
+        }
     }
 
-    @Test
-    @DisplayName("GET /recipe/:id invalid id")
-    public void readRecipeInvalidId() {
+    @TestFactory
+    @DisplayName("POST /recipe")
+    public Stream<DynamicTest> postRecipeTest() {
+        return Stream.of(
+                new PostRecipeTestcase("valid data",
+                        "fixtures/schlammkrabbeneintopf.json",
+                        HttpStatus.SC_CREATED,
+                        response -> response.contentType(ContentType.JSON)
+                                .header("Location", r -> equalTo(getUrl() + "/" + r.path("recipeId")))
+                                .body("title", equalTo("Schlammkrabbeneintopf"))),
 
-        var url = URI.create(getUrl());
+                new PostRecipeTestcase("invalid data",
+                        "fixtures/invalid.json",
+                        HttpStatus.SC_BAD_REQUEST,
+                        response -> response.header("Location", equalTo(null)))
+        ).map(testcase -> DynamicTest.dynamicTest(testcase.name,
+                () -> testcase.assertions.accept(RestAssured
+                        .given()
+                        .body(readFixture(testcase.fixture))
+                        .contentType(ContentType.JSON)
+                        .when()
+                        .post(getUrl())
+                        .then()
+                        .statusCode(testcase.status))));
+    }
 
-        // UriBuild.path ersetzt nicht, sondern fügt hinzu
-        var uriWithInvalidId = UriBuilder.fromUri(url)
-                .path(UUID.randomUUID().toString())
-                .build();
+    public static class GetRecipeTestcase {
 
-        Assertions.assertFalse(uriWithInvalidId.toString().startsWith("http://localhost:8081/recipe/recipe"));
+        public GetRecipeTestcase(
+                String name,
+                String recipeId,
+                @SuppressWarnings("CdiInjectionPointsInspection") ThrowingConsumer<ValidatableResponse> assertions) {
+            this.name = name;
+            this.recipeId = recipeId;
+            this.assertions = assertions;
+        }
 
-        RestAssured
-                .given()
-                .when()
-                .get(uriWithInvalidId)
-                .then()
-                .statusCode(HttpStatus.SC_NOT_FOUND);
+        String name;
+        String recipeId;
+        ThrowingConsumer<ValidatableResponse> assertions;
+    }
+
+    @TestFactory
+    @DisplayName("GET /recipe/:id")
+    public Stream<DynamicTest> getRecipeTest() throws URISyntaxException, IOException {
+        return Stream.of(
+                new GetRecipeTestcase("valid id",
+                        location(createRecipe()),
+                        response -> response.statusCode(HttpStatus.SC_OK)
+                                .contentType(ContentType.JSON)
+                                .body("title", equalTo("Schlammkrabbeneintopf"))),
+
+                new GetRecipeTestcase("unknown id",
+                        UUID.randomUUID().toString(),
+                        response -> response.statusCode(HttpStatus.SC_NOT_FOUND)),
+
+                new GetRecipeTestcase("malformed id",
+                        "malformed id",
+                        response -> response.statusCode(HttpStatus.SC_NOT_FOUND))
+        ).map(testcase -> DynamicTest.dynamicTest(testcase.name, () -> {
+            var response = RestAssured
+                    .given()
+                    .when()
+                    .get(testcase.recipeId)
+                    .then();
+
+            testcase.assertions.accept(response);
+        }));
     }
 
     @Test
     @DisplayName("GET /recipe")
-    public void listRecipes() {
+    public void listRecipes() throws URISyntaxException, IOException {
 
-        String id = response.extract().path("recipeId");
+        String id = recipeId(createRecipe());
 
         RestAssured
                 .given()
@@ -152,8 +168,9 @@ public class RecipeTest {
 
     @Test
     @DisplayName("GET /recipe minimal data")
-    public void listRecipesMinimal() {
-        String id = response.extract().path("recipeId");
+    public void listRecipesMinimal() throws URISyntaxException, IOException {
+
+        createRecipe();
 
         ArrayList<Map<String, Object>> result = RestAssured.given()
                 .when()
@@ -168,17 +185,10 @@ public class RecipeTest {
         Assertions.assertEquals(allKeys, new HashSet<>(Arrays.asList("recipeId", "title")));
     }
 
-    private static Set<String> mergeSet(Set<String> a, Set<String> b) {
-        Set<String> result = new HashSet<>();
-        Stream.of(a, b).forEach(result::addAll);
-
-        return result;
-    }
-
     @Test
-    @DisplayName("Delete Recipe")
-    public void deleteRecipe() {
-        String location = response.extract().header("Location");
+    @DisplayName("DELETE /recipe/:id")
+    public void deleteRecipe() throws URISyntaxException, IOException {
+        String location = location(createRecipe());
 
         // TODO: Ein Rezept löschen, dass nicht vorhanden ist.
         // Wenn ich ein Rezept lösche
@@ -199,34 +209,36 @@ public class RecipeTest {
     }
 
     @Test
-    @DisplayName("Update Recipe")
-    public void updateRecipe() {
-        String location = response.extract().header("Location");
-        var body = response.extract().body().asInputStream();
-        var reader = Json.createReader(body);
-        var recipe = reader.readObject();
-        var change = Json.createObjectBuilder(recipe);
-        change.remove("title");
-        change.add("title", "Schlachterfischsuppe");
+    @DisplayName("PUT /recipe/:id")
+    public void updateRecipe() throws URISyntaxException, IOException {
+        var created = createRecipe();
+        var location = created.extract().header("Location");
 
-        var changed = change.build();
+        try (var body = created.extract().body().asInputStream()) {
+            try (var reader = Json.createReader(body)) {
+                var recipe = reader.readObject();
+                var changedRecipe = Json.createObjectBuilder(recipe);
+                changedRecipe.remove("title");
+                changedRecipe.add("title", "Schlachterfischsuppe");
 
-        RestAssured
-                .given()
-                .body(changed.toString())
-                .contentType(ContentType.JSON)
-                .when()
-                .put(location)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .body("title", equalTo("Schlachterfischsuppe"));
+                RestAssured
+                        .given()
+                        .body(changedRecipe.build().toString())
+                        .contentType(ContentType.JSON)
+                        .when()
+                        .put(location)
+                        .then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .body("title", equalTo("Schlachterfischsuppe"));
+            }
+        }
     }
 
     @Test
     @DisplayName("PATCH /recipe/:id - change title")
-    public void patchRecipe() {
+    public void patchRecipe() throws URISyntaxException, IOException {
 
-        String location = response.extract().header("Location");
+        String location = location(createRecipe());
 
         Map<String, ?> config = Collections.emptyMap();
         var factory = Json.createBuilderFactory(config);
@@ -251,7 +263,7 @@ public class RecipeTest {
 
 
         // Dann werde ich den geänderten Titel beim nächsten Abrufen
-        // des Rezept erhalten.
+        // des Rezepts erhalten.
         RestAssured
                 .given()
                 .accept(ContentType.JSON)
@@ -260,6 +272,37 @@ public class RecipeTest {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("title", equalTo("Schneebeeren-Crostata"));
+    }
+
+    private String getPort() {
+        return System.getProperty("quarkus.http.port");
+    }
+
+    private String getUrl() {
+        return "http://localhost:" + getPort() + "/recipe";
+    }
+
+    public ValidatableResponse createRecipe() throws URISyntaxException, IOException {
+        var str = readFixture("fixtures/schlammkrabbeneintopf.json");
+
+        // POST /recipe valid data
+        return RestAssured
+                .given()
+                .body(str)
+                .contentType(ContentType.JSON)
+                .when()
+                .post(getUrl())
+                .then()
+                .statusCode(HttpStatus.SC_CREATED)
+                .header("Location", response -> equalTo(getUrl() + "/" + response.path("recipeId")));
+    }
+
+    private String location(ValidatableResponse response) {
+        return response.extract().header("Location");
+    }
+
+    private String recipeId(ValidatableResponse response) {
+        return response.extract().path("recipeId");
     }
 
     private String readFixture(String resourceFileName) throws URISyntaxException, IOException {
@@ -271,5 +314,12 @@ public class RecipeTest {
 
         File file = new File(resource.toURI());
         return Files.readString(file.toPath());
+    }
+
+    private static Set<String> mergeSet(Set<String> a, Set<String> b) {
+        Set<String> result = new HashSet<>();
+        Stream.of(a, b).forEach(result::addAll);
+
+        return result;
     }
 }

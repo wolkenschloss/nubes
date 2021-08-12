@@ -3,6 +3,11 @@
     <module name="nubes.services.cookbook.service.main" />
     <QsGradleRunConfiguration>
       <ExternalSystemSettings>
+        <option name="env">
+          <map>
+            <entry key="DOCKER_HOST" value="unix:///run/user/1000/docker.sock" />
+          </map>
+        </option>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/services/cookbook/service" />
         <option name="externalSystemIdString" value="GRADLE" />

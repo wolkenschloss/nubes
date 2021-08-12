@@ -1,5 +1,8 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.*;
@@ -7,7 +10,6 @@ import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
 
 import javax.inject.Inject;
-
 import java.util.UUID;
 
 @QuarkusTest
@@ -15,6 +17,7 @@ public class RecipeServiceTest {
 
     @InjectMock
     RecipeRepository recipeRepository;
+
 
     @Inject
     RecipeService subjectUnderTest;
@@ -31,6 +34,7 @@ public class RecipeServiceTest {
     public void verifyMockInteractions() {
         Mockito.verifyNoMoreInteractions(recipeRepository);
     }
+
     @Test
     @DisplayName("'get' should return value if exists")
     public void testNewRecipe() {
