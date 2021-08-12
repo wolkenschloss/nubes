@@ -72,12 +72,8 @@ public class RecipeService {
     public void steal(@ObservesAsync JobReceivedEvent event) {
         try {
             var parser = new HttpParser();
-            log.info("RecipeService.steal");
             var thief = new RecipeImport(parser);
-            log.info("Thief created");
-            log.info(event);
             var recipes = thief.extract(event.source);
-            log.info("recipes extracted");
 
             if (recipes.size() == 0) {
                 throw new RecipeParseException("The data source does not contain an importable recipe");
@@ -85,25 +81,24 @@ public class RecipeService {
 
             recipes.get(0).recipeId = UUID.randomUUID();
             recipeRepository.persist(recipes.get(0));
-            log.info("recipe persisted");
-            log.info(recipes.get(0));
+
             var done = new JobCompletedEvent();
             done.error = Optional.empty();
             done.jobId = event.jobId;
-            done.location = Optional.of(UriBuilder.fromUri("/recipe").path(recipes.get(0).recipeId.toString()).build());
+            done.location = Optional.of(UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId));
 
-            log.info("sending completed event");
             completed.fire(done);
-            log.info("send completed event");
+
         } catch (IOException e) {
             var done = new JobCompletedEvent();
             done.error = Optional.of("The data source cannot be read");
             done.jobId = event.jobId;
             done.location = Optional.empty();
 
-            log.warn("Can not steal recipe", e);
-            log.warn("sending completed event");
+            log.info("Can not steal recipe", e);
+
             completed.fire(done);
+
             log.warn("send completed event");
         } catch (RecipeParseException e) {
             var done = new JobCompletedEvent();
@@ -111,10 +106,9 @@ public class RecipeService {
             done.jobId = event.jobId;
             done.location = Optional.empty();
 
-            log.warn("Can not steal recipe", e);
-            log.warn("sending completed event");
+            log.info("Can not steal recipe", e);
+
             completed.fire(done);
-            log.warn("send completed event");
         }
     }
 }
