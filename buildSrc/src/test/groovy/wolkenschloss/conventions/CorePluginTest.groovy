@@ -84,7 +84,7 @@ class CorePluginTest extends Specification {
         result.task(':build').outcome == TaskOutcome.SUCCESS
     }
 
-    def "Source code cannot be written in Java with language level 16"() {
+    def "Source code can be written in Java with language level 16"() {
         given:
         srcFile << """
             package wolkenschloss.cookbook.core;
@@ -96,10 +96,10 @@ class CorePluginTest extends Specification {
                 .withProjectDir(testProjectDir)
                 .withArguments("build")
                 .withPluginClasspath()
-                .buildAndFail()
+                .build()
 
         then: "build failed"
-        result.task(':compileJava').outcome == TaskOutcome.FAILED
+        result.task(':compileJava').outcome == TaskOutcome.SUCCESS
 
     }
 }
