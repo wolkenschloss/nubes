@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,8 +40,8 @@ import static org.mockito.ArgumentMatchers.any;
 @TestProfile(MockJobServiceProfile.class)
 public class ImportRecipeTest {
 
-    @InjectMock
-    ResourceParser parser;
+//    @InjectMock
+//    ResourceParser parser;
 
 
     @Inject
@@ -63,16 +64,24 @@ public class ImportRecipeTest {
 
     @Test
     @DisplayName("should import recipe from url")
-    public void testImportRecipe() throws ExecutionException, InterruptedException, IOException {
+    public void testImportRecipe() throws ExecutionException, InterruptedException, IOException, URISyntaxException {
+
+        var lasagneUrl = this.getClass().getClassLoader().getResource("lasagne.html");
+        var lasagneUri = lasagneUrl.toURI();
+
         var event = new JobReceivedEvent();
         event.jobId = UUID.randomUUID();
-        event.source = URI.create("http://meinerezepte.local/lasagne.html");
+
+        event.source = lasagneUri;
 
         var recipeId = UUID.randomUUID();
 
         var localParser = new ResourceHtmlParser();
-        var data = localParser.readData(URI.create("lasagne.html"));
-        Mockito.when(parser.readData(event.source)).thenReturn(data);
+
+        //var data = localParser.readData(URI.create("lasagne.html"));
+
+        //Mockito.when(parser.readData(event.source)).thenReturn(data);
+
         Mockito.doAnswer(recipe -> {
             recipe.getArgument(0, Recipe.class).recipeId = recipeId;
             return null;
@@ -91,10 +100,10 @@ public class ImportRecipeTest {
 
         }).toCompletableFuture().get();
 
-        Mockito.verify(parser, Mockito.times(1)).readData(event.source);
+//        Mockito.verify(parser, Mockito.times(1)).readData(event.source);
         Mockito.verify(recipeRepository, Mockito.times(1)).persist(any(Recipe.class));
 
-        Mockito.verifyNoMoreInteractions(parser);
+//        Mockito.verifyNoMoreInteractions(parser);
         Mockito.verifyNoMoreInteractions(recipeRepository);
     }
 

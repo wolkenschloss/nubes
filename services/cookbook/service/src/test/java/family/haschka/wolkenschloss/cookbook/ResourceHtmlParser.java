@@ -14,9 +14,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
-@Alternative
-@AlternativePriority(100)
+//@ApplicationScoped
+//@Alternative
+//@AlternativePriority(100)
 public class ResourceHtmlParser implements ResourceParser {
 
     public ResourceHtmlParser() {

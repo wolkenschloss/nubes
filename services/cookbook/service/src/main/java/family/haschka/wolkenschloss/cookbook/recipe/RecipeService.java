@@ -69,11 +69,9 @@ public class RecipeService {
     @Inject
     Event<JobCompletedEvent> completed;
 
-    @Inject
-    ResourceParser parser;
-
-    public void steal(@ObservesAsync JobReceivedEvent event) throws IOException {
+    public void steal(@ObservesAsync JobReceivedEvent event) {
         try {
+            var parser = new HttpParser();
             log.info("RecipeService.steal");
             var thief = new RecipeImport(parser);
             log.info("Thief created");
