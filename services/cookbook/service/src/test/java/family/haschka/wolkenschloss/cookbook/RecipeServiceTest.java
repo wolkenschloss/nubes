@@ -10,10 +10,7 @@ import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
 
 import javax.inject.Inject;
-
 import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
 public class RecipeServiceTest {

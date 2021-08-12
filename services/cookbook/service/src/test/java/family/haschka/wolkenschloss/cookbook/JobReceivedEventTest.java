@@ -44,6 +44,7 @@ public class JobReceivedEventTest {
     @Inject
     Event<JobReceivedEvent> received;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     ManagedExecutor executor;
 

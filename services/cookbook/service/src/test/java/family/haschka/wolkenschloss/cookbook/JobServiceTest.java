@@ -29,6 +29,7 @@ public class JobServiceTest {
     @InjectMock
     ImportJobRepository repository;
 
+    @SuppressWarnings("unused")
     @InjectMock
     RecipeService recipeService;
 
@@ -58,7 +59,6 @@ public class JobServiceTest {
         future.thenAccept(event -> {
 
             Assertions.assertTrue(observer.events.contains(event));
-//            Assertions.assertEquals(1, observer.getEvents().size());
             var expected = new JobReceivedEvent();
             expected.jobId = event.jobId;
             expected.source = URI.create(job.getUrl());
@@ -167,6 +167,7 @@ public class JobServiceTest {
             events.add(event);
         }
 
+        // Hm
         List<JobReceivedEvent> getEvents() {
             return events;
         }

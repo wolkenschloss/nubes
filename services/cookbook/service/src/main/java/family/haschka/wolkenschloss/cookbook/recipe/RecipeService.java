@@ -22,6 +22,7 @@ public class RecipeService {
     @Inject
     RecipeRepository recipeRepository;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger log;
 

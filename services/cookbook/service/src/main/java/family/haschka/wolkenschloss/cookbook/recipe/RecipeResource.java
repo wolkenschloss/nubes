@@ -13,6 +13,7 @@ import java.util.UUID;
 @Path("/recipe")
 public class RecipeResource {
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger logger;
 

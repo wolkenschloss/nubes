@@ -71,7 +71,11 @@ public class RecipeTest {
         private final ThrowingConsumer<ValidatableResponse> assertions;
         private final String name;
 
-        public PostRecipeTestcase(String name, String fixture, int status, ThrowingConsumer<ValidatableResponse> assertions) {
+        public PostRecipeTestcase(
+                String name,
+                String fixture,
+                int status,
+                @SuppressWarnings("CdiInjectionPointsInspection") ThrowingConsumer<ValidatableResponse> assertions) {
             this.name = name;
             this.fixture = fixture;
             this.status = status;
@@ -95,19 +99,22 @@ public class RecipeTest {
                         HttpStatus.SC_BAD_REQUEST,
                         response -> response.header("Location", equalTo(null)))
         ).map(testcase -> DynamicTest.dynamicTest(testcase.name,
-                () -> RestAssured
+                () -> testcase.assertions.accept(RestAssured
                         .given()
                         .body(readFixture(testcase.fixture))
                         .contentType(ContentType.JSON)
                         .when()
                         .post(getUrl())
                         .then()
-                        .statusCode(testcase.status)));
+                        .statusCode(testcase.status))));
     }
 
     public static class GetRecipeTestcase {
 
-        public GetRecipeTestcase(String name, String recipeId, ThrowingConsumer<ValidatableResponse> assertions) {
+        public GetRecipeTestcase(
+                String name,
+                String recipeId,
+                @SuppressWarnings("CdiInjectionPointsInspection") ThrowingConsumer<ValidatableResponse> assertions) {
             this.name = name;
             this.recipeId = recipeId;
             this.assertions = assertions;

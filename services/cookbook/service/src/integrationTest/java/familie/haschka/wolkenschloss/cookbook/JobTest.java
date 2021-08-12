@@ -22,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusIntegrationTest
 @QuarkusTestResource(value = MongoDbResource.class)
@@ -83,7 +84,10 @@ public class JobTest {
         private final String requestedData;
         private final ThrowingConsumer<ValidatableResponse> assertion;
 
-        public PostJobTestcase(String name, String requestedData, ThrowingConsumer<ValidatableResponse> assertion) {
+        public PostJobTestcase(
+                String name,
+                String requestedData,
+                @SuppressWarnings("CdiInjectionPointsInspection") ThrowingConsumer<ValidatableResponse> assertion) {
             this.name = name;
             this.requestedData = requestedData;
             this.assertion = assertion;
