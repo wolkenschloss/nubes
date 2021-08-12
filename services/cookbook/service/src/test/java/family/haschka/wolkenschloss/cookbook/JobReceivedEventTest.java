@@ -2,10 +2,10 @@ package family.haschka.wolkenschloss.cookbook;
 
 import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
 import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
+import family.haschka.wolkenschloss.cookbook.job.JobService;
 import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectMock;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +21,6 @@ import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +31,15 @@ import java.util.concurrent.ExecutionException;
 import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
-@TestProfile(MockJobServiceProfile.class)
 public class JobReceivedEventTest {
 
     @InjectMock
     RecipeRepository recipeRepository;
+
+    // Verhindert, dass JobService das Ereignis JobCompletedEvent empfängt.
+    @SuppressWarnings("unused")
+    @InjectMock
+    JobService jobService;
 
     @Inject
     Event<JobReceivedEvent> received;
@@ -48,19 +51,17 @@ public class JobReceivedEventTest {
     @DisplayName("should import recipe from url")
     public void testImportRecipe() throws ExecutionException, InterruptedException, URISyntaxException {
 
-        var lasagneUrl = this.getClass().getClassLoader().getResource("lasagne.html");
-        var lasagneUri = lasagneUrl.toURI();
-
-        var event = new JobReceivedEvent();
-        event.jobId = UUID.randomUUID();
-        event.source = lasagneUri;
-
+        var lasagneUri = this.getClass().getClassLoader().getResource("lasagne.html").toURI();
         var recipeId = UUID.randomUUID();
 
         Mockito.doAnswer(recipe -> {
             recipe.getArgument(0, Recipe.class).recipeId = recipeId;
             return null;
         }).when(recipeRepository).persist(any(Recipe.class));
+
+        var event = new JobReceivedEvent();
+        event.jobId = UUID.randomUUID();
+        event.source = lasagneUri;
 
         received.fireAsync(event, NotificationOptions.ofExecutor(executor))
                 .thenAccept(e -> {

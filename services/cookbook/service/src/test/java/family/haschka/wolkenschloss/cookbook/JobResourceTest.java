@@ -1,8 +1,8 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import family.haschka.wolkenschloss.cookbook.job.IJobService;
 import family.haschka.wolkenschloss.cookbook.job.ImportJob;
 import family.haschka.wolkenschloss.cookbook.job.JobResource;
+import family.haschka.wolkenschloss.cookbook.job.JobService;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -29,7 +29,7 @@ public class JobResourceTest {
 
     public static final String JOB_URL = "http://meinkochbuch.local/lasagne.html";
     @InjectMock
-    IJobService service;
+    JobService service;
 
     @TestHTTPEndpoint(JobResource.class)
     @TestHTTPResource

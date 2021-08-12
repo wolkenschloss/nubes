@@ -9,13 +9,13 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class JobEventHandler {
     @Inject
-    IJobService service;
+    JobService service;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger log;
 
-    public void jobCompleted(@Observes JobCompletedEvent event) {
+    public void jobCompleted(/*@Observes*/ JobCompletedEvent event) {
         log.info("Job Event Handler job completed");
         service.jobCompleted(event);
     }

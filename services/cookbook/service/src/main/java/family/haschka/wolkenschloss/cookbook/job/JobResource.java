@@ -16,7 +16,7 @@ public class JobResource {
     public static final String GET_PATH = "{id}";
 
     @Inject
-    IJobService service;
+    JobService service;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject

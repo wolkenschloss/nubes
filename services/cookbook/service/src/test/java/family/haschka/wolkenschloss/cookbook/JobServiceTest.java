@@ -24,17 +24,16 @@ import java.util.concurrent.ExecutionException;
 import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
-//@TestProfile(MockRecipeServiceProfile.class)
 public class JobServiceTest {
 
     @InjectMock
-    ImportJobRepository respository;
+    ImportJobRepository repository;
 
     @InjectMock
     RecipeService recipeService;
 
     @Inject
-    IJobService sut;
+    JobService sut;
 
     @Inject
     JobReceivedObserver observer;
@@ -48,7 +47,7 @@ public class JobServiceTest {
         Mockito.doAnswer(x -> {
             x.getArgument(0, ImportJob.class).setJobId(id);
             return null;
-        }).when(respository).persist(any(ImportJob.class));
+        }).when(repository).persist(any(ImportJob.class));
 
         var job = new ImportJob();
         job.setUrl("https://meinerezepte.local/lasagen");
@@ -68,15 +67,15 @@ public class JobServiceTest {
 
         }).toCompletableFuture().get();
 
-        Mockito.verify(respository, Mockito.times(1)).persist(job);
-        Mockito.verifyNoMoreInteractions(respository);
+        Mockito.verify(repository, Mockito.times(1)).persist(job);
+        Mockito.verifyNoMoreInteractions(repository);
     }
 
     @Inject
     Event<JobCompletedEvent> completed;
 
     @Test
-    public void jobCompletedSuccessfullyTest() throws ExecutionException, InterruptedException {
+    public void jobCompletedSuccessfullyTest() {
         var id = UUID.randomUUID();
         var event = new JobCompletedEvent();
         event.jobId = id;
@@ -93,30 +92,29 @@ public class JobServiceTest {
         jobAfterCompletion.setState(ImportJob.State.COMPLETED);
         jobAfterCompletion.setLocation(event.location.orElse(null));
 
-        Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
-        Mockito.doAnswer(x -> null).when(respository).update(jobAfterCompletion);
+        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
+        Mockito.doAnswer(x -> null).when(repository).update(jobAfterCompletion);
 
-        Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
+        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
 
         completed.fire(event);
 
-            var j = sut.get(event.jobId);
-            var expected = new ImportJob();
-            expected.setJobId(id);
-            expected.setState(ImportJob.State.COMPLETED);
-            expected.setLocation(event.location.orElse(null));
-            expected.setError(null);
+        var j = sut.get(event.jobId);
+        var expected = new ImportJob();
+        expected.setJobId(id);
+        expected.setState(ImportJob.State.COMPLETED);
+        expected.setLocation(event.location.orElse(null));
+        expected.setError(null);
 
-            Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
+        Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
 
-
-        Mockito.verify(respository, Mockito.times(2)).findByIdOptional(any());
-        Mockito.verify(respository, Mockito.times(1)).update(any(ImportJob.class));
-        Mockito.verifyNoMoreInteractions(respository);
+        Mockito.verify(repository, Mockito.times(2)).findByIdOptional(any());
+        Mockito.verify(repository, Mockito.times(1)).update(any(ImportJob.class));
+        Mockito.verifyNoMoreInteractions(repository);
     }
 
     @Test
-    public void jobCompletedWithErrorsTest() throws ExecutionException, InterruptedException {
+    public void jobCompletedWithErrorsTest() {
         var id = UUID.randomUUID();
         var event = new JobCompletedEvent();
         event.jobId = id;
@@ -133,28 +131,26 @@ public class JobServiceTest {
         jobAfterCompletion.setState(ImportJob.State.COMPLETED);
         jobAfterCompletion.setError(event.error.orElse(null));
 
-        Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
-        Mockito.doAnswer(x -> null).when(respository).update(jobAfterCompletion);
+        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
+        Mockito.doAnswer(x -> null).when(repository).update(jobAfterCompletion);
 
-        Mockito.when(respository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
+        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
 
         completed.fire(event);
 
-                    var j = sut.get(event.jobId);
-            var expected = new ImportJob();
-            expected.setJobId(id);
-            expected.setState(ImportJob.State.COMPLETED);
-            expected.setError(event.error.orElse(null));
-            expected.setLocation(event.location.orElse(null));
+        var j = sut.get(event.jobId);
+        var expected = new ImportJob();
+        expected.setJobId(id);
+        expected.setState(ImportJob.State.COMPLETED);
+        expected.setError(event.error.orElse(null));
+        expected.setLocation(event.location.orElse(null));
 
-            Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
-            Assertions.assertEquals(expected.getError(), j.orElseThrow(AssertionFailedError::new).getError());
+        Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
+        Assertions.assertEquals(expected.getError(), j.orElseThrow(AssertionFailedError::new).getError());
 
-
-
-        Mockito.verify(respository, Mockito.times(2)).findByIdOptional(any());
-        Mockito.verify(respository, Mockito.times(1)).update(jobAfterCompletion);
-        Mockito.verifyNoMoreInteractions(respository);
+        Mockito.verify(repository, Mockito.times(2)).findByIdOptional(any());
+        Mockito.verify(repository, Mockito.times(1)).update(jobAfterCompletion);
+        Mockito.verifyNoMoreInteractions(repository);
     }
 
     @Singleton

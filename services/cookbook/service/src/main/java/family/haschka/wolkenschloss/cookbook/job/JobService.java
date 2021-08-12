@@ -6,6 +6,7 @@ import org.jboss.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.NotificationOptions;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.net.URI;
@@ -14,7 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
-public class JobService implements IJobService {
+public class JobService {
     @Inject
     Event<JobReceivedEvent> received;
 
@@ -28,7 +29,6 @@ public class JobService implements IJobService {
     @Inject
     ManagedExecutor executor;
 
-    @Override
     public CompletionStage<JobReceivedEvent> addJob(ImportJob job) {
         log.info("JobService.addJob start");
         repository.persist(job);
@@ -41,13 +41,11 @@ public class JobService implements IJobService {
         return received.fireAsync(event, NotificationOptions.ofExecutor(executor));
     }
 
-    @Override
     public Optional<ImportJob> get(UUID id) {
         return repository.findByIdOptional(id);
     }
 
-    @Override
-    public void jobCompleted(JobCompletedEvent completed) {
+    public void jobCompleted(@Observes JobCompletedEvent completed) {
         log.info("handle job completed event");
         var job = repository.findByIdOptional(completed.jobId).orElseThrow(NotFoundException::new);
         job.setState(ImportJob.State.COMPLETED);
