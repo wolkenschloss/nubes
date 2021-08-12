@@ -66,15 +66,10 @@ public class JobReceivedEventTest {
 
         received.fireAsync(event, NotificationOptions.ofExecutor(executor))
                 .thenAccept(e -> {
-                    var expectedEvent = new JobCompletedEvent();
+
                     var expectedUri = UriBuilder.fromUri("/recipe/{id}").build(recipeId);
-
-                    expectedEvent.error = Optional.empty();
-                    expectedEvent.jobId = e.jobId;
-                    expectedEvent.location = Optional.of(expectedUri);
-
+                    var expectedEvent = new JobCompletedEvent(e.jobId, expectedUri, null);
                     Assertions.assertTrue(observer.getEvents().contains(expectedEvent));
-
                 })
                 .toCompletableFuture().get();
 

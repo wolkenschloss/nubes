@@ -47,11 +47,12 @@ public class JobService {
     }
 
     public void jobCompleted(@Observes JobCompletedEvent completed) {
+
         log.info("handle job completed event");
-        var job = repository.findByIdOptional(completed.jobId).orElseThrow(NotFoundException::new);
+        var job = repository.findByIdOptional(completed.jobId()).orElseThrow(NotFoundException::new);
         job.setState(ImportJob.State.COMPLETED);
-        job.setLocation(completed.location.orElse(null));
-        job.setError(completed.error.orElse(null));
+        job.setLocation(completed.location());
+        job.setError(completed.error());
 
         repository.update(job);
         log.info("updated job");
