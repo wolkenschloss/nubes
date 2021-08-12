@@ -59,9 +59,7 @@ public class JobServiceTest {
         future.thenAccept(event -> {
 
             Assertions.assertTrue(observer.events.contains(event));
-            var expected = new JobReceivedEvent();
-            expected.jobId = event.jobId;
-            expected.source = URI.create(job.getUrl());
+            var expected = new JobReceivedEvent(event.jobId(), URI.create(job.getUrl()));
 
             Assertions.assertEquals(expected, event);
 

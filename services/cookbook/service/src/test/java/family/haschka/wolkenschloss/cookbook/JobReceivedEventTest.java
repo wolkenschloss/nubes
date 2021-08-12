@@ -60,15 +60,13 @@ public class JobReceivedEventTest {
             return null;
         }).when(recipeRepository).persist(any(Recipe.class));
 
-        var event = new JobReceivedEvent();
-        event.jobId = UUID.randomUUID();
-        event.source = lasagneUri;
+        var event = new JobReceivedEvent(UUID.randomUUID(), lasagneUri);
 
         received.fireAsync(event, NotificationOptions.ofExecutor(executor))
                 .thenAccept(e -> {
 
                     var expectedUri = UriBuilder.fromUri("/recipe/{id}").build(recipeId);
-                    var expectedEvent = new JobCompletedEvent(e.jobId, expectedUri, null);
+                    var expectedEvent = new JobCompletedEvent(e.jobId(), expectedUri, null);
                     Assertions.assertTrue(observer.getEvents().contains(expectedEvent));
                 })
                 .toCompletableFuture().get();

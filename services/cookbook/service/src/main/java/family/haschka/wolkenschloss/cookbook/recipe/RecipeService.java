@@ -73,7 +73,7 @@ public class RecipeService {
     public void steal(@ObservesAsync JobReceivedEvent event) {
         try {
             var thief = new RecipeImport();
-            var recipes = thief.extract(event.source);
+            var recipes = thief.extract(event.source());
 
             if (recipes.size() == 0) {
                 throw new RecipeParseException("The data source does not contain an importable recipe");
@@ -83,7 +83,7 @@ public class RecipeService {
             recipeRepository.persist(recipes.get(0));
 
             var done = new JobCompletedEvent(
-                    event.jobId,
+                    event.jobId(),
                     UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId),
                     null
             );
@@ -91,14 +91,14 @@ public class RecipeService {
             completed.fire(done);
 
         } catch (IOException e) {
-            var done = new JobCompletedEvent(event.jobId, null, "The data source cannot be read");
+            var done = new JobCompletedEvent(event.jobId(), null, "The data source cannot be read");
             log.info("Can not steal recipe", e);
 
             completed.fire(done);
 
             log.warn("send completed event");
         } catch (RecipeParseException e) {
-            var done = new JobCompletedEvent(event.jobId, null, e.getMessage());
+            var done = new JobCompletedEvent(event.jobId(), null, e.getMessage());
 
             log.info("Can not steal recipe", e);
 

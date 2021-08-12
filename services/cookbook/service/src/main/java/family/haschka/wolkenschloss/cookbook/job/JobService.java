@@ -35,9 +35,7 @@ public class JobService {
         repository.persist(job);
 
         log.info(job);
-        var event = new JobReceivedEvent();
-        event.jobId = job.getJobId();
-        event.source = URI.create(job.getUrl());
+        var event = new JobReceivedEvent(job.getJobId(), URI.create(job.getUrl()));
         log.info("JobService.addJob end");
         return received.fireAsync(event, NotificationOptions.ofExecutor(executor));
     }
