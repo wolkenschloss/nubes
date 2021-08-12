@@ -9,8 +9,6 @@ import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.ThrowingConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
 import java.io.File;
@@ -31,12 +29,9 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("Recipe CRUD Operations")
 public class RecipeTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(RecipeTest.class);
-
     @Test
     public void checkDefaultHttpPort() {
         var port = System.getProperty("quarkus.http.port");
-        logger.info("quarkus.http.port = {}", port);
         Assertions.assertEquals("9292", port);
     }
 
@@ -44,12 +39,10 @@ public class RecipeTest {
     @DisplayName("Verbindungszeichenfolge erfordert UUID Konfiguration")
     public void checkMongoDbConnectionString() {
         var host = System.getProperty("quarkus.mongodb.connection-string");
-        logger.warn("quarkus.mongodb.hosts = {}", host);
         Assertions.assertNotNull(host);
         assertThat(host, containsString("uuidRepresentation=STANDARD"));
     }
 
-    // POST /recipe
     @Test
     @DisplayName("POST /recipe invalid data => 400")
     public void testCreateInvalid() throws URISyntaxException, IOException {
@@ -153,8 +146,6 @@ public class RecipeTest {
         }));
     }
 
-    // GET /recipe
-
     @Test
     @DisplayName("GET /recipe")
     public void listRecipes() throws URISyntaxException, IOException {
@@ -194,7 +185,6 @@ public class RecipeTest {
         Assertions.assertEquals(allKeys, new HashSet<>(Arrays.asList("recipeId", "title")));
     }
 
-    // DELETE /recipe/:id
     @Test
     @DisplayName("DELETE /recipe/:id")
     public void deleteRecipe() throws URISyntaxException, IOException {
@@ -218,7 +208,6 @@ public class RecipeTest {
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
-    // PUT /recipe/:id
     @Test
     @DisplayName("PUT /recipe/:id")
     public void updateRecipe() throws URISyntaxException, IOException {
@@ -245,7 +234,6 @@ public class RecipeTest {
         }
     }
 
-    // PATCH /recipe/:id
     @Test
     @DisplayName("PATCH /recipe/:id - change title")
     public void patchRecipe() throws URISyntaxException, IOException {
