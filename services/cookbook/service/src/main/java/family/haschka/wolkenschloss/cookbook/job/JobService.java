@@ -26,6 +26,7 @@ public class JobService {
     @Inject
     Logger log;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     ManagedExecutor executor;
 

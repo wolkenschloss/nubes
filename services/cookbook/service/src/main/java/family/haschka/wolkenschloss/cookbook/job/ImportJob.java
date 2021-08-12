@@ -55,6 +55,8 @@ public class ImportJob {
         this.url = url;
     }
 
+    // Used by serialization
+    @SuppressWarnings("unused")
     public State getState() {
         return state;
     }

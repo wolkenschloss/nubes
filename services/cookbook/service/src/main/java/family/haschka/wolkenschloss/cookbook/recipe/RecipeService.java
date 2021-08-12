@@ -71,8 +71,7 @@ public class RecipeService {
 
     public void steal(@ObservesAsync JobReceivedEvent event) {
         try {
-            var parser = new HttpParser();
-            var thief = new RecipeImport(parser);
+            var thief = new RecipeImport();
             var recipes = thief.extract(event.source);
 
             if (recipes.size() == 0) {

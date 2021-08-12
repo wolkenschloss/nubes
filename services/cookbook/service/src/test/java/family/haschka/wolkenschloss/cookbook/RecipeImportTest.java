@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook;
 
-import family.haschka.wolkenschloss.cookbook.recipe.HttpParser;
 import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeImport;
 import org.junit.jupiter.api.Assertions;
@@ -37,8 +36,7 @@ public class RecipeImportTest {
     @EnumSource
     @DisplayName("should convert ld+json script to recipe")
     public void xxx(Testcase testcase) throws IOException, URISyntaxException {
-        var reader = new HttpParser();
-        var importer = new RecipeImport(reader);
+        var importer = new RecipeImport();
         List<Recipe> recipes = importer.extract(testcase.getRecipeSource());
 
         Assertions.assertEquals(1, recipes.size());
