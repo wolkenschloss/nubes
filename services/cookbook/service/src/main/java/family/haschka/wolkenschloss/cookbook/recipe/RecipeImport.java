@@ -18,29 +18,33 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RecipeImport {
 
     public List<Recipe> extract(URI source) throws IOException {
+
+        String content = download(source);
+        Stream<String> scripts = extractJsonLdScripts(content);
+
         var config = new JsonbConfig()
                 .withAdapters(new RecipeAdapter());
 
         var jsonb = JsonbBuilder.create(config);
 
-        return extractJsonLdScripts(source).stream()
+        return scripts
                 .filter(this::isRecipe)
                 .map(s -> jsonb.fromJson(s, Recipe.class))
                 .collect(Collectors.toList());
     }
 
-    public List<String> extractJsonLdScripts(URI source) throws IOException {
+    public Stream<String> extractJsonLdScripts(String content) {
 
-        Document dom = Jsoup.parse(download(source));
+        Document dom = Jsoup.parse(content);
         Elements scripts = dom.select("script[type=application/ld+json]");
 
         return scripts.stream()
-                .map(Element::data)
-                .collect(Collectors.toList());
+                .map(Element::data);
     }
 
     private String download(URI source) throws IOException {
