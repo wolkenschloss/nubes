@@ -35,8 +35,8 @@ public class RecipeResourceTest {
     @Test
     void searchTest() throws URISyntaxException, MalformedURLException {
 
-        var recipes = new ArrayList<BriefDescription>();
-        recipes.add(new BriefDescription(UUID.randomUUID(), "Blaukraut"));
+        var recipes = new ArrayList<Summary>();
+        recipes.add(new Summary(UUID.randomUUID(), "Blaukraut"));
         var toc = new TableOfContents(1, recipes);
 
         Mockito.when(service.list(0, 4, null)).thenReturn(toc);

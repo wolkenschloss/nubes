@@ -31,28 +31,30 @@ public class JobService {
     ManagedExecutor executor;
 
     public CompletionStage<JobReceivedEvent> addJob(ImportJob job) {
+        log.infov("addJob({0})", job);
         log.info("JobService.addJob start");
         repository.persist(job);
 
         log.info(job);
-        var event = new JobReceivedEvent(job.getJobId(), URI.create(job.getUrl()));
+        var event = new JobReceivedEvent(job.jobId, URI.create(job.order));
         log.info("JobService.addJob end");
+
         return received.fireAsync(event, NotificationOptions.ofExecutor(executor));
     }
 
     public Optional<ImportJob> get(UUID id) {
+        log.infov("get({0})", id);
         return repository.findByIdOptional(id);
     }
 
-    public void jobCompleted(@Observes JobCompletedEvent completed) {
+    public void jobCompleted(@Observes JobCompletedEvent event) {
 
         log.info("handle job completed event");
-        var job = repository.findByIdOptional(completed.jobId()).orElseThrow(NotFoundException::new);
-        job.setState(ImportJob.State.COMPLETED);
-        job.setLocation(completed.location());
-        job.setError(completed.error());
 
-        repository.update(job);
+        var job = repository.findByIdOptional(event.jobId()).orElseThrow(NotFoundException::new);
+        var completed = job.complete(event.location(), event.error());
+        repository.update(completed);
+
         log.info("updated job");
     }
 }

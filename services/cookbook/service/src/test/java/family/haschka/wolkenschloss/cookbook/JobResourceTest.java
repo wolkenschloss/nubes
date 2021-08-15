@@ -3,6 +3,7 @@ package family.haschka.wolkenschloss.cookbook;
 import family.haschka.wolkenschloss.cookbook.job.ImportJob;
 import family.haschka.wolkenschloss.cookbook.job.JobResource;
 import family.haschka.wolkenschloss.cookbook.job.JobService;
+import family.haschka.wolkenschloss.cookbook.job.State;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -14,8 +15,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import javax.inject.Inject;
+import javax.json.bind.Jsonb;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
@@ -28,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 public class JobResourceTest {
 
     public static final String JOB_URL = "http://meinkochbuch.local/lasagne.html";
+
     @InjectMock
     JobService service;
 
@@ -35,21 +40,25 @@ public class JobResourceTest {
     @TestHTTPResource
     URL url;
 
+    @Inject
+    Jsonb jsonb;
+
     @Test
     public void createImportJobTest() {
 
         var id = UUID.randomUUID();
 
         Mockito.doAnswer(x -> {
-            x.getArgument(0, ImportJob.class).setJobId(id);
+            x.getArgument(0, ImportJob.class).jobId = id;
             return null;
         }).when(service).addJob(any(ImportJob.class));
 
-        ImportJob job = new ImportJob();
-        job.setUrl(JOB_URL);
+        ImportJob job = getImportJob();
 
         RestAssured.given()
-                .body(job, ObjectMapperType.JSONB).contentType(MediaType.APPLICATION_JSON)
+                .log().all()
+                .body(job, ObjectMapperType.JSONB)
+                .contentType(MediaType.APPLICATION_JSON)
                 .when()
                 .post(url)
                 .then()
@@ -85,8 +94,8 @@ public class JobResourceTest {
         var location = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
 
         var job = new ImportJob();
-        job.setJobId(id);
-        job.setUrl(JOB_URL);
+        job.jobId = id;
+        job.order = JOB_URL;
 
         Mockito.when(service.get(id)).thenReturn(Optional.of(job));
 
@@ -96,6 +105,7 @@ public class JobResourceTest {
                 .when()
                 .get(location)
                 .then()
+                .log().all()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
@@ -105,5 +115,29 @@ public class JobResourceTest {
 
         Mockito.verify(service, Mockito.times(1)).get(id);
         Mockito.verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    public void ImportJobSerializationTest() {
+
+        ImportJob job = getImportJob();
+        String serialized = jsonb.toJson(job);
+
+        System.out.println(serialized);
+
+        ImportJob clone  = jsonb.fromJson(serialized, ImportJob.class);
+        Assertions.assertEquals(job, clone);
+
+    }
+
+    private ImportJob getImportJob() {
+        ImportJob job = new ImportJob();
+        job.error = null;
+        job.jobId = UUID.randomUUID();
+        job.location = URI.create("https://google.de");
+        job.state = State.COMPLETED;
+        job.order = JOB_URL;
+
+        return job;
     }
 }

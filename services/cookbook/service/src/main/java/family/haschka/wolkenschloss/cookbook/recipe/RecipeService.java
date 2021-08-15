@@ -48,7 +48,7 @@ public class RecipeService {
         var range = query.list();
 
         var content = range.stream()
-                .map(recipe -> new BriefDescription(recipe.recipeId, recipe.title))
+                .map(recipe -> new Summary(recipe.recipeId, recipe.title))
                 .collect(Collectors.toList());
 
         return new TableOfContents(total, content);
@@ -92,7 +92,7 @@ public class RecipeService {
 
         } catch (IOException e) {
             var done = new JobCompletedEvent(event.jobId(), null, "The data source cannot be read");
-            log.info("Can not steal recipe", e);
+            log.infov("Can not steal recipe from {0}", event.source(), e);
 
             completed.fire(done);
 

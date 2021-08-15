@@ -30,14 +30,14 @@ public class JobResource {
         log.infov("POST /job");
         log.info(job);
 
-        job.setJobId(UUID.randomUUID());
-        job.setState(ImportJob.State.IN_PROGRESS);
+        job.jobId = UUID.randomUUID();
+        job.state = State.IN_PROGRESS;
 
         service.addJob(job);
 
         var location = uriInfo.getAbsolutePathBuilder()
                 .path(GET_PATH)
-                .build(job.getJobId());
+                .build(job.jobId);
 
         log.info("post end");
         log.infov("Response Location Header: {0}", location.toString());
@@ -52,6 +52,7 @@ public class JobResource {
     @Path(GET_PATH)
     @Produces(MediaType.APPLICATION_JSON)
     public ImportJob get(@PathParam("id")UUID id) {
+        log.infov("GET /job/{0}", id);
         return service.get(id).orElseThrow(NotFoundException::new);
     }
 }
