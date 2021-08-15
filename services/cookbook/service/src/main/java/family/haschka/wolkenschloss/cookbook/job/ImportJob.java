@@ -8,30 +8,30 @@ import java.util.UUID;
 
 public class ImportJob {
     @BsonId
-    private UUID jobId;
+    public UUID jobId;
 
-    private String url;
-    private State state;
-    private URI location;
-    private String error;
+    public String order;
+    public State state;
+    public URI location;
+    public String error;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ImportJob importJob = (ImportJob) o;
-        return Objects.equals(url, importJob.url) && Objects.equals(jobId, importJob.jobId) && state == importJob.state && Objects.equals(location, importJob.location) && Objects.equals(error, importJob.error);
+        return Objects.equals(order, importJob.order) && Objects.equals(jobId, importJob.jobId) && state == importJob.state && Objects.equals(location, importJob.location) && Objects.equals(error, importJob.error);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, jobId, state, location, error);
+        return Objects.hash(order, jobId, state, location, error);
     }
 
     @Override
     public String toString() {
         return "ImportJob{" +
-                "url='" + url + '\'' +
+                "url='" + order + '\'' +
                 ", jobId=" + jobId +
                 ", state=" + state +
                 ", location=" + location +
@@ -39,47 +39,13 @@ public class ImportJob {
                 '}';
     }
 
-    public UUID getJobId() {
-        return jobId;
-    }
 
-    public void setJobId(UUID jobId) {
-        this.jobId = jobId;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    // Used by serialization
-    @SuppressWarnings("unused")
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public URI getLocation() {
-        return location;
-    }
-
-    public void setLocation(URI location) {
+    public ImportJob complete(URI location, String error) {
         this.location = location;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
         this.error = error;
+        this.state = State.COMPLETED;
+
+        return this;
     }
 
-    public enum State {IN_PROGRESS, COMPLETED}
 }

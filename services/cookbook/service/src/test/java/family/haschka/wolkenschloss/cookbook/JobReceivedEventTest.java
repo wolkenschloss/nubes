@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -60,21 +59,14 @@ public class JobReceivedEventTest {
             return null;
         }).when(recipeRepository).persist(any(Recipe.class));
 
-        var event = new JobReceivedEvent();
-        event.jobId = UUID.randomUUID();
-        event.source = lasagneUri;
+        var event = new JobReceivedEvent(UUID.randomUUID(), lasagneUri);
 
         received.fireAsync(event, NotificationOptions.ofExecutor(executor))
                 .thenAccept(e -> {
-                    var expectedEvent = new JobCompletedEvent();
+
                     var expectedUri = UriBuilder.fromUri("/recipe/{id}").build(recipeId);
-
-                    expectedEvent.error = Optional.empty();
-                    expectedEvent.jobId = e.jobId;
-                    expectedEvent.location = Optional.of(expectedUri);
-
+                    var expectedEvent = new JobCompletedEvent(e.jobId(), expectedUri, null);
                     Assertions.assertTrue(observer.getEvents().contains(expectedEvent));
-
                 })
                 .toCompletableFuture().get();
 

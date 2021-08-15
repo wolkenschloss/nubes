@@ -58,12 +58,8 @@ public class RecipeTest {
                 .statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
-    public static class PostRecipeTestcase {
-        private final String fixture;
-        private final int status;
-        private final ThrowingConsumer<ValidatableResponse> assertions;
-        private final String name;
-
+    public record PostRecipeTestcase(String name, String fixture, int status,
+                                     ThrowingConsumer<ValidatableResponse> assertions) {
         public PostRecipeTestcase(
                 String name,
                 String fixture,

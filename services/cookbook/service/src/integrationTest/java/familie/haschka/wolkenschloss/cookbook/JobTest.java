@@ -75,15 +75,12 @@ public class JobTest {
         var factory = Json.createBuilderFactory(config);
         var builder = factory.createObjectBuilder();
 
-        builder.add("url", job_url);
+        builder.add("order",  job_url);
         return builder.build().toString();
     }
 
-    public static class PostJobTestcase {
-        private final String name;
-        private final String requestedData;
-        private final ThrowingConsumer<ValidatableResponse> assertion;
-
+    public record PostJobTestcase(String name, String requestedData,
+                                  ThrowingConsumer<ValidatableResponse> assertion) {
         public PostJobTestcase(
                 String name,
                 String requestedData,

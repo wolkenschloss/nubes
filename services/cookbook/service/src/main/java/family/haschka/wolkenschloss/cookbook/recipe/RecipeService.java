@@ -48,7 +48,7 @@ public class RecipeService {
         var range = query.list();
 
         var content = range.stream()
-                .map(recipe -> new BriefDescription(recipe.recipeId, recipe.title))
+                .map(recipe -> new Summary(recipe.recipeId, recipe.title))
                 .collect(Collectors.toList());
 
         return new TableOfContents(total, content);
@@ -73,7 +73,7 @@ public class RecipeService {
     public void steal(@ObservesAsync JobReceivedEvent event) {
         try {
             var thief = new RecipeImport();
-            var recipes = thief.extract(event.source);
+            var recipes = thief.extract(event.source());
 
             if (recipes.size() == 0) {
                 throw new RecipeParseException("The data source does not contain an importable recipe");
@@ -82,29 +82,23 @@ public class RecipeService {
             recipes.get(0).recipeId = UUID.randomUUID();
             recipeRepository.persist(recipes.get(0));
 
-            var done = new JobCompletedEvent();
-            done.error = Optional.empty();
-            done.jobId = event.jobId;
-            done.location = Optional.of(UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId));
+            var done = new JobCompletedEvent(
+                    event.jobId(),
+                    UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId),
+                    null
+            );
 
             completed.fire(done);
 
         } catch (IOException e) {
-            var done = new JobCompletedEvent();
-            done.error = Optional.of("The data source cannot be read");
-            done.jobId = event.jobId;
-            done.location = Optional.empty();
-
-            log.info("Can not steal recipe", e);
+            var done = new JobCompletedEvent(event.jobId(), null, "The data source cannot be read");
+            log.infov("Can not steal recipe from {0}", event.source(), e);
 
             completed.fire(done);
 
             log.warn("send completed event");
         } catch (RecipeParseException e) {
-            var done = new JobCompletedEvent();
-            done.error = Optional.of(e.getMessage());
-            done.jobId = event.jobId;
-            done.location = Optional.empty();
+            var done = new JobCompletedEvent(event.jobId(), null, e.getMessage());
 
             log.info("Can not steal recipe", e);
 

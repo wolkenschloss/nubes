@@ -3,10 +3,10 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import java.util.List;
 
 public class TableOfContents {
-    public List<BriefDescription> content;
+    public List<Summary> content;
     public long total;
 
-    public TableOfContents(long total, List<BriefDescription> content) {
+    public TableOfContents(long total, List<Summary> content) {
         this.total = total;
         this.content = content;
     }

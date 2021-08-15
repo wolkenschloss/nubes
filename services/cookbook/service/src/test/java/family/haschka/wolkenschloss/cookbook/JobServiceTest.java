@@ -45,23 +45,18 @@ public class JobServiceTest {
         var id = UUID.randomUUID();
 
         // Mongo DB setzt die ID, wenn die Entität persistiert wird.
-        Mockito.doAnswer(x -> {
-            x.getArgument(0, ImportJob.class).setJobId(id);
-            return null;
-        }).when(repository).persist(any(ImportJob.class));
+        Mockito.doAnswer(x -> null).when(repository).persist(any(ImportJob.class));
 
         var job = new ImportJob();
-        job.setUrl("https://meinerezepte.local/lasagen");
-        job.setJobId(id);
+        job.order = "https://meinerezepte.local/lasagen";
+        job.jobId = id;
 
         var future = sut.addJob(job);
 
         future.thenAccept(event -> {
 
             Assertions.assertTrue(observer.events.contains(event));
-            var expected = new JobReceivedEvent();
-            expected.jobId = event.jobId;
-            expected.source = URI.create(job.getUrl());
+            var expected = new JobReceivedEvent(event.jobId(), URI.create(job.order));
 
             Assertions.assertEquals(expected, event);
 
@@ -77,20 +72,17 @@ public class JobServiceTest {
     @Test
     public void jobCompletedSuccessfullyTest() {
         var id = UUID.randomUUID();
-        var event = new JobCompletedEvent();
-        event.jobId = id;
-        event.location = Optional.of(URI.create("/recipe/123"));
-        event.error = Optional.empty();
+        var event = new JobCompletedEvent(id, URI.create("/recipe/123"), null);
 
         var jobBeforeCompletion = new ImportJob();
-        jobBeforeCompletion.setJobId(id);
-        jobBeforeCompletion.setState(ImportJob.State.IN_PROGRESS);
-        jobBeforeCompletion.setLocation(null);
+        jobBeforeCompletion.jobId = id;
+        jobBeforeCompletion.state = State.IN_PROGRESS;
+        jobBeforeCompletion.location = null;
 
         var jobAfterCompletion = new ImportJob();
-        jobAfterCompletion.setJobId(id);
-        jobAfterCompletion.setState(ImportJob.State.COMPLETED);
-        jobAfterCompletion.setLocation(event.location.orElse(null));
+        jobAfterCompletion.jobId = id;
+        jobAfterCompletion.state =State.COMPLETED;
+        jobAfterCompletion.location = event.location();
 
         Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
         Mockito.doAnswer(x -> null).when(repository).update(jobAfterCompletion);
@@ -99,12 +91,12 @@ public class JobServiceTest {
 
         completed.fire(event);
 
-        var j = sut.get(event.jobId);
+        var j = sut.get(event.jobId());
         var expected = new ImportJob();
-        expected.setJobId(id);
-        expected.setState(ImportJob.State.COMPLETED);
-        expected.setLocation(event.location.orElse(null));
-        expected.setError(null);
+        expected.jobId = id;
+        expected.state = State.COMPLETED;
+        expected.location = event.location();
+        expected.error = null;
 
         Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
 
@@ -116,20 +108,20 @@ public class JobServiceTest {
     @Test
     public void jobCompletedWithErrorsTest() {
         var id = UUID.randomUUID();
-        var event = new JobCompletedEvent();
-        event.jobId = id;
-        event.error = Optional.of("The data source cannot be read");
-        event.location = Optional.of(URI.create("https://meinerezepte.local.lasagne.html"));
+        var event = new JobCompletedEvent(
+                id,
+                URI.create("https://meinerezepte.local.lasagne.html"),
+                "The data source cannot be read");
 
         var jobBeforeCompletion = new ImportJob();
-        jobBeforeCompletion.setJobId(id);
-        jobBeforeCompletion.setState(ImportJob.State.IN_PROGRESS);
-        jobBeforeCompletion.setError(null);
+        jobBeforeCompletion.jobId = id;
+        jobBeforeCompletion.state = State.IN_PROGRESS;
+        jobBeforeCompletion.error = null;
 
         var jobAfterCompletion = new ImportJob();
-        jobAfterCompletion.setJobId(id);
-        jobAfterCompletion.setState(ImportJob.State.COMPLETED);
-        jobAfterCompletion.setError(event.error.orElse(null));
+        jobAfterCompletion.jobId = id;
+        jobAfterCompletion.state = State.COMPLETED;
+        jobAfterCompletion.error = event.error();
 
         Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
         Mockito.doAnswer(x -> null).when(repository).update(jobAfterCompletion);
@@ -138,15 +130,15 @@ public class JobServiceTest {
 
         completed.fire(event);
 
-        var j = sut.get(event.jobId);
+        var j = sut.get(event.jobId());
         var expected = new ImportJob();
-        expected.setJobId(id);
-        expected.setState(ImportJob.State.COMPLETED);
-        expected.setError(event.error.orElse(null));
-        expected.setLocation(event.location.orElse(null));
+        expected.jobId = id;
+        expected.state = State.COMPLETED;
+        expected.error = event.error();
+        expected.location = event.location();
 
         Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
-        Assertions.assertEquals(expected.getError(), j.orElseThrow(AssertionFailedError::new).getError());
+        Assertions.assertEquals(expected.error, j.orElseThrow(AssertionFailedError::new).error);
 
         Mockito.verify(repository, Mockito.times(2)).findByIdOptional(any());
         Mockito.verify(repository, Mockito.times(1)).update(jobAfterCompletion);
