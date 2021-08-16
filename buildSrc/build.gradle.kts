@@ -12,14 +12,13 @@ buildscript {
         classpath("org.libvirt:libvirt:0.5.2")
         classpath("net.java.dev.jna:jna:5.8.0")
         classpath("com.jayway.jsonpath:json-path:2.6.0")
-        classpath("gradle.plugin.io.quarkus:quarkus-gradle-plugin:2.1.2.Final")
+//        classpath("gradle.plugin.io.quarkus:quarkus-gradle-plugin:2.1.2.Final")
     }
 }
 
 plugins {
-//    groovy
     `kotlin-dsl`
-   `java-gradle-plugin`
+    `java-gradle-plugin`
     java
 }
 

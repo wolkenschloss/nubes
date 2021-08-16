@@ -52,7 +52,6 @@ tasks {
 }
 
 dependencies {
-    // Dependencies für Convention Plugin
     implementation(enforcedPlatform("io.quarkus:quarkus-bom:2.1.2.Final"))
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.quarkus:quarkus-junit5-mockito")
