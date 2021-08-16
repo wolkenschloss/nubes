@@ -1,8 +1,10 @@
 rootProject.name = "nubes"
 
-include ("services:cookbook:service",
+include (
+        "services:cookbook:service",
         "services:cookbook:webapp",
-        "testbed")
+//        "testbed"
+)
 
 include("services:cookbook:core")
 
