@@ -46,7 +46,7 @@ export default {
   methods: {
     async importRecipe() {
       this.loading = true;
-      const job = {url: this.url}
+      const job = {order: this.url}
       try {
         const response = await axios.post("/job", job)
         await this.getJobResult(response.headers['location'])

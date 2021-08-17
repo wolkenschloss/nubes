@@ -1,8 +1,6 @@
-package family.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
-import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
-import family.haschka.wolkenschloss.cookbook.job.JobService;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeFixture;
 import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
 import io.quarkus.test.junit.QuarkusTest;
@@ -51,7 +49,7 @@ public class JobReceivedEventTest {
     @DisplayName("should import recipe from url")
     public void testImportRecipe() throws ExecutionException, InterruptedException, URISyntaxException {
 
-        var lasagneUri = this.getClass().getClassLoader().getResource("lasagne.html").toURI();
+        var lasagneUri = RecipeFixture.LASAGNE.getRecipeSource();
         var recipeId = UUID.randomUUID();
 
         Mockito.doAnswer(recipe -> {
@@ -63,7 +61,6 @@ public class JobReceivedEventTest {
 
         received.fireAsync(event, NotificationOptions.ofExecutor(executor))
                 .thenAccept(e -> {
-
                     var expectedUri = UriBuilder.fromUri("/recipe/{id}").build(recipeId);
                     var expectedEvent = new JobCompletedEvent(e.jobId(), expectedUri, null);
                     Assertions.assertTrue(observer.getEvents().contains(expectedEvent));

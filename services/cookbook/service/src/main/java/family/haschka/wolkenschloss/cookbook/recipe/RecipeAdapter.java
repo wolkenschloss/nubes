@@ -18,7 +18,7 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotated> {
 
         if (obj.ingredients != null) {
             recipe.ingredients = obj.ingredients.stream()
-                    .map(ingredient -> new Ingredient(null, null, ingredient))
+                    .map(Ingredient::parse)
                     .collect(Collectors.toList());
         }
         recipe.recipeId = null;
