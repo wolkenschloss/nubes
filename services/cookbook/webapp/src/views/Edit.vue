@@ -15,7 +15,7 @@
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
-          <v-btn plain @click="save" v-bind:disabled="!valid" >Save</v-btn>
+          <v-btn plain @click="save" v-bind:disabled="!valid">Save</v-btn>
         </v-toolbar-items>
         <template v-slot:extension>
           <v-tabs v-model="tab" fixed-tabs>
@@ -35,38 +35,41 @@
         </template>
 
       </v-toolbar>
-        <v-card-text class="mt-6 fullscreen" >
+      <v-card-text class="mt-6 fullscreen">
         <v-form v-model="valid">
-        <v-tabs-items v-model="tab">
-          <v-tab-item key="0">
-            <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
-          </v-tab-item>
-          <v-tab-item key="1">
-            <v-expansion-panels class="pa-1" v-model="ingredientPanel">
-              <v-expansion-panel v-for="(ingredient, index) in value.ingredients" :key="index">
-                <v-expansion-panel-header>
-                  <template v-slot:default="{open}">
-                    <v-row no-gutters>
-                      <v-col cols="12">
-                        {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <edit-ingredient v-model="value.ingredients[index]"></edit-ingredient>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                  <v-btn text color="secondary" @click="removeIngredient(index)">Remove Item</v-btn>
-                  </v-card-actions>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-tab-item>
-          <v-tab-item key="2">
-            <v-textarea label="Preparation" v-model="value.preparation" prepend-icon="mdi-pencil"></v-textarea>
-          </v-tab-item>
-        </v-tabs-items>
+          <v-tabs-items v-model="tab">
+            <v-tab-item key="0">
+              <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
+            </v-tab-item>
+            <v-tab-item key="1">
+              <v-expansion-panels class="pa-1" v-model="ingredientPanel">
+                <v-expansion-panel v-for="(ingredient, index) in value.ingredients" :key="index">
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{open}">
+                      <v-row no-gutters>
+                        <v-col cols="12">
+                          {{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <edit-ingredient v-model="value.ingredients[index]"></edit-ingredient>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn text color="secondary" @click="removeIngredient(index)">Remove Item</v-btn>
+                    </v-card-actions>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-tab-item>
+            <v-tab-item key="2">
+              <v-textarea v-model="value.preparation"
+                          prepend-icon="mdi-pencil"
+                          counter
+                          auto-grow/>
+            </v-tab-item>
+          </v-tabs-items>
         </v-form>
       </v-card-text>
     </v-card>
@@ -101,9 +104,10 @@ export default {
       dialog: false,
       editable: this.$props.value || {},
       titleRules: [
-          v => !!v || "Title is required"
+        v => !!v || "Title is required"
       ],
-      valid: false
+      valid: false,
+      windowsize: ""
     }
   },
   methods: {
@@ -132,6 +136,7 @@ export default {
 .fab-container {
   position: relative;
 }
+
 .fullscreen {
   height: 100vh;
 }

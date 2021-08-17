@@ -2,7 +2,7 @@
 <v-container>
     <v-card class="ma-4 pa-4" flat>
       <v-card-title v-text="recipe.title"></v-card-title>
-      <v-card-text v-text="recipe.preparation"></v-card-text>
+      <preparation :text="recipe.preparation"></preparation>
       <v-list v-if="recipe.ingredients.length > 0">
         <v-list-group>
           <template v-slot:activator>
@@ -35,10 +35,11 @@
 <script>
 import axios from "axios";
 import Edit from "@/views/Edit";
+import Preparation from "@/components/Preparation";
 
 export default {
   name: "Recipe",
-  components: {Edit},
+  components: {Preparation, Edit},
   props: {id: String},
   data() {
     return {
