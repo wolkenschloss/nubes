@@ -10,6 +10,11 @@ Desktop verwendest. Benutzt Du etwas anderes, bist Du auf Dich allein gestellt.
 * QuarkusTest (): sudo apt install 
 
 ```bash
+# Zunächst das übliche Procedere: System aktualisieren
+sudo apt update
+sudo apt upgrade
+
+# Zeugs für die Testumgebung
 sudo apt install -y xvfb libxss1
 
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -19,8 +24,6 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 sudo apt-get remove docker docker-engine docker.io containerd runc
 
 # Docker installieren
-sudo apt update
-sudo apt upgrade
 sudo apt-get install     apt-transport-https     ca-certificates     curl     gnupg     lsb-release
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
@@ -140,9 +143,9 @@ Gradle Build Konvention existiert.
 
 | Verzeichnisname | Konvention          | Zweck                                |
 | ----------------|---------------------|--------------------------------------|
-| webapp          | webapp-conventions  | Webbasierte Benutzeroberfläche       |
-| service         | service-conventions | HTTP oder gRPC Kommunikationsendpunkt|
-| core            | wolkenschloss.conventions.core | Implementierung der Domäne           |
+| webapp          | wolkenschloss.conventions.webapp  | Webbasierte Benutzeroberfläche       |
+| service         | wolkenschloss.conventions.service | Technische Infrastruktur für HTTP Endpunkt, Persistenz, Messaging und weiteres |
+| core            | wolkenschloss.conventions.core | Implementierung der Domäne |
 
 Die Projekte *service* und *core* folgen der 
 [Zwiebelschalen-Architektur][onion].
