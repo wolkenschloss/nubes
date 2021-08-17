@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Build" pattern="file:*.gradle.kts||file:gradle.properties||file:vue.config.js||file:package.json" />
+</component>

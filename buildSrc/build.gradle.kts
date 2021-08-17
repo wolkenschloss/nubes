@@ -3,20 +3,14 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
     repositories {
-//        gradlePluginPortal()
+        gradlePluginPortal()
         mavenCentral()
-    }
-    dependencies {
-        classpath("com.github.spullara.mustache.java:compiler:0.9.10")
-        classpath("org.libvirt:libvirt:0.5.2")
-        classpath("net.java.dev.jna:jna:5.8.0")
-        classpath("com.jayway.jsonpath:json-path:2.6.0")
     }
 }
 
 plugins {
     groovy
-    `groovy-gradle-plugin`
+    `kotlin-dsl`
     `java-gradle-plugin`
     java
 }
@@ -36,6 +30,7 @@ repositories {
 }
 
 dependencies {
+    implementation("gradle.plugin.io.quarkus:quarkus-gradle-plugin:2.1.2.Final")
     implementation("com.github.node-gradle:gradle-node-plugin:3.1.0")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")
