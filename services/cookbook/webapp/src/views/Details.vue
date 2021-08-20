@@ -22,72 +22,45 @@
       </v-list>
 
       <v-card-actions>
-        <v-btn text v-on:click="remove">
+        <v-btn text v-on:click="deleteRecipe(id)">
           <v-icon>mdi-delete</v-icon>
           Delete
         </v-btn>
       </v-card-actions>
-      <edit fab-icon="mdi-pencil" title="Edit Recipe" v-on:change="save" v-bind:value="copy" v-on:cancel="cancel"/>
+      <edit fab-icon="mdi-pencil" title="Edit Recipe"
+            v-on:change="saveRecipe"
+            v-bind:value="copy"
+            v-on:cancel="cancelEdit"/>
     </v-card>
 </v-container>
 </template>
 
 <script>
-import axios from "axios";
 import Edit from "@/views/Edit";
 import Preparation from "@/components/Preparation";
+import { mapGetters, mapActions } from "vuex"
 
 export default {
   name: "Recipe",
   components: {Preparation, Edit},
   props: {id: String},
-  data() {
-    return {
-      recipe: {
-        ingredients: []
+  computed: {
+    ...mapGetters(['recipe']),
+    copy: {
+      get() {
+        return this.$store.getters.copy
       },
-      copy: {}
+      set(value) {
+        this.$store.commit('setCopy', value)
+      }
     }
   },
   mounted() {
-    this.load()
+    console.log(`component details mounted. loading recipe ${this.$props.id}`)
+    this.loadRecipe(this.$props.id)
   },
-
   methods: {
-    load() {
-      let url = "/recipe/" + this.$props.id
-      axios.get(url)
-      .then(response => {
-        this.recipe = response.data
-        this.copy = {...response.data}
-      })
-      .catch(error => {
-        alert(error)
-      })
-    },
-    remove() {
-      let url = "/recipe/" + this.$props.id
-      axios.delete(url)
-          .then(() => {
-            this.$router.push("/")
-          })
-          .catch(error => {
-            alert(error)
-          })
-    },
-    async save(r) {
-      this.recipe = r
-      let url = "/recipe/" + this.$props.id
-      try {
-        await axios.put(url, r)
-        this.recipe = {...r}
-      } catch (error) {
-        alert(error)
-      }
-    },
-    cancel() {
-      this.copy = {...this.recipe}
-    }
+    ...mapActions(['loadRecipe', 'deleteRecipe', 'saveRecipe', 'cancelEdit']),
   }
 }
 </script>

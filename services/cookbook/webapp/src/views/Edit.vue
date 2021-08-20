@@ -1,10 +1,12 @@
 <template>
-  <v-dialog scrollable max-width="560px" v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile">
+  <v-dialog scrollable max-width="560px" v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile" @click:outside="closeDialog">
     <template v-slot:activator="{on, attrs}">
       <slot v-bind="{on, attrs}" name="activator">
-        <v-btn color="primary" elevation="2" fab bottom fixed right v-on="on" v-bind="attrs">
+        <v-fab-transition  appear>
+        <v-btn color="primary" elevation="2" fab bottom fixed right v-on="on" v-bind="attrs" >
           <v-icon>{{ fabIcon }}</v-icon>
         </v-btn>
+        </v-fab-transition>
       </slot>
     </template>
     <v-card class="fab-container" height="560px">
@@ -84,6 +86,11 @@ export default {
   name: "Edit",
   props: ['fabIcon', 'title', 'value'],
   components: {EditIngredient},
+  mounted() {
+    // Die fab-transition wird nur aktiviert, wenn der state von false auf true gesetzt wird,
+    // nachdem die Komponente erzeugt wurde.
+    this.showFab = true
+  },
   computed: {
     // Bestimmt, ob eine neue Zutat hinzugefügt werden kann.
     // Besser wäre zu prüfen, ob die Eingabe der letzten Zutat
@@ -99,6 +106,7 @@ export default {
   },
   data() {
     return {
+      showFab: false,
       ingredientPanel: null,
       tab: null,
       dialog: false,
