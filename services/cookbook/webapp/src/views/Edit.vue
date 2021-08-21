@@ -44,6 +44,14 @@
               <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
             </v-tab-item>
             <v-tab-item key="1">
+              <v-text-field label="Servings"
+                            v-model="value.servings"
+                            type="number"
+                            persistent-hint
+                            :rules="servingRules"
+                            required
+                            hint="Number of servings the recipe is designed for.">
+            </v-text-field>
               <v-expansion-panels class="pa-1" v-model="ingredientPanel">
                 <v-expansion-panel v-for="(ingredient, index) in value.ingredients" :key="index">
                   <v-expansion-panel-header>
@@ -56,6 +64,7 @@
                     </template>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content>
+
                     <edit-ingredient v-model="value.ingredients[index]"></edit-ingredient>
                     <v-card-actions>
                       <v-spacer></v-spacer>
@@ -114,8 +123,10 @@ export default {
       titleRules: [
         v => !!v || "Title is required"
       ],
+      servingRules: [
+        value => (!!value && value > 0 && value < 101) || "The number of servings must be between 1 and 100"
+      ],
       valid: false,
-      windowsize: ""
     }
   },
   methods: {

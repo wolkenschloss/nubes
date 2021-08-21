@@ -22,6 +22,7 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotated> {
                     .collect(Collectors.toList());
         }
         recipe.recipeId = null;
+        recipe.servings = obj.servings == null ? new Servings(1) : new Servings(obj.servings);
         return recipe;
     }
 }

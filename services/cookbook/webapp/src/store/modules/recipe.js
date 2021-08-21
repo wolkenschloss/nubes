@@ -45,8 +45,8 @@ const actions = {
     },
     newRecipe({commit, state}) {
         console.log("Action newRecipe()")
-        commit('setRecipe', {ingredients: []})
-        commit('setCopy', {ingredients: []})
+        commit('setRecipe', {ingredients: [], servings: 1})
+        commit('setCopy', {ingredients: [], servings: 1})
     }
 }
 

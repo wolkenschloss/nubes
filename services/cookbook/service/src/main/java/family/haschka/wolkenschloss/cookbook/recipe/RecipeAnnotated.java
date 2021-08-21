@@ -15,4 +15,7 @@ public class RecipeAnnotated {
 
     @JsonbProperty("recipeIngredient")
     public List<String> ingredients;
+
+    @JsonbProperty("recipeYield")
+    public Integer servings;
 }
