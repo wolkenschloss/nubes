@@ -6,7 +6,7 @@ import javax.json.bind.annotation.JsonbProperty;
 public record Servings(@JsonbProperty("amount") int amount) {
     @JsonbCreator
     public Servings {
-        if (amount < 1 || amount > 10) {
+        if (amount < 1 || amount > 100) {
             throw new IllegalArgumentException();
         }
     }
