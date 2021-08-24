@@ -44,6 +44,7 @@
               <v-text-field label="Title" v-model="value.title" :rules="titleRules" required></v-text-field>
             </v-tab-item>
             <v-tab-item key="1">
+              <servings v-model="value.servings" hint="Number of servings the recipe is designed for." class="mb-6"/>
               <v-expansion-panels class="pa-1" v-model="ingredientPanel">
                 <v-expansion-panel v-for="(ingredient, index) in value.ingredients" :key="index">
                   <v-expansion-panel-header>
@@ -56,6 +57,7 @@
                     </template>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content>
+
                     <edit-ingredient v-model="value.ingredients[index]"></edit-ingredient>
                     <v-card-actions>
                       <v-spacer></v-spacer>
@@ -81,11 +83,12 @@
 <script>
 
 import EditIngredient from "@/components/EditIngredient";
+import Servings from "@/components/Servings";
 
 export default {
   name: "Edit",
   props: ['fabIcon', 'title', 'value'],
-  components: {EditIngredient},
+  components: {Servings, EditIngredient},
   mounted() {
     // Die fab-transition wird nur aktiviert, wenn der state von false auf true gesetzt wird,
     // nachdem die Komponente erzeugt wurde.
@@ -96,8 +99,8 @@ export default {
     // Besser wäre zu prüfen, ob die Eingabe der letzten Zutat
     // gültig ist.
     isLastIngredientEmpty() {
-      if (this.value.ingredients && this.value.ingredients.length > 0) {
-        const last = this.value.ingredients[this.value.ingredients.length - 1];
+      if (this.recipe.ingredients && this.recipe.ingredients.length > 0) {
+        const last = this.recipe.ingredients[this.recipe.ingredients.length - 1];
         return Object.keys(last).length === 0
       } else {
         return false
@@ -106,6 +109,7 @@ export default {
   },
   data() {
     return {
+      recipe: this.$props.value,
       showFab: false,
       ingredientPanel: null,
       tab: null,
@@ -115,7 +119,6 @@ export default {
         v => !!v || "Title is required"
       ],
       valid: false,
-      windowsize: ""
     }
   },
   methods: {
@@ -124,16 +127,16 @@ export default {
       this.dialog = false
     },
     save() {
-      this.$emit('change', this.value)
+      this.$emit('change', this.recipe)
       this.dialog = false;
     },
     addIngredient() {
-      this.value.ingredients.push({quantity: null, unit: null, name: null})
-      this.ingredientPanel = this.value.ingredients.length - 1
+      this.recipe.ingredients.push({quantity: null, unit: null, name: null})
+      this.ingredientPanel = this.recipe.ingredients.length - 1
     },
     removeIngredient(index) {
       this.ingredientPanel = null
-      this.value.ingredients.splice(index, 1)
+      this.recipe.ingredients.splice(index, 1)
     }
   }
 }

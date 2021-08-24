@@ -5,6 +5,7 @@ import org.jboss.logging.Logger;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.Optional;
 import java.util.UUID;
 
 @Path("/recipe")
@@ -42,8 +43,9 @@ public class RecipeResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    public Recipe get(@PathParam("id") UUID id) {
-        return service.get(id).orElseThrow(NotFoundException::new);
+    public Recipe get(@PathParam("id") UUID id, @QueryParam("servings") Integer servings) {
+        return service.get(id, Optional.ofNullable(servings).map(Servings::new))
+                .orElseThrow(NotFoundException::new);
     }
 
     @DELETE

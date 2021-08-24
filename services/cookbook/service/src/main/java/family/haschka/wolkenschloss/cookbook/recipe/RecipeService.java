@@ -54,9 +54,11 @@ public class RecipeService {
         return new TableOfContents(total, content);
     }
 
-    public Optional<Recipe> get(UUID id) {
-        var recipe = recipeRepository.findById(id);
-        return Optional.ofNullable(recipe);
+    public Optional<Recipe> get(UUID id, Optional<Servings> servings) {
+        servings.ifPresent(s -> System.out.println("Servings da"));
+
+        var recipe = Optional.ofNullable(recipeRepository.findById(id));
+        return recipe.map(r -> servings.map(r::scale).orElse(r));
     }
 
     public void delete(UUID id) {

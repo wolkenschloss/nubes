@@ -1,7 +1,8 @@
 {
-  "ingredients": {
+  "ingredients": [{
     "car": {
       "vin": "12312300098"
-    }
-  }
+    },
+    "name": null
+  }]
 }

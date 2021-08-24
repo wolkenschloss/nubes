@@ -1,14 +1,24 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Ingredient {
 
-    public Ingredient() {}
+    // Required by Bson
+    @SuppressWarnings("unused")
+    public Ingredient() {
+    }
 
-    public Ingredient(Long quantity, String unit, String name) {
+    @JsonbCreator
+    public Ingredient(
+            @JsonbProperty("quantity") Rational quantity,
+            @JsonbProperty("unit") String unit,
+            @JsonbProperty(value = "name") String name) {
 
         this.name = name;
         this.unit = unit;
@@ -17,10 +27,10 @@ public class Ingredient {
 
     public String name;
     public String unit;
-
-    public Long quantity;
+    public Rational quantity;
 
     public static Ingredient parse(String string) {
+        // TODO: rational statt long für quantity
         Pattern p = Pattern.compile("(?<quant>[1-9][0-9]*)\\s*(?<unit>g|kg|ml|cl|l)?\\s*(?<name>.*)");
 
         Matcher m = p.matcher(string);
@@ -29,7 +39,8 @@ public class Ingredient {
             String quant = m.group("quant");
             String unit = m.group("unit");
             String name = m.group("name");
-            return new Ingredient(Long.parseLong(quant), unit, name);
+
+            return new Ingredient(Rational.parse(quant), unit, name);
         } else {
             return new Ingredient(null, null, string);
         }
@@ -56,5 +67,14 @@ public class Ingredient {
     @Override
     public int hashCode() {
         return Objects.hash(name, unit, quantity);
+    }
+
+    public Ingredient scale(Rational factor) {
+
+        var scaledQuantity = Optional.ofNullable(quantity)
+                .map(q -> q.multiply(factor))
+                .orElse(null);
+
+        return new Ingredient(scaledQuantity, unit, name);
     }
 }

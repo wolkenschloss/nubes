@@ -28,7 +28,8 @@ public class RecipeImport {
         Stream<String> scripts = extractJsonLdScripts(content);
 
         var config = new JsonbConfig()
-                .withAdapters(new RecipeAdapter());
+                .withDeserializers(new ServingsDeserializer(), new RationalDeserializer())
+                .withAdapters(new RecipeAdapterFromRecipeAnnotated());
 
         var jsonb = JsonbBuilder.create(config);
 
