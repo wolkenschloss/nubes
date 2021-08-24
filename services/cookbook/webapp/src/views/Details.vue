@@ -10,17 +10,8 @@
             Ingredients
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-
-            <div>
-              <v-spacer></v-spacer>
-              <servings v-model="servings" hint="Number of servings that will be served" class="mb-6"></servings>
-            </div>
-
-            <v-icon>mdi-food</v-icon> ({{recipe.servings}} servings)
-
-            <v-divider></v-divider>
+           <servings v-model="servings" hint="Number of servings that will be served" class="mb-6" @input="servingsChanged"></servings>
             <v-list v-if="recipe.ingredients.length > 0">
-
                 <v-list-item v-for="(ingredient, index) in recipe.ingredients" :key="index">
                   <v-list-item-content>
                     <v-list-item-title>
@@ -78,6 +69,11 @@ export default {
       }
     }
   },
+  watch: {
+    servings(newVal) {
+      console.log(`watching serving(${newVal})`)
+    }
+  },
   data() {
     return {
       panel: null,
@@ -88,7 +84,11 @@ export default {
     this.loadRecipe(this.$props.id)
   },
   methods: {
-    ...mapActions(['loadRecipe', 'deleteRecipe', 'saveRecipe', 'cancelEdit']),
+    ...mapActions(['loadRecipe', 'deleteRecipe', 'saveRecipe', 'cancelEdit', 'scaleIngredients']),
+    servingsChanged(value) {
+      console.log(`servingsChanged(${value}`)
+      this.scaleIngredients(value)
+    }
   }
 }
 </script>

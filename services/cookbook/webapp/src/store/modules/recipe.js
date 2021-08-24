@@ -16,6 +16,13 @@ const getters = {
 }
 
 const actions = {
+    async scaleIngredients({commit, state}, servings) {
+        console.log(`Action scaleIngredients(${servings}`)
+        let url = `/recipe/${state.recipe.recipeId}?servings=${servings}`
+        const response = await axios.get(url)
+        commit('setRecipe', response.data)
+        commit('setServings', servings)
+    },
     async loadRecipe({commit, state}, id) {
         console.log(`Action loadRecipe(${id})`)
         let url = "/recipe/" + id
