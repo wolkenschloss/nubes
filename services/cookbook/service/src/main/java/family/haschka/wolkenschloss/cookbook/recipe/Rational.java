@@ -1,5 +1,6 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import javax.json.bind.annotation.JsonbCreator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +14,10 @@ public record Rational(int numerator, int denominator)  {
         var gcd = gcd(numerator, denominator);
         numerator /= gcd;
         denominator /= gcd;
+    }
+
+    public Rational(int value) {
+        this(value, 1);
     }
 
     private int gcd(int a, int b) {

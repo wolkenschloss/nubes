@@ -1,5 +1,7 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.recipe.RationalDeserializer;
+import family.haschka.wolkenschloss.cookbook.recipe.RationalSerializer;
 import family.haschka.wolkenschloss.cookbook.recipe.ServingsDeserializer;
 import family.haschka.wolkenschloss.cookbook.recipe.ServingsSerializer;
 
@@ -31,8 +33,8 @@ public class Serialization {
         };
 
         var config = new JsonbConfig()
-                .withDeserializers(new ServingsDeserializer())
-                .withSerializers(new ServingsSerializer())
+                .withDeserializers(new ServingsDeserializer(), new RationalDeserializer())
+                .withSerializers(new ServingsSerializer(), new RationalSerializer())
                 .withPropertyVisibilityStrategy(visibilityStrategy);
         return JsonbBuilder.create(config);
     }

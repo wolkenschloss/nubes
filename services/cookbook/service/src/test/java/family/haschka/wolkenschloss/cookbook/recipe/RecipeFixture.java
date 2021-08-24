@@ -24,12 +24,12 @@ public enum RecipeFixture {
 
     private static Recipe getLasagne() {
         Recipe lasagne = new Recipe("Lasagne", "Preparation");
-        lasagne.ingredients.add(new Ingredient(500L, "g", "Hackfleisch"));
-        lasagne.ingredients.add(new Ingredient(1L, null, "Zwiebeln(n)"));
-        lasagne.ingredients.add(new Ingredient(2L, null, "Knoblauchzehen"));
-        lasagne.ingredients.add(new Ingredient(1L, null, "Bund Petersilie oder TK"));
-        lasagne.ingredients.add(new Ingredient(1L, null, "EL Tomatenmark"));
-        lasagne.ingredients.add(new Ingredient(1L, null, "Dose Tomaten, geschälte (800g)"));
+        lasagne.ingredients.add(new Ingredient(new Rational(500), "g", "Hackfleisch"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Zwiebeln(n)"));
+        lasagne.ingredients.add(new Ingredient(new Rational(2), null, "Knoblauchzehen"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Bund Petersilie oder TK"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "EL Tomatenmark"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Dose Tomaten, geschälte (800g)"));
         lasagne.ingredients.add(new Ingredient(null, null, "Etwas Rotwein"));
 
         return lasagne;
@@ -39,9 +39,9 @@ public enum RecipeFixture {
 
     private static Recipe getAntipasti() {
         Recipe antipasti = new Recipe("Antipasti", LOREM_IPSUM);
-        antipasti.ingredients.add(new Ingredient(500L, "ml", "Olivenöl"));
-        antipasti.ingredients.add(new Ingredient(4L, "", "Knoblauchzehen"));
-        antipasti.ingredients.add(new Ingredient(4L, "EL", "getrocknete italienische Kräuter"));
+        antipasti.ingredients.add(new Ingredient(new Rational(500), "ml", "Olivenöl"));
+        antipasti.ingredients.add(new Ingredient(new Rational(4), "", "Knoblauchzehen"));
+        antipasti.ingredients.add(new Ingredient(new Rational(4), "EL", "getrocknete italienische Kräuter"));
         antipasti.servings = new Servings(4);
 
         return antipasti;
@@ -49,9 +49,9 @@ public enum RecipeFixture {
 
     private static Recipe getChiliConCarne() {
         Recipe chiliConCarne = new Recipe("Chili con carne", "Preparation");
-        chiliConCarne.ingredients.add(new Ingredient(800L, "g", "Rinderhackfleisch"));
-        chiliConCarne.ingredients.add(new Ingredient(1200L, "g", "Tomaten, geschält"));
-        chiliConCarne.ingredients.add(new Ingredient(1L, null, "Zimtstange"));
+        chiliConCarne.ingredients.add(new Ingredient(new Rational(800), "g", "Rinderhackfleisch"));
+        chiliConCarne.ingredients.add(new Ingredient(new Rational(1200), "g", "Tomaten, geschält"));
+        chiliConCarne.ingredients.add(new Ingredient(new Rational(1), null, "Zimtstange"));
         return chiliConCarne;
     }
 }
