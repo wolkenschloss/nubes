@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import javax.json.bind.annotation.JsonbCreator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

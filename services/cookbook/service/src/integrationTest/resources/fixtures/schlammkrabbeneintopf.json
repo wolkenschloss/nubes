@@ -3,17 +3,23 @@
   "preparation": "Bekannt.",
   "ingredients": [
     {
-      "quantity": 1,
+      "quantity": "4",
       "unit": "",
       "name": "Schlammkrabbenchitin"
     },
     {
+      "quantity": "1/3",
+      "unit": "TL",
       "name": "Pfeffer"
     },
     {
+      "quantity": 2,
+      "unit": "",
       "name": "Salz"
     },
     {
+      "quantity": "-1",
+      "unit": "",
       "name": "Frostmirriam"
     }
   ]

@@ -34,4 +34,32 @@ public class IngredientTest {
         var ingredient = Ingredient.parse(testcase.string);
         Assertions.assertEquals(testcase.ingredient, ingredient);
     }
+
+    public enum ServingsTestcase {
+        ONIONS(new Ingredient(new Rational(2), null, "Onions"),
+                new Rational(5, 4),
+                new Ingredient(new Rational(5, 2), null, "Onions")),
+
+        // Das ist ein Beispiel, wo es nicht so gut ist mit Brüchen zu arbeiten.
+        TOMATOES(new Ingredient(new Rational(800), "g", "Tomatoes"),
+                new Rational(2, 3),
+                new Ingredient(new Rational(1600, 3), "g", "Tomatoes"));
+
+        private final Ingredient ingredient;
+        private final Rational factor;
+        private final Ingredient expected;
+
+        ServingsTestcase(Ingredient ingredient, Rational factor, Ingredient expected) {
+            this.ingredient = ingredient;
+            this.factor = factor;
+            this.expected = expected;
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(ServingsTestcase.class)
+    void scaleTests(ServingsTestcase testcase) {
+        var actual = testcase.ingredient.scale(testcase.factor);
+        Assertions.assertEquals(testcase.expected, actual);
+    }
 }

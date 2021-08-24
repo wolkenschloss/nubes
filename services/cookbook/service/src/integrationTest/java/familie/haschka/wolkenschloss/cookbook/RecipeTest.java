@@ -83,6 +83,7 @@ public class RecipeTest {
                                 .header("Location", r -> equalTo(getUrl() + "/" + r.path("recipeId")))
                                 .body("title", equalTo("Schlammkrabbeneintopf"))),
 
+                // TODO: Es wäre schön, wenn der Fehler als JSON Objekt und nicht als HTML zurückkäme.
                 new PostRecipeTestcase("invalid data",
                         "fixtures/invalid.json",
                         HttpStatus.SC_BAD_REQUEST,
@@ -153,7 +154,6 @@ public class RecipeTest {
                 .when()
                 .get(getUrl())
                 .then()
-                .log().all()
                 .statusCode(HttpStatus.SC_OK)
                 .body("content.size()", greaterThan(0))
                 .body("content.size()", response -> equalTo(response.getBody().jsonPath().<Integer>get("total")))
@@ -284,6 +284,7 @@ public class RecipeTest {
         // POST /recipe valid data
         return RestAssured
                 .given()
+                .log().all()
                 .body(str)
                 .contentType(ContentType.JSON)
                 .when()
