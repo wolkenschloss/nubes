@@ -2,8 +2,9 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 
 import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
 import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
-import io.quarkus.mongodb.panache.PanacheQuery;
+import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
+import io.smallrye.mutiny.Uni;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -26,12 +27,11 @@ public class RecipeService {
     @Inject
     Logger log;
 
-    public void save(Recipe recipe) {
-
-        recipeRepository.persist(recipe);
+    public Uni<Recipe> save(Recipe recipe) {
+        return recipeRepository.persist(recipe);
     }
 
-    private PanacheQuery<Recipe> getQuery(String search) {
+    private ReactivePanacheQuery<Recipe> getQuery(String search) {
         if (search == null || search.equals("")) {
             return recipeRepository.findAll(Sort.by("title"));
         }
@@ -39,34 +39,36 @@ public class RecipeService {
         return recipeRepository.find("title like ?1}", search, Sort.by("title"));
     }
 
-    public TableOfContents list(int from, int to, String search) {
+    public Uni<TableOfContents> list(int from, int to, String search) {
 
         var query = getQuery(search);
         var total = query.count();
 
-        query.range(from, to);
-        var range = query.list();
+        var page = query.range(from, to);
+        var elements = page.list();
 
-        var content = range.stream()
+        // TODO: Statt alle Rezepte vollständig zu laden, könnte auch eine
+        //  Projektion angewendet werden.
+        var summaries = elements.map(e -> e.stream()
                 .map(recipe -> new Summary(recipe.recipeId, recipe.title))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
 
-        return new TableOfContents(total, content);
+        return Uni.combine().all().unis(summaries, total).asTuple()
+                .map(t -> new TableOfContents(t.getItem2(), t.getItem1()));
     }
 
-    public Optional<Recipe> get(UUID id, Optional<Servings> servings) {
-        servings.ifPresent(s -> System.out.println("Servings da"));
-
-        var recipe = Optional.ofNullable(recipeRepository.findById(id));
-        return recipe.map(r -> servings.map(r::scale).orElse(r));
+    public Uni<Optional<Recipe>> get(UUID id, Optional<Servings> servings) {
+        return recipeRepository.findByIdOptional(id)
+                .map(uni -> uni.map(recipe -> servings.map(recipe::scale).orElse(recipe)));
     }
 
-    public void delete(UUID id) {
-        recipeRepository.deleteById(id);
+    public Uni<Boolean> delete(UUID id) {
+        return recipeRepository.deleteById(id);
     }
 
-    public void update(Recipe recipe) {
-        recipeRepository.update(recipe);
+    public Uni<Recipe> update(Recipe recipe) {
+        log.infov("update Recipe: {0}", recipe.toString());
+        return recipeRepository.update(recipe);
     }
 
     @Inject

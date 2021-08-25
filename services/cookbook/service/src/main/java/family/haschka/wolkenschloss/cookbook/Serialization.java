@@ -4,9 +4,11 @@ import family.haschka.wolkenschloss.cookbook.recipe.RationalDeserializer;
 import family.haschka.wolkenschloss.cookbook.recipe.RationalSerializer;
 import family.haschka.wolkenschloss.cookbook.recipe.ServingsDeserializer;
 import family.haschka.wolkenschloss.cookbook.recipe.ServingsSerializer;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -17,8 +19,14 @@ import java.lang.reflect.Method;
 @ApplicationScoped
 public class Serialization {
 
+    @Inject
+    Logger log;
+
     @Produces
     public Jsonb createJsonb() {
+
+        log.infov("Configure Jsonb");
+
         // Wird benötigt, um Java Records mit yasson zu serialisieren.
         var visibilityStrategy = new PropertyVisibilityStrategy() {
             @Override
@@ -35,8 +43,9 @@ public class Serialization {
         var config = new JsonbConfig()
                 .withDeserializers(new ServingsDeserializer(), new RationalDeserializer())
                 .withSerializers(new ServingsSerializer(), new RationalSerializer())
-                .withNullValues(false)
+                .withNullValues(true)
                 .withPropertyVisibilityStrategy(visibilityStrategy);
+
         return JsonbBuilder.create(config);
     }
 }

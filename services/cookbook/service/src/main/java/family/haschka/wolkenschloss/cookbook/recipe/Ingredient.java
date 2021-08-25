@@ -18,7 +18,7 @@ public class Ingredient {
     public Ingredient(
             @JsonbProperty("quantity") Rational quantity,
             @JsonbProperty("unit") String unit,
-            @JsonbProperty(value = "name") String name) {
+            @JsonbProperty("name") String name) {
 
         this.name = name;
         this.unit = unit;

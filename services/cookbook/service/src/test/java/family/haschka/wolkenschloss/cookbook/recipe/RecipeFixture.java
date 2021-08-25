@@ -1,10 +1,10 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import javax.json.bind.Jsonb;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public enum RecipeFixture {
 
@@ -67,5 +67,9 @@ public enum RecipeFixture {
         chiliConCarne.ingredients.add(new Ingredient(new Rational(1200), "g", "Tomaten, geschält"));
         chiliConCarne.ingredients.add(new Ingredient(new Rational(1), null, "Zimtstange"));
         return chiliConCarne;
+    }
+
+    public String asJson(Jsonb jsonb) {
+        return jsonb.toJson(this.recipe);
     }
 }
