@@ -3,13 +3,16 @@ package family.haschka.wolkenschloss.cookbook.job;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
-import org.junit.jupiter.api.Assertions;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
+import org.eclipse.microprofile.context.ManagedExecutor;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.NotificationOptions;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -39,27 +41,20 @@ public class JobServiceTest {
     JobReceivedObserver observer;
 
     @Test
-    public void addJobTest() throws ExecutionException, InterruptedException {
-
-        var id = UUID.randomUUID();
-
-        // Mongo DB setzt die ID, wenn die Entität persistiert wird.
-        Mockito.doAnswer(x -> null).when(repository).persist(any(ImportJob.class));
+    public void addJobTest() {
 
         var job = new ImportJob();
         job.order = "https://meinerezepte.local/lasagen";
-        job.jobId = id;
+        job.jobId = UUID.randomUUID();
 
-        var future = sut.addJob(job);
+        Mockito.when(repository.persist(job))
+                .thenReturn(Uni.createFrom().item(job));
 
-        future.thenAccept(event -> {
 
-            Assertions.assertTrue(observer.events.contains(event));
-            var expected = new JobReceivedEvent(event.jobId(), URI.create(job.order));
-
-            Assertions.assertEquals(expected, event);
-
-        }).toCompletableFuture().get();
+        var expected = new JobReceivedEvent(job.jobId, URI.create(job.order));
+        var event = sut.addJob(job).log("test");
+        var subscriber = event.subscribe().withSubscriber(UniAssertSubscriber.create());
+        subscriber.awaitItem().assertItem(expected);
 
         Mockito.verify(repository, Mockito.times(1)).persist(job);
         Mockito.verifyNoMoreInteractions(repository);
@@ -67,6 +62,9 @@ public class JobServiceTest {
 
     @Inject
     Event<JobCompletedEvent> completed;
+
+    @Inject
+    ManagedExecutor executor;
 
     @Test
     public void jobCompletedSuccessfullyTest() {
@@ -80,24 +78,31 @@ public class JobServiceTest {
 
         var jobAfterCompletion = new ImportJob();
         jobAfterCompletion.jobId = id;
-        jobAfterCompletion.state =State.COMPLETED;
+        jobAfterCompletion.state = State.COMPLETED;
         jobAfterCompletion.location = event.location();
 
-        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
-        Mockito.doAnswer(x -> null).when(repository).update(jobAfterCompletion);
+        Mockito.when(repository.findByIdOptional(id))
+                .thenReturn(Uni.createFrom().item(Optional.of(jobBeforeCompletion)));
 
-        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
+        Mockito.when(repository.update(jobAfterCompletion))
+                .thenReturn(Uni.createFrom().item(jobAfterCompletion));
 
-        completed.fire(event);
+        Mockito.when(repository.findByIdOptional(id))
+                .thenReturn(Uni.createFrom().item(Optional.of(jobAfterCompletion)));
 
-        var j = sut.get(event.jobId());
+        var j = Uni.createFrom().completionStage(completed.fireAsync(event, NotificationOptions.ofExecutor(executor)))
+                .flatMap(x -> sut.get(event.jobId()))
+                .map(optional -> optional.orElseThrow(AssertionFailedError::new))
+                .onFailure().invoke(failure -> System.out.println(failure.getMessage()));
+
         var expected = new ImportJob();
         expected.jobId = id;
         expected.state = State.COMPLETED;
         expected.location = event.location();
         expected.error = null;
 
-        Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
+        var subscriber = j.subscribe().withSubscriber(UniAssertSubscriber.create());
+        subscriber.awaitItem().assertItem(expected);
 
         Mockito.verify(repository, Mockito.times(2)).findByIdOptional(any());
         Mockito.verify(repository, Mockito.times(1)).update(any(ImportJob.class));
@@ -122,22 +127,27 @@ public class JobServiceTest {
         jobAfterCompletion.state = State.COMPLETED;
         jobAfterCompletion.error = event.error();
 
-        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobBeforeCompletion));
-        Mockito.doAnswer(x -> null).when(repository).update(jobAfterCompletion);
+        Mockito.when(repository.findByIdOptional(id))
+                .thenReturn(Uni.createFrom().item(Optional.of(jobBeforeCompletion)));
 
-        Mockito.when(repository.findByIdOptional(id)).thenReturn(Optional.of(jobAfterCompletion));
+        Mockito.when(repository.update(jobAfterCompletion))
+                        .thenReturn(Uni.createFrom().item(jobAfterCompletion));
 
-        completed.fire(event);
+        Mockito.when(repository.findByIdOptional(id))
+                .thenReturn(Uni.createFrom().item(Optional.of(jobAfterCompletion)));
 
-        var j = sut.get(event.jobId());
+        var j = Uni.createFrom().completionStage(completed.fireAsync(event, NotificationOptions.ofExecutor(executor)))
+                .flatMap(e -> sut.get(e.jobId()))
+                .map(optional -> optional.orElseThrow(AssertionFailedError::new));
+
         var expected = new ImportJob();
         expected.jobId = id;
         expected.state = State.COMPLETED;
         expected.error = event.error();
         expected.location = event.location();
 
-        Assertions.assertEquals(expected, j.orElseThrow(AssertionFailedError::new));
-        Assertions.assertEquals(expected.error, j.orElseThrow(AssertionFailedError::new).error);
+        var subscriber = j.subscribe().withSubscriber(UniAssertSubscriber.create());
+        subscriber.awaitItem().assertItem(expected);
 
         Mockito.verify(repository, Mockito.times(2)).findByIdOptional(any());
         Mockito.verify(repository, Mockito.times(1)).update(jobAfterCompletion);
@@ -155,6 +165,7 @@ public class JobServiceTest {
         }
 
         void observeAsync(@ObservesAsync JobReceivedEvent event) {
+            System.out.println("observeAsync JobReceivedEvent");
             events.add(event);
         }
 

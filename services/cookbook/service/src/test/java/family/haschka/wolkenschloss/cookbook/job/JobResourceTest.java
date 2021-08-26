@@ -1,11 +1,13 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
+import family.haschka.wolkenschloss.cookbook.recipe.IdentityGenerator;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
+import io.smallrye.mutiny.Uni;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,17 +41,21 @@ public class JobResourceTest {
     @Inject
     Jsonb jsonb;
 
+    @InjectMock
+    IdentityGenerator identityGenerator;
+
     @Test
     public void createImportJobTest() {
 
         var id = UUID.randomUUID();
-
-        Mockito.doAnswer(x -> {
-            x.getArgument(0, ImportJob.class).jobId = id;
-            return null;
-        }).when(service).addJob(any(ImportJob.class));
-
         ImportJob job = getImportJob();
+        JobReceivedEvent event = new JobReceivedEvent(id, URI.create(job.order));
+
+        Mockito.when(identityGenerator.generate())
+                .thenReturn(id);
+
+        Mockito.when(service.addJob(any(ImportJob.class)))
+                .thenReturn(Uni.createFrom().item(event));
 
         RestAssured.given()
                 .log().all()
@@ -64,7 +70,7 @@ public class JobResourceTest {
                     return equalTo(expected.toString());
                 });
 
-        Mockito.verify(service, Mockito.times(1)).addJob(Mockito.any(ImportJob.class));
+        Mockito.verify(service, Mockito.times(1)).addJob(any(ImportJob.class));
         Mockito.verifyNoMoreInteractions(service);
     }
 
@@ -73,7 +79,8 @@ public class JobResourceTest {
         var id = UUID.randomUUID();
         var location = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
 
-        Mockito.when(service.get(id)).thenReturn(Optional.empty());
+        Mockito.when(service.get(id))
+                .thenReturn(Uni.createFrom().item(Optional.empty()));
 
         RestAssured.given()
                 .accept(MediaType.APPLICATION_JSON)
@@ -93,7 +100,8 @@ public class JobResourceTest {
         job.jobId = id;
         job.order = JOB_URL;
 
-        Mockito.when(service.get(id)).thenReturn(Optional.of(job));
+        Mockito.when(service.get(id))
+                .thenReturn(Uni.createFrom().item(Optional.of(job)));
 
         var actual = RestAssured.given()
                 .accept(MediaType.APPLICATION_JSON)
@@ -123,7 +131,6 @@ public class JobResourceTest {
 
         ImportJob clone  = jsonb.fromJson(serialized, ImportJob.class);
         Assertions.assertEquals(job, clone);
-
     }
 
     private ImportJob getImportJob() {

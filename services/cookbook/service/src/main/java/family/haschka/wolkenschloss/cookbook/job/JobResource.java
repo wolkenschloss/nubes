@@ -1,6 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import org.jboss.logging.Logger;
+import family.haschka.wolkenschloss.cookbook.recipe.IdentityGenerator;
+import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -18,29 +19,32 @@ public class JobResource {
     @Inject
     JobService service;
 
+    @Inject
+    IdentityGenerator identityGenerator;
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response post(ImportJob job, @Context UriInfo uriInfo) {
-        job.jobId = UUID.randomUUID();
+    public Uni<Response> post(ImportJob job, @Context UriInfo uriInfo) {
         job.state = State.IN_PROGRESS;
+        job.jobId = identityGenerator.generate();
 
-        service.addJob(job);
-
-        var location = uriInfo.getAbsolutePathBuilder()
-                .path(GET_PATH)
-                .build(job.jobId);
-
-        return Response.status(Response.Status.CREATED)
-                .header("Location", location.toString())
-                .entity(job)
-                .build();
+        return service.addJob(job)
+                .map(event -> uriInfo.getAbsolutePathBuilder()
+                        .path(GET_PATH)
+                        .build(event.jobId()))
+                .map(location -> Response
+                        .status(Response.Status.CREATED)
+                        .header("Location", location.toString())
+                        .entity(job)
+                        .build());
     }
 
     @GET
     @Path(GET_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public ImportJob get(@PathParam("id")UUID id) {
-        return service.get(id).orElseThrow(NotFoundException::new);
+    public Uni<ImportJob> get(@PathParam("id") UUID id) {
+        return service.get(id)
+                .map(optional -> optional.orElseThrow(NotFoundException::new));
     }
 }

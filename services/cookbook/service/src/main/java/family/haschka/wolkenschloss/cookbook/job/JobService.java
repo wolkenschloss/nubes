@@ -1,18 +1,19 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
+import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.NotificationOptions;
-import javax.enterprise.event.Observes;
+import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
 public class JobService {
@@ -30,31 +31,24 @@ public class JobService {
     @Inject
     ManagedExecutor executor;
 
-    public CompletionStage<JobReceivedEvent> addJob(ImportJob job) {
-        log.infov("addJob({0})", job);
-        log.info("JobService.addJob start");
-        repository.persist(job);
-
-        log.info(job);
-        var event = new JobReceivedEvent(job.jobId, URI.create(job.order));
-        log.info("JobService.addJob end");
-
-        return received.fireAsync(event, NotificationOptions.ofExecutor(executor));
+    public Uni<JobReceivedEvent> addJob(ImportJob job) {
+        return repository.persist(job)
+                .map(j -> new JobReceivedEvent(j.jobId, URI.create(j.order)))
+                .flatMap(e -> Uni.createFrom()
+                        .completionStage(() -> received.fireAsync(e, NotificationOptions.ofExecutor(executor)))
+                        .map(x -> e));
     }
 
-    public Optional<ImportJob> get(UUID id) {
-        log.infov("get({0})", id);
+    public Uni<Optional<ImportJob>> get(UUID id) {
         return repository.findByIdOptional(id);
     }
 
-    public void jobCompleted(@Observes JobCompletedEvent event) {
+    public void jobCompleted(@ObservesAsync JobCompletedEvent event) {
+        var result = repository.findByIdOptional(event.jobId())
+                .map(optional -> optional.orElseThrow(NotFoundException::new))
+                .map(job -> job.complete(event.location(), event.error()))
+                .flatMap(completed -> repository.update(completed));
 
-        log.info("handle job completed event");
-
-        var job = repository.findByIdOptional(event.jobId()).orElseThrow(NotFoundException::new);
-        var completed = job.complete(event.location(), event.error());
-        repository.update(completed);
-
-        log.info("updated job");
+        result.await().atMost(Duration.ofSeconds(4));
     }
 }

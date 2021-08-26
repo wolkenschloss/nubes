@@ -5,14 +5,17 @@ import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.NotificationOptions;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,6 +77,12 @@ public class RecipeService {
     @Inject
     Event<JobCompletedEvent> completed;
 
+    @Inject
+    ManagedExecutor executor;
+
+    @Inject
+    IdentityGenerator identityGenerator;
+
     public void steal(@ObservesAsync JobReceivedEvent event) {
         try {
             var thief = new RecipeImport();
@@ -83,22 +92,20 @@ public class RecipeService {
                 throw new RecipeParseException("The data source does not contain an importable recipe");
             }
 
-            recipes.get(0).recipeId = UUID.randomUUID();
-            recipeRepository.persist(recipes.get(0));
-
-            var done = new JobCompletedEvent(
-                    event.jobId(),
-                    UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId),
-                    null
-            );
-
-            completed.fire(done);
-
+            recipes.get(0).recipeId = identityGenerator.generate();
+            recipeRepository.persist(recipes.get(0))
+                    .map(recipe -> new JobCompletedEvent(
+                            event.jobId(),
+                            UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId),
+                            null))
+                    .flatMap(done -> Uni.createFrom().completionStage(completed.fireAsync(done, NotificationOptions.ofExecutor(executor))))
+                    .log("steal")
+                    .await().atMost(Duration.ofSeconds(4));
         } catch (IOException e) {
             var done = new JobCompletedEvent(event.jobId(), null, "The data source cannot be read");
             log.infov("Can not steal recipe from {0}", event.source(), e);
 
-            completed.fire(done);
+            completed.fireAsync(done, NotificationOptions.ofExecutor(executor));
 
             log.warn("send completed event");
         } catch (RecipeParseException e) {
@@ -106,7 +113,7 @@ public class RecipeService {
 
             log.info("Can not steal recipe", e);
 
-            completed.fire(done);
+            completed.fireAsync(done, NotificationOptions.ofExecutor(executor));
         }
     }
 }
