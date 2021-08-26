@@ -6,7 +6,8 @@ plugins {
 dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-resteasy-jsonb")
+    implementation("io.quarkus:quarkus-resteasy-reactive")
+    implementation("io.quarkus:quarkus-resteasy-reactive-jsonb")
     implementation("io.quarkus:quarkus-mongodb-panache")
     implementation("org.jsoup:jsoup:1.14.1")
 

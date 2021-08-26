@@ -32,6 +32,15 @@ public class ServingsDeserializerTest {
     }
 
     @Test
+    public void shouldExtractValue() {
+        var deserialized = jsonb.fromJson("{\"servings\": \"3 Portion(en)\"}", Recipe.class);
+        var expected = new Recipe();
+        expected.servings = new Servings(3);
+
+        Assertions.assertEquals(expected, deserialized);
+    }
+
+    @Test
     public void shouldSerialize() {
         var serialized = jsonb.toJson(new Servings(1));
         Assertions.assertEquals("1", serialized);
