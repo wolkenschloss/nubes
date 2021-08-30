@@ -124,9 +124,11 @@ public class JobTest {
                             .given()
                             .body(createJob(testcase.jobBody()))
                             .contentType(ContentType.JSON)
+                            .log().all()
                             .when()
                             .post(url)
                             .then()
+                            .log().all()
                             .statusCode(HttpStatus.SC_CREATED)
                             .header("Location", r -> equalTo(url + "/" + r.path("jobId")))
                             .extract().header("location");
@@ -137,9 +139,11 @@ public class JobTest {
                             .untilAsserted(() -> testcase.assertion.accept(
                                     RestAssured.given()
                                             .accept(ContentType.JSON)
+                                            .log().all()
                                             .when()
                                             .get(location)
                                             .then()
+                                            .log().all()
                                             .statusCode(HttpStatus.SC_OK)
                                             .body("state", equalTo("COMPLETED"))));
                 }));

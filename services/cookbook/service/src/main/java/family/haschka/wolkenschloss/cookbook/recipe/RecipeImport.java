@@ -25,6 +25,10 @@ public class RecipeImport {
     public List<Recipe> extract(URI source) throws IOException {
 
         String content = download(source);
+        return extract(content);
+    }
+
+    public List<Recipe> extract(String content) {
         Stream<String> scripts = extractJsonLdScripts(content);
 
         var config = new JsonbConfig()

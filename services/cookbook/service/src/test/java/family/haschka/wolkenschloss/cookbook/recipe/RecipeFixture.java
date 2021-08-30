@@ -1,8 +1,14 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import io.smallrye.mutiny.Uni;
+
 import javax.json.bind.Jsonb;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -71,5 +77,12 @@ public enum RecipeFixture {
 
     public String asJson(Jsonb jsonb) {
         return jsonb.toJson(this.recipe);
+    }
+
+    public Uni<String> toUni() throws URISyntaxException, IOException {
+        try(InputStream in = this.getRecipeSource().toURL().openStream()) {
+            byte[] bytes = in.readAllBytes();
+            return Uni.createFrom().item(new String(bytes, Charset.defaultCharset()));
+        }
     }
 }

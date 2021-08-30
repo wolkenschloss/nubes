@@ -51,7 +51,7 @@ tasks.withType<Test> {
         // options for log level LIFECYCLE.
         // LIFECYCLE is gradle's default log level.
         // Starting gradle with options -q or -w only
-        // the summarize is will be shown
+        // the summary is shown
         exceptionFormat = TestExceptionFormat.SHORT
 
         info {

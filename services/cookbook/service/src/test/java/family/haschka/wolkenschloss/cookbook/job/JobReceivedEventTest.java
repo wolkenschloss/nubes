@@ -1,13 +1,11 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.recipe.IdentityGenerator;
-import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
-import family.haschka.wolkenschloss.cookbook.recipe.RecipeFixture;
-import family.haschka.wolkenschloss.cookbook.recipe.RecipeRepository;
+import family.haschka.wolkenschloss.cookbook.recipe.*;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
+import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -15,13 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.NotificationOptions;
 import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.SynchronousQueue;
 
@@ -41,19 +39,25 @@ public class JobReceivedEventTest {
     @InjectMock
     IdentityGenerator identityGenerator;
 
-    @Inject
-    Event<JobReceivedEvent> received;
-
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     ManagedExecutor executor;
 
+    @Inject
+    EventBus bus;
+
+    @InjectMock
+    DataGrabber grabber;
+
     @Test
     @DisplayName("should import recipe from url")
-    public void testImportRecipe() throws InterruptedException, URISyntaxException {
+    public void testImportRecipe() throws InterruptedException, URISyntaxException, IOException {
 
         var lasagneUri = RecipeFixture.LASAGNE.getRecipeSource();
         var recipeId = UUID.randomUUID();
+
+        Mockito.when(grabber.grab(any(URL.class)))
+                .thenReturn(RecipeFixture.LASAGNE.toUni());
 
         Mockito.when(identityGenerator.generate())
                 .thenReturn(recipeId);
@@ -63,16 +67,14 @@ public class JobReceivedEventTest {
 
         var event = new JobReceivedEvent(UUID.randomUUID(), lasagneUri);
 
-        var expected = Uni.createFrom().completionStage(
-                        received.fireAsync(event, NotificationOptions.ofExecutor(executor)))
-                .map(received -> new JobCompletedEvent(
-                        received.jobId(),
-                        UriBuilder.fromUri("/recipe/{id}").build(recipeId),
-                        null));
+        bus.publish("job-received", event);
 
-        var subscriber = expected.subscribe().withSubscriber(UniAssertSubscriber.create());
+        var expected = new JobCompletedEvent(
+                event.jobId(),
+                UriBuilder.fromUri("/recipe/{id}").build(recipeId),
+                null);
 
-        Assertions.assertEquals(observer.lastEvent(), subscriber.awaitItem().getItem());
+        Assertions.assertEquals(observer.lastEvent(), expected);
 
         Mockito.verify(recipeRepository, Mockito.times(1)).persist(any(Recipe.class));
         Mockito.verifyNoMoreInteractions(recipeRepository);
@@ -91,6 +93,7 @@ public class JobReceivedEventTest {
             events = new SynchronousQueue<>();
         }
 
+        @ConsumeEvent("job.completed")
         void observeAsync(@ObservesAsync JobCompletedEvent event) {
             events.offer(event);
         }

@@ -4,18 +4,18 @@ import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
 import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
+import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.NotificationOptions;
-import javax.enterprise.event.ObservesAsync;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.time.Duration;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -75,45 +75,35 @@ public class RecipeService {
     }
 
     @Inject
-    Event<JobCompletedEvent> completed;
-
-    @Inject
     ManagedExecutor executor;
 
     @Inject
     IdentityGenerator identityGenerator;
 
-    public void steal(@ObservesAsync JobReceivedEvent event) {
-        try {
-            var thief = new RecipeImport();
-            var recipes = thief.extract(event.source());
+    @Inject
+    EventBus bus;
 
-            if (recipes.size() == 0) {
-                throw new RecipeParseException("The data source does not contain an importable recipe");
-            }
+    @Inject
+    DataGrabber grabber;
 
-            recipes.get(0).recipeId = identityGenerator.generate();
-            recipeRepository.persist(recipes.get(0))
-                    .map(recipe -> new JobCompletedEvent(
-                            event.jobId(),
-                            UriBuilder.fromUri("/recipe/{id}").build(recipes.get(0).recipeId),
-                            null))
-                    .flatMap(done -> Uni.createFrom().completionStage(completed.fireAsync(done, NotificationOptions.ofExecutor(executor))))
-                    .log("steal")
-                    .await().atMost(Duration.ofSeconds(4));
-        } catch (IOException e) {
-            var done = new JobCompletedEvent(event.jobId(), null, "The data source cannot be read");
-            log.infov("Can not steal recipe from {0}", event.source(), e);
-
-            completed.fireAsync(done, NotificationOptions.ofExecutor(executor));
-
-            log.warn("send completed event");
-        } catch (RecipeParseException e) {
-            var done = new JobCompletedEvent(event.jobId(), null, e.getMessage());
-
-            log.info("Can not steal recipe", e);
-
-            completed.fireAsync(done, NotificationOptions.ofExecutor(executor));
-        }
+    @ConsumeEvent("job-received")
+    public void onJobReceived(JobReceivedEvent event) throws MalformedURLException {
+        log.infov("onJobReceivedEvent: {0}", event);
+        Uni<String> data = grabber.grab(event.source().toURL());
+        data.map(body -> new RecipeImport().extract(body))
+                .invoke(recipes -> {
+                    if (recipes.size() != 1) {
+                        throw new RecipeParseException("The data source does not contain an importable recipe");
+                    }
+                })
+                .map(recipes -> recipes.get(0))
+                .invoke(recipe -> recipe.recipeId = identityGenerator.generate())
+                .flatMap(recipe -> recipeRepository.persist(recipe))
+                .map(recipe -> new JobCompletedEvent(event.jobId(), UriBuilder.fromUri("/recipe/{id}").build(recipe.recipeId), null))
+                .subscribe()
+                .with(
+                        completed -> bus.publish("job.completed", completed),
+                        error -> bus.publish("job.completed", new JobCompletedEvent(event.jobId(), null, error.getMessage())));
     }
+
 }

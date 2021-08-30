@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 module.exports = {
   transpileDependencies: [
     'vuetify'
@@ -8,7 +10,7 @@ module.exports = {
       "^/": {
         target: 'http://localhost:8180/',
         changeOrigin: true,
-        onProxyRes: (proxyRes, req, res) => {
+        onProxyRes: (proxyRes) => {
           if (proxyRes.headers.location) {
             let loc = proxyRes.headers.location;
             loc = loc.replace('http://localhost:8180', '');
