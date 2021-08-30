@@ -5,7 +5,6 @@ import io.smallrye.mutiny.Uni;
 import javax.json.bind.Jsonb;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
