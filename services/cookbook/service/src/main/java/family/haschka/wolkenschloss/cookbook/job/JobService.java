@@ -20,8 +20,6 @@ import java.util.UUID;
 
 @ApplicationScoped
 public class JobService {
-    @Inject
-    Event<JobReceivedEvent> received;
 
     @Inject
     ImportJobRepository repository;
@@ -37,7 +35,7 @@ public class JobService {
     public Uni<JobReceivedEvent> addJob(ImportJob job) {
         return repository.persist(job)
                 .map(j -> new JobReceivedEvent(j.jobId, URI.create(j.order)))
-                .invoke(event -> eventBus.publish("job-received", event));
+                .invoke(event -> eventBus.send("job-received", event));
     }
 
     public Uni<Optional<ImportJob>> get(UUID id) {

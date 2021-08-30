@@ -100,10 +100,10 @@ public class RecipeService {
                 .invoke(recipe -> recipe.recipeId = identityGenerator.generate())
                 .flatMap(recipe -> recipeRepository.persist(recipe))
                 .map(recipe -> new JobCompletedEvent(event.jobId(), UriBuilder.fromUri("/recipe/{id}").build(recipe.recipeId), null))
+                .onFailure().recoverWithItem(throwable -> new JobCompletedEvent(event.jobId(),null, throwable.getMessage()))
                 .subscribe()
                 .with(
-                        completed -> bus.publish("job.completed", completed),
-                        error -> bus.publish("job.completed", new JobCompletedEvent(event.jobId(), null, error.getMessage())));
+                        completed -> bus.send("job.completed", completed),
+                        error -> bus.send("job.completed", new JobCompletedEvent(event.jobId(), null, error.getMessage())));
     }
-
 }

@@ -71,7 +71,7 @@ public class JobServiceTest {
                 .thenReturn(Uni.createFrom().item(jobAfterCompletion));
 
         // when!
-        bus.publish("job.completed", event);
+        bus.send("job.completed", event);
 
         var expected = new ImportJob();
         expected.jobId = id;
@@ -111,7 +111,7 @@ public class JobServiceTest {
         Mockito.when(repository.findByIdOptional(id))
                 .thenReturn(Uni.createFrom().item(Optional.of(jobAfterCompletion)));
 
-        bus.publish("job.completed", event);
+        bus.send("job.completed", event);
 
         var expected = new ImportJob();
         expected.jobId = id;

@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation("gradle.plugin.io.quarkus:quarkus-gradle-plugin:2.1.2.Final")
+    implementation("gradle.plugin.io.quarkus:quarkus-gradle-plugin:2.1.4.Final")
     implementation("com.github.node-gradle:gradle-node-plugin:3.1.0")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")
