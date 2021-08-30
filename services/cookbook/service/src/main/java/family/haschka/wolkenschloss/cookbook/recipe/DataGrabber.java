@@ -7,13 +7,19 @@ import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.net.URL;
 
 @ApplicationScoped
-public record DataGrabber(@Inject Vertx vertx) {
+public class DataGrabber {
+
+    private final Vertx vertx;
+
+    public DataGrabber(Vertx vertx) {
+        this.vertx = vertx;
+    }
+
     public Uni<String> grab(URL url) {
-        var client = WebClient.create(this.vertx());
+        var client = WebClient.create(this.vertx);
         return client.getAbs(url.toString())
                 .send()
                 .log("on job received: after send")

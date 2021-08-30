@@ -54,7 +54,7 @@ public class JobResourceTest {
         Mockito.when(identityGenerator.generate())
                 .thenReturn(id);
 
-        Mockito.when(service.addJob(any(ImportJob.class)))
+        Mockito.when(service.create(any(ImportJob.class)))
                 .thenReturn(Uni.createFrom().item(event));
 
         RestAssured.given()
@@ -70,7 +70,7 @@ public class JobResourceTest {
                     return equalTo(expected.toString());
                 });
 
-        Mockito.verify(service, Mockito.times(1)).addJob(any(ImportJob.class));
+        Mockito.verify(service, Mockito.times(1)).create(any(ImportJob.class));
         Mockito.verifyNoMoreInteractions(service);
     }
 

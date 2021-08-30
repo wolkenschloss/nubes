@@ -23,6 +23,7 @@ public class RecipeAdapterFromRecipeAnnotated implements JsonbAdapter<Recipe, Re
                     .map(Ingredient::parse)
                     .collect(Collectors.toCollection(ArrayList::new));
         }
+
         recipe.recipeId = null;
         recipe.servings = Optional.ofNullable(obj.servings).orElse(new Servings(1));
 

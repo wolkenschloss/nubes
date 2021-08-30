@@ -1,10 +1,15 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.recipe.IdentityGenerator;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,7 +34,7 @@ public class JobResource {
         job.state = State.IN_PROGRESS;
         job.jobId = identityGenerator.generate();
 
-        return service.addJob(job)
+        return service.create(job)
                 .map(event -> uriInfo.getAbsolutePathBuilder()
                         .path(GET_PATH)
                         .build(event.jobId()))

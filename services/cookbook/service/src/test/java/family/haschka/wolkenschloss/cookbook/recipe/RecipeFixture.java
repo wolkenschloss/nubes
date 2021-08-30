@@ -80,9 +80,13 @@ public enum RecipeFixture {
     }
 
     public Uni<String> toUni() throws URISyntaxException, IOException {
+        return Uni.createFrom().item(read());
+    }
+
+    public String read() throws URISyntaxException, IOException {
         try(InputStream in = this.getRecipeSource().toURL().openStream()) {
             byte[] bytes = in.readAllBytes();
-            return Uni.createFrom().item(new String(bytes, Charset.defaultCharset()));
+            return new String(bytes, Charset.defaultCharset());
         }
     }
 }

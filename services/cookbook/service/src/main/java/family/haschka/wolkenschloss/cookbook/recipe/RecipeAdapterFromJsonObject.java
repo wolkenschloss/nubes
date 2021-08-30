@@ -38,7 +38,7 @@ public class RecipeAdapterFromJsonObject implements JsonbAdapter<Recipe, JsonObj
 
            if (ingredients != null) {
                recipe.ingredients = ingredients.stream()
-                       .peek(s -> System.out.println(s))
+                       .peek(System.out::println)
                        .map(Ingredient::parse)
                        .collect(Collectors.toCollection(ArrayList::new));
            }

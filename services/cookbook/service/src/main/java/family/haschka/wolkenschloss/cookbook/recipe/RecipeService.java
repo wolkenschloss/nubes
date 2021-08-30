@@ -1,21 +1,19 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import family.haschka.wolkenschloss.cookbook.job.EventBusAddress;
 import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
 import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.eventbus.EventBus;
-import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,6 +27,15 @@ public class RecipeService {
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Logger log;
+
+    @Inject
+    IdentityGenerator identityGenerator;
+
+    @Inject
+    EventBus bus;
+
+    @Inject
+    DataGrabber grabber;
 
     public Uni<Recipe> save(Recipe recipe) {
         return recipeRepository.persist(recipe);
@@ -74,19 +81,9 @@ public class RecipeService {
         return recipeRepository.update(recipe);
     }
 
-    @Inject
-    ManagedExecutor executor;
 
-    @Inject
-    IdentityGenerator identityGenerator;
 
-    @Inject
-    EventBus bus;
-
-    @Inject
-    DataGrabber grabber;
-
-    @ConsumeEvent("job-received")
+    @ConsumeEvent(EventBusAddress.RECEIVED)
     public void onJobReceived(JobReceivedEvent event) throws MalformedURLException {
         log.infov("onJobReceivedEvent: {0}", event);
         Uni<String> data = grabber.grab(event.source().toURL());
@@ -103,7 +100,7 @@ public class RecipeService {
                 .onFailure().recoverWithItem(throwable -> new JobCompletedEvent(event.jobId(),null, throwable.getMessage()))
                 .subscribe()
                 .with(
-                        completed -> bus.send("job.completed", completed),
-                        error -> bus.send("job.completed", new JobCompletedEvent(event.jobId(), null, error.getMessage())));
+                        completed -> bus.send(EventBusAddress.COMPLETED, completed),
+                        error -> bus.send(EventBusAddress.COMPLETED, new JobCompletedEvent(event.jobId(), null, error.getMessage())));
     }
 }

@@ -11,22 +11,12 @@ import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RecipeImport {
-
-    public List<Recipe> extract(URI source) throws IOException {
-
-        String content = download(source);
-        return extract(content);
-    }
 
     public List<Recipe> extract(String content) {
         Stream<String> scripts = extractJsonLdScripts(content);
@@ -52,13 +42,6 @@ public class RecipeImport {
                 .map(Element::data);
     }
 
-    private String download(URI source) throws IOException {
-        try (InputStream in = source.toURL().openStream()) {
-            byte[] bytes = in.readAllBytes();
-            return new String(bytes, Charset.defaultCharset());
-        }
-    }
-
     public boolean isRecipe(String s) {
         var reader = Json.createReader(new StringReader(s));
         var structure = reader.read();
@@ -71,6 +54,7 @@ public class RecipeImport {
         } catch (JsonException exception) {
             return false;
         }
+
         return false;
     }
 }

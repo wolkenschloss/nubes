@@ -39,12 +39,14 @@ public class ImportJob {
                 '}';
     }
 
-
     public ImportJob complete(URI location, String error) {
-        this.location = location;
-        this.error = error;
-        this.state = State.COMPLETED;
+        ImportJob copy = new ImportJob();
+        copy.location = location;
+        copy.error = error;
+        copy.state = State.COMPLETED;
+        copy.order = order;
+        copy.jobId = jobId;
 
-        return this;
+        return copy;
     }
 }

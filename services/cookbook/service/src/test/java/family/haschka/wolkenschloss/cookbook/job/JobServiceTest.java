@@ -38,7 +38,7 @@ public class JobServiceTest {
                 .thenReturn(Uni.createFrom().item(job));
 
         var expected = new JobReceivedEvent(job.jobId, URI.create(job.order));
-        var event = sut.addJob(job).log("test");
+        var event = sut.create(job).log("test");
         var subscriber = event.subscribe().withSubscriber(UniAssertSubscriber.create());
         subscriber.awaitItem().assertItem(expected);
 
@@ -71,7 +71,7 @@ public class JobServiceTest {
                 .thenReturn(Uni.createFrom().item(jobAfterCompletion));
 
         // when!
-        bus.send("job.completed", event);
+        bus.send(EventBusAddress.COMPLETED, event);
 
         var expected = new ImportJob();
         expected.jobId = id;
@@ -89,18 +89,23 @@ public class JobServiceTest {
         var id = UUID.randomUUID();
         var event = new JobCompletedEvent(
                 id,
-                URI.create("https://meinerezepte.local.lasagne.html"),
+                null,
                 "The data source cannot be read");
 
         var jobBeforeCompletion = new ImportJob();
         jobBeforeCompletion.jobId = id;
         jobBeforeCompletion.state = State.IN_PROGRESS;
         jobBeforeCompletion.error = null;
+        jobBeforeCompletion.location = null;
+        jobBeforeCompletion.order = null;
 
         var jobAfterCompletion = new ImportJob();
         jobAfterCompletion.jobId = id;
         jobAfterCompletion.state = State.COMPLETED;
         jobAfterCompletion.error = event.error();
+        jobAfterCompletion.location = null;
+        jobAfterCompletion.order = null;
+
 
         Mockito.when(repository.findByIdOptional(id))
                 .thenReturn(Uni.createFrom().item(Optional.of(jobBeforeCompletion)));
@@ -111,7 +116,7 @@ public class JobServiceTest {
         Mockito.when(repository.findByIdOptional(id))
                 .thenReturn(Uni.createFrom().item(Optional.of(jobAfterCompletion)));
 
-        bus.send("job.completed", event);
+        bus.send(EventBusAddress.COMPLETED, event);
 
         var expected = new ImportJob();
         expected.jobId = id;

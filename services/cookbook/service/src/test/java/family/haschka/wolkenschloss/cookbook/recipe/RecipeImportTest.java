@@ -16,7 +16,7 @@ public class RecipeImportTest {
     @DisplayName("should convert ld+json script to recipe")
     public void convertLdJsonScriptTest(RecipeFixture testcase) throws IOException, URISyntaxException {
         var importer = new RecipeImport();
-        List<Recipe> recipes = importer.extract(testcase.getRecipeSource());
+        List<Recipe> recipes = importer.extract(testcase.read());
 
         Assertions.assertEquals(1, recipes.size());
         Assertions.assertEquals(testcase.recipe, recipes.get(0));
