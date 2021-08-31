@@ -10,8 +10,10 @@ public class RationalTest {
 
     enum Testcase {
 
-        TWO_QUARTERS(new Rational(2, 4), new Rational(1, 2), "1/2"),
-        FOUR_QUARTERS(new Rational(4, 4), new Rational(1, 1 ), "1");
+        TWO_QUARTERS(new Rational(2, 4), new Rational(1, 2), "\u00bd"),
+        FOUR_QUARTERS(new Rational(4, 4), new Rational(1, 1 ), "1"),
+        TWO_AND_A_HALF(new Rational(5, 2), new Rational(5, 2), "2 \u00bd"),
+        SEVEN_THIRDS(new Rational(7, 3), new Rational(14, 6), "2 \u2153");
 
         Testcase(Rational actual, Rational expected, String pretty) {
             this.actual = actual;
@@ -52,29 +54,51 @@ public class RationalTest {
 
     @ParameterizedTest
     @EnumSource(InvalidRationalTestcase.class)
-    public void denominatorShouldNotBeZero(InvalidRationalTestcase testcase) throws Throwable {
+    public void denominatorShouldNotBeZero(InvalidRationalTestcase testcase) {
         Assertions.assertThrows(InvalidNumber.class, testcase.fn);
     }
 
     enum MultiplicationTestcase {
-        CASE_1(new Rational(1, 2), new Rational(1, 2), new Rational(1, 4)),
-        CASE_2(new Rational(2, 1), new Rational(3, 1), new Rational(6, 1));
+        CASE_1(
+                new Rational(1, 2),
+                new Rational(1, 2),
+                new Rational(1, 4),
+                new Rational(0, 1)),
+
+        CASE_2(
+                new Rational(2, 1),
+                new Rational(3, 1),
+                new Rational(6, 1),
+                new Rational(-1, 1)),
+
+        CASE_3(
+                new Rational(1, 3),
+                new Rational(1, 5),
+                new Rational(1, 15),
+                new Rational(2, 15));
 
         public final Rational op1;
         public final Rational op2;
-        public final Rational result;
+        public final Rational product;
+        private final Rational difference;
 
-        MultiplicationTestcase(Rational op1, Rational op2, Rational result) {
+        MultiplicationTestcase(Rational op1, Rational op2, Rational product, Rational difference) {
             this.op1 = op1;
             this.op2 = op2;
-            this.result = result;
+            this.product = product;
+            this.difference = difference;
         }
     }
 
     @ParameterizedTest
     @EnumSource(MultiplicationTestcase.class)
+    public  void difference(MultiplicationTestcase testcase) {
+        Assertions.assertEquals(testcase.difference, testcase.op1.minus(testcase.op2));
+    }
+    @ParameterizedTest
+    @EnumSource(MultiplicationTestcase.class)
     public void multiplyTests(MultiplicationTestcase testcase) {
-        Assertions.assertEquals(testcase.result, testcase.op1.multiply(testcase.op2));
+        Assertions.assertEquals(testcase.product, testcase.op1.multiply(testcase.op2));
     }
 
     enum ParseTestcase {
