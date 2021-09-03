@@ -30,21 +30,25 @@ public class Ingredient {
     public Rational quantity;
 
     public static Ingredient parse(String string) {
+        var regex = "^(?<quant>" + Rational.REGEX + ")?\\s?((?<unit>g|kg|ml|cl|l)?\\s(?<name>.*?))?$";
         // TODO: rational statt long für quantity
-        Pattern p = Pattern.compile("(?<quant>[1-9][0-9]*)\\s*(?<unit>g|kg|ml|cl|l)?\\s*(?<name>.*)");
-
+        //Pattern p = Pattern.compile("(?<quant>[1-9][0-9]*)\\s*(?<unit>g|kg|ml|cl|l)?\\s*(?<name>.*)");
+        Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(string);
         if (m.find())
         {
-            String quant = m.group("quant");
+            Rational quant = Optional.ofNullable(m.group("quant"))
+                    .filter(r -> !r.isEmpty())
+                    .map(r -> Rational.parse(r.trim()))
+                    .orElse(null);
+
             String unit = m.group("unit");
             String name = m.group("name");
 
-            return new Ingredient(Rational.parse(quant), unit, name);
+            return new Ingredient(quant, unit, name);
         } else {
             return new Ingredient(null, null, string);
         }
-
     }
 
     @Override
