@@ -102,17 +102,25 @@ public class RationalTest {
     }
 
     enum ParseTestcase {
+        CASE_0("500", new Rational(500, 1)),
         CASE_1("1/2", new Rational(1, 2)),
         CASE_2("1", new Rational(1, 1)),
         CASE_3("0", new Rational(0, 1)),
         CASE_4("-1", new Rational(-1, 1)),
-        CASE_5("-1/2", new Rational(-1, 2));
+        CASE_5("-1/2", new Rational(-1, 2)),
+        CASE_6("½", new Rational(1, 2)),
+        CASE_7("⅓", new Rational(1, 3)),
+        CASE_8("⅔", new Rational(2, 3)),
+        CASE_9("⅑", new Rational(1, 9)),
+        CASE_10("1 1/2", new Rational(3, 2)),
+        CASE_11("1 ½", new Rational(3, 2)),
+        CASE_12("1½", new Rational(3, 2))
+        ;
 
         private final String input;
         private final Rational expected;
 
         ParseTestcase(String input, Rational expected) {
-
             this.input = input;
             this.expected = expected;
         }
@@ -125,7 +133,7 @@ public class RationalTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "/", "1/", "/2", "something", "0.5", "0.7/0.8"})
+    @ValueSource(strings = {"", "/", "1/", "/2", "something", "0.5", "0.7/0.8", "-0", "-0 1/3"})
     public void invalidStringsTests(String input) {
         Assertions.assertThrows(InvalidNumber.class, () -> Rational.parse(input));
     }
