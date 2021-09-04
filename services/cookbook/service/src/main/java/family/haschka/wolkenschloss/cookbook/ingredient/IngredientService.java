@@ -2,7 +2,9 @@ package family.haschka.wolkenschloss.cookbook.ingredient;
 
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
+import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.core.eventbus.EventBus;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -31,5 +33,26 @@ public class IngredientService {
         }
 
         return repository.find("name like ?1", Sort.by("name"), search);
+    }
+
+    @Inject
+    EventBus bus;
+
+    @Inject
+    IdentityGenerator identityGenerator;
+
+    @ConsumeEvent("recipe added")
+    public void onRecipeAdded(RecipeAddedEvent event) {
+        var ingredients = event.ingredients().stream()
+                .map(i -> i.withId(identityGenerator.generate()))
+                        .toList();
+
+        repository.persist(ingredients)
+                .subscribe()
+                .with(
+                        V -> ingredients.stream()
+                                .map(i -> new IngredientAddedEvent(event.recipeId(), i))
+                                .forEach(e -> bus.publish("ingredient added", e)),
+                        failure -> System.err.println(failure.toString()));
     }
 }

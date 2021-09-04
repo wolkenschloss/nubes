@@ -81,8 +81,6 @@ public class RecipeService {
         return recipeRepository.update(recipe);
     }
 
-
-
     @ConsumeEvent(EventBusAddress.RECEIVED)
     public void onJobReceived(JobReceivedEvent event) throws MalformedURLException {
         log.infov("onJobReceivedEvent: {0}", event);
