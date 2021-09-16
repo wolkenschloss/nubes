@@ -24,24 +24,16 @@ public class JobResource {
     @Inject
     JobService service;
 
-    @Inject
-    IdentityGenerator identityGenerator;
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> post(ImportJob job, @Context UriInfo uriInfo) {
-        job.state = State.IN_PROGRESS;
-        job.jobId = identityGenerator.generate();
 
-        return service.create(job)
-                .map(event -> uriInfo.getAbsolutePathBuilder()
-                        .path(GET_PATH)
-                        .build(event.jobId()))
-                .map(location -> Response
+        return service.create(job.order)
+                .map(entity -> Response
                         .status(Response.Status.CREATED)
-                        .header("Location", location.toString())
-                        .entity(job)
+                        .header("Location", uriInfo.getAbsolutePathBuilder().path(GET_PATH).build(entity.jobId))
+                        .entity(entity)
                         .build());
     }
 

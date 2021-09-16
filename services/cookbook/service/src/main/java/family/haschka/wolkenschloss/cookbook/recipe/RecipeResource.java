@@ -1,6 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.smallrye.mutiny.Uni;
+import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;

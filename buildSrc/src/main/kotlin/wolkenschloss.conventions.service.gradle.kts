@@ -52,7 +52,7 @@ tasks {
 }
 
 dependencies {
-    implementation(enforcedPlatform("io.quarkus:quarkus-bom:2.1.4.Final"))
+    implementation(enforcedPlatform("io.quarkus:quarkus-bom:2.2.2.Final"))
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.quarkus:quarkus-junit5-mockito")
     testImplementation("io.rest-assured:rest-assured")

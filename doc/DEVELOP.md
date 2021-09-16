@@ -138,6 +138,13 @@ Sie dazu auch [Getting Started](https://bootstrap-vue.org/docs#vue-cli-3-plugin)
 
 ## Konventionen
 
+### REST
+* [Representational State Transfer](https://de.wikipedia.org/wiki/Representational_State_Transfer)
+* [REST Resource Naming Guide](https://restfulapi.net/resource-naming/)
+* [Best practices for REST API design](https://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/)
+ 
+
+### Microservice
 Jeder Microservice besteht aus drei Unterprojekten, für die jeweils eine 
 Gradle Build Konvention existiert.
 

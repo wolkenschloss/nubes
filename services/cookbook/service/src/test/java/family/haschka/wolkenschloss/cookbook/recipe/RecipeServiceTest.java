@@ -1,9 +1,11 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -24,9 +26,14 @@ public class RecipeServiceTest {
     @Inject
     RecipeService subjectUnderTest;
 
+    @BeforeEach
+    public void initEventBusMock() {
+    }
+
     @AfterEach
     public void verifyMockInteractions() {
         Mockito.verifyNoMoreInteractions(recipeRepository);
+//        Mockito.verifyNoMoreInteractions(bus);
     }
 
     @Test

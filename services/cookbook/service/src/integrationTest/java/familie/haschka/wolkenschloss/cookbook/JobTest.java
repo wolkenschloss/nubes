@@ -66,7 +66,7 @@ public class JobTest {
                         .statusCode(HttpStatus.SC_OK)
                         .extract()
                         .path("state")
-                        .equals("COMPLETED"));
+                        .equals("INCOMPLETE"));
     }
 
     private String createJob(String job_url) {
@@ -105,16 +105,23 @@ public class JobTest {
         return Stream.of(
                         new PostJobTestcase("valid job", "lasagne.html",
                                 response -> response
+                                        .body("state", equalTo("INCOMPLETE"))
                                         .body("location", matchesPattern("/recipe/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}"))
                                         .body("error", equalTo(null))),
 
                         new PostJobTestcase("missing resource", "chili.html",
                                 response -> response
+                                        .body("state", equalTo("FAILED"))
                                         .body("error", equalTo("The data source cannot be read"))),
 
                         new PostJobTestcase("not a recipe", "news.html",
                                 response -> response
-                                        .body("error", equalTo("The data source does not contain an importable recipe"))))
+                                        .body("state", equalTo("FAILED"))
+                                        .body("error", equalTo("The data source does not contain an importable recipe"))),
+                        new PostJobTestcase("more than one recipe", "menu.html",
+                                response -> response
+                                        .body("state", equalTo("FAILED"))
+                                        .body("error", equalTo("Data source contains more than one recipe"))))
 
                 .map(testcase -> DynamicTest.dynamicTest(testcase.name, () -> {
                     var port = System.getProperty("quarkus.http.port");
@@ -144,8 +151,7 @@ public class JobTest {
                                             .get(location)
                                             .then()
                                             .log().all()
-                                            .statusCode(HttpStatus.SC_OK)
-                                            .body("state", equalTo("COMPLETED"))));
+                                            .statusCode(HttpStatus.SC_OK)));
                 }));
     }
 }

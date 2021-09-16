@@ -1,5 +1,8 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
+import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
+import io.smallrye.mutiny.Uni;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +12,7 @@ import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonString;
 import javax.json.JsonValue;
+import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.io.StringReader;
@@ -17,6 +21,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RecipeImport {
+
+    JsonbConfig config = new JsonbConfig()
+            .withDeserializers(new ServingsDeserializer(), new RationalDeserializer())
+            .withAdapters(new RecipeAdapterFromRecipeAnnotated());
+
+    Jsonb jsonb = JsonbBuilder.create(config);
+
+    public Uni<Recipe> grab(DataSource dataSource, JobCreatedEvent event) {
+
+        return dataSource.extract(event.source(), content -> extractJsonLdScripts(content).filter(this::isRecipe)
+
+                        .map(script -> jsonb.fromJson(script, Recipe.class))
+                        .collect(SingletonCollector.toItem()))
+                .log("import extract")
+                .onFailure(SingletonCollector.TooFewItemsException.class).transform(failure -> new RuntimeException(
+                        "The data source does not contain an importable recipe"))
+                .onFailure(SingletonCollector.TooManyItemsException.class).transform(failure -> new RuntimeException(
+                        "Data source contains more than one recipe"));
+    }
 
     public List<Recipe> extract(String content) {
         Stream<String> scripts = extractJsonLdScripts(content);
@@ -56,5 +79,8 @@ public class RecipeImport {
         }
 
         return false;
+    }
+
+    public record GrabResult(Recipe entity, JobCompletedEvent event) {
     }
 }

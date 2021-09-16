@@ -1,8 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import family.haschka.wolkenschloss.cookbook.job.EventBusAddress;
-import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
-import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
+import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.vertx.ConsumeEvent;
@@ -13,7 +12,7 @@ import org.jboss.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,23 +20,24 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class RecipeService {
 
-    @Inject
-    RecipeRepository recipeRepository;
+    private final Logger log;
+    private final RecipeRepository recipeRepository;
+    private final IdentityGenerator identityGenerator;
+    private final EventBus bus;
+    private final DataSource dataSource2;
 
-    @SuppressWarnings("CdiInjectionPointsInspection")
-    @Inject
-    Logger log;
+    public RecipeService(Logger log, RecipeRepository recipeRepository, IdentityGenerator identityGenerator,
+            EventBus bus, DataSource dataSource2) {
 
-    @Inject
-    IdentityGenerator identityGenerator;
-
-    @Inject
-    EventBus bus;
-
-    @Inject
-    DataGrabber grabber;
+        this.log = log;
+        this.recipeRepository = recipeRepository;
+        this.identityGenerator = identityGenerator;
+        this.bus = bus;
+        this.dataSource2 = dataSource2;
+    }
 
     public Uni<Recipe> save(Recipe recipe) {
+        recipe.recipeId = identityGenerator.generate();
         return recipeRepository.persist(recipe);
     }
 
@@ -81,24 +81,40 @@ public class RecipeService {
         return recipeRepository.update(recipe);
     }
 
-    @ConsumeEvent(EventBusAddress.RECEIVED)
-    public void onJobReceived(JobReceivedEvent event) throws MalformedURLException {
-        log.infov("onJobReceivedEvent: {0}", event);
-        Uni<String> data = grabber.grab(event.source().toURL());
-        data.map(body -> new RecipeImport().extract(body))
-                .invoke(recipes -> {
-                    if (recipes.size() != 1) {
-                        throw new RecipeParseException("The data source does not contain an importable recipe");
-                    }
-                })
-                .map(recipes -> recipes.get(0))
-                .invoke(recipe -> recipe.recipeId = identityGenerator.generate())
-                .flatMap(recipe -> recipeRepository.persist(recipe))
-                .map(recipe -> new JobCompletedEvent(event.jobId(), UriBuilder.fromUri("/recipe/{id}").build(recipe.recipeId), null))
-                .onFailure().recoverWithItem(throwable -> new JobCompletedEvent(event.jobId(),null, throwable.getMessage()))
+
+    @ConsumeEvent(EventBusAddress.CREATED)
+//    https://github.com/janmaterne/quarkus-cdi-interceptor/blob/master/src/main/java/de/materne/quarkus/HelloWorldInterceptor.java
+    public void onJobCreated(JobCreatedEvent event) {
+        log.infov("on job created: ({0}, {1})", event.jobId(), event.source());
+        var service = new RecipeImport();
+        var id = service.grab(dataSource2, event)
+                .log("job created before save")
+                .flatMap(this::save)
+                .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe.recipeId))
+                .invoke(location -> bus.send(EventBusAddress.IMPORTED, new RecipeImportedEvent(event.jobId(), location)))
+                .onFailure().invoke(failure -> bus.send(EventBusAddress.FAILED, new ImportRecipeFailedEvent(event.jobId(), failure)))
+                .replaceWithVoid()
                 .subscribe()
-                .with(
-                        completed -> bus.send(EventBusAddress.COMPLETED, completed),
-                        error -> bus.send(EventBusAddress.COMPLETED, new JobCompletedEvent(event.jobId(), null, error.getMessage())));
+                .with(V -> log.infov("recipe imported."), failure -> log.warnv("Can not import recipe: {0}", failure));
     }
+
+//    @ConsumeEvent(EventBusAddress.RECEIVED)
+//    public void onJobReceived(JobReceivedEvent event) throws MalformedURLException {
+//        log.infov("onJobReceivedEvent: {0}", event);
+//        grabber.grab(event.source().toURL())
+//                .map(body -> new RecipeImport().extract(body))
+//                .invoke(recipes -> {
+//                    if (recipes.size() != 1) {
+//                        throw new RecipeParseException("The data source does not contain an importable recipe");
+//                    }
+//                })
+//                .map(recipes -> recipes.get(0))
+//                .flatMap(recipe -> save(recipe))
+//                .map(recipe -> new JobCompletedEvent(event.jobId(), UriBuilder.fromUri("/recipe/{id}").build(recipe.recipeId), null))
+//                .onFailure().recoverWithItem(throwable -> new JobCompletedEvent(event.jobId(),null, throwable.getMessage()))
+//                .subscribe()
+//                .with(
+//                        completed -> bus.send(EventBusAddress.COMPLETED, completed),
+//                        error -> bus.send(EventBusAddress.COMPLETED, new JobCompletedEvent(event.jobId(), null, error.getMessage())));
+//    }
 }
