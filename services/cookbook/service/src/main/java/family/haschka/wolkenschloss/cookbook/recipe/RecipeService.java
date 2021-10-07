@@ -1,19 +1,11 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import family.haschka.wolkenschloss.cookbook.job.EventBusAddress;
-import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
-import family.haschka.wolkenschloss.cookbook.job.JobReceivedEvent;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
-import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.core.eventbus.EventBus;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.core.UriBuilder;
-import java.net.MalformedURLException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,25 +13,13 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class RecipeService {
 
-    @Inject
-    RecipeRepository recipeRepository;
-
-    @SuppressWarnings("CdiInjectionPointsInspection")
-    @Inject
-    Logger log;
-
-    @Inject
-    IdentityGenerator identityGenerator;
-
-    @Inject
-    EventBus bus;
-
-    @Inject
-    DataGrabber grabber;
-
-    public Uni<Recipe> save(Recipe recipe) {
-        return recipeRepository.persist(recipe);
+    public RecipeService(Logger log, RecipeRepository recipeRepository) {
+        this.log = log;
+        this.recipeRepository = recipeRepository;
     }
+
+    private final Logger log;
+    private final RecipeRepository recipeRepository;
 
     private ReactivePanacheQuery<Recipe> getQuery(String search) {
         if (search == null || search.equals("")) {
@@ -79,28 +59,5 @@ public class RecipeService {
     public Uni<Recipe> update(Recipe recipe) {
         log.infov("update Recipe: {0}", recipe.toString());
         return recipeRepository.update(recipe);
-    }
-
-
-
-    @ConsumeEvent(EventBusAddress.RECEIVED)
-    public void onJobReceived(JobReceivedEvent event) throws MalformedURLException {
-        log.infov("onJobReceivedEvent: {0}", event);
-        Uni<String> data = grabber.grab(event.source().toURL());
-        data.map(body -> new RecipeImport().extract(body))
-                .invoke(recipes -> {
-                    if (recipes.size() != 1) {
-                        throw new RecipeParseException("The data source does not contain an importable recipe");
-                    }
-                })
-                .map(recipes -> recipes.get(0))
-                .invoke(recipe -> recipe.recipeId = identityGenerator.generate())
-                .flatMap(recipe -> recipeRepository.persist(recipe))
-                .map(recipe -> new JobCompletedEvent(event.jobId(), UriBuilder.fromUri("/recipe/{id}").build(recipe.recipeId), null))
-                .onFailure().recoverWithItem(throwable -> new JobCompletedEvent(event.jobId(),null, throwable.getMessage()))
-                .subscribe()
-                .with(
-                        completed -> bus.send(EventBusAddress.COMPLETED, completed),
-                        error -> bus.send(EventBusAddress.COMPLETED, new JobCompletedEvent(event.jobId(), null, error.getMessage())));
     }
 }

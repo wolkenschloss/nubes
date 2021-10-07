@@ -22,7 +22,7 @@ public enum RecipeFixture {
         this.resource = resource;
     }
 
-    public final Recipe recipe;
+    private final Recipe recipe;
     public final String resource;
 
     public URI getRecipeSource() throws URISyntaxException {
@@ -78,8 +78,8 @@ public enum RecipeFixture {
         return jsonb.toJson(this.recipe);
     }
 
-    public Uni<String> toUni() throws URISyntaxException, IOException {
-        return Uni.createFrom().item(read());
+    public Uni<Recipe> toUni() {
+        return Uni.createFrom().item(this.recipe);
     }
 
     public String read() throws URISyntaxException, IOException {
@@ -87,5 +87,9 @@ public enum RecipeFixture {
             byte[] bytes = in.readAllBytes();
             return new String(bytes, Charset.defaultCharset());
         }
+    }
+
+    public Recipe get() {
+        return withId(null);
     }
 }

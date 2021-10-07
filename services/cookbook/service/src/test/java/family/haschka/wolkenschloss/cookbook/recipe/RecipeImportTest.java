@@ -19,6 +19,6 @@ public class RecipeImportTest {
         List<Recipe> recipes = importer.extract(testcase.read());
 
         Assertions.assertEquals(1, recipes.size());
-        Assertions.assertEquals(testcase.recipe, recipes.get(0));
+        Assertions.assertEquals(testcase.get(), recipes.get(0));
     }
 }

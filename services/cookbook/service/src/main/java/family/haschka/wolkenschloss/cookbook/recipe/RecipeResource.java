@@ -28,6 +28,7 @@ public class RecipeResource {
     @Inject
     RecipeService service;
 
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<TableOfContents> get(
@@ -37,22 +38,23 @@ public class RecipeResource {
         return service.list(from, to, search);
     }
 
-    @Inject
-    IdentityGenerator id;
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Response> post(Recipe recipe, @Context UriInfo uriInfo) {
-        recipe.recipeId = id.generate();
-        return service.save(recipe)
+        return creator.save(recipe)
+                .log("saved")
                 .map(r -> {
                     var location = uriInfo.getAbsolutePathBuilder()
-                            .path(recipe.recipeId.toString())
+                            .path(r.recipeId.toString())
                             .build();
-                    return Response.created(location).entity(recipe).build();
+                    return Response.created(location).entity(r).build();
                 });
     }
+
+    @Inject
+    CreatorService creator;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

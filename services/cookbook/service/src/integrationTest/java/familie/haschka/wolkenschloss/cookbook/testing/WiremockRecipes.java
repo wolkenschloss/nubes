@@ -36,6 +36,12 @@ public class WiremockRecipes implements QuarkusTestResourceLifecycleManager {
                         .withHeader("Content-Type", "text/html")
                         .withBodyFile("news.html")));
 
+        stubFor(get(urlEqualTo("/menu.html"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/html")
+                        .withBodyFile("menu.html")));
+
         return Collections.singletonMap("family.haschka.wiremock.recipes", wireMockServer.baseUrl());
     }
 

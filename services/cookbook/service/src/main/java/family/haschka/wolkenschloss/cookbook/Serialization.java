@@ -41,7 +41,7 @@ public class Serialization {
         };
 
         var config = new JsonbConfig()
-                .withDeserializers(new ServingsDeserializer(), new RationalDeserializer())
+                .withDeserializers(new ServingsDeserializer(), new RationalDeserializer(), new UriDeserializer())
                 .withSerializers(new ServingsSerializer(), new RationalSerializer())
                 .withNullValues(true)
                 .withPropertyVisibilityStrategy(visibilityStrategy);

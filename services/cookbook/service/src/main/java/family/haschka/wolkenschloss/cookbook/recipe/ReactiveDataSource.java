@@ -7,24 +7,27 @@ import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.net.URL;
+import java.net.URI;
+import java.util.function.Function;
 
 @ApplicationScoped
-public class DataGrabber {
+public class ReactiveDataSource implements DataSource {
 
     private final Vertx vertx;
 
-    public DataGrabber(Vertx vertx) {
+    public ReactiveDataSource(Vertx vertx) {
         this.vertx = vertx;
     }
 
-    public Uni<String> grab(URL url) {
+    @Override
+    public Uni<Recipe> extract(URI source, Function<String, Recipe> transform) {
         var client = WebClient.create(this.vertx);
-        return client.getAbs(url.toString())
+        var content = client.getAbs(source.toString())
                 .send()
-                .log("on job received: after send")
                 .invoke(this::validate)
                 .map(HttpResponse::bodyAsString);
+
+        return content.map(transform);
     }
 
     private void validate(HttpResponse<Buffer> response) {
