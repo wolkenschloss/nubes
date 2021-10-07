@@ -45,7 +45,7 @@ public class RecipeResourceTest {
     Jsonb jsonb;
 
     @InjectMock
-    IdentityGenerator identityGenerator;
+    CreatorService creator;
 
     @BeforeEach
     public void configureObjectMapper() {
@@ -91,16 +91,12 @@ public class RecipeResourceTest {
     @DisplayName("POST /recipe")
     void postRecipeTest() {
 
-        var recipe = RecipeFixture.LASAGNE.recipe;
+        var recipe = RecipeFixture.LASAGNE.get();
         var id = UUID.randomUUID();
-        recipe.recipeId = id;
         recipe.servings = new Servings(1);
 
-        Mockito.when(service.save(RecipeFixture.LASAGNE.withId(id)))
+        Mockito.when(creator.save(recipe))
                 .thenReturn(Uni.createFrom().item(RecipeFixture.LASAGNE.withId(id)));
-
-        Mockito.when(identityGenerator.generate())
-                .thenReturn(id);
 
         RestAssured.given()
                 .body(recipe, ObjectMapperType.JSONB)
@@ -115,8 +111,9 @@ public class RecipeResourceTest {
                     return equalTo(expected.toString());
                 });
 
-        Mockito.verify(service, Mockito.times(1)).save(recipe);
+        Mockito.verify(creator, Mockito.times(1)).save(recipe);
         Mockito.verifyNoMoreInteractions(service);
+        Mockito.verifyNoMoreInteractions(creator);
     }
 
     @Test

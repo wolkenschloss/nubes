@@ -2,19 +2,25 @@ package family.haschka.wolkenschloss.cookbook.ingredient;
 
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
-import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.core.eventbus.EventBus;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 @ApplicationScoped
 public class IngredientService {
-    @Inject
-    IngredientRepository repository;
 
-    public Uni<Ingredient> create(Ingredient ingredient) {
+    public IngredientService(IngredientRepository repository, IdentityGenerator identityGenerator) {
+        this.repository = repository;
+        this.identityGenerator = identityGenerator;
+    }
+
+    private final IngredientRepository repository;
+    private final IdentityGenerator identityGenerator;
+
+    public Uni<Ingredient> create(String title) {
+        var ingredient = new Ingredient(identityGenerator.generate(), title);
         return repository.persist(ingredient);
     }
 
@@ -35,24 +41,10 @@ public class IngredientService {
         return repository.find("name like ?1", Sort.by("name"), search);
     }
 
-    @Inject
-    EventBus bus;
-
-    @Inject
-    IdentityGenerator identityGenerator;
-
-    @ConsumeEvent("recipe added")
-    public void onRecipeAdded(RecipeAddedEvent event) {
-        var ingredients = event.ingredients().stream()
-                .map(i -> i.withId(identityGenerator.generate()))
-                        .toList();
-
-        repository.persist(ingredients)
-                .subscribe()
-                .with(
-                        V -> ingredients.stream()
-                                .map(i -> new IngredientAddedEvent(event.recipeId(), i))
-                                .forEach(e -> bus.publish("ingredient added", e)),
-                        failure -> System.err.println(failure.toString()));
+    @Incoming("ingredient-required")
+    public Uni<Void> onIngredientRequired(Message<IngredientRequiredEvent> event) {
+        return Uni.createFrom().item(event)
+                .onItem().invoke(msg -> create(msg.getPayload().ingredient()))
+                .onItem().transformToUni(x -> Uni.createFrom().completionStage(event.ack()));
     }
 }

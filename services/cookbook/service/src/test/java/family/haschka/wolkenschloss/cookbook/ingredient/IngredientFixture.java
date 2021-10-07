@@ -6,13 +6,13 @@ public enum IngredientFixture {
     FLOUR("flour"),
     SUGAR("sugar");
 
-    private final String name;
+    public final String title;
 
-    IngredientFixture(String name) {
-        this.name = name;
+    IngredientFixture(String title) {
+        this.title = title;
     }
 
     public Ingredient withId(UUID id) {
-        return new Ingredient(id, name);
+        return new Ingredient(id, title);
     }
 }

@@ -24,7 +24,6 @@ public class ReactiveDataSource implements DataSource {
         var client = WebClient.create(this.vertx);
         var content = client.getAbs(source.toString())
                 .send()
-                .log("on job received: after send")
                 .invoke(this::validate)
                 .map(HttpResponse::bodyAsString);
 

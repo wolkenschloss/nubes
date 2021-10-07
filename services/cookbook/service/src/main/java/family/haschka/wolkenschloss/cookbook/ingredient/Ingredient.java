@@ -5,6 +5,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import java.util.Objects;
 import java.util.UUID;
 
+// TODO: Move to model package and exclude from CDI
 public class Ingredient {
     @BsonId
     private final UUID id;
@@ -17,6 +18,10 @@ public class Ingredient {
 
     public String getName() {
         return name;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     @Override
@@ -38,9 +43,5 @@ public class Ingredient {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
-    }
-
-    public Ingredient withId(UUID id) {
-        return new Ingredient(id, name);
     }
 }

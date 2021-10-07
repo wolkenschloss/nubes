@@ -31,10 +31,8 @@ public class RecipeImport {
     public Uni<Recipe> grab(DataSource dataSource, JobCreatedEvent event) {
 
         return dataSource.extract(event.source(), content -> extractJsonLdScripts(content).filter(this::isRecipe)
-
                         .map(script -> jsonb.fromJson(script, Recipe.class))
                         .collect(SingletonCollector.toItem()))
-                .log("import extract")
                 .onFailure(SingletonCollector.TooFewItemsException.class).transform(failure -> new RuntimeException(
                         "The data source does not contain an importable recipe"))
                 .onFailure(SingletonCollector.TooManyItemsException.class).transform(failure -> new RuntimeException(

@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.recipe.IdentityGenerator;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -42,9 +41,6 @@ public class JobResourceTest {
 
     @Inject
     Jsonb jsonb;
-
-    @InjectMock
-    IdentityGenerator identityGenerator;
 
     @Test
     @DisplayName("POST /job")

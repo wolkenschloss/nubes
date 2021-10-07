@@ -22,7 +22,7 @@ public enum RecipeFixture {
         this.resource = resource;
     }
 
-    public final Recipe recipe;
+    private final Recipe recipe;
     public final String resource;
 
     public URI getRecipeSource() throws URISyntaxException {
@@ -87,5 +87,9 @@ public enum RecipeFixture {
             byte[] bytes = in.readAllBytes();
             return new String(bytes, Charset.defaultCharset());
         }
+    }
+
+    public Recipe get() {
+        return withId(null);
     }
 }

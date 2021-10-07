@@ -7,7 +7,6 @@ import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import javax.json.Json;
+import javax.ws.rs.core.Response;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,12 +42,10 @@ public class JobTest {
                 .given()
                 .body(createJob(job_url))
                 .contentType(ContentType.JSON)
-                .log().all()
                 .when()
                 .post(url)
                 .then()
-                .log().all()
-                .statusCode(HttpStatus.SC_CREATED)
+                .statusCode(Response.Status.CREATED.getStatusCode())
                 .header("Location", r -> equalTo(url + "/" + r.path("jobId")));
 
         String jobId = response.extract().path("jobId");
@@ -57,13 +55,11 @@ public class JobTest {
                 .pollInterval(1, TimeUnit.SECONDS)
                 .pollDelay(1, TimeUnit.SECONDS)
                 .until(() -> RestAssured.given()
-                        .log().all()
                         .accept(ContentType.JSON)
                         .when()
                         .get(url + "/" + jobId)
                         .then()
-                        .log().all()
-                        .statusCode(HttpStatus.SC_OK)
+                        .statusCode(Response.Status.OK.getStatusCode())
                         .extract()
                         .path("state")
                         .equals("INCOMPLETE"));
@@ -114,14 +110,17 @@ public class JobTest {
                                         .body("state", equalTo("FAILED"))
                                         .body("error", equalTo("The data source cannot be read"))),
 
+
                         new PostJobTestcase("not a recipe", "news.html",
                                 response -> response
                                         .body("state", equalTo("FAILED"))
                                         .body("error", equalTo("The data source does not contain an importable recipe"))),
+
                         new PostJobTestcase("more than one recipe", "menu.html",
                                 response -> response
                                         .body("state", equalTo("FAILED"))
-                                        .body("error", equalTo("Data source contains more than one recipe"))))
+                                        .body("error", equalTo("Data source contains more than one recipe")))
+                )
 
                 .map(testcase -> DynamicTest.dynamicTest(testcase.name, () -> {
                     var port = System.getProperty("quarkus.http.port");
@@ -131,12 +130,10 @@ public class JobTest {
                             .given()
                             .body(createJob(testcase.jobBody()))
                             .contentType(ContentType.JSON)
-                            .log().all()
                             .when()
                             .post(url)
                             .then()
-                            .log().all()
-                            .statusCode(HttpStatus.SC_CREATED)
+                            .statusCode(Response.Status.CREATED.getStatusCode())
                             .header("Location", r -> equalTo(url + "/" + r.path("jobId")))
                             .extract().header("location");
 
@@ -146,12 +143,12 @@ public class JobTest {
                             .untilAsserted(() -> testcase.assertion.accept(
                                     RestAssured.given()
                                             .accept(ContentType.JSON)
-                                            .log().all()
+                                            
                                             .when()
                                             .get(location)
                                             .then()
-                                            .log().all()
-                                            .statusCode(HttpStatus.SC_OK)));
+                                            
+                                            .statusCode(Response.Status.OK.getStatusCode())));
                 }));
     }
 }
