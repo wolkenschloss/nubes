@@ -19,12 +19,19 @@ const routes = [
     }
   },
   {
-    path: "/recipe/:id",
     name: "details",
+    path: "/recipe/:id",
     props: {default: true},
     components: {
       default: () =>
           import(/* webpackChunkName: "details" */ '../views/Details.vue')
+    }
+  },
+  {
+    name: 'ingredients',
+    path: '/ingredients',
+    components: {
+      default: () => import(/* webpackChunkName: "ingredients" */ '../views/Ingredients')
     }
   }
 ]
