@@ -27,7 +27,7 @@ const actions = {
         const uri = `/ingredient?from=${from}&to=${to}&q=${state.filter || ''}`
         try {
             const response = await axios.get(uri)
-            commit("setItoc", {content: response.data.content, total: response.data.count})
+            commit("setToc", {content: response.data.content, total: response.data.count})
         } catch (error) {
             console.log(error)
         }
@@ -40,12 +40,12 @@ const mutations = {
         state.filter = filter
         state.pagination.page = 1
     },
-    setIpagination(state, payload){
-        console.log(`mutation setIpagination(${payload}`)
+    setPagination(state, payload){
+        console.log(`mutation setPagination(${payload}`)
         state.pagination = payload
     },
-    setItoc(state, {content, total}) {
-        console.log(`mutation set itoc(content: ${content.length}, total: ${total}`)
+    setToc(state, {content, total}) {
+        console.log(`mutation set ingredients toc(content: ${content.length}, total: ${total}`)
         state.toc = content
         state.total = total
     }

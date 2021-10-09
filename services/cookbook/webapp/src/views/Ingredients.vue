@@ -29,7 +29,7 @@
       </template>
       <template v-slot:default="props">
         <v-row v-if="view_mode === 0">
-          <v-col v-for="(item, index) in props.items"
+          <v-col v-for="item in props.items"
                  :key="item.id"
                  cols="12"
                  sm="6"
@@ -43,7 +43,7 @@
           </v-col>
         </v-row>
         <v-list v-else>
-          <v-list-item v-for="(item, index) in props.items" :key="item.id">
+          <v-list-item v-for="item in props.items" :key="item.id">
             <v-list-item-content>
               <v-list-item-title>{{item.name}}</v-list-item-title>
             </v-list-item-content>
@@ -82,18 +82,12 @@ export default {
   },
   computed: {
     ...mapGetters('ingredients', ['toc', 'total']),
-    numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage)
-    },
-    filteredKeys() {
-      return this.keys.filter(key => key != 'Name')
-    },
     pagination: {
       get() {
         return this.$store.getters['ingredients/pagination']
       },
       set(value) {
-        this.$store.commit('ingredients/setIpagination', value)
+        this.$store.commit('ingredients/setPagination', value)
       }
     },
     search: {
@@ -111,15 +105,6 @@ export default {
       this.loading = true
       await this.queryIngredients()
       this.loading = false
-    },
-    nextPage() {
-      if (this.page + 1 <= this.numberOfPages) this.page += 1
-    },
-    formerPage() {
-      if (this.page - 1 >= 1) this.page -= 1
-    },
-    updateItemsPerPage(number) {
-      this.itemsPerPage = number
     }
   }
 }
