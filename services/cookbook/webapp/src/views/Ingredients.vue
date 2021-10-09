@@ -11,6 +11,14 @@
     >
       <template v-slot:header>
         <v-toolbar elevation="0">
+          <v-btn-toggle group dense mandatory v-model="view_mode" color="primary" class="mr-4">
+            <v-btn>
+              <v-icon>mdi-view-grid</v-icon>
+            </v-btn>
+            <v-btn>
+              <v-icon>mdi-view-list</v-icon>
+            </v-btn>
+          </v-btn-toggle>
           <v-text-field v-model="search"
                         append-icon="mdi-magnify"
                         label="Search"
@@ -20,7 +28,7 @@
         </v-toolbar>
       </template>
       <template v-slot:default="props">
-        <v-row>
+        <v-row v-if="view_mode === 0">
           <v-col v-for="(item, index) in props.items"
                  :key="item.id"
                  cols="12"
@@ -29,11 +37,18 @@
                  lg="3">
             <v-card>
               <v-card-title class="subheading font-weight-bold">
-                {{index}} {{item.id}} {{ item.name }}
+                {{ item.name }}
               </v-card-title>
             </v-card>
           </v-col>
         </v-row>
+        <v-list v-else>
+          <v-list-item v-for="(item, index) in props.items" :key="item.id">
+            <v-list-item-content>
+              <v-list-item-title>{{item.name}}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
       </template>
     </v-data-iterator>
   </v-container>
@@ -62,6 +77,7 @@ export default {
   data() {
     return {
       loading: false,
+      view_mode: 0
     }
   },
   computed: {

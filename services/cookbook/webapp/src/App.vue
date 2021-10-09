@@ -26,7 +26,7 @@
           </v-list-item>
           <v-list-item :to="{name: 'ingredients'}">
             <v-list-item-icon>
-              <v-icon>mdi-account</v-icon>
+              <v-icon>mdi-food-apple</v-icon>
             </v-list-item-icon>
             <v-list-item-title>Ingredients</v-list-item-title>
           </v-list-item>
