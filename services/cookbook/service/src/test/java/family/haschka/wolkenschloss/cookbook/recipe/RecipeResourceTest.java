@@ -45,7 +45,7 @@ public class RecipeResourceTest {
     Jsonb jsonb;
 
     @InjectMock
-    IdentityGenerator identityGenerator;
+    CreatorService creator;
 
     @BeforeEach
     public void configureObjectMapper() {
@@ -68,7 +68,8 @@ public class RecipeResourceTest {
         recipes.add(new Summary(UUID.randomUUID(), "Blaukraut"));
         var toc = new TableOfContents(1, recipes);
 
-        Mockito.when(service.list(0, 4, null)).thenReturn(Uni.createFrom().item(toc));
+        Mockito.when(service.list(0, 4, null))
+                .thenReturn(Uni.createFrom().item(toc));
 
         var query = UriBuilder.fromUri(url.toURI())
                 .queryParam("from", 0)
@@ -91,16 +92,12 @@ public class RecipeResourceTest {
     @DisplayName("POST /recipe")
     void postRecipeTest() {
 
-        var recipe = RecipeFixture.LASAGNE.recipe;
+        var recipe = RecipeFixture.LASAGNE.get();
         var id = UUID.randomUUID();
-        recipe.recipeId = id;
         recipe.servings = new Servings(1);
 
-        Mockito.when(service.save(RecipeFixture.LASAGNE.withId(id)))
+        Mockito.when(creator.save(recipe))
                 .thenReturn(Uni.createFrom().item(RecipeFixture.LASAGNE.withId(id)));
-
-        Mockito.when(identityGenerator.generate())
-                .thenReturn(id);
 
         RestAssured.given()
                 .body(recipe, ObjectMapperType.JSONB)
@@ -115,8 +112,9 @@ public class RecipeResourceTest {
                     return equalTo(expected.toString());
                 });
 
-        Mockito.verify(service, Mockito.times(1)).save(recipe);
+        Mockito.verify(creator, Mockito.times(1)).save(recipe);
         Mockito.verifyNoMoreInteractions(service);
+        Mockito.verifyNoMoreInteractions(creator);
     }
 
     @Test

@@ -25,7 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @QuarkusIntegrationTest
-@QuarkusTestResource(value = MongoDbResource.class)
+//@QuarkusTestResource(value = MongoDbResource.class)
 @DisplayName("Recipe CRUD Operations")
 public class RecipeTest {
 

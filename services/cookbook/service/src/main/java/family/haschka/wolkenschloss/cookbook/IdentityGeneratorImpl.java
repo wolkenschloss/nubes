@@ -8,7 +8,8 @@ import java.util.UUID;
 @ApplicationScoped
 public class IdentityGeneratorImpl implements
         family.haschka.wolkenschloss.cookbook.recipe.IdentityGenerator,
-        family.haschka.wolkenschloss.cookbook.job.IdentityGenerator {
+        family.haschka.wolkenschloss.cookbook.job.IdentityGenerator,
+        family.haschka.wolkenschloss.cookbook.ingredient.IdentityGenerator {
     public UUID generate() {
         return UUID.randomUUID();
     }

@@ -10,10 +10,14 @@ public class ImportJob {
     @BsonId
     public UUID jobId;
 
-    public String order;
+    public URI order;
     public State state;
     public URI location;
     public String error;
+
+    // Required by JSON-B
+    public ImportJob() {
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -48,5 +52,35 @@ public class ImportJob {
         copy.jobId = jobId;
 
         return copy;
+    }
+
+    public ImportJob located(URI location) {
+        ImportJob copy = new ImportJob();
+        copy.location = location;
+        copy.error = error;
+        copy.state = State.INCOMPLETE;
+        copy.order = order;
+        copy.jobId = jobId;
+
+        return copy;
+    }
+
+    public static ImportJob create(UUID jobId, URI order) {
+        var job = new ImportJob();
+        job.jobId = jobId;
+        job.order = order;
+        job.state = State.CREATED;
+
+        return job;
+    }
+
+    public ImportJob failed(Throwable failure) {
+        var job = new ImportJob();
+        job.jobId = jobId;
+        job.order = order;
+        job.state = State.FAILED;
+        job.error = failure.getMessage();
+
+        return job;
     }
 }

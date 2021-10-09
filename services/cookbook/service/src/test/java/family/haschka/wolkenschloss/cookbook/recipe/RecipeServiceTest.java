@@ -4,7 +4,9 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -50,8 +52,8 @@ public class RecipeServiceTest {
     }
 
     enum GetScaledRecipeTestcase {
-        LASAGNE(RecipeFixture.LASAGNE.recipe, new Servings(5), RecipeFixture.LASAGNE.recipe.scale(new Servings(5))),
-        CHILI(RecipeFixture.CHILI_CON_CARNE.recipe, null, RecipeFixture.CHILI_CON_CARNE.recipe);
+        LASAGNE(RecipeFixture.LASAGNE.get(), new Servings(5), RecipeFixture.LASAGNE.get().scale(new Servings(5))),
+        CHILI(RecipeFixture.CHILI_CON_CARNE.get(), null, RecipeFixture.CHILI_CON_CARNE.get());
 
         private final Recipe recipe;
         private final Servings servings;
@@ -102,20 +104,7 @@ public class RecipeServiceTest {
         Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(anotherId);
     }
 
-    @Test
-    @DisplayName("'save' should persist recipe entity")
-    public void testShouldSaveRecipeWithoutIngredients() {
-        var recipe = RecipeFixture.LASAGNE.withId(UUID.randomUUID());
 
-        Mockito.when(recipeRepository.persist(recipe))
-                .thenReturn(Uni.createFrom().item(recipe));
-
-        var result = subjectUnderTest.save(recipe);
-        var subscriber = result.subscribe().withSubscriber(UniAssertSubscriber.create());
-        subscriber.assertCompleted().assertItem(recipe);
-
-        Mockito.verify(recipeRepository, Mockito.times(1)).persist(recipe);
-    }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
