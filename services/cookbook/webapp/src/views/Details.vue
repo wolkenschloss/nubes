@@ -51,21 +51,21 @@ export default {
   components: {Servings, Preparation, Edit},
   props: {id: String},
   computed: {
-    ...mapGetters(['recipe']),
+    ...mapGetters('recipe', ['recipe']),
     copy: {
       get() {
-        return this.$store.getters.copy
+        return this.$store.getters['recipe/copy']
       },
       set(value) {
-        this.$store.commit('setCopy', value)
+        this.$store.commit('recipe/setCopy', value)
       }
     },
     servings: {
       get() {
-        return this.$store.getters.servings
+        return this.$store.getters['recipe/servings']
       },
       set(value) {
-        this.$store.commit('setServings', value)
+        this.$store.commit('recipe/setServings', value)
       }
     }
   },
@@ -84,7 +84,7 @@ export default {
     this.loadRecipe(this.$props.id)
   },
   methods: {
-    ...mapActions(['loadRecipe', 'deleteRecipe', 'saveRecipe', 'cancelEdit', 'scaleIngredients']),
+    ...mapActions('recipe', ['loadRecipe', 'deleteRecipe', 'saveRecipe', 'cancelEdit', 'scaleIngredients']),
     servingsChanged(value) {
       console.log(`servingsChanged(${value}`)
       this.scaleIngredients(value)

@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-const state = {
+const state = () => ({
     toc: [],
     filter: "",
     pagination: {page: 1},
     total: 0,
     loading: false
-}
+})
 
 const getters = {
     toc: (state) => state.toc,
@@ -57,6 +57,7 @@ const mutations = {
 }
 
 export default {
+    namespaced: true,
     state,
     getters,
     actions,
