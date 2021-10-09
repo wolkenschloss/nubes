@@ -35,6 +35,11 @@ const actions = {
 }
 
 const mutations = {
+    setFilter(state, filter) {
+        console.log(`mutation ingredients set filter: ${filter}`)
+        state.filter = filter
+        state.pagination.page = 1
+    },
     setIpagination(state, payload){
         console.log(`mutation setIpagination(${payload}`)
         state.pagination = payload

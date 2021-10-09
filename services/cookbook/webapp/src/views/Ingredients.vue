@@ -10,31 +10,27 @@
         :server-items-length="total"
     >
       <template v-slot:header>
-        <v-toolbar dark color="primary darken-3" class="mb-3">
-          <v-text-field v-model="search" clearable flat solo-inverted hide-details prepend-inner-icon="mdi-magnify"
-                        label="Search"></v-text-field>
+        <v-toolbar elevation="0">
+          <v-text-field v-model="search"
+                        append-icon="mdi-magnify"
+                        label="Search"
+                        single-line
+                        hide-details
+                        clearable/>
         </v-toolbar>
       </template>
       <template v-slot:default="props">
         <v-row>
           <v-col v-for="(item, index) in props.items"
-                 :key="index"
+                 :key="item.id"
                  cols="12"
                  sm="6"
                  md="4"
                  lg="3">
             <v-card>
               <v-card-title class="subheading font-weight-bold">
-                {{ item.name }}
+                {{index}} {{item.id}} {{ item.name }}
               </v-card-title>
-              <v-divider></v-divider>
-              <v-list dense>
-                <v-list-item>
-                  <v-list-item-content >
-                    X
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
             </v-card>
           </v-col>
         </v-row>
@@ -89,7 +85,7 @@ export default {
         return this.$store.getters['ingredients/filter']
       },
       set: debounce(async function(value) {
-        // await this.$store.commit('setIfilter', value)
+        await this.$store.commit('ingredients/setFilter', value)
       }, 500)
     }
   },
