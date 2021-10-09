@@ -27,7 +27,7 @@ const actions = {
         const uri = `/ingredient?from=${from}&to=${to}&q=${state.filter || ''}`
         try {
             const response = await axios.get(uri)
-            commit("setItoc", {content: response.data.content, total: response.data.total})
+            commit("setItoc", {content: response.data.content, total: response.data.count})
         } catch (error) {
             console.log(error)
         }
