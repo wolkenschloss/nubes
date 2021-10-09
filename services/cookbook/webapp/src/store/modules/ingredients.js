@@ -1,25 +1,25 @@
 import axios from 'axios'
 
-const state = {
- itoc: [],
- ifilter: "",
- ipagination: {page: 1},
- itotal: 0,
- iloading: false
-}
+const state = () => ({
+    toc: [],
+    filter: "",
+    pagination: {page: 1},
+    total: 0,
+    loading: false
+})
 
 const getters = {
- itoc: (state) => state.itoc,
- ifilter: (state) => state.ifilter,
- iloading: (state) => state.iloading,
- ipagination: (state) => state.ipagination,
- itotal: (state) => state.itotal
+ toc: (state) => state.toc,
+ filter: (state) => state.filter,
+ loading: (state) => state.loading,
+ pagination: (state) => state.pagination,
+ total: (state) => state.total
 }
 
 const actions = {
     async queryIngredients({commit, state }) {
         console.log("Action query ingredients")
-        const {page, itemsPerPage } = state.ipagination
+        const {page, itemsPerPage } = state.pagination
         const from = (page - 1) * itemsPerPage;
         const to = from + itemsPerPage - 1;
 
@@ -37,13 +37,13 @@ const actions = {
 const mutations = {
     setIpagination(state, payload){
         console.log(`mutation setIpagination(${payload}`)
-        state.ipagination = payload
+        state.pagination = payload
     },
     setItoc(state, {content, total}) {
         console.log(`mutation set itoc(content: ${content.length}, total: ${total}`)
-        state.itoc = content
-        state.itotal = total
+        state.toc = content
+        state.total = total
     }
 }
 
-export default { state, getters, actions, mutations }
+export default { namespaced: true, state, getters, actions, mutations }

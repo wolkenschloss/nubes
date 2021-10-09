@@ -4,8 +4,8 @@
         class="mt-4"
         :options.sync="pagination"
         :loading="loading"
-        :items="itoc"
-        :server-items-length="itotal"
+        :items="toc"
+        :server-items-length="total"
         :items-per-page.sync="itemsPerPage"
         hide-default-footer>
       <template v-slot:header>
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import {debounce} from "lodash";
+import { debounce } from "lodash";
 import {mapActions, mapGetters} from 'vuex'
 
 export default {
@@ -100,7 +100,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['itoc', 'itotal']),
+    ...mapGetters('ingredients', ['toc', 'total']),
     numberOfPages() {
       return Math.ceil(this.items.length / this.itemsPerPage)
     },
@@ -109,15 +109,15 @@ export default {
     },
     pagination: {
       get() {
-        return this.$store.getters.ipagination
+        return this.$store.getters['ingredients/pagination']
       },
       set(value) {
-        this.$store.commit('setIpagination', value)
+        this.$store.commit('ingredients/setIpagination', value)
       }
     },
     search: {
       get() {
-        return this.$store.getters.ifilter
+        return this.$store.getters['ingredients/filter']
       },
       set: debounce(async function(value) {
         // await this.$store.commit('setIfilter', value)
@@ -125,7 +125,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["queryIngredients"]),
+    ...mapActions('ingredients', ["queryIngredients"]),
     async load() {
       this.loading = true
       await this.queryIngredients()
