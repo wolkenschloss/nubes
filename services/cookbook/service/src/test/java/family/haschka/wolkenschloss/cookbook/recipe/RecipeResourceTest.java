@@ -68,7 +68,8 @@ public class RecipeResourceTest {
         recipes.add(new Summary(UUID.randomUUID(), "Blaukraut"));
         var toc = new TableOfContents(1, recipes);
 
-        Mockito.when(service.list(0, 4, null)).thenReturn(Uni.createFrom().item(toc));
+        Mockito.when(service.list(0, 4, null))
+                .thenReturn(Uni.createFrom().item(toc));
 
         var query = UriBuilder.fromUri(url.toURI())
                 .queryParam("from", 0)

@@ -3,11 +3,11 @@ import Vue from 'vue'
 import router from '../../router'
 import {cloneDeep} from "lodash";
 
-const state = {
+const state = () => ({
     recipe: {},
     copy: {},
     servings: null
-}
+})
 
 const getters = {
     recipe: (state) => state.recipe,
@@ -81,6 +81,7 @@ const mutations = {
 }
 
 export default {
+    namespaced: true,
     state,
     getters,
     actions,

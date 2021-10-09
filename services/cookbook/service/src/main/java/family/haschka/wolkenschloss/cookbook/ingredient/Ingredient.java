@@ -8,9 +8,12 @@ import java.util.UUID;
 // TODO: Move to model package and exclude from CDI
 public class Ingredient {
     @BsonId
-    private final UUID id;
-    private final String name;
+    public UUID id;
+    public String name;
 
+    protected Ingredient() {
+        this(null, null);
+    }
     public Ingredient(UUID id, String name) {
         this.id = id;
         this.name = name;

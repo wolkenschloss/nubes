@@ -32,8 +32,8 @@
 <script>
 
 import Edit from "@/views/Edit";
-import {debounce} from "lodash";
-import {mapActions, mapGetters} from 'vuex'
+import { debounce } from "lodash";
+import { mapActions, mapGetters } from 'vuex'
 import ImportDialog from "@/components/ImportDialog";
 
 export default {
@@ -54,29 +54,29 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['toc', 'total']),
+    ...mapGetters('toc', ['toc', 'total']),
     copy: {
       get() {
-        return this.$store.getters.copy
+        return this.$store.getters['recipe/copy']
       },
       set(value) {
-        this.$store.commit('setCopy', value)
+        this.$store.commit('recipe/setCopy', value)
       }
     },
     pagination: {
       get() {
-        return this.$store.getters.pagination
+        return this.$store.getters['toc/pagination']
       },
       set(value) {
-        this.$store.commit('setPagination', value)
+        this.$store.commit('toc/setPagination', value)
       }
     },
     search: {
       get() {
-        return this.$store.getters.filter
+        return this.$store.getters['toc/filter']
       },
       set: debounce(async function (value) {
-        await this.$store.commit('setFilter', value)
+        await this.$store.commit('toc/setFilter', value)
       }, 500)
     }
   },
@@ -92,7 +92,8 @@ export default {
     this.newRecipe()
   },
   methods: {
-    ...mapActions(["updateQuery", "queryRecipes", "newRecipe", 'createRecipe']),
+    ...mapActions('toc', ["updateQuery", "queryRecipes"]),
+    ...mapActions('recipe', ["newRecipe", 'createRecipe']),
     async load() {
       this.loading = true
       await this.queryRecipes()
