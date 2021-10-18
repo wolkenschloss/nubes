@@ -52,16 +52,16 @@ tasks {
 }
 
 dependencies {
-    implementation(enforcedPlatform("io.quarkus:quarkus-bom:2.2.2.Final"))
+    implementation(enforcedPlatform("io.quarkus:quarkus-bom:2.3.0.Final"))
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.quarkus:quarkus-junit5-mockito")
     testImplementation("io.rest-assured:rest-assured")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.2"))
+    testImplementation(platform("org.junit:junit-bom:5.8.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    integrationTestImplementation(platform("org.junit:junit-bom:5.7.2"))
+    integrationTestImplementation(platform("org.junit:junit-bom:5.8.1"))
     integrationTestImplementation("org.junit.jupiter:junit-jupiter-api")
     integrationTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     integrationTestImplementation("io.quarkus:quarkus-junit5")
