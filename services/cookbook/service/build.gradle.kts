@@ -5,6 +5,7 @@ plugins {
 
 
 dependencies {
+    implementation("io.quarkus:quarkus-container-image-docker")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")

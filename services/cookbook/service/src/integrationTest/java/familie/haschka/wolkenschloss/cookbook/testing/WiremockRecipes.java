@@ -3,6 +3,7 @@ package familie.haschka.wolkenschloss.cookbook.testing;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 import java.util.Collections;
 import java.util.Map;
@@ -42,7 +43,10 @@ public class WiremockRecipes implements QuarkusTestResourceLifecycleManager {
                         .withHeader("Content-Type", "text/html")
                         .withBodyFile("menu.html")));
 
-        return Collections.singletonMap("family.haschka.wiremock.recipes", wireMockServer.baseUrl());
+        var host = ConfigProvider.getConfig().getValue("wolkenschloss.nubes.testhost", String.class);
+
+        return Collections.singletonMap("family.haschka.wiremock.recipes",
+                wireMockServer.baseUrl().replace("localhost", host));
     }
 
     @Override
