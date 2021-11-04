@@ -1,6 +1,5 @@
 package familie.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MongoDbResource;
 import familie.haschka.wolkenschloss.cookbook.testing.WiremockRecipes;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
@@ -26,7 +25,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusIntegrationTest
-@QuarkusTestResource(value = MongoDbResource.class)
 @QuarkusTestResource(value = WiremockRecipes.class)
 public class JobTest {
 

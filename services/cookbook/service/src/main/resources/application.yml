@@ -20,7 +20,6 @@ quarkus:
 
   mongodb:
     database: cookbook
-    connection-string: mongodb://${HOST:localhost}:27017/?uuidRepresentation=STANDARD
     devservices:
       properties:
         uuidRepresentation: STANDARD
@@ -37,6 +36,10 @@ quarkus:
 wolkenschloss:
   nubes:
     testhost: ${HOST:localhost}
+"%prod":
+   quarkus:
+     mongodb:
+       connection-string: mongodb://${HOST:localhost}:27017/?uuidRepresentation=STANDARD
 
 "%dev":
    quarkus:
@@ -50,6 +53,6 @@ wolkenschloss:
       test-port: 9292
     log:
       level: INFO
-    mongodb:
-      devservices:
-        enabled: false
+#    mongodb:
+#      devservices:
+#        enabled: false
