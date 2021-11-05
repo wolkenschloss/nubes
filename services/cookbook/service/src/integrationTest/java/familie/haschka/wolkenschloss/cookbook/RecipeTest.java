@@ -1,12 +1,15 @@
 package familie.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MongoDbResource;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import javax.json.Json;
@@ -17,15 +20,20 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.withArgs;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 @QuarkusIntegrationTest
-//@QuarkusTestResource(value = MongoDbResource.class)
 @DisplayName("Recipe CRUD Operations")
 public class RecipeTest {
 
@@ -36,11 +44,12 @@ public class RecipeTest {
     }
 
     @Test
-    @DisplayName("Verbindungszeichenfolge erfordert UUID Konfiguration")
+    @DisplayName("Verbindungszeichenfolge darf nicht gesetzt sein")
     public void checkMongoDbConnectionString() {
+        // Wenn Quarkus Dev Services verwendet werden, darf die Verbindungszeichenfolge
+        // nicht gesetzt sein.
         var host = System.getProperty("quarkus.mongodb.connection-string");
-        Assertions.assertNotNull(host);
-        assertThat(host, containsString("uuidRepresentation=STANDARD"));
+        Assertions.assertNull(host);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package familie.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MongoDbResource;
 import familie.haschka.wolkenschloss.cookbook.testing.WiremockRecipes;
+import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.ThrowingConsumer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.json.Json;
 import javax.ws.rs.core.Response;
@@ -26,13 +27,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusIntegrationTest
-@QuarkusTestResource(value = MongoDbResource.class)
 @QuarkusTestResource(value = WiremockRecipes.class)
-public class JobTest {
+@Testcontainers
+public class JobTest implements DevServicesContext.ContextAware {
 
     @Test
     @DisplayName("import recipe from website")
     public void importRecipe() {
+
         var mock_url = System.getProperty("family.haschka.wiremock.recipes");
         var job_url = String.format("%s/lasagne.html", mock_url);
         var port = System.getProperty("quarkus.http.port");
@@ -40,11 +42,13 @@ public class JobTest {
 
         var response = RestAssured
                 .given()
+                .log().all()
                 .body(createJob(job_url))
                 .contentType(ContentType.JSON)
                 .when()
                 .post(url)
                 .then()
+                .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .header("Location", r -> equalTo(url + "/" + r.path("jobId")));
 
@@ -59,6 +63,7 @@ public class JobTest {
                         .when()
                         .get(url + "/" + jobId)
                         .then()
+                        .log().all()
                         .statusCode(Response.Status.OK.getStatusCode())
                         .extract()
                         .path("state")
@@ -71,8 +76,13 @@ public class JobTest {
         var factory = Json.createBuilderFactory(config);
         var builder = factory.createObjectBuilder();
 
-        builder.add("order",  job_url);
+        builder.add("order", job_url);
         return builder.build().toString();
+    }
+
+    @Override
+    public void setIntegrationTestContext(DevServicesContext context) {
+        System.out.println("Hurra, da ist ein Kontext");
     }
 
     public record PostJobTestcase(String name, String requestedData,

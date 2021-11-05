@@ -1,12 +1,16 @@
 quarkus:
+  docker:
+    dockerfile-jvm-path: ./src/docker/Dockerfile.jvm
+  container-image:
+    group: nubes
+    name: cookbook
+    tag: latest
   http:
     port: 8180
     access-log:
       enabled: true
-
   mongodb:
     database: cookbook
-    connection-string: mongodb://localhost:27017/?uuidRepresentation=STANDARD
     devservices:
       properties:
         uuidRepresentation: STANDARD
@@ -21,6 +25,11 @@ quarkus:
       "io.quarkus.deployment.**":
         level: ERROR
 
+"%prod":
+   quarkus:
+     mongodb:
+       connection-string: mongodb://${HOST:localhost}:27017/?uuidRepresentation=STANDARD
+
 "%dev":
    quarkus:
      http:
@@ -33,6 +42,3 @@ quarkus:
       test-port: 9292
     log:
       level: INFO
-    mongodb:
-      devservices:
-        enabled: false

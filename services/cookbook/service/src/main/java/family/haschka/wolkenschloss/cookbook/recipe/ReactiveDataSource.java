@@ -22,7 +22,10 @@ public class ReactiveDataSource implements DataSource {
     @Override
     public Uni<Recipe> extract(URI source, Function<String, Recipe> transform) {
         var client = WebClient.create(this.vertx);
-        var content = client.getAbs(source.toString())
+        var content = client
+
+                .getAbs(source.toString())
+                .timeout(2000)
                 .send()
                 .invoke(this::validate)
                 .map(HttpResponse::bodyAsString);

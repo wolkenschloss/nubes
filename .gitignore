@@ -12,3 +12,5 @@ node_modules/
 .idea/*
 !.idea/externalDependencies.xml
 !.idea/scopes
+
+*.hprof

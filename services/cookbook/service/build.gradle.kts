@@ -5,6 +5,7 @@ plugins {
 
 
 dependencies {
+    implementation("io.quarkus:quarkus-container-image-docker")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
@@ -19,8 +20,12 @@ dependencies {
 
     testImplementation("org.awaitility:awaitility:4.1.0")
 
-    integrationTestImplementation("org.testcontainers:testcontainers")
+    implementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
+
     integrationTestImplementation("org.testcontainers:mongodb")
+    integrationTestImplementation("org.testcontainers:mockserver")
+    integrationTestImplementation("org.testcontainers:junit-jupiter")
+    integrationTestImplementation("org.mock-server:mockserver-client-java:5.5.4")
     integrationTestImplementation("io.rest-assured:rest-assured:4.4.0")
     integrationTestImplementation("com.github.tomakehurst:wiremock-jre8:2.29.1")
     integrationTestImplementation("org.awaitility:awaitility:4.1.0")
