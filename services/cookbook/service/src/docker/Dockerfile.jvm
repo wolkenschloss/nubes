@@ -1,17 +1,12 @@
 ####
 # This Dockerfile is used in order to build a container that runs the Quarkus application in JVM mode
+# You can find the build configuration in application.yaml.
 #
-# Before building the container image run:
+# Build container image with:
 #
-# ./gradlew build
-#
-# Then, build the image with:
-#
-# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/native-example-jvm .
+# ./gradlew build -Dquarkus.container-image.build=true
 #
 # Then run the container using:
-#
-# docker run -i --rm -p 8080:8080 quarkus/native-example-jvm
 #
 # If you want to include the debug port into your docker image
 # you will have to expose the debug port (default 5005) like this :  EXPOSE 8080 5005

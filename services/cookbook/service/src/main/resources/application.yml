@@ -1,23 +1,14 @@
 quarkus:
   docker:
     dockerfile-jvm-path: ./src/docker/Dockerfile.jvm
-#  native:
-#    builder-image: quay.io/quarkus/ubi-quarkus-native-image:21.3-java17
-#  container-image:
-#    name: cookbook
-#    tag: latest
-#    push: false
-#    insecure: true
-#    build: true
-#  jib:
-#    ports: 8180
-#    base-jvm-image: "quay.io/quarkus/ubi-quarkus-native-image:21.2.0-java16"
-#    base-jvm-image: "fabricate/java-alpine-openjdk11-jre"
+  container-image:
+    group: nubes
+    name: cookbook
+    tag: latest
   http:
     port: 8180
     access-log:
       enabled: true
-
   mongodb:
     database: cookbook
     devservices:
@@ -33,9 +24,7 @@ quarkus:
         level: WARN
       "io.quarkus.deployment.**":
         level: ERROR
-wolkenschloss:
-  nubes:
-    testhost: ${HOST:localhost}
+
 "%prod":
    quarkus:
      mongodb:
@@ -53,6 +42,3 @@ wolkenschloss:
       test-port: 9292
     log:
       level: INFO
-#    mongodb:
-#      devservices:
-#        enabled: false
