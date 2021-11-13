@@ -25,12 +25,16 @@ gradlePlugin {
 }
 
 repositories {
+    mavenLocal()
     gradlePluginPortal()
     mavenCentral()
 }
 
+val quarkusPluginVersion: String by project
+val quarkusPluginArtifactId: String by project
+
 dependencies {
-    implementation("io.quarkus:gradle-application-plugin:2.3.0.Final")
+    implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}")
     implementation("com.github.node-gradle:gradle-node-plugin:3.1.0")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")

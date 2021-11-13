@@ -1,9 +1,16 @@
+
+
 buildscript {
+    val quarkusPluginVersion: String by project
+    val quarkusPluginArtifactId: String by project
+
     repositories {
+        mavenLocal()
         gradlePluginPortal()
+        mavenCentral()
     }
     dependencies {
-        classpath("io.quarkus:io.quarkus.gradle.plugin:2.1.1.Final")
+        classpath("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}")
     }
 }
 

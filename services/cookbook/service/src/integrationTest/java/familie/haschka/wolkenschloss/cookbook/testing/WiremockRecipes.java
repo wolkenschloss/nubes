@@ -2,7 +2,9 @@ package familie.haschka.wolkenschloss.cookbook.testing;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import org.jboss.logging.Logger;
 
 import java.util.Collections;
 import java.util.Map;
@@ -12,9 +14,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
-public class WiremockRecipes implements QuarkusTestResourceLifecycleManager {
+public class WiremockRecipes implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
 
     private WireMockServer wireMockServer;
+
+    private static Logger logger = Logger.getLogger(WiremockRecipes.class);
 
     @Override
     public Map<String, String> start() {
@@ -62,5 +66,13 @@ public class WiremockRecipes implements QuarkusTestResourceLifecycleManager {
         if (wireMockServer != null) {
             wireMockServer.stop();
         }
+    }
+
+    @Override
+    public void setIntegrationTestContext(DevServicesContext context) {
+
+        context.devServicesProperties().forEach((k, v) -> {
+            logger.infov("[{0}]: {1}", k, v);
+        });
     }
 }
