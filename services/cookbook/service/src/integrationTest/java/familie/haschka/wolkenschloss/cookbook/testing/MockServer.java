@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @QuarkusTestResource(MockServerResource.class)
 @ExtendWith(MockServerClientParameterResolver.class)
-public @interface MockServerClientExtension {
+public @interface MockServer {
 }

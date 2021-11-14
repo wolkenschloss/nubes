@@ -6,15 +6,36 @@ import org.mockserver.client.MockServerClient;
 public class MockServerClientParameterResolver implements Extension, ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType() == MockServerClient.class;
+        var type = parameterContext.getParameter().getType();
+
+        if (type.equals(MockServerClient.class)) {
+            return true;
+        }
+
+        if(type.equals(RecipeWebsite.class)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
 
-        var host = System.getProperty(MockServerResource.TESTCLIENT_HOST_CONFIG);
-        var port = Integer.parseInt(System.getProperty(MockServerResource.TESTCLIENT_PORT_CONFIG));
+        var type = parameterContext.getParameter().getType();
+        var host = System.getProperty(MockServerResource.CLIENT_HOST_CONFIG);
+        var port = Integer.parseInt(System.getProperty(MockServerResource.CLIENT_PORT_CONFIG));
 
-        return new MockServerClient(host, port);
+        var client = new MockServerClient(host, port);
+
+        if (type.equals(MockServerClient.class)) {
+            return client;
+        }
+
+        if (type.equals(RecipeWebsite.class)) {
+            return new RecipeWebsite(client);
+        }
+
+        return null;
     }
 }

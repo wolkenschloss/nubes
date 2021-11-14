@@ -10,38 +10,41 @@ import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
-import javax.ws.rs.core.UriBuilder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class MockServerResource implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
 
-    public static final String APPLICATION_TEMPLATE_CONFIG = "mockserver.application.template";
-    public static final String TESTCLIENT_HOST_CONFIG = "mockserver.testclient.host";
-    public static final String TESTCLIENT_PORT_CONFIG = "mockserver.testclient.port";
+    public static final String SERVER_HOST_CONFIG = "mockserver.server.host";
+    public static final String SERVER_PORT_CONFIG = "mockserver.server.port";
+    public static final String CLIENT_HOST_CONFIG = "mockserver.client.host";
+    public static final String CLIENT_PORT_CONFIG = "mockserver.client.port";
+
     private static final String ALIAS = "mockserver";
     private static final Logger logger = Logger.getLogger(MockServerResource.class);
 
-
     private MockServerContainer mockServerContainer = null;
-    private HashMap<String, String> config = new HashMap<>();
+    private final HashMap<String, String> config = new HashMap<>();
 
     @Override
     public void setIntegrationTestContext(DevServicesContext context) {
         this.mockServerContainer = context.containerNetworkId()
                 .map(ContainerNetwork::new)
-                .map(network -> create()
-                        .withNetwork(network)
-                        .withNetworkAliases(ALIAS))
-                .orElseGet(this::create);
-
+                .map(this::container)
+                .orElseGet(this::container);
 
         context.containerNetworkId().ifPresent(id -> logger.infov("container network id: {0}", id));
     }
 
+    private MockServerContainer container(ContainerNetwork network) {
+        logger.infov("container network id: {0}", network.id());
+        return container()
+                .withNetwork(network)
+                .withNetworkAliases(ALIAS);
+    }
+
     @NotNull
-    private MockServerContainer create() {
+    private MockServerContainer container() {
         return new MockServerContainer();
     }
 
@@ -51,19 +54,32 @@ public class MockServerResource implements QuarkusTestResourceLifecycleManager, 
         logger.infov("starting mockserver");
         this.mockServerContainer.start();
 
-        config.put(TESTCLIENT_HOST_CONFIG, "localhost");
-        config.put(TESTCLIENT_PORT_CONFIG, mockServerContainer.getServerPort().toString());
+        config.put(CLIENT_HOST_CONFIG, "localhost");
+        config.put(CLIENT_PORT_CONFIG, mockServerContainer.getServerPort().toString());
+        config.put(SERVER_HOST_CONFIG, host());
+        config.put(SERVER_PORT_CONFIG, port().toString());
 
-        UriBuilder template = UriBuilder.fromUri("http://localhost:80");
-
-        if (mockServerContainer.getNetworkAliases().contains(ALIAS)) {
-            config.put(APPLICATION_TEMPLATE_CONFIG, template.host(ALIAS).port(MockServerContainer.PORT).build().toString());
-        } else {
-            config.put(APPLICATION_TEMPLATE_CONFIG, template.port(mockServerContainer.getServerPort()).build().toString());
-        }
-
-        logger.infov("mock server started.");
         return config;
+    }
+
+    private String host() {
+        if (usesContainerNetwork()) {
+            return ALIAS;
+        } else {
+            return "localhost";
+        }
+    }
+
+    private boolean usesContainerNetwork() {
+        return mockServerContainer.getNetworkAliases().contains(ALIAS);
+    }
+
+    private Integer port() {
+        if (usesContainerNetwork()) {
+            return MockServerContainer.PORT;
+        } else {
+            return mockServerContainer.getServerPort();
+        }
     }
 
     @Override
