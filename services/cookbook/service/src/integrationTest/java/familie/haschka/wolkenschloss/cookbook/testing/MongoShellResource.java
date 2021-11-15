@@ -82,7 +82,6 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
                         "--quiet",
                         connection.toString(),
                         script
-                        //String.format("mongosh %s listCollections.js", connectionString)
                 );
                 var output = result.getStdout();
                 logger.infov("output: {0}", output);
@@ -105,7 +104,6 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
                         "mongosh",
                         connection.toString(),
                         script
-                        //String.format("mongosh %s listCollections.js", connectionString)
                 );
                 var output = result.getStdout();
                 logger.infov("output: {0}", output);
