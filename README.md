@@ -14,7 +14,7 @@ Mögliche Dienste wären zum Beispiel
 * To-do Liste
 * Kalender
 * Kontakte
-* Kochbuch mit Rezepten
+* **Kochbuch mit Rezepten**
 * Dateiverwaltung vergleichbar mit Google Drive, OneDrive, und Nextcloud für
     - Dokumente
     - Medien wie Filme, Fotos und Musik
