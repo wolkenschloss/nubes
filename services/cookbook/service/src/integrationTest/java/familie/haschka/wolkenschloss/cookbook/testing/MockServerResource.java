@@ -4,11 +4,7 @@ import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,21 +88,4 @@ public class MockServerResource implements QuarkusTestResourceLifecycleManager, 
         }
     }
 
-    record ContainerNetwork(String id) implements Network {
-
-        @Override
-        public String getId() {
-            return this.id;
-        }
-
-        @Override
-        public void close() {
-        }
-
-        @NotNull
-        @Override
-        public Statement apply(@NotNull Statement base, @NotNull Description description) {
-            throw new NotImplementedException();
-        }
-    }
 }

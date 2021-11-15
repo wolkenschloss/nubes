@@ -1,13 +1,13 @@
 package familie.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MockServerResource;
-import familie.haschka.wolkenschloss.cookbook.testing.MongoDbHelperResource;
+import familie.haschka.wolkenschloss.cookbook.testing.InjectMongoShell;
+import familie.haschka.wolkenschloss.cookbook.testing.MongoShellResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.logging.Logger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,26 +26,37 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 
 @QuarkusIntegrationTest
-@QuarkusTestResource(MongoDbHelperResource.class)
+@QuarkusTestResource(MongoShellResource.class)
 @DisplayName("Ingredient CRUD Operations")
 
 public class IngredientTest  {
 
     private static final Logger LOG = org.jboss.logging.Logger.getLogger(IngredientTest.class);
 
-    @BeforeEach
-    public void dropDatabaseCollections() {
-        var database = ConfigProvider.getConfig().getConfigValue("quarkus.mongodb.database");
-        var connectionString = ConfigProvider.getConfig().getConfigValue("quarkus.mongodb.connection-string");
-        var port = System.getProperty("quarkus.http.port");
-        LOG.infov("MongoDB Connection String: {0}, Database: {1}", connectionString.getRawValue(), database.getRawValue());
+    @InjectMongoShell
+    MongoShellResource.MongoShell mongo;
 
-        RestAssured.given()
-                .when()
-                .log().all()
-                .delete(String.format("http://localhost:%s/mongodb", port))
-                .then()
-                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+    @AfterEach
+    public void showCollections() throws IOException, InterruptedException {
+        mongo.exec();
+        mongo.drop();
+    }
+
+    @BeforeEach
+    public void dropDatabaseCollections() throws IOException, InterruptedException {
+//        var database = ConfigProvider.getConfig().getConfigValue("quarkus.mongodb.database");
+//        var connectionString = ConfigProvider.getConfig().getConfigValue("quarkus.mongodb.connection-string");
+//        var port = System.getProperty("quarkus.http.port");
+//        LOG.infov("MongoDB Connection String: {0}, Database: {1}", connectionString.getRawValue(), database.getRawValue());
+//
+//        RestAssured.given()
+//                .when()
+//                .log().all()
+//                .delete(String.format("http://localhost:%s/mongodb", port))
+//                .then()
+//                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+
+        mongo.exec();
     }
 
     @Test
