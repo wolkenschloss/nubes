@@ -1,6 +1,7 @@
 package familie.haschka.wolkenschloss.cookbook;
 
 import familie.haschka.wolkenschloss.cookbook.testing.MockServerResource;
+import familie.haschka.wolkenschloss.cookbook.testing.MongoDbHelperResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
@@ -25,6 +26,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 
 @QuarkusIntegrationTest
+@QuarkusTestResource(MongoDbHelperResource.class)
 @DisplayName("Ingredient CRUD Operations")
 
 public class IngredientTest  {
