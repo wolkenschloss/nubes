@@ -36,14 +36,10 @@ public class IngredientTest  {
         MongoShellResource.MongoShell.log(
                 mongosh.eval("disableTelemetry(); db.getCollectionNames().join(', ');"));
 
-        MongoShellResource.MongoShell.log(
-                mongosh.eval("disableTelemetry(); db.Ingredient.drop(); db.Recipe.drop();")
-        );
-
-//        Assume.assumeThat(
-//                "ingredient collection must be dropped",
-//                mongosh.eval("disableTelemetry(); db.Ingredient.drop(); db.Recipe.drop();").getExitCode(),
-//                equalTo(0));
+        Assume.assumeThat(
+                "ingredient collection must be dropped",
+                mongosh.eval("disableTelemetry(); db.Ingredient.drop(); db.Recipe.drop();").getExitCode(),
+                equalTo(0));
 
         MongoShellResource.MongoShell.log(
                 mongosh.eval("disableTelemetry(); db.getCollectionNames().join(', ');"));
