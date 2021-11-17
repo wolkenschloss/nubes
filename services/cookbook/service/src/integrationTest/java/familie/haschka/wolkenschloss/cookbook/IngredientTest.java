@@ -33,6 +33,11 @@ public class IngredientTest  {
 
     @BeforeEach
     public void dropDatabaseCollections() throws IOException, InterruptedException {
+
+        MongoShellResource.MongoShell.log(
+                mongosh.ls()
+        );
+
         MongoShellResource.MongoShell.log(
                 mongosh.eval("disableTelemetry(); db.getCollectionNames().join(', ');"));
 

@@ -10,6 +10,7 @@ import org.testcontainers.containers.ContainerLaunchException;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 public class MongoShellResource implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
     private static final Logger logger = Logger.getLogger(MongoShellResource.class);
@@ -34,8 +35,9 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
 
     @NotNull
     private MongoShellContainer container() {
-        logger.infov("creating MongoShellContainer");
-        return new MongoShellContainer().withNetworkMode("host");
+        logger.infov("creating MongoShellContainer with network mode 'host'");
+
+        return MongoShellContainer.create("host");
     }
 
     @Override
@@ -50,21 +52,22 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
     public void setIntegrationTestContext(DevServicesContext context) {
         this.container = context.containerNetworkId()
                 .map(ContainerNetwork::new)
-                .map(this::container)
-                .orElseGet(this::container);
+//                .map(this::container)
+                .map(MongoShellContainer::create)
+                .orElseGet( this::container);
 
-        this.connectionString = context.devServicesProperties()
-                .getOrDefault("quarkus.mongodb.connection-string", null);
+        this.connectionString = Optional.ofNullable(context.devServicesProperties()
+                .get("quarkus.mongodb.connection-string"))
+                .orElseThrow();
 
         logger.infov("using connection string: {0}", connectionString);
     }
 
     @Override
     public void inject(TestInjector testInjector) {
-//        testInjector.injectIntoFields(new MongoShell(),
-//                new TestInjector.AnnotatedAndMatchesType(InjectMongoShell.class, MongoShell.class));
-
-        testInjector.injectIntoFields(new MongoShell(), field -> field.getType().isAssignableFrom(MongoShell.class));
+        testInjector.injectIntoFields(
+                new MongoShell(),
+                field -> field.getType().isAssignableFrom(MongoShell.class));
     }
 
     public class MongoShell {
@@ -73,37 +76,24 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
             logger.infov("mongosh --eval {0} {1}", script, sanitisedConnectionString());
             var result= container.execInContainer(
                     "mongosh",
-                    "--verbose",
+                    "--quiet",
                     "--eval",
                     script,
                     sanitisedConnectionString());
 
-            logger.info(container.getLogs());
-
             return result;
         }
 
-        public void exec() throws IOException, InterruptedException {
-            if (container != null && container.isRunning()) {
-                var connection = sanitisedConnectionString();
-
-                var script = "/opt/mongosh/listCollections.js";
-                logger.infov("executing mongosh {0} {1}", connection, script);
-                var result = container.execInContainer(
-                        "mongosh",
-                        "--quiet",
-                        connection,
-                        script
-                );
-
-                log(result);
-            }
+        public Container.ExecResult ls() throws IOException, InterruptedException {
+            return container.execInContainer(
+                    "ls",
+                    "-lhaR",
+                    "/opt/"
+            );
         }
-
         private String sanitisedConnectionString() {
             return UriBuilder.fromUri(connectionString)
                     .replaceQueryParam("uuidRepresentation")
-//                    .queryParam("serverSelectionTimeoutMS", 20000)
                     .build()
                     .toString();
         }
@@ -113,22 +103,6 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
 
             if(result.getExitCode() != 0) {
                 logger.errorv("stderr: {0}", result.getStderr());
-            }
-        }
-
-        public void drop() throws IOException, InterruptedException {
-            if (container != null && container.isRunning()) {
-                var connection = sanitisedConnectionString();
-
-                var script = "/opt/mongosh/dropCollections.js";
-                logger.infov("executing mongosh {0} {1}", connection, script);
-                var result = container.execInContainer(
-                        "mongosh",
-                        connection,
-                        script
-                );
-
-                log(result);
             }
         }
     }

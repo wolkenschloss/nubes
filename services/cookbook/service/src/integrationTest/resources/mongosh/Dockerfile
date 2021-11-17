@@ -6,5 +6,5 @@ RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mon
 RUN apt-get update
 RUN apt-get install -y mongodb-mongosh
 RUN mkdir -p /opt/mongosh
-COPY *.js /opt/mongosh/
+COPY scripts/*.js /opt/mongosh/
 CMD ["/bin/bash", "-c", "while :; do echo 'Hit CTRL+C'; sleep 1; done"]
