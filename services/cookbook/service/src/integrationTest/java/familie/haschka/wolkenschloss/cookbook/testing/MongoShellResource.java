@@ -4,12 +4,14 @@ import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 public class MongoShellResource implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
@@ -74,46 +76,49 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
 
         public void exec() throws IOException, InterruptedException {
             if (container != null && container.isRunning()) {
-                var connection = UriBuilder.fromUri(connectionString)
-                        .replaceQueryParam("uuidRepresentation").build();
+                var connection = sanitisedConnectionString();
 
                 var script = "/opt/mongosh/listCollections.js";
-                logger.infov("executing mongosh {0} {1}", connection.toString(), script);
+                logger.infov("executing mongosh {0} {1}", connection, script);
                 var result = container.execInContainer(
                         "mongosh",
                         "--quiet",
-                        connection.toString(),
+                        connection,
                         script
                 );
-                var output = result.getStdout();
-                logger.infov("output: {0}", output);
 
-                if(result.getExitCode() != 0) {
-                    var error = result.getStderr();
-                    logger.errorv("stderr: {0}", error);
-                }
+                log(result);
+            }
+        }
+
+        private String sanitisedConnectionString() {
+            return UriBuilder.fromUri(connectionString)
+                    .replaceQueryParam("uuidRepresentation")
+                    .build()
+                    .toString();
+        }
+
+        private void log(Container.ExecResult result) {
+            logger.infov("output: {0}", result.getStdout());
+
+            if(result.getExitCode() != 0) {
+                logger.errorv("stderr: {0}", result.getStderr());
             }
         }
 
         public void drop() throws IOException, InterruptedException {
             if (container != null && container.isRunning()) {
-                var connection = UriBuilder.fromUri(connectionString)
-                        .replaceQueryParam("uuidRepresentation").build();
+                var connection = sanitisedConnectionString();
 
                 var script = "/opt/mongosh/dropCollections.js";
-                logger.infov("executing mongosh {0} {1}", connection.toString(), script);
+                logger.infov("executing mongosh {0} {1}", connection, script);
                 var result = container.execInContainer(
                         "mongosh",
-                        connection.toString(),
+                        connection,
                         script
                 );
-                var output = result.getStdout();
-                logger.infov("output: {0}", output);
 
-                if(result.getExitCode() != 0) {
-                    var error = result.getStderr();
-                    logger.errorv("stderr: {0}", error);
-                }
+                log(result);
             }
         }
     }
