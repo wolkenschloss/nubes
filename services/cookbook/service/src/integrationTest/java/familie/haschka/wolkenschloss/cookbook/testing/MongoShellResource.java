@@ -6,17 +6,14 @@ import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.ContainerLaunchException;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Map;
 
 public class MongoShellResource implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
     private static final Logger logger = Logger.getLogger(MongoShellResource.class);
-    private GenericContainer container;
+    private MongoShellContainer container;
     private String connectionString;
 
     @Override
@@ -30,19 +27,13 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
         return null;
     }
 
-    private GenericContainer getContainer(ContainerNetwork network) {
-        return container()
-                .withNetwork(network);
+    private MongoShellContainer container(ContainerNetwork network) {
+        return container().withNetwork(network);
     }
 
     @NotNull
-    private GenericContainer container() {
-        return new GenericContainer(
-                new ImageFromDockerfile("nubes/mongosh:latest", false)
-                        .withFileFromClasspath("Dockerfile", "mongosh/docker/Dockerfile")
-                        .withFileFromClasspath("listCollections.js", "mongosh/scripts/listCollections.js")
-                        .withFileFromClasspath("dropCollections.js", "mongosh/scripts/dropCollections.js")
-        );
+    private MongoShellContainer container() {
+        return new MongoShellContainer();
     }
 
     @Override
@@ -56,8 +47,8 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
     @Override
     public void setIntegrationTestContext(DevServicesContext context) {
         this.container = context.containerNetworkId()
-                .map(id -> new ContainerNetwork(id))
-                .map(this::getContainer)
+                .map(ContainerNetwork::new)
+                .map(this::container)
                 .orElseGet(this::container);
 
         this.connectionString = context.devServicesProperties()
