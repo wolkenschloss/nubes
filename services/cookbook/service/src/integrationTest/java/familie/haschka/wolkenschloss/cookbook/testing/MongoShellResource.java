@@ -59,8 +59,10 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
 
     @Override
     public void inject(TestInjector testInjector) {
-        testInjector.injectIntoFields(new MongoShell(),
-                new TestInjector.AnnotatedAndMatchesType(InjectMongoShell.class, MongoShell.class));
+//        testInjector.injectIntoFields(new MongoShell(),
+//                new TestInjector.AnnotatedAndMatchesType(InjectMongoShell.class, MongoShell.class));
+
+        testInjector.injectIntoFields(new MongoShell(), field -> field.getType().isAssignableFrom(MongoShell.class));
     }
 
     public class MongoShell {

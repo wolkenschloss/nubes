@@ -16,14 +16,11 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 @QuarkusIntegrationTest
 @QuarkusTestResource(MongoShellResource.class)
@@ -33,7 +30,6 @@ public class IngredientTest  {
 
     private static final Logger LOG = org.jboss.logging.Logger.getLogger(IngredientTest.class);
 
-    @InjectMongoShell
     MongoShellResource.MongoShell mongo;
 
     @AfterEach
@@ -44,18 +40,6 @@ public class IngredientTest  {
 
     @BeforeEach
     public void dropDatabaseCollections() throws IOException, InterruptedException {
-//        var database = ConfigProvider.getConfig().getConfigValue("quarkus.mongodb.database");
-//        var connectionString = ConfigProvider.getConfig().getConfigValue("quarkus.mongodb.connection-string");
-//        var port = System.getProperty("quarkus.http.port");
-//        LOG.infov("MongoDB Connection String: {0}, Database: {1}", connectionString.getRawValue(), database.getRawValue());
-//
-//        RestAssured.given()
-//                .when()
-//                .log().all()
-//                .delete(String.format("http://localhost:%s/mongodb", port))
-//                .then()
-//                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
-
         mongo.exec();
     }
 
@@ -111,11 +95,11 @@ public class IngredientTest  {
                 throw new RuntimeException(e);
             }
         }
-    };
+    }
 
     @Test
     @DisplayName("GET /ingredients (1 Element)")
-    public void listIngredientsOneElement() throws IOException, URISyntaxException {
+    public void listIngredientsOneElement() {
 
         var testcase = new IngredientTestCase(
                 "1 Recipe",
