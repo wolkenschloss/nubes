@@ -3,10 +3,10 @@ package familie.haschka.wolkenschloss.cookbook.testing;
 import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.jboss.logging.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.utility.DockerImageName;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -14,20 +14,11 @@ import java.util.Map;
 
 public class MongoShellResource implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
     private static final Logger logger = Logger.getLogger(MongoShellResource.class);
-    private static final DockerImageName MONGO_CLIENT = DockerImageName.parse("alpine:3.14");
     private GenericContainer container;
-    private String networkId;
     private String connectionString;
 
     @Override
     public Map<String, String> start() {
-        this.container = new GenericContainer(
-                new ImageFromDockerfile("nubes/mongosh:latest", false)
-                        .withFileFromClasspath("Dockerfile", "mongosh/docker/Dockerfile")
-                        .withFileFromClasspath("listCollections.js", "mongosh/scripts/listCollections.js")
-                        .withFileFromClasspath("dropCollections.js", "mongosh/scripts/dropCollections.js")
-        )
-                .withNetwork(new ContainerNetwork(networkId));
         try {
             this.container.start();
         } catch (ContainerLaunchException exception) {
@@ -35,6 +26,21 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
         }
 
         return null;
+    }
+
+    private GenericContainer getContainer(ContainerNetwork network) {
+        return container()
+                .withNetwork(network);
+    }
+
+    @NotNull
+    private GenericContainer container() {
+        return new GenericContainer(
+                new ImageFromDockerfile("nubes/mongosh:latest", false)
+                        .withFileFromClasspath("Dockerfile", "mongosh/docker/Dockerfile")
+                        .withFileFromClasspath("listCollections.js", "mongosh/scripts/listCollections.js")
+                        .withFileFromClasspath("dropCollections.js", "mongosh/scripts/dropCollections.js")
+        );
     }
 
     @Override
@@ -47,37 +53,33 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
 
     @Override
     public void setIntegrationTestContext(DevServicesContext context) {
+        this.container = context.containerNetworkId()
+                .map(id -> new ContainerNetwork(id))
+                .map(this::getContainer)
+                .orElseGet(this::container);
+
         this.connectionString = context.devServicesProperties()
                 .getOrDefault("quarkus.mongodb.connection-string", null);
 
-        this.networkId = context.containerNetworkId().orElse(null);
-
         logger.infov("quarkus.mongodb.connection-string: {0}", connectionString);
-        logger.infov("docker network id: {0}", networkId);
     }
 
     @Override
     public void inject(TestInjector testInjector) {
-        testInjector.injectIntoFields(new MongoShell(container),
+        testInjector.injectIntoFields(new MongoShell(),
                 new TestInjector.AnnotatedAndMatchesType(InjectMongoShell.class, MongoShell.class));
     }
 
     public class MongoShell {
-        private final GenericContainer container;
-
-        MongoShell(GenericContainer container) {
-
-            this.container = container;
-        }
 
         public void exec() throws IOException, InterruptedException {
-            if (this.container != null && this.container.isRunning()) {
+            if (container != null && container.isRunning()) {
                 var connection = UriBuilder.fromUri(connectionString)
                         .replaceQueryParam("uuidRepresentation").build();
 
                 var script = "/opt/mongosh/listCollections.js";
                 logger.infov("executing mongosh {0} {1}", connection.toString(), script);
-                var result = this.container.execInContainer(
+                var result = container.execInContainer(
                         "mongosh",
                         "--quiet",
                         connection.toString(),
@@ -94,13 +96,13 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
         }
 
         public void drop() throws IOException, InterruptedException {
-            if (this.container != null && this.container.isRunning()) {
+            if (container != null && container.isRunning()) {
                 var connection = UriBuilder.fromUri(connectionString)
                         .replaceQueryParam("uuidRepresentation").build();
 
                 var script = "/opt/mongosh/dropCollections.js";
                 logger.infov("executing mongosh {0} {1}", connection.toString(), script);
-                var result = this.container.execInContainer(
+                var result = container.execInContainer(
                         "mongosh",
                         connection.toString(),
                         script
