@@ -28,12 +28,14 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
     }
 
     private MongoShellContainer container(ContainerNetwork network) {
-        return container().withNetwork(network);
+        logger.infov("using container network ${0}", network.getId());
+        return new MongoShellContainer().withNetwork(network);
     }
 
     @NotNull
     private MongoShellContainer container() {
-        return new MongoShellContainer();
+        logger.infov("creating MongoShellContainer");
+        return new MongoShellContainer().withNetworkMode("host");
     }
 
     @Override
@@ -54,7 +56,7 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
         this.connectionString = context.devServicesProperties()
                 .getOrDefault("quarkus.mongodb.connection-string", null);
 
-        logger.infov("quarkus.mongodb.connection-string: {0}", connectionString);
+        logger.infov("using connection string: {0}", connectionString);
     }
 
     @Override
@@ -66,6 +68,20 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
     }
 
     public class MongoShell {
+
+        public Container.ExecResult eval(String script) throws IOException, InterruptedException {
+            logger.infov("mongosh --eval {0} {1}", script, sanitisedConnectionString());
+            var result= container.execInContainer(
+                    "mongosh",
+                    "--verbose",
+                    "--eval",
+                    script,
+                    sanitisedConnectionString());
+
+            logger.info(container.getLogs());
+
+            return result;
+        }
 
         public void exec() throws IOException, InterruptedException {
             if (container != null && container.isRunning()) {
@@ -87,11 +103,12 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
         private String sanitisedConnectionString() {
             return UriBuilder.fromUri(connectionString)
                     .replaceQueryParam("uuidRepresentation")
+//                    .queryParam("serverSelectionTimeoutMS", 20000)
                     .build()
                     .toString();
         }
 
-        private void log(Container.ExecResult result) {
+        public static void log(Container.ExecResult result) {
             logger.infov("output: {0}", result.getStdout());
 
             if(result.getExitCode() != 0) {

@@ -1,13 +1,12 @@
 package familie.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.InjectMongoShell;
 import familie.haschka.wolkenschloss.cookbook.testing.MongoShellResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.jboss.logging.Logger;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.Assume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,22 +29,29 @@ public class IngredientTest  {
 
     private static final Logger LOG = org.jboss.logging.Logger.getLogger(IngredientTest.class);
 
-    MongoShellResource.MongoShell mongo;
-
-    @AfterEach
-    public void showCollections() throws IOException, InterruptedException {
-        mongo.exec();
-        mongo.drop();
-    }
+    MongoShellResource.MongoShell mongosh;
 
     @BeforeEach
     public void dropDatabaseCollections() throws IOException, InterruptedException {
-        mongo.exec();
+        MongoShellResource.MongoShell.log(
+                mongosh.eval("disableTelemetry(); db.getCollectionNames().join(', ');"));
+
+        MongoShellResource.MongoShell.log(
+                mongosh.eval("disableTelemetry(); db.Ingredient.drop(); db.Recipe.drop();")
+        );
+
+//        Assume.assumeThat(
+//                "ingredient collection must be dropped",
+//                mongosh.eval("disableTelemetry(); db.Ingredient.drop(); db.Recipe.drop();").getExitCode(),
+//                equalTo(0));
+
+        MongoShellResource.MongoShell.log(
+                mongosh.eval("disableTelemetry(); db.getCollectionNames().join(', ');"));
     }
 
     @Test
     @DisplayName("GET /ingredients (empty)")
-    public void listIngredientsEmpty() {
+    public void listIngredientsEmpty() throws InterruptedException {
         var location = String.format("http://localhost:%s/ingredient",
                 System.getProperty("quarkus.http.port"));
 
