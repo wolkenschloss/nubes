@@ -1,0 +1,21 @@
+{
+  "title": "Fishsoup",
+  "preparation": "Bekannt.",
+  "ingredients": [
+    {
+      "quantity": "4",
+      "unit": "",
+      "name": "Fish"
+    },
+    {
+      "quantity": "1",
+      "unit": "TL",
+      "name": "Pepper"
+    },
+    {
+      "quantity": "1",
+      "unit": "",
+      "name": "Salt"
+    }
+  ]
+}

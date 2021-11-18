@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-class FileResource {
+public class FileResource {
     private static final Logger logger = Logger.getLogger(FileResource.class);
 
     private final String path;
@@ -15,10 +15,14 @@ class FileResource {
         this.path = path;
     }
 
-    public String read() throws IOException {
+    public String read() {
         logger.infov("reading {0}", this.path);
 
         var path = Paths.get(ClassLoader.getSystemResource(this.path).getPath());
-        return Files.readString(path);
+        try {
+            return Files.readString(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

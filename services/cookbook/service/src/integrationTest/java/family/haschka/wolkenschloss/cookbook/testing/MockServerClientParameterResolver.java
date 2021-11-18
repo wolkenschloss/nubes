@@ -9,7 +9,8 @@ import org.mockserver.client.MockServerClient;
 
 public class MockServerClientParameterResolver implements Extension, ParameterResolver {
     @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
         var type = parameterContext.getParameter().getType();
 
         if (type.equals(MockServerClient.class)) {
@@ -24,7 +25,8 @@ public class MockServerClientParameterResolver implements Extension, ParameterRe
     }
 
     @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
 
         var type = parameterContext.getParameter().getType();
         var host = System.getProperty(MockServerResource.CLIENT_HOST_CONFIG);

@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @QuarkusTestResource(MockServerResource.class)
-@ExtendWith(MockServerClientParameterResolver.class)
+@ExtendWith(value = {MockServerClientParameterResolver.class})
 public @interface MockServer {
 }
