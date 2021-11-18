@@ -28,12 +28,12 @@ public class IngredientServiceTest {
     public void mockCollaborators() {
         this.repository = Mockito.mock(IngredientRepository.class);
         this.identityGenerator = Mockito.mock(IdentityGenerator.class);
-        this.query = Mockito.mock(ReactivePanacheQuery.class);
+        this.query = Mockito.mock(IngredientQuery.class);
     }
 
     IngredientRepository repository;
     IdentityGenerator identityGenerator;
-    ReactivePanacheQuery query;
+    IngredientQuery query;
 
     @Test
     public void createIngredient() {
@@ -112,9 +112,6 @@ public class IngredientServiceTest {
         }
     }
 
-    public interface IngredientQuery extends ReactivePanacheQuery<Ingredient> {
-    }
-
     @ParameterizedTest
     @EnumSource(ListIngredientsTestCase.class)
     @DisplayName("search for ingredient")
@@ -162,7 +159,7 @@ public class IngredientServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ListIngredientsTestCase.class)
+    @EnumSource(value = ListIngredientsTestCase.class)
     @DisplayName("list all ingredients")
     public void listAllIngredients(ListIngredientsTestCase testcase) {
 
