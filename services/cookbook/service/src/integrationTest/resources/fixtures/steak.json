@@ -1,0 +1,16 @@
+{
+  "title": "Steak",
+  "preparation": "Bekannt.",
+  "ingredients": [
+    {
+      "quantity": "250",
+      "unit": "g",
+      "name": "Steak"
+    },
+    {
+      "quantity": "1",
+      "unit": "EL",
+      "name": "Chili oil"
+    }
+  ]
+}

@@ -24,8 +24,17 @@ public class IngredientService {
 
     public Uni<Ingredient> create(String title) {
         log.infov("creating ingredient {0}", title);
-        var ingredient = new Ingredient(identityGenerator.generate(), title);
-        return repository.persist(ingredient);
+
+        return repository.find("name like ?1", title)
+                .firstResultOptional()
+                .onItem().transformToUni(i -> i.map(j -> Uni.createFrom().item(j))
+                        .orElseGet(() -> {
+                            log.infov("no duplicates found. creating new ingredient {0}", title);
+                    var ingredient = new Ingredient(identityGenerator.generate(), title);
+                    return repository.persist(ingredient);
+                }));
+
+//        return repository.persist(ingredient);
     }
 
     public Uni<TableOfContents> list(int from, int to, String search) {

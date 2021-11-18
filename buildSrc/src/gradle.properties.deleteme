@@ -6,9 +6,7 @@ org.gradle.parallel=true
 org.gradle.jvmargs=-Xms128m -Xmx1024m
 
 quarkusPluginId=io.quarkus
-quarkusPluginArtifactId=gradle-application-plugin
-#quarkusPluginArtifactId=io.quarkus.gradle.plugin
-quarkusPluginVersion=2.5.0.Final
+quarkusPluginVersion=2.4.1.Final
 quarkusPlatformGroupId=io.quarkus
 quarkusPlatformArtifactId=quarkus-bom
-quarkusPlatformVersion=2.5.0.Final
+quarkusPlatformVersion=2.4.1.Final

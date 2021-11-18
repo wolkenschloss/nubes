@@ -1,4 +1,4 @@
-package familie.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
