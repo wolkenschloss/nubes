@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class FileResource {
+class FileResource {
     private static final Logger logger = Logger.getLogger(FileResource.class);
 
     private final String path;
