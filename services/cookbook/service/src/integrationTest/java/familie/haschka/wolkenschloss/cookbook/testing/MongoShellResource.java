@@ -3,7 +3,6 @@ package familie.haschka.wolkenschloss.cookbook.testing;
 import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.jboss.logging.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.ContainerLaunchException;
 
@@ -28,18 +27,6 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
         return null;
     }
 
-    private MongoShellContainer container(ContainerNetwork network) {
-        logger.infov("using container network ${0}", network.getId());
-        return new MongoShellContainer().withNetwork(network);
-    }
-
-    @NotNull
-    private MongoShellContainer container() {
-        logger.infov("creating MongoShellContainer with network mode 'host'");
-
-        return MongoShellContainer.create("host");
-    }
-
     @Override
     public void stop() {
         if (this.container != null) {
@@ -52,9 +39,8 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
     public void setIntegrationTestContext(DevServicesContext context) {
         this.container = context.containerNetworkId()
                 .map(ContainerNetwork::new)
-//                .map(this::container)
                 .map(MongoShellContainer::create)
-                .orElseGet( this::container);
+                .orElseGet(MongoShellContainer::create);
 
         this.connectionString = Optional.ofNullable(context.devServicesProperties()
                 .get("quarkus.mongodb.connection-string"))
@@ -74,14 +60,13 @@ public class MongoShellResource implements QuarkusTestResourceLifecycleManager, 
 
         public Container.ExecResult eval(String script) throws IOException, InterruptedException {
             logger.infov("mongosh --eval {0} {1}", script, sanitisedConnectionString());
-            var result= container.execInContainer(
+
+            return container.execInContainer(
                     "mongosh",
                     "--quiet",
                     "--eval",
                     script,
                     sanitisedConnectionString());
-
-            return result;
         }
 
         public Container.ExecResult ls() throws IOException, InterruptedException {
