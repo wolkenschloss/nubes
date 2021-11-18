@@ -1,47 +1,47 @@
-# MyCloud
+# Wolkenschloss
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Gradle Build](https://github.com/wolkenschloss/nubes/actions/workflows/gradle-build.yml/badge.svg)
 
-## Die Vision 
+## The vision
 
-MyCloud ist eine Gruppe unabhängiger Diensten für eine private 
-Cloud, mit denen alltägliche Aufgaben des privaten Lebens unterstützt werden.
+*Wolkenschloss* (Cloud Castle) is a group of independent services for a private
+Cloud, with which everyday tasks of private life are supported.
 
-Mögliche Dienste wären zum Beispiel
+Possible services would be for example
 
 * **Blog**
-* To-do Liste
-* Kalender
-* Kontakte
-* **Kochbuch mit Rezepten**
-* Dateiverwaltung vergleichbar mit Google Drive, OneDrive, und Nextcloud für
-    - Dokumente
-    - Medien wie Filme, Fotos und Musik
-    - Workflows
+* To do list
+* Calendar
+* Contacts
+* **Cookbook with recipes**
+* File management comparable to Google Drive, OneDrive, and Nextcloud for
+    - Documents
+    - Media such as movies, photos and music
+    - workflows
 
-Zentrale Dienste:
+Central Services:
 
-* Benutzerverwaltung
-    - Benutzerkonto mit Profil
-    - Benutzerrechte
-    - An- und Abmeldung
-    - Zentrale Anmeldung und Berechtigung auch für die Geräte im Heimnetz.
-* Backup und Restore
+* User administration
+    - User account with profile
+    - User rights
+    - Registration and deregistration
+    - Central registration and authorization also for the devices in the home network.
+* Backup and Restore
 * Logging
 * Monitoring
 
-## Installation
+## installation
 
-*TBD*
+* TBD *
 
-*MyCloud soll für möglichst viele zugänglich sein. Die Installation
-sollte daher auch für Laien möglichst einfach sein. Ideen sind:*
+*Wolkenschloss* should be accessible to as many as possible. The installation
+should therefore be as simple as possible, even for laypeople. Ideas are: *
 
-- Image für Raspberry PI
-- Docker-Compose Installation
-- Kubernetes Installation
-- Virtuelle Maschine
+- Image for Raspberry PI
+- Docker-Compose installation
+- Kubernetes installation
+- Virtual machine
 
 ## Usage
 
@@ -51,17 +51,16 @@ sollte daher auch für Laien möglichst einfach sein. Ideen sind:*
 
 *TBD*
 
-*Wolkenschloss/MyCloud ist derzeit ein privates Projekt. Mitarbeit
-erfolgt nur auf persönliche Einladung*
+*Wolkenschloss* is currently a private project. cooperation
+only by personal invitation
 
-Hinweise zum Entwickeln befinden sich in der Projektdokumentation im
-`doc` Ordner.
+Notes on development can be found in the project documentation in
+`doc` folder.
 
-## Credits
+## credits
 
 *TBD*
 
 ## License
 
-Apache 2.0
-
+Apache 2.0 
