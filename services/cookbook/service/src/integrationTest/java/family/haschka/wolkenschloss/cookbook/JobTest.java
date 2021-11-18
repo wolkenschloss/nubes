@@ -1,7 +1,7 @@
-package familie.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MockServer;
-import familie.haschka.wolkenschloss.cookbook.testing.RecipeWebsite;
+import family.haschka.wolkenschloss.cookbook.testing.MockServer;
+import family.haschka.wolkenschloss.cookbook.testing.RecipeWebsite;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

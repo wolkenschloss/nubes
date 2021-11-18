@@ -1,7 +1,7 @@
-package familie.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MockServerResource;
-import familie.haschka.wolkenschloss.cookbook.testing.RecipeWebsite;
+import family.haschka.wolkenschloss.cookbook.testing.MockServerResource;
+import family.haschka.wolkenschloss.cookbook.testing.RecipeWebsite;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

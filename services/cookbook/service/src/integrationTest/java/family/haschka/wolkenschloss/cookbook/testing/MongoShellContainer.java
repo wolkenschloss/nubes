@@ -1,4 +1,4 @@
-package familie.haschka.wolkenschloss.cookbook.testing;
+package family.haschka.wolkenschloss.cookbook.testing;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;

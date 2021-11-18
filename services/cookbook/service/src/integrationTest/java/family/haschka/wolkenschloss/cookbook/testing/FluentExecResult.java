@@ -1,4 +1,4 @@
-package familie.haschka.wolkenschloss.cookbook.testing;
+package family.haschka.wolkenschloss.cookbook.testing;
 
 import org.junit.jupiter.api.Assumptions;
 import org.slf4j.Logger;

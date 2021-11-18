@@ -24,7 +24,8 @@ quarkus:
         level: WARN
       "io.quarkus.deployment.**":
         level: ERROR
-
+  arc:
+    exclude-types: familie.haschka.wolkenschloss.cookbook.testing.*
 "%prod":
    quarkus:
      mongodb:

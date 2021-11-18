@@ -1,4 +1,4 @@
-package familie.haschka.wolkenschloss.cookbook.testing;
+package family.haschka.wolkenschloss.cookbook.testing;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;

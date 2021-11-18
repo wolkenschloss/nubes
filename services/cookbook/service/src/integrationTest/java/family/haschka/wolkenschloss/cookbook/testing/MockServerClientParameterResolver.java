@@ -1,6 +1,10 @@
-package familie.haschka.wolkenschloss.cookbook.testing;
+package family.haschka.wolkenschloss.cookbook.testing;
 
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 import org.mockserver.client.MockServerClient;
 
 public class MockServerClientParameterResolver implements Extension, ParameterResolver {

@@ -1,7 +1,7 @@
-package familie.haschka.wolkenschloss.cookbook;
+package family.haschka.wolkenschloss.cookbook;
 
-import familie.haschka.wolkenschloss.cookbook.testing.MongoShell;
-import familie.haschka.wolkenschloss.cookbook.testing.MongoShellResource;
+import family.haschka.wolkenschloss.cookbook.testing.MongoShell;
+import family.haschka.wolkenschloss.cookbook.testing.MongoShellResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;

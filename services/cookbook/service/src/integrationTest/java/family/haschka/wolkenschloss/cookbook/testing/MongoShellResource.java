@@ -1,4 +1,4 @@
-package familie.haschka.wolkenschloss.cookbook.testing;
+package family.haschka.wolkenschloss.cookbook.testing;
 
 import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
