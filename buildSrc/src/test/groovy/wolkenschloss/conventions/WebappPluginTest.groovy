@@ -66,7 +66,7 @@ class WebappPluginTest extends Specification {
         result.task(':vue').outcome == TaskOutcome.SUCCESS
 
         and: "output is written into META-INF"
-        def dir = new File(testProjectDir, "build/classes/java/main/META-INF/resources")
+        def dir = new File(testProjectDir, "build/classes/java/main/META-INF/resources/")
         dir.exists()
         new File(dir, "index.html").isFile()
         new File(dir, "js").isDirectory()

@@ -6,11 +6,6 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: {name: 'contents'}
-  },
-  {
-    path: '/contents',
-    name: 'contents',
     components: {
       default: () => import(/* webpackChunkName: "contents" */ '../views/Contents')
     },

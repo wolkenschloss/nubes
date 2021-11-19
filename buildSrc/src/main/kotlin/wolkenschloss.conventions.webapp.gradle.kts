@@ -4,6 +4,7 @@ import com.github.gradle.node.npm.task.NpxTask
 plugins {
     id("wolkenschloss.conventions.java")
     id("com.github.node-gradle.node")
+    id("java-library")
 }
 
 node {
@@ -12,7 +13,7 @@ node {
     npmInstallCommand.set("ci")
 }
 
-val destination = file("$buildDir/classes/java/main/META-INF/resources")
+val destination = file("$buildDir/classes/java/main/META-INF/resources/")
 
 sourceSets {
     main {
