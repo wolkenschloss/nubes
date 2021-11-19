@@ -19,6 +19,7 @@ jobs:
     steps:
       - name: "Show Properties"
         run: |
+          echo "GITHUB_REF $GITHUB_REF"
           echo "GITHUB_REF_NAME $GITHUB_REF_NAME"
           echo "GITHUB_SHA $GITHUB_SHA"
 #      - uses: actions/checkout@v2
