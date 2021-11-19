@@ -26,6 +26,9 @@ quarkus:
         level: ERROR
   arc:
     exclude-types: familie.haschka.wolkenschloss.cookbook.testing.*
+  config:
+    locations:
+      - project.properties
 "%prod":
    quarkus:
      mongodb:

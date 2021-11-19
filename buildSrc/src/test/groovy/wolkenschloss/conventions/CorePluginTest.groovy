@@ -23,6 +23,7 @@ class CorePluginTest extends Specification {
         srcFile = new File(testProjectDir, "src/main/java/CodeWithJava11.java")
         srcFile.parentFile.mkdirs()
 
+
         setup: "create gradle project"
         settingsFile << "rootProject.name = 'hello-world'"
 
@@ -32,6 +33,18 @@ class CorePluginTest extends Specification {
           id 'wolkenschloss.conventions.core'
         }
         """
+    }
+
+    private void initGitRepositoryWithTag(String tag) {
+        git("init")
+        git("add .")
+        git("commit -m 'initial'")
+        git("tag -a $tag -m 'message'")
+    }
+
+    private int git(String cmd) {
+        def process = "git $cmd".execute(null, testProjectDir)
+        return process.waitFor()
     }
 
     def "Unit tests can use the JUnit 5 framework"() {
@@ -49,6 +62,7 @@ class CorePluginTest extends Specification {
                 }
             }
         """
+        initGitRepositoryWithTag("v1.0")
 
         when: "running gradle :test task"
         def result = GradleRunner.create()
@@ -56,6 +70,8 @@ class CorePluginTest extends Specification {
         .withArguments("test")
         .withPluginClasspath()
         .build()
+
+        println result.output
 
         then: "the outcome of task :test is SUCCESS"
         result.task(':test').outcome == TaskOutcome.SUCCESS
@@ -72,6 +88,7 @@ class CorePluginTest extends Specification {
                 }
             }
         """
+        initGitRepositoryWithTag("v1.0")
 
         when: "running gradle build"
         def result = GradleRunner.create()
@@ -90,6 +107,7 @@ class CorePluginTest extends Specification {
             package wolkenschloss.cookbook.core;
             record MinMax(int min, int max) {}
         """
+        initGitRepositoryWithTag("v1.0")
 
         when: "running gradle build"
         def result = GradleRunner.create()
@@ -100,6 +118,47 @@ class CorePluginTest extends Specification {
 
         then: "build failed"
         result.task(':compileJava').outcome == TaskOutcome.SUCCESS
+    }
 
+    def "build with tagged git repository should contain git tag in project.properties"() {
+        given: "a git project with tag"
+        initGitRepositoryWithTag("v1.0")
+
+        when: "running gradle build"
+        def result = GradleRunner.create()
+        .withProjectDir(testProjectDir)
+        .withArguments("classes")
+        .withPluginClasspath()
+        .build()
+
+        def properties = readProperties("build/resources/main/project.properties")
+
+        then: "project.properties contains git tag"
+        result.task(":projectProperties").outcome == TaskOutcome.SUCCESS
+        println result.output
+        properties."project.version" == "v1.0"
+    }
+
+    def "build without git repository should fail"() {
+        when: "running gradle build"
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("build")
+                .withPluginClasspath()
+                .buildAndFail()
+
+        then:
+        result.task(":projectProperties").outcome == TaskOutcome.FAILED
+    }
+
+    Properties readProperties(String path) {
+        def properties = new Properties()
+        def file =  new File(testProjectDir, path)
+
+        file.withDataInputStream {
+            properties.load(it)
+        }
+
+        return  properties
     }
 }

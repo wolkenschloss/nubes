@@ -1,2 +1,10 @@
-package family.haschka.wolkenschloss.cookbook;public interface Project {
+package family.haschka.wolkenschloss.cookbook;
+
+import io.smallrye.config.ConfigMapping;
+
+@ConfigMapping(prefix = "project")
+public interface Project {
+    String version();
+    String name();
+    String group();
 }
