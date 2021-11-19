@@ -34,7 +34,11 @@ val quarkusPluginVersion: String by project
 val quarkusPluginArtifactId: String by project
 
 dependencies {
-    implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}")
+    implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
+        // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
+        exclude(group = "org.jboss.slf4j", module = "slf4j-jboss-logmanager")
+    }
+
     implementation("com.github.node-gradle:gradle-node-plugin:3.1.0")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")
