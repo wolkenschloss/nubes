@@ -2,10 +2,15 @@ package wolkenschloss.conventions
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.TempDir
 
 class CorePluginTest extends Specification {
+
+    public static final String PROJECT_PROPERTIES_FILE = "build/resources/main/project.properties"
+    public static final String SHA = "ffac537e6cbbf934b08745a378932722df287a53"
+    public static final String REF = "refs/heads/feature-branch-1"
 
     @TempDir File testProjectDir
     File settingsFile
@@ -13,6 +18,7 @@ class CorePluginTest extends Specification {
     File testFile
     File srcFile
 
+    @SuppressWarnings('unused')
     def setup() {
         settingsFile = new File(testProjectDir, 'settings.gradle')
         buildFile = new File(testProjectDir, 'build.gradle')
@@ -120,6 +126,7 @@ class CorePluginTest extends Specification {
         result.task(':compileJava').outcome == TaskOutcome.SUCCESS
     }
 
+    @Ignore("issue: #180, not yet implemented")
     def "build with tagged git repository should contain git tag in project.properties"() {
         given: "a git project with tag"
         initGitRepositoryWithTag("v1.0")
@@ -131,7 +138,7 @@ class CorePluginTest extends Specification {
         .withPluginClasspath()
         .build()
 
-        def properties = readProperties("build/resources/main/project.properties")
+        def properties = readProperties(PROJECT_PROPERTIES_FILE)
 
         then: "project.properties contains git tag"
         result.task(":projectProperties").outcome == TaskOutcome.SUCCESS
@@ -148,7 +155,26 @@ class CorePluginTest extends Specification {
                 .buildAndFail()
 
         then:
-        result.task(":projectProperties").outcome == TaskOutcome.FAILED
+        result.tasks == []
+    }
+
+    def "build without git repository should not fail if environment variables are set"() {
+
+        when: "running gradle build"
+
+         def result = GradleRunner.create()
+                .withProjectDir(testProjectDir)
+                .withArguments("build")
+                .withEnvironment(["GITHUB_SHA": SHA, "GITHUB_REF": REF])
+                .withPluginClasspath()
+                .build()
+        def properties = readProperties(PROJECT_PROPERTIES_FILE)
+        println result.output
+
+        then:
+        result.task(":projectProperties").outcome == TaskOutcome.SUCCESS
+        properties."project.sha" == SHA
+        properties."project.ref" == REF
     }
 
     Properties readProperties(String path) {

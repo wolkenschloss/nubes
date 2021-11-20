@@ -16,7 +16,7 @@ java {
     }
 }
 
-val gitDescribe =  {
+val gitDescribe by lazy {
     val stdout = ByteArrayOutputStream()
     rootProject.exec {
         workingDir(projectDir)
@@ -26,6 +26,32 @@ val gitDescribe =  {
 
     stdout.toString(StandardCharsets.UTF_8).trim()
 }
+
+val gitBranch by lazy {
+    val stdout = ByteArrayOutputStream()
+    rootProject.exec {
+        workingDir(projectDir)
+        commandLine("git", "branch", "--show-current")
+        standardOutput = stdout
+    }
+
+    stdout.toString(StandardCharsets.UTF_8).trim()
+}
+
+val gitSha by lazy {
+    val stdout = ByteArrayOutputStream()
+    rootProject.exec {
+        workingDir(projectDir)
+        commandLine("git", "rev-parse", "HEAD")
+        standardOutput = stdout
+    }
+
+    stdout.toString(StandardCharsets.UTF_8).trim()
+}
+
+fun getenv(name: String, default: () -> String): String {
+    return System.getenv(name) ?: default()
+};
 
 tasks {
     val projectProperties by registering(WriteProperties::class) {
@@ -38,7 +64,9 @@ tasks {
         properties(mapOf(
                 "project.name" to project.name,
                 "project.group" to project.group,
-                "project.version" to gitDescribe // that's deferred
+                "project.version" to project.version,
+                "project.sha" to getenv("GITHUB_SHA") { gitSha },
+                "project.ref" to getenv("GITHUB_REF") { gitBranch }
         ))
     }
 

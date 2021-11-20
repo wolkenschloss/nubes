@@ -19,5 +19,6 @@ public class StartService {
 
     void printVersion(@Observes StartupEvent event) {
         log.info("Starting {} {} {}", project.group(), project.name(), project.version());
+        log.info("ref {} sha {}", project.ref(), project.sha());
     }
 }
