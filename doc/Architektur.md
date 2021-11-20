@@ -79,6 +79,13 @@ gewählt und erhöht werden. Mit einer von Anfang an einheitlichen Vergabe der
 Versionsnummern wird das professionelle Arbeiten im Team unterstützt. Es
 gibt keine Auseinandersetzung bezüglich der Versionsnummern.
 
+##### Git Branches
+
+[Wolkenschloss] verwendet [GitFlow].
+
+* Verringert den Aufwand, ein eigenes Branch Modell zu entwickeln.
+* Ist ein bekanntes und gut dokumentiertes Vorgehen.
+
 ##### Lizenz
 
 Die Software wird unter der Apache 2.0 Lizenz bereitgestellt.
@@ -122,4 +129,4 @@ Du brauchst:
 [GitHub]: https://github.com/
 [Konventionelle Commits]: https://www.conventionalcommits.org/de/v1.0.0/
 [Semantic Versioning]: https://semver.org/lang/de/
-
+[GitFlow]: https://nvie.com/posts/a-successful-git-branching-model/
