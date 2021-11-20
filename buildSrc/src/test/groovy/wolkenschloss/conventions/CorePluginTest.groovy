@@ -3,6 +3,7 @@ package wolkenschloss.conventions
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -146,6 +147,7 @@ class CorePluginTest extends Specification {
         properties."project.version" == "v1.0"
     }
 
+    @IgnoreIf({env.CI})
     def "build without git repository should fail"() {
         when: "running gradle build"
         def result = GradleRunner.create()
