@@ -17,7 +17,7 @@ class WebappPluginTest extends Specification {
        assert new File(testProjectDir, "build").deleteDir()
     }
 
-    def "build task should build jar file"() {
+    def "build task should create jar file"() {
         when: "running gradle :build task"
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir)
@@ -36,7 +36,7 @@ class WebappPluginTest extends Specification {
         jar.exists()
     }
 
-    def "run unit and e2e task when calling check"() {
+    def "check task should run unit and e2e tasks"() {
         when: "running gradle :check task"
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir)
