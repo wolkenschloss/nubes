@@ -187,6 +187,7 @@ Mit Pull Requests können in GitHub Actions ausgelöst werden. Wolkenschloss
 verwendet Actions für den Continuous Integration (CI) Build. Dazu werden
 einige Schritte in GitFlow durch entsprechende Pull Requests ersetzt:
 
+0. create new branch from develop
 1. [Incorporating a finished feature on develop]
     * PR: origin/develop <- origin/feature-branch
     * Squash and merge
