@@ -180,6 +180,30 @@ der Webanwendung benötigt.
 
 ### Arbeitsabläufe
 
+#### GitFlow und Pull Request
+
+GitFlow berücksichtigt nicht die Arbeitsabläufe in Zusammenhang mit GitHub.
+Mit Pull Requests können in GitHub Actions ausgelöst werden. Wolkenschloss
+verwendet Actions für den Continuous Integration (CI) Build. Dazu werden
+einige Schritte in GitFlow durch entsprechende Pull Requests ersetzt:
+
+1. [Incorporating a finished feature on develop]  
+   PR: origin/develop <- origin/feature-branch
+2. [Creating a release branch]  
+   ```bash
+   git checkout -b release-* origin/develop
+   change build.gradle.kts
+   git commit -a -m "bump: version *"
+   ```
+3. [Finishing a release branch]  
+   PR: origin/master <- origin/release-* (fast-forwarded)  
+   ```bash
+   git checkout master  
+   git pull
+   git tag v*  
+   git push --tags
+6. PR: origin/develop <- origin/master
+
 #### Issues bearbeiten
 
 1. Ein Issue im Projekt in den Status *in progress* setzen.
@@ -247,3 +271,7 @@ Dokumentation zu den Build Badges in GitHub:
 [npm]: https://www.npmjs.com/
 [vue]: https://v3.vuejs.org/
 [gea]: https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address#setting-your-commit-email-address-in-git
+
+[Incorporating a finished feature on develop]: https://nvie.com/posts/a-successful-git-branching-model/#incorporating-a-finished-feature-on-develop
+[Creating a release branch]: https://nvie.com/posts/a-successful-git-branching-model/#creating-a-release-branch
+[Finishing a release branch]: https://nvie.com/posts/a-successful-git-branching-model/#finishing-a-release-branch
