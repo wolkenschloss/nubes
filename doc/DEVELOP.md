@@ -187,22 +187,37 @@ Mit Pull Requests können in GitHub Actions ausgelöst werden. Wolkenschloss
 verwendet Actions für den Continuous Integration (CI) Build. Dazu werden
 einige Schritte in GitFlow durch entsprechende Pull Requests ersetzt:
 
-1. [Incorporating a finished feature on develop]  
-   PR: origin/develop <- origin/feature-branch
-2. [Creating a release branch]  
+1. [Incorporating a finished feature on develop]
+    * PR: origin/develop <- origin/feature-branch
+    * Squash and merge
+2. [Creating a release branch]
    ```bash
+   # Remote Branches > origin/develop > New Branch from Selected...
    git checkout -b release-* origin/develop
    change build.gradle.kts
+   # Commit > Commit and Push...
    git commit -a -m "bump: version *"
    ```
 3. [Finishing a release branch]  
-   PR: origin/master <- origin/release-* (fast-forwarded)  
-   ```bash
-   git checkout master  
+   * PR: origin/master <- origin/release-* 
+   * Squash and merge
+   * Create version tag on master:
+   ```bash   
+   # Local Branches > master > Checkout
+   git checkout master
+   # Update Project (Ctrl-T)
    git pull
-   git tag v*  
+   # New Tag
+   git tag v*
+   # Push (Ctrl-Shift-K)
    git push --tags
-6. PR: origin/develop <- origin/master
+4. Github: [Create new release](https://github.com/wolkenschloss/nubes/releases/new)
+   * Choose a tag
+   * [ ] This is a pre-release
+   * Publish release
+5. PR: origin/develop <- origin/release-*
+6. `git checkout -b nubes-* origin/develop` ?
+
 
 #### Issues bearbeiten
 
