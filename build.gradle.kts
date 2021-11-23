@@ -16,5 +16,5 @@ buildscript {
 
 allprojects {
     group = "family.haschka.nubes"
-    version = "v0.0.6"
+    version = "v0.0.7"
 }
