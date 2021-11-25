@@ -1,6 +1,3 @@
-import java.io.ByteArrayOutputStream
-import java.nio.charset.StandardCharsets
-
 plugins {
     java
 }
@@ -16,43 +13,6 @@ java {
     }
 }
 
-val gitDescribe by lazy {
-    val stdout = ByteArrayOutputStream()
-    rootProject.exec {
-        workingDir(projectDir)
-        commandLine("git", "describe", "--tags")
-        standardOutput = stdout
-    }
-
-    stdout.toString(StandardCharsets.UTF_8).trim()
-}
-
-val gitBranch by lazy {
-    val stdout = ByteArrayOutputStream()
-    rootProject.exec {
-        workingDir(projectDir)
-        commandLine("git", "branch", "--show-current")
-        standardOutput = stdout
-    }
-
-    stdout.toString(StandardCharsets.UTF_8).trim()
-}
-
-val gitSha by lazy {
-    val stdout = ByteArrayOutputStream()
-    rootProject.exec {
-        workingDir(projectDir)
-        commandLine("git", "rev-parse", "HEAD")
-        standardOutput = stdout
-    }
-
-    stdout.toString(StandardCharsets.UTF_8).trim()
-}
-
-fun getenv(name: String, default: () -> String): String {
-    return System.getenv(name) ?: default()
-};
-
 tasks {
     val projectProperties by registering(WriteProperties::class) {
         group = "other"
@@ -65,9 +25,15 @@ tasks {
                 "project.name" to project.name,
                 "project.group" to project.group,
                 "project.version" to project.version,
-                "project.sha" to getenv("GITHUB_SHA") { gitSha },
-                "project.ref" to getenv("GITHUB_REF") { gitBranch }
         ))
+
+        project.findProperty("vcs.commit")?.apply {
+            property("vcs.commit", this)
+        }
+
+        project.findProperty("vcs.ref")?.apply {
+            property("vcs.ref", this)
+        }
     }
 
     processResources {

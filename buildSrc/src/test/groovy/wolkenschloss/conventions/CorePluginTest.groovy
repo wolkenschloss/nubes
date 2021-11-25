@@ -10,7 +10,7 @@ import spock.lang.TempDir
 class CorePluginTest extends Specification {
 
     public static final String PROJECT_PROPERTIES_FILE = "build/resources/main/project.properties"
-    public static final String SHA = "ffac537e6cbbf934b08745a378932722df287a53"
+    public static final String COMMIT_ID = "ffac537e6cbbf934b08745a378932722df287a53"
     public static final String REF = "refs/heads/feature-branch-1"
 
     @TempDir File testProjectDir
@@ -18,6 +18,7 @@ class CorePluginTest extends Specification {
     File buildFile
     File testFile
     File srcFile
+    File propertiesFile
 
     @SuppressWarnings('unused')
     def setup() {
@@ -30,9 +31,20 @@ class CorePluginTest extends Specification {
         srcFile = new File(testProjectDir, "src/main/java/CodeWithJava11.java")
         srcFile.parentFile.mkdirs()
 
+        propertiesFile = new File(testProjectDir, "gradle.properties")
 
         setup: "create gradle project"
-        settingsFile << "rootProject.name = 'hello-world'"
+        settingsFile << """
+            rootProject.name = 'core-plugin-test'
+        """
+
+        propertiesFile << """
+            # Defaults
+            version = 999-SNAPSHOT
+            group = family.haschka.wolkenschloss.conventions
+            vcs.commit = unspecified
+            vcs.ref = unspecified            
+        """
 
         given: "a build file using core-conventions Plugin"
         buildFile << """
@@ -40,18 +52,6 @@ class CorePluginTest extends Specification {
           id 'wolkenschloss.conventions.core'
         }
         """
-    }
-
-    private void initGitRepositoryWithTag(String tag) {
-        git("init")
-        git("add .")
-        git("commit -m 'initial'")
-        git("tag -a $tag -m 'message'")
-    }
-
-    private int git(String cmd) {
-        def process = "git $cmd".execute(null, testProjectDir)
-        return process.waitFor()
     }
 
     def "Unit tests can use the JUnit 5 framework"() {
@@ -69,7 +69,6 @@ class CorePluginTest extends Specification {
                 }
             }
         """
-        initGitRepositoryWithTag("v1.0")
 
         when: "running gradle :test task"
         def result = GradleRunner.create()
@@ -95,7 +94,6 @@ class CorePluginTest extends Specification {
                 }
             }
         """
-        initGitRepositoryWithTag("v1.0")
 
         when: "running gradle build"
         def result = GradleRunner.create()
@@ -114,7 +112,6 @@ class CorePluginTest extends Specification {
             package wolkenschloss.cookbook.core;
             record MinMax(int min, int max) {}
         """
-        initGitRepositoryWithTag("v1.0")
 
         when: "running gradle build"
         def result = GradleRunner.create()
@@ -127,56 +124,48 @@ class CorePluginTest extends Specification {
         result.task(':compileJava').outcome == TaskOutcome.SUCCESS
     }
 
-    @Ignore("issue: #180, not yet implemented")
     def "build with tagged git repository should contain git tag in project.properties"() {
-        given: "a git project with tag"
-        initGitRepositoryWithTag("v1.0")
 
-        when: "running gradle build"
+        when: "running gradle build with project property version"
         def result = GradleRunner.create()
         .withProjectDir(testProjectDir)
-        .withArguments("classes")
+        .withArguments("classes", "--project-prop", "version=v1.0")
         .withPluginClasspath()
         .build()
 
         def properties = readProperties(PROJECT_PROPERTIES_FILE)
 
-        then: "project.properties contains git tag"
+        then: "project.properties file contains project version"
         result.task(":projectProperties").outcome == TaskOutcome.SUCCESS
         println result.output
         properties."project.version" == "v1.0"
     }
 
-    @IgnoreIf({env.CI})
-    def "build without git repository should fail"() {
-        when: "running gradle build"
-        def result = GradleRunner.create()
-                .withProjectDir(testProjectDir)
-                .withArguments("build")
-                .withPluginClasspath()
-                .buildAndFail()
 
-        then:
-        result.tasks == []
-    }
-
-    def "build without git repository should not fail if environment variables are set"() {
+    def "build should process vcs information"() {
 
         when: "running gradle build"
 
          def result = GradleRunner.create()
                 .withProjectDir(testProjectDir)
-                .withArguments("build")
-                .withEnvironment(["GITHUB_SHA": SHA, "GITHUB_REF": REF])
+                .withArguments("build",
+                        "--project-prop", "vcs.commit=$COMMIT_ID",
+                        "--project-prop", "vcs.ref=$REF",
+                        "--project-prop", "version=123")
                 .withPluginClasspath()
                 .build()
-        def properties = readProperties(PROJECT_PROPERTIES_FILE)
+
         println result.output
+        def properties = readProperties(PROJECT_PROPERTIES_FILE)
+        println properties
 
         then:
         result.task(":projectProperties").outcome == TaskOutcome.SUCCESS
-        properties."project.sha" == SHA
-        properties."project.ref" == REF
+        properties."vcs.commit" == COMMIT_ID
+        properties."vcs.ref" == REF
+        properties."project.version" == "123"
+        properties."project.group" == "family.haschka.wolkenschloss.conventions"
+        properties."project.name" == "core-plugin-test"
     }
 
     Properties readProperties(String path) {
