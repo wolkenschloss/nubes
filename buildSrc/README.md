@@ -1,3 +1,9 @@
+# Running Tests in buildSrc
+
+```java
+:test --tests "wolkenschloss.conventions.CorePluginTest" -p buildSrc
+```
+
 # Webapp Convention Plugin
 
 Mit dem *Webapp Convention Plugin* werden die auf [npm] basierenden 

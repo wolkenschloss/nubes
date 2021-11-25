@@ -14,7 +14,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,7 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-all-
       - name: Build with Gradle
-        run: gradle build
+        run: gradle build -i --project-prop vcs.commit=$GITHUB_SHA
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
