@@ -13,8 +13,3 @@ buildscript {
         classpath("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}")
     }
 }
-
-allprojects {
-    group = "family.haschka.nubes"
-    version = "v0.0.7"
-}
