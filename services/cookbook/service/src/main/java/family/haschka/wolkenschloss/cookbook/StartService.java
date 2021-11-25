@@ -21,5 +21,6 @@ public class StartService {
     void printVersion(@Observes StartupEvent event) {
         log.infov("Starting {0}:{1}:{2}", project.group(), project.name(), project.version());
         vcs.commit().ifPresent(commit -> log.infov("Version Control System - Commit: {0}", commit));
+        vcs.ref().ifPresent(ref -> log.infov("Version Control System - Ref {0}", ref));
     }
 }
