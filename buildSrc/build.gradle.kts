@@ -6,6 +6,19 @@ buildscript {
         gradlePluginPortal()
         mavenCentral()
     }
+
+//    plugins {
+//        groovy
+//        `kotlin-dsl`
+//        `java-gradle-plugin`
+//        java
+//    }
+//    val quarkusPluginVersion: String by project
+//    val quarkusPluginArtifactId: String by project
+
+//    dependencies {
+//        classpath("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}")
+//    }
 }
 
 plugins {
@@ -15,9 +28,11 @@ plugins {
     java
 }
 
+val JAVA_VERSION = 8
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(11))
         vendor.set(JvmVendorSpec.ADOPTOPENJDK)
     }
 }
