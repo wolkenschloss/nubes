@@ -15,9 +15,18 @@ plugins {
     java
 }
 
+val JAVA_VERSION = JavaLanguageVersion.of(11)
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JAVA_VERSION)
+        vendor.set(JvmVendorSpec.ADOPTOPENJDK)
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JAVA_VERSION)
         vendor.set(JvmVendorSpec.ADOPTOPENJDK)
     }
 }
@@ -41,17 +50,16 @@ val quarkusPluginVersion: String by project
 val quarkusPluginArtifactId: String by project
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
     implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
         exclude(group = "org.jboss.slf4j", module = "slf4j-jboss-logmanager")
     }
-
     implementation("com.github.node-gradle:gradle-node-plugin:3.1.0")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.libvirt:libvirt:0.5.2")
     implementation("net.java.dev.jna:jna:5.8.0")
     implementation("com.google.cloud.tools:jib-core:0.19.0")
-
     implementation("com.jayway.jsonpath:json-path:2.6.0")
 
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0") {
