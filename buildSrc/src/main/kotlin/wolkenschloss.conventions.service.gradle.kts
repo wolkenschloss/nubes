@@ -69,4 +69,5 @@ dependencies {
     integrationTestImplementation("org.junit.jupiter:junit-jupiter-api")
     integrationTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     integrationTestImplementation("io.quarkus:quarkus-junit5")
+    integrationTestImplementation("io.rest-assured:rest-assured")
 }
