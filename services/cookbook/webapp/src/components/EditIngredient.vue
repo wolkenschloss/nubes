@@ -83,10 +83,13 @@ export default {
   },
   watch: {
     search: {
-      async handler(val) {
-        await this.$store.commit('ingredients/setFilter', val)
+      handler: debounce(async function(value) {
+        console.log(`debounced search: ${value}`)
+        await this.$store.commit('ingredients/setFilter', value)
         await this.load()
-      },
+      }, 500),
+      // async handler(val) {
+      // },
       deep: true
     }
   },
