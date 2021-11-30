@@ -20,7 +20,7 @@ val integrationTestRuntimeOnly: Configuration by configurations.getting {
 }
 
 tasks {
-    val integrationTest by register<Test>("integrationTest") {
+    val integrationTest by registering(Test::class) {
         description = "Runs integration tests."
         group = "verification"
         dependsOn("assemble")
@@ -47,7 +47,7 @@ tasks {
         }
     }
     check {
-        dependsOn(integrationTest)
+        dependsOn(integrationTest.get())
     }
 }
 
@@ -69,4 +69,5 @@ dependencies {
     integrationTestImplementation("org.junit.jupiter:junit-jupiter-api")
     integrationTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     integrationTestImplementation("io.quarkus:quarkus-junit5")
+    integrationTestImplementation("io.rest-assured:rest-assured")
 }
