@@ -88,25 +88,14 @@ export default {
         await this.$store.commit('ingredients/setFilter', value)
         await this.load()
       }, 500),
-      // async handler(val) {
-      // },
       deep: true
     }
   },
   mounted() {
     this.$store.commit("ingredients/setPagination", {page: 1, itemsPerPage: 5})
-    // this.$store.commit("ingredients/setFilter", "")
   },
   computed: {
     ...mapGetters('ingredients', ['toc', 'total']),
-    // search: {
-    //   // get() {
-    //   //   return this.$store.getters['ingredients/filter']
-    //   // },
-    //   set: debounce(async function(value) {
-    //     await this.$store.commit('ingredients/setFilter', value)
-    //   }, 500)
-    // }
   },
   methods: {
     ...mapActions('ingredients', ["queryIngredients"]),
