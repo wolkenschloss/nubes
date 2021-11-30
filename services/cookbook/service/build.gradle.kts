@@ -26,7 +26,6 @@ dependencies {
     integrationTestImplementation("org.testcontainers:mockserver")
     integrationTestImplementation("org.testcontainers:junit-jupiter")
     integrationTestImplementation("org.mock-server:mockserver-client-java:5.5.4")
-    integrationTestImplementation("io.rest-assured:rest-assured:4.4.0")
     integrationTestImplementation("com.github.tomakehurst:wiremock-jre8:2.29.1")
     integrationTestImplementation("org.awaitility:awaitility:4.1.0")
 }
