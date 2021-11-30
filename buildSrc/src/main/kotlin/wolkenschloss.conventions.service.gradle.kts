@@ -20,7 +20,7 @@ val integrationTestRuntimeOnly: Configuration by configurations.getting {
 }
 
 tasks {
-    val integrationTest by register<Test>("integrationTest") {
+    val integrationTest by registering(Test::class) {
         description = "Runs integration tests."
         group = "verification"
         dependsOn("assemble")
@@ -47,7 +47,7 @@ tasks {
         }
     }
     check {
-        dependsOn(integrationTest)
+        dependsOn(integrationTest.get())
     }
 }
 
