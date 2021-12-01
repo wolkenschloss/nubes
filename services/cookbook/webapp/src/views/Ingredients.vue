@@ -80,6 +80,7 @@ export default {
       view_mode: 0
     }
   },
+
   computed: {
     ...mapGetters('ingredients', ['toc', 'total']),
     pagination: {

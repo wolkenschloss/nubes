@@ -4,26 +4,44 @@
       <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" ></v-text-field>
     </v-col>
     <v-col cols="3">
-      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged">
+      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged" ref="editName">
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
         </template>
       </v-select>
     </v-col>
     <v-col>
-      <v-text-field dense label="Ingredient" persistent-hint v-model="value.name" :rules="nameRules" required ref="editName">
-      </v-text-field>
+      <v-combobox dense
+                  :rules="nameRules"
+                      :loading="loading"
+                      label="Ingredient"
+                      v-model="value.name"
+                      :items="toc"
+                      :search-input.sync="search"
+                      no-filter
+                      hide-no-data
+                      item-text="name"
+                      item-value="name"
+                      :return-object="false"
+      >
+      </v-combobox>
     </v-col>
   </v-row>
 </template>
 <script>
+
+// https://en.wikibooks.org/wiki/Cookbook:Units_of_measurement
+import { debounce } from "lodash";
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
   name: "EditIngredient",
   props: ['value'],
   data() {
     return {
-      // https://en.wikibooks.org/wiki/Cookbook:Units_of_measurement
+      loading: false,
+      search: null,
+      items: [],
       units: [
 
         {header: "Volumes"},
@@ -63,7 +81,29 @@ export default {
       ]
     }
   },
+  watch: {
+    search: {
+      handler: debounce(async function(value) {
+        console.log(`debounced search: ${value}`)
+        await this.$store.commit('ingredients/setFilter', value)
+        await this.load()
+      }, 500),
+      deep: true
+    }
+  },
+  mounted() {
+    this.$store.commit("ingredients/setPagination", {page: 1, itemsPerPage: 5})
+  },
+  computed: {
+    ...mapGetters('ingredients', ['toc', 'total']),
+  },
   methods: {
+    ...mapActions('ingredients', ["queryIngredients"]),
+    async load() {
+      this.loading = true
+      await this.queryIngredients()
+      this.loading = false
+    },
     unitChanged() {
       this.$refs.editQuantity.validate(true);
     },
