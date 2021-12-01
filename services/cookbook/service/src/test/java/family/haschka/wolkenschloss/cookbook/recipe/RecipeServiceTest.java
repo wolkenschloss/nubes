@@ -16,6 +16,9 @@ import org.opentest4j.AssertionFailedError;
 import javax.inject.Inject;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
 public class RecipeServiceTest {
@@ -49,21 +52,6 @@ public class RecipeServiceTest {
         subscriber.assertCompleted().assertItem(RecipeFixture.LASAGNE.withId(id));
 
         Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(id);
-    }
-
-    enum GetScaledRecipeTestcase {
-        LASAGNE(RecipeFixture.LASAGNE.get(), new Servings(5), RecipeFixture.LASAGNE.get().scale(new Servings(5))),
-        CHILI(RecipeFixture.CHILI_CON_CARNE.get(), null, RecipeFixture.CHILI_CON_CARNE.get());
-
-        private final Recipe recipe;
-        private final Servings servings;
-        private final Recipe expected;
-
-        GetScaledRecipeTestcase(Recipe recipe, Servings servings, Recipe expected) {
-            this.recipe = recipe;
-            this.servings = servings;
-            this.expected = expected;
-        }
     }
 
     @ParameterizedTest
@@ -104,8 +92,6 @@ public class RecipeServiceTest {
         Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(anotherId);
     }
 
-
-
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     public void deleteShouldReturnResult(boolean value) {
@@ -135,8 +121,63 @@ public class RecipeServiceTest {
     }
 
     @Test
+    @DisplayName("'list' should calculate recent updates")
+    public void calculateRecentUpdate() {
+
+        var recipes = Stream.of(
+                        RecipeFixture.LASAGNE.withId(UUID.randomUUID()),
+                        RecipeFixture.CHILI_CON_CARNE.withId(UUID.randomUUID()))
+                .toList();
+
+        RecipeQuery query = Mockito.mock(RecipeQuery.class);
+        RecipeQuery page = Mockito.mock(RecipeQuery.class);
+
+
+        Mockito.when(query.count())
+                .thenReturn(Uni.createFrom().item((long) recipes.size()));
+
+        Mockito.when(recipeRepository.findAll(any()))
+                .thenReturn(query);
+
+        Mockito.when(query.range(0, 10))
+                .thenReturn(page);
+
+        Mockito.when(page.list())
+                .thenReturn(Uni.createFrom().item(recipes));
+
+        var result = subjectUnderTest.list(0, 10, "");
+
+        var expected = new TableOfContents(
+                (long) recipes.size(),
+                recipes.stream().map(recipe -> new Summary(recipe.recipeId, recipe.title)).toList()
+        );
+
+        result.subscribe().withSubscriber(UniAssertSubscriber.create())
+                .assertCompleted()
+                .assertItem(expected);
+
+
+        Mockito.verify(recipeRepository, Mockito.times(1)).findAll(any());
+    }
+
+    @Test
     @DisplayName("'save' can throw exception")
     public void testCanThrowException() {
 
+    }
+
+    enum GetScaledRecipeTestcase {
+        LASAGNE(RecipeFixture.LASAGNE.get(), new Servings(5), RecipeFixture.LASAGNE.get().scale(new Servings(5))),
+        CHILI(RecipeFixture.CHILI_CON_CARNE.get(), null, RecipeFixture.CHILI_CON_CARNE.get());
+
+        private final Recipe recipe;
+        private final Servings servings;
+        private final Recipe expected;
+
+        GetScaledRecipeTestcase(Recipe recipe, Servings servings, Recipe expected) {
+            this.recipe = recipe;
+            this.servings = servings;
+            this.expected = expected;
+        }
     }
 }

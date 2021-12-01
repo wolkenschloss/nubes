@@ -29,7 +29,7 @@ public class CreatorService {
 
     public Uni<Recipe> save(Recipe recipe) {
         recipe.recipeId = identityGenerator.generate();
-        recipe.created = timeService.now();
+        recipe.created = timeService.now().toInstant().toEpochMilli();
         return recipeRepository.persist(recipe)
                 .onItem().invoke(this::lookupIngredients);
     }

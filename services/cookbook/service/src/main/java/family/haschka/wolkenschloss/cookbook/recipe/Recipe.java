@@ -15,7 +15,7 @@ public class Recipe {
     public String preparation;
     public ArrayList<Ingredient> ingredients = new ArrayList<>();
     public Servings servings;
-    public ZonedDateTime created;
+    public Long created;
 
     protected Recipe() {
         this(null, null);
