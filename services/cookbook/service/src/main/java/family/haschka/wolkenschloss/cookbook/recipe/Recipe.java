@@ -2,6 +2,7 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,6 +15,7 @@ public class Recipe {
     public String preparation;
     public ArrayList<Ingredient> ingredients = new ArrayList<>();
     public Servings servings;
+    public ZonedDateTime created;
 
     protected Recipe() {
         this(null, null);

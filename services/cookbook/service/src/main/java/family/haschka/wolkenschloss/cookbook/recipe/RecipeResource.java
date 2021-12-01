@@ -38,7 +38,6 @@ public class RecipeResource {
         return service.list(from, to, search);
     }
 
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
