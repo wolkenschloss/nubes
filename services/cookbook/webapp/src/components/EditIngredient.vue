@@ -4,7 +4,7 @@
       <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" ></v-text-field>
     </v-col>
     <v-col cols="3">
-      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged">
+      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged" ref="editName">
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
         </template>
@@ -12,6 +12,7 @@
     </v-col>
     <v-col>
       <v-combobox dense
+                  :rules="nameRules"
                       :loading="loading"
                       label="Ingredient"
                       v-model="value.name"
@@ -19,7 +20,6 @@
                       :search-input.sync="search"
                       no-filter
                       hide-no-data
-                      hide-details
                       item-text="name"
                       item-value="name"
                       :return-object="false"
