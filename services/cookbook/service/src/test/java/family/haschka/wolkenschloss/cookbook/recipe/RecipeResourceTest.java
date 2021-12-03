@@ -9,6 +9,7 @@ import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
 import io.smallrye.mutiny.Uni;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;
 import static org.hamcrest.Matchers.equalTo;
@@ -65,8 +65,8 @@ public class RecipeResourceTest {
     void searchTest() throws URISyntaxException, MalformedURLException {
 
         var recipes = new ArrayList<Summary>();
-        recipes.add(new Summary(UUID.randomUUID(), "Blaukraut"));
-        var toc = new TableOfContents(1, recipes);
+        recipes.add(new Summary(ObjectId.get().toHexString(), "Blaukraut"));
+        var toc = new TableOfContents(0, recipes);
 
         Mockito.when(service.list(0, 4, null))
                 .thenReturn(Uni.createFrom().item(toc));
@@ -85,6 +85,7 @@ public class RecipeResourceTest {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("content.size()", is(recipes.size()));
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(service, Mockito.times(1)).list(0, 4, null);
     }
 
@@ -93,7 +94,7 @@ public class RecipeResourceTest {
     void postRecipeTest() {
 
         var recipe = RecipeFixture.LASAGNE.get();
-        var id = UUID.randomUUID();
+        var id = ObjectId.get().toHexString();
         recipe.servings = new Servings(1);
 
         Mockito.when(creator.save(recipe))
@@ -108,10 +109,11 @@ public class RecipeResourceTest {
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .header("Location", response -> {
-                    var expected = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
+                    var expected = UriBuilder.fromUri(url.toURI()).path(id).build();
                     return equalTo(expected.toString());
                 });
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(creator, Mockito.times(1)).save(recipe);
         Mockito.verifyNoMoreInteractions(service);
         Mockito.verifyNoMoreInteractions(creator);
@@ -120,10 +122,10 @@ public class RecipeResourceTest {
     @Test
     @DisplayName("GET /recipe/{id}")
     public void getRecipe() throws URISyntaxException {
-        var recipe = RecipeFixture.LASAGNE.withId(UUID.randomUUID());
-        var query = UriBuilder.fromUri(url.toURI()).path(recipe.recipeId.toString()).build();
+        var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
+        var query = UriBuilder.fromUri(url.toURI()).path(recipe._id.toString()).build();
 
-        Mockito.when(service.get(recipe.recipeId, Optional.empty()))
+        Mockito.when(service.get(recipe._id.toHexString(), Optional.empty()))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         System.out.println(RecipeFixture.LASAGNE.asJson(jsonb));
@@ -135,13 +137,14 @@ public class RecipeResourceTest {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body(is(jsonb.toJson(recipe)));
 
-        Mockito.verify(service, Mockito.times(1)).get(recipe.recipeId, Optional.empty());
+        //noinspection ReactiveStreamsUnusedPublisher
+        Mockito.verify(service, Mockito.times(1)).get(recipe._id.toHexString(), Optional.empty());
     }
 
     @Test
     @DisplayName("DELETE /recipe/{id}")
     public void deleteRecipe() throws URISyntaxException {
-        var id = UUID.randomUUID();
+        var id = ObjectId.get();
         var query = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
         RestAssured.given()
                 .when()
@@ -149,14 +152,15 @@ public class RecipeResourceTest {
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-        Mockito.verify(service, Mockito.times(1)).delete(id);
+        //noinspection ReactiveStreamsUnusedPublisher
+        Mockito.verify(service, Mockito.times(1)).delete(id.toHexString());
     }
 
     @Test
     @DisplayName("PUT /recipe/{id}")
     public void putRecipe() throws URISyntaxException {
-        var recipe = RecipeFixture.LASAGNE.withId(UUID.randomUUID());
-        var query = UriBuilder.fromUri(url.toURI()).path(recipe.recipeId.toString()).build();
+        var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
+        var query = UriBuilder.fromUri(url.toURI()).path(recipe._id.toString()).build();
 
         RestAssured.given()
                 .body(recipe, ObjectMapperType.JSONB)
@@ -167,6 +171,7 @@ public class RecipeResourceTest {
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(service, Mockito.times(1)).update(recipe);
     }
 }

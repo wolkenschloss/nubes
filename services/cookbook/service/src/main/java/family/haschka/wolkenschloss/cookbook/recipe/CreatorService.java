@@ -2,6 +2,7 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 
 import family.haschka.wolkenschloss.cookbook.ingredient.IngredientRequiredEvent;
 import io.smallrye.mutiny.Uni;
+import org.bson.types.ObjectId;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
@@ -12,30 +13,27 @@ public class CreatorService {
 
     private final RecipeRepository recipeRepository;
     private final IdentityGenerator identityGenerator;
-    private final TimeService timeService;
     private final Emitter<IngredientRequiredEvent> emitter;
 
     public CreatorService(
             RecipeRepository recipeRepository,
             IdentityGenerator identityGenerator,
-            TimeService systemTimeService,
             @Channel("ingredient-required") Emitter<IngredientRequiredEvent> emitter) {
 
         this.recipeRepository = recipeRepository;
         this.identityGenerator = identityGenerator;
-        this.timeService = systemTimeService;
         this.emitter = emitter;
     }
 
     public Uni<Recipe> save(Recipe recipe) {
-        recipe.recipeId = identityGenerator.generate();
-        recipe.created = timeService.now().toInstant().toEpochMilli();
+       recipe._id = new ObjectId(identityGenerator.generateObjectId());
         return recipeRepository.persist(recipe)
+                .log("persisted")
                 .onItem().invoke(this::lookupIngredients);
     }
 
     private void lookupIngredients(Recipe recipe) {
         recipe.ingredients.forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe.recipeId, ingredient.name)));
+                emitter.send(new IngredientRequiredEvent(recipe._id.toHexString(), ingredient.name)));
     }
 }

@@ -18,7 +18,7 @@ const getters = {
 const actions = {
     async scaleIngredients({commit, state}, servings) {
         console.log(`Action scaleIngredients(${servings}`)
-        let url = `/recipe/${state.recipe.recipeId}?servings=${servings}`
+        let url = `/recipe/${state.recipe._id}?servings=${servings}`
         const response = await axios.get(url)
         commit('setRecipe', response.data)
         commit('setServings', servings)
@@ -39,7 +39,7 @@ const actions = {
     },
     async saveRecipe({commit, state}) {
         console.log('Action saveRecipe()')
-        let url = "/recipe/" + state.recipe.recipeId;
+        let url = "/recipe/" + state.recipe._id;
         await axios.put(url, state.copy)
         commit('setRecipe', state.copy)
         commit('setServings', state.copy.servings)
@@ -55,7 +55,7 @@ const actions = {
         console.log((`Action cancelEdit()`))
         commit('setCopy', state.recipe)
     },
-    newRecipe({commit, state}) {
+    newRecipe({commit}) {
         console.log("Action newRecipe()")
         commit('setRecipe', {ingredients: [], servings: 1})
         commit('setCopy', {ingredients: [], servings: 1})

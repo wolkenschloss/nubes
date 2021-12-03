@@ -3,31 +3,20 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.Optional;
-import java.util.UUID;
 
 @Path("/recipe")
 public class RecipeResource {
 
     @Inject
     RecipeService service;
-
+    @Inject
+    CreatorService creator;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -46,19 +35,16 @@ public class RecipeResource {
                 .log("saved")
                 .map(r -> {
                     var location = uriInfo.getAbsolutePathBuilder()
-                            .path(r.recipeId.toString())
+                            .path(r._id.toString())
                             .build();
                     return Response.created(location).entity(r).build();
                 });
     }
 
-    @Inject
-    CreatorService creator;
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    public Uni<Recipe> get(@PathParam("id") UUID id, @QueryParam("servings") Integer servings) {
+    public Uni<Recipe> get(@PathParam("id") String id, @QueryParam("servings") Integer servings) {
         return service.get(id, Optional.ofNullable(servings).map(Servings::new))
                 .map(or -> or.orElseThrow(NotFoundException::new));
     }
@@ -66,7 +52,7 @@ public class RecipeResource {
     @DELETE
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> delete(@PathParam("id") UUID id) {
+    public Uni<Response> delete(@PathParam("id") String id) {
         return service.delete(id)
                 .map(success -> Response.noContent().build());
     }

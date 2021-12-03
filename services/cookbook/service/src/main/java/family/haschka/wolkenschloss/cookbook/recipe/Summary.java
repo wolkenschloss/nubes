@@ -1,13 +1,12 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class Summary {
-    public UUID recipeId;
+    public String recipeId;
     public String title;
 
-    public Summary(UUID recipeId, String title) {
+    public Summary(String recipeId, String title) {
         this.recipeId = recipeId;
         this.title = title;
     }

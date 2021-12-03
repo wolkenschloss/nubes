@@ -24,14 +24,13 @@
           Dismiss
         </v-btn>
       </v-card-actions>
-
-
     </v-card>
   </v-dialog>
 </template>
 
 <script>
 import axios from "axios";
+import {mapActions} from 'vuex'
 
 export default {
   name: "ImportDialog",
@@ -44,12 +43,14 @@ export default {
     }
   },
   methods: {
+    ...mapActions('toc', ['queryRecipes']),
     async importRecipe() {
       this.loading = true;
       const job = {order: this.url}
       try {
         const response = await axios.post("/job", job)
         await this.getJobResult(response.headers['location'])
+        await this.queryRecipes();
       } catch (error) {
         console.log(error)
       }
@@ -57,11 +58,12 @@ export default {
       this.loading = false
     },
 
+    // That's evil.
     async getJobResult(location) {
       try {
         console.log(`getJobResult(${location})`)
         const response = await axios.get(location)
-        if (response.data.status === "IN_PROGRESS") {
+        if (response.data.state === "CREATED") {
           console.log("job in progress")
           setTimeout(async () => {
             console.log("await recursive call")
@@ -72,7 +74,8 @@ export default {
           this.loading = false
           this.error = response.data.error
           if (!response.data.error) {
-            console.log(`New Recipe added at ${response.data.url}`)
+            console.log(`New Recipe added at ${response.data.location}`)
+            await this.queryRecipes()
             this.dialog = false
             this.url = null
           }
@@ -85,9 +88,7 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>
-
 </style>
