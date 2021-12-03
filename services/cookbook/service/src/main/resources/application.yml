@@ -25,7 +25,7 @@ quarkus:
       "io.quarkus.deployment.**":
         level: ERROR
   arc:
-    exclude-types: familie.haschka.wolkenschloss.cookbook.testing.*
+    exclude-types: familie.haschka.wolkenschloss.cookbook.testing.*,*Testcase,ThrowingConsumer,*Fixture,*Test$*
   config:
     locations:
       - project.properties

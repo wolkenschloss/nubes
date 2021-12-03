@@ -4,6 +4,8 @@ import family.haschka.wolkenschloss.cookbook.recipe.RationalDeserializer;
 import family.haschka.wolkenschloss.cookbook.recipe.RationalSerializer;
 import family.haschka.wolkenschloss.cookbook.recipe.ServingsDeserializer;
 import family.haschka.wolkenschloss.cookbook.recipe.ServingsSerializer;
+import io.quarkus.mongodb.panache.jsonb.ObjectIdDeserializer;
+import io.quarkus.mongodb.panache.jsonb.ObjectIdSerializer;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -41,8 +43,15 @@ public class Serialization {
         };
 
         var config = new JsonbConfig()
-                .withDeserializers(new ServingsDeserializer(), new RationalDeserializer(), new UriDeserializer())
-                .withSerializers(new ServingsSerializer(), new RationalSerializer())
+                .withDeserializers(
+                        new ServingsDeserializer(),
+                        new RationalDeserializer(),
+                        new UriDeserializer(),
+                        new ObjectIdDeserializer())
+                .withSerializers(
+                        new ServingsSerializer(),
+                        new RationalSerializer(),
+                        new ObjectIdSerializer())
                 .withNullValues(true)
                 .withPropertyVisibilityStrategy(visibilityStrategy);
 

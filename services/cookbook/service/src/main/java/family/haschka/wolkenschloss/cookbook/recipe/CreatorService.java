@@ -2,6 +2,7 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 
 import family.haschka.wolkenschloss.cookbook.ingredient.IngredientRequiredEvent;
 import io.smallrye.mutiny.Uni;
+import org.bson.types.ObjectId;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
@@ -25,13 +26,14 @@ public class CreatorService {
     }
 
     public Uni<Recipe> save(Recipe recipe) {
-        recipe.recipeId = identityGenerator.generate();
+       recipe._id = new ObjectId(identityGenerator.generateObjectId());
         return recipeRepository.persist(recipe)
+                .log("persisted")
                 .onItem().invoke(this::lookupIngredients);
     }
 
     private void lookupIngredients(Recipe recipe) {
         recipe.ingredients.forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe.recipeId, ingredient.name)));
+                emitter.send(new IngredientRequiredEvent(recipe._id.toHexString(), ingredient.name)));
     }
 }

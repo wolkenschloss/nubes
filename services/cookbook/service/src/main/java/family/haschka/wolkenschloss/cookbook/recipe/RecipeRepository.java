@@ -1,11 +1,11 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoRepositoryBase;
+import org.bson.types.ObjectId;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.UUID;
 
 @ApplicationScoped
-public class RecipeRepository implements ReactivePanacheMongoRepositoryBase<Recipe, UUID> {
+public class RecipeRepository implements ReactivePanacheMongoRepositoryBase<Recipe, ObjectId> {
 }
 
