@@ -1,9 +1,9 @@
 package family.haschka.wolkenschloss.cookbook.ingredient;
 
-import io.quarkus.mongodb.panache.reactive.ReactivePanacheQuery;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
+import org.bson.types.ObjectId;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +18,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 
 public class IngredientServiceTest {
 
@@ -60,8 +58,10 @@ public class IngredientServiceTest {
                 .assertItem(ingredient);
 
         Mockito.verify(identityGenerator, Mockito.times(1)).generate();
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(repository, Mockito.times(1)).persist(ingredient);
         Mockito.verify(repository, Mockito.times(1)).find("name like ?1", ingredient.getName());
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(query, Mockito.times(1)).firstResultOptional();
     }
 
@@ -84,6 +84,7 @@ public class IngredientServiceTest {
                 .assertItem(ingredient);
 
         Mockito.verify(repository, Mockito.times(1)).find("name like ?1", ingredient.getName());
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(query, Mockito.times(1)).firstResultOptional();
     }
 
@@ -150,8 +151,10 @@ public class IngredientServiceTest {
                         ArgumentMatchers.any(Sort.class),
                         eq(testcase.search));
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(query, Mockito.times(1)).count();
         Mockito.verify(query, Mockito.times(1)).range(testcase.first, testcase.last);
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(range, Mockito.times(1)).list();
 
         Mockito.verifyNoMoreInteractions(query);
@@ -193,8 +196,10 @@ public class IngredientServiceTest {
                         .map(Sort.Column::getName).anyMatch(name -> name.equals("name"))
                         && sort.getColumns().size() == 1));
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(query, Mockito.times(1)).count();
         Mockito.verify(query, Mockito.times(1)).range(testcase.first, testcase.last);
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(range, Mockito.times(1)).list();
 
         Mockito.verifyNoMoreInteractions(repository);
@@ -206,7 +211,7 @@ public class IngredientServiceTest {
     @DisplayName("should create ingredient if required ingredient is unknown")
     public void onIngredientRequired() {
 
-        var recipeId = UUID.randomUUID();
+        var recipeId = ObjectId.get().toHexString();
         var ingredientId = UUID.randomUUID();
         var entity = IngredientFixture.FLOUR.withId(ingredientId);
 
@@ -227,8 +232,10 @@ public class IngredientServiceTest {
                 .assertTerminated();
 
         Mockito.verify(identityGenerator, Mockito.times(1)).generate();
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(repository, Mockito.times(1)).persist(entity);
         Mockito.verify(repository, Mockito.times(1)).find("name like ?1", entity.getName());
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(query, Mockito.times(1)).firstResultOptional();
     }
 

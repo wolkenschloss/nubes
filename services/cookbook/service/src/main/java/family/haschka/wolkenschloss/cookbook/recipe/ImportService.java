@@ -3,12 +3,7 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
-import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Message;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.reactive.messaging.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.core.UriBuilder;
@@ -22,8 +17,8 @@ public class ImportService {
 
     public ImportService(
             CreatorService creator,
-            DataSource dataSource, @Channel("import-failed")
-            Emitter<ImportRecipeFailedEvent> emitter) {
+            DataSource dataSource,
+            @Channel("import-failed") Emitter<ImportRecipeFailedEvent> emitter) {
 
         this.creator = creator;
         this.dataSource = dataSource;
@@ -38,7 +33,7 @@ public class ImportService {
         return event.onItem().transformToUniAndMerge(e ->
                 service.grab(dataSource, e.getPayload())
                         .chain(creator::save)
-                        .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe.recipeId))
+                        .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe._id))
                         .map(location -> new RecipeImportedEvent(e.getPayload().jobId(), location))
                         .call(x -> Uni.createFrom().completionStage(e.ack()))
                         .map(e::withPayload)

@@ -30,7 +30,7 @@ public class RecipeAdapterFromJsonObject implements JsonbAdapter<Recipe, JsonObj
         var servings = obj.getInt("recipeYield", 1);
 
        Recipe recipe = new Recipe(name, preparation);
-       recipe.recipeId = null;
+       recipe._id = null;
        recipe.servings = new Servings(servings);
 
        if (obj.containsKey("recipeIngredient")) {

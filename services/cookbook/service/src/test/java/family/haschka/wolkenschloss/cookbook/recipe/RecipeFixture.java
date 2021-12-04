@@ -1,7 +1,9 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.smallrye.mutiny.Uni;
+import org.bson.types.ObjectId;
 
+import javax.enterprise.inject.Vetoed;
 import javax.json.bind.Jsonb;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.Optional;
 
 public enum RecipeFixture {
 
@@ -27,12 +30,16 @@ public enum RecipeFixture {
 
     public URI getRecipeSource() throws URISyntaxException {
         var uri = this.getClass().getClassLoader().getResource(resource);
-        return uri.toURI();
+        return Objects.requireNonNull(uri).toURI();
     }
 
-    public Recipe withId(UUID id) {
+    public Recipe withId() {
+        return withId(ObjectId.get().toHexString());
+    }
+
+    public Recipe withId(String id) {
         var recipeWithId = new Recipe(this.recipe.title, this.recipe.preparation);
-        recipeWithId.recipeId = id;
+        recipeWithId._id = Optional.ofNullable(id).map(ObjectId::new).orElse(null);
         recipeWithId.servings = recipe.servings;
         recipeWithId.ingredients = new ArrayList<>(recipe.ingredients);
 

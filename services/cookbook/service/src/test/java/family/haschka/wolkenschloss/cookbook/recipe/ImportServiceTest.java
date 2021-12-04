@@ -4,6 +4,7 @@ import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.helpers.test.AssertSubscriber;
+import org.bson.types.ObjectId;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.junit.jupiter.api.AfterEach;
@@ -46,10 +47,10 @@ public class ImportServiceTest {
 
     static Stream<Testcase> createTestcases() {
         return Arrays.stream(RecipeFixture.values())
-                .map(fixture -> new Testcase(fixture, UUID.randomUUID(), UUID.randomUUID()));
+                .map(fixture -> new Testcase(fixture, ObjectId.get().toHexString(), UUID.randomUUID()));
     }
 
-    record Testcase(RecipeFixture fixture, UUID recipeId, UUID jobId) {
+    record Testcase(RecipeFixture fixture, String recipeId, UUID jobId) {
 
         private URI expectedLocation() {
             return UriBuilder.fromUri("/recipe/{id}").build(recipeId);
@@ -95,9 +96,11 @@ public class ImportServiceTest {
                 .awaitCompletion()
                 .assertItems(new RecipeImportedEvent(testcase.jobId(), testcase.expectedLocation()));
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(creator, Mockito.times(1))
                         .save(testcase.fixture.get());
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(dataSource, Mockito.times(1))
                 .extract(eq(testcase.source()), any());
     }
@@ -123,6 +126,7 @@ public class ImportServiceTest {
         Mockito.verify(nack, Mockito.times(1))
                         .apply(failure);
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(dataSource, Mockito.times(1))
                 .extract(eq(testcase.source()), any());
 
@@ -155,9 +159,11 @@ public class ImportServiceTest {
         Mockito.verify(nack, Mockito.times(1))
                         .apply(failure);
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(creator, Mockito.times(1))
                 .save(testcase.fixture.get());
 
+        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(dataSource, Mockito.timeout(1000).times(1))
                 .extract(eq(testcase.source()), any());
 

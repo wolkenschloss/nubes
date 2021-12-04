@@ -4,12 +4,7 @@ import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import javax.json.Json;
@@ -20,13 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.withArgs;
@@ -36,6 +25,13 @@ import static org.hamcrest.Matchers.greaterThan;
 @QuarkusIntegrationTest
 @DisplayName("Recipe CRUD Operations")
 public class RecipeTest {
+
+    private static Set<String> mergeSet(Set<String> a, Set<String> b) {
+        Set<String> result = new HashSet<>();
+        Stream.of(a, b).forEach(result::addAll);
+
+        return result;
+    }
 
     @Test
     public void checkDefaultHttpPort() {
@@ -64,22 +60,8 @@ public class RecipeTest {
                 .when()
                 .post(getUrl())
                 .then()
-                
-                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
-    }
 
-    public record PostRecipeTestcase(String name, String fixture, int status,
-                                     ThrowingConsumer<ValidatableResponse> assertions) {
-        public PostRecipeTestcase(
-                String name,
-                String fixture,
-                int status,
-                @SuppressWarnings("CdiInjectionPointsInspection") ThrowingConsumer<ValidatableResponse> assertions) {
-            this.name = name;
-            this.fixture = fixture;
-            this.status = status;
-            this.assertions = assertions;
-        }
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @TestFactory
@@ -90,7 +72,7 @@ public class RecipeTest {
                         "fixtures/schlammkrabbeneintopf.json",
                         Response.Status.CREATED.getStatusCode(),
                         response -> response.contentType(ContentType.JSON)
-                                .header("Location", r -> equalTo(getUrl() + "/" + r.path("recipeId")))
+                                .header("Location", r -> equalTo(getUrl() + "/" + r.path("_id")))
                                 .body("title", equalTo("Schlammkrabbeneintopf"))),
 
                 // TODO: Es wäre schön, wenn der Fehler als JSON Objekt und nicht als HTML zurückkäme.
@@ -107,23 +89,6 @@ public class RecipeTest {
                         .post(getUrl())
                         .then()
                         .statusCode(testcase.status))));
-    }
-
-    public static class GetRecipeTestcase {
-
-        public GetRecipeTestcase(
-                String name,
-                String recipeId,
-                @SuppressWarnings("CdiInjectionPointsInspection")
-                        ThrowingConsumer<ValidatableResponse> assertions) {
-            this.name = name;
-            this.recipeId = recipeId;
-            this.assertions = assertions;
-        }
-
-        String name;
-        String recipeId;
-        ThrowingConsumer<ValidatableResponse> assertions;
     }
 
     @TestFactory
@@ -296,14 +261,13 @@ public class RecipeTest {
         // POST /recipe valid data
         return RestAssured
                 .given()
-                
                 .body(str)
                 .contentType(ContentType.JSON)
                 .when()
                 .post(getUrl())
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
-                .header("Location", response -> equalTo(getUrl() + "/" + response.path("recipeId")));
+                .header("Location", response -> equalTo(getUrl() + "/" + response.path("_id")));
     }
 
     private String location(ValidatableResponse response) {
@@ -311,7 +275,7 @@ public class RecipeTest {
     }
 
     private String recipeId(ValidatableResponse response) {
-        return response.extract().path("recipeId");
+        return response.extract().path("_id");
     }
 
     private String readFixture(String resourceFileName) throws URISyntaxException, IOException {
@@ -325,10 +289,22 @@ public class RecipeTest {
         return Files.readString(file.toPath());
     }
 
-    private static Set<String> mergeSet(Set<String> a, Set<String> b) {
-        Set<String> result = new HashSet<>();
-        Stream.of(a, b).forEach(result::addAll);
+    record PostRecipeTestcase(String name, String fixture, int status,
+                                     ThrowingConsumer<ValidatableResponse> assertions) {
+    }
 
-        return result;
+    public static class GetRecipeTestcase {
+        String name;
+        String recipeId;
+        ThrowingConsumer<ValidatableResponse> assertions;
+        public GetRecipeTestcase(
+                String name,
+                String recipeId,
+                @SuppressWarnings("CdiInjectionPointsInspection")
+                        ThrowingConsumer<ValidatableResponse> assertions) {
+            this.name = name;
+            this.recipeId = recipeId;
+            this.assertions = assertions;
+        }
     }
 }

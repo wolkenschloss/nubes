@@ -11,7 +11,8 @@ const routes = [
     },
     props: {
       default: route => ({first: route.query.first || 0, last: route.query.last || 4})
-    }
+    },
+    name: "contents"
   },
   {
     name: "details",

@@ -13,7 +13,6 @@ public class WebappTest {
     public void webappShouldLoad() {
         RestAssured.given().when().get("/")
                 .then()
-                .log().all()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 }

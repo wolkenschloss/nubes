@@ -69,7 +69,6 @@ public class JobTest {
                             .given()
                             .body(testcase.job())
                             .contentType(ContentType.JSON)
-                            .log().all()
                             .when()
                             .post(job)
                             .then()
@@ -88,7 +87,6 @@ public class JobTest {
                                             .when()
                                             .get(location)
                                             .then()
-                                            .log().all()
                                             .statusCode(Response.Status.OK.getStatusCode())));
                 }));
     }
@@ -98,8 +96,9 @@ public class JobTest {
             String filename,
             ThrowingConsumer<ValidatableResponse> assertion) {
 
+        // z.B. /recipe/61aa3fe8537e6c3885e6816a
         private static final Pattern locationPattern = Pattern.compile(
-                "/recipe/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}");
+                "/recipe/[a-f0-9]{24}");
 
         static private void success(ValidatableResponse assertion) {
             assertion
