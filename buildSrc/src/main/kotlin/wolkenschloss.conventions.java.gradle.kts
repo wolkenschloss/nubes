@@ -1,6 +1,3 @@
-import java.io.ByteArrayOutputStream
-import java.nio.charset.StandardCharsets
-
 plugins {
     java
 }
@@ -41,5 +38,12 @@ tasks {
 
     processResources {
         from(projectProperties)
+    }
+
+    withType(JavaCompile::class) {
+        options.compilerArgs.add("-Xlint:deprecation,unchecked")
+//        options.compilerArgs.add("-Xlint:unchecked")
+//        options.compilerArgs.add("-deprecation")
+        options.compilerArgs.add("-Werror")
     }
 }
