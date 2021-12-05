@@ -5,6 +5,7 @@ import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 
 public class RationalCodecProvider implements CodecProvider  {
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
         if (clazz == Rational.class) {
