@@ -4,16 +4,19 @@ import io.quarkus.test.common.DevServicesContext;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.mockserver.Version;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.HashMap;
+import java.util.AbstractMap;
 import java.util.Map;
 
 public class MockServerResource implements QuarkusTestResourceLifecycleManager, DevServicesContext.ContextAware {
 
-    private static final DockerImageName IMAGE_NAME = DockerImageName.parse("jamesdbloom/mockserver");
-    private static final String IMAGE_TAG = "mockserver-5.5.4";
+    private static final Logger logger = Logger.getLogger(MockServerResource.class);
+
+    private static final DockerImageName IMAGE_NAME = DockerImageName.parse("mockserver/mockserver");
+    private static final String IMAGE_TAG = String.format("mockserver-%s", Version.getVersion());
 
     public static final String SERVER_HOST_CONFIG = "mockserver.server.host";
     public static final String SERVER_PORT_CONFIG = "mockserver.server.port";
@@ -21,10 +24,8 @@ public class MockServerResource implements QuarkusTestResourceLifecycleManager, 
     public static final String CLIENT_PORT_CONFIG = "mockserver.client.port";
 
     private static final String ALIAS = "mockserver";
-    private static final Logger logger = Logger.getLogger(MockServerResource.class);
 
     private MockServerContainer mockServerContainer = null;
-    private final HashMap<String, String> config = new HashMap<>();
 
     @Override
     public void setIntegrationTestContext(DevServicesContext context) {
@@ -32,8 +33,6 @@ public class MockServerResource implements QuarkusTestResourceLifecycleManager, 
                 .map(ContainerNetwork::new)
                 .map(this::container)
                 .orElseGet(this::container);
-
-        context.containerNetworkId().ifPresent(id -> logger.infov("container network id: {0}", id));
     }
 
     private MockServerContainer container(ContainerNetwork network) {
@@ -54,12 +53,12 @@ public class MockServerResource implements QuarkusTestResourceLifecycleManager, 
         logger.infov("starting mockserver");
         this.mockServerContainer.start();
 
-        config.put(CLIENT_HOST_CONFIG, "localhost");
-        config.put(CLIENT_PORT_CONFIG, mockServerContainer.getServerPort().toString());
-        config.put(SERVER_HOST_CONFIG, host());
-        config.put(SERVER_PORT_CONFIG, port().toString());
-
-        return config;
+        return Map.ofEntries(
+                new AbstractMap.SimpleEntry<>(CLIENT_HOST_CONFIG, "localhost"),
+                new AbstractMap.SimpleEntry<>(CLIENT_PORT_CONFIG, mockServerContainer.getServerPort().toString()),
+                new AbstractMap.SimpleEntry<>(SERVER_HOST_CONFIG, host()),
+                new AbstractMap.SimpleEntry<>(SERVER_PORT_CONFIG, port().toString())
+        );
     }
 
     private String host() {
@@ -91,5 +90,4 @@ public class MockServerResource implements QuarkusTestResourceLifecycleManager, 
             mockServerContainer = null;
         }
     }
-
 }

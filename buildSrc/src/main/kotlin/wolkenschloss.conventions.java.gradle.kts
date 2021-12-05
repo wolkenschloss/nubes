@@ -42,8 +42,6 @@ tasks {
 
     withType(JavaCompile::class) {
         options.compilerArgs.add("-Xlint:deprecation,unchecked")
-//        options.compilerArgs.add("-Xlint:unchecked")
-//        options.compilerArgs.add("-deprecation")
         options.compilerArgs.add("-Werror")
     }
 }
