@@ -3,6 +3,7 @@ plugins {
     id("idea")
 }
 
+val mockServerVersion = "5.11.2"
 
 dependencies {
     implementation("io.quarkus:quarkus-container-image-docker")
@@ -24,7 +25,7 @@ dependencies {
     integrationTestImplementation("org.testcontainers:mongodb")
     integrationTestImplementation("org.testcontainers:mockserver")
     integrationTestImplementation("org.testcontainers:junit-jupiter")
-    integrationTestImplementation("org.mock-server:mockserver-client-java:5.5.4")
+    integrationTestImplementation("org.mock-server:mockserver-client-java:${mockServerVersion}")
     integrationTestImplementation("com.github.tomakehurst:wiremock-jre8:2.29.1")
     integrationTestImplementation("org.awaitility:awaitility:4.1.0")
 }
