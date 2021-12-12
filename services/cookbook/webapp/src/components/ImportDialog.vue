@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="560px">
     <template v-slot:activator="{on, attrs}">
-      <v-btn text v-bind="attrs" v-on="on">Import Recipe</v-btn>
+      <v-btn text v-bind="attrs" v-on="on" accesskey="i">Import Recipe</v-btn>
     </template>
     <v-card>
       <v-card-title>

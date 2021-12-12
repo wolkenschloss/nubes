@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <v-toolbar elevation="0">
-      <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="change" v-bind:value="copy" v-on:cancel="newRecipe">
-        <template v-slot:activator="{on, attrs}">
-          <v-btn v-on="on" v-bind="attrs" color="secondary">New Recipe</v-btn>
-        </template>
+      <v-btn color="secondary" v-shortcut="'n'" @click="edit({ingredients: [], servings: 1})">
+        New Recipe
+      </v-btn>
+      <edit fab-icon="mdi-plus" title="New Recipe" @change="change" v-bind:value.sync="copy" @cancel="edit(null)">
       </edit>&nbsp;
-      <import-dialog/>
+      <import-dialog/>&nbsp;
       <v-text-field v-model="search"
                     append-icon="mdi-magnify"
                     label="Search"
@@ -32,13 +32,23 @@
 <script>
 
 import Edit from "@/views/Edit";
-import { debounce } from "lodash";
-import { mapActions, mapGetters } from 'vuex'
+import {debounce} from "lodash";
+import {mapActions, mapGetters} from 'vuex'
 import ImportDialog from "@/components/ImportDialog";
 
 export default {
   name: 'Contents',
   components: {ImportDialog, Edit},
+  directives: {
+    shortcut: {
+      bind(el, binding) {
+        console.log(`binding shortcut ${binding.value}`)
+      },
+      unbind(el, binding) {
+        console.log(`unbinding shortcut ${binding.value}`)
+      }
+    }
+  },
   watch: {
     pagination: {
       async handler() {
@@ -55,6 +65,7 @@ export default {
   },
   computed: {
     ...mapGetters('toc', ['toc', 'total']),
+
     copy: {
       get() {
         return this.$store.getters['recipe/copy']
@@ -91,9 +102,16 @@ export default {
   created() {
     this.newRecipe()
   },
+  mounted() {
+    console.log("Mounted")
+  },
+
   methods: {
     ...mapActions('toc', ["updateQuery", "queryRecipes"]),
-    ...mapActions('recipe', ["newRecipe", 'createRecipe']),
+    ...mapActions('recipe', ["newRecipe", 'createRecipe', 'edit']),
+    klicki() {
+      console.log("Keyboard ALT gedrückt.")
+    },
     async load() {
       this.loading = true
       await this.queryRecipes()
@@ -102,8 +120,10 @@ export default {
     onItemClick(item) {
       this.$router.push({name: 'details', params: {id: item['recipeId']}})
     },
-    change() {
-      this.createRecipe()
+    async change(recipe) {
+      console.log(`contents change: ${JSON.stringify(recipe)}`)
+      this.edit(null)
+      await this.createRecipe(recipe)
       this.newRecipe()
       this.queryRecipes()
     }
