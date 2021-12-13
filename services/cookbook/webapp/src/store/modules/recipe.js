@@ -13,20 +13,18 @@ const state = () => ({
 const getters = {
     recipe: (state) => state.recipe,
     copy: (state) => state.copy,
-    servings: (state) => state.servings || state.recipe.servings,
+    servings: (state) => state.servings || (state.recipe && state.recipe.servings) || null,
     ingredients: (state) => state.ingredients
 }
 
 const actions = {
     async scaleIngredients({commit, state}, servings) {
-        console.log(`Action scaleIngredients(${servings}`)
         let url = `/recipe/${state.recipe._id}?servings=${servings}`
         const response = await axios.get(url)
         commit('setServings', servings)
         commit('setIngredients', response.data.ingredients)
     },
     async loadRecipe({commit, state}, id) {
-        console.log(`Action loadRecipe(${id})`)
         let url = "/recipe/" + id
         const response = await axios.get(url)
         commit('setRecipe', response.data)
@@ -34,13 +32,11 @@ const actions = {
         commit('setIngredients', response.data.ingredients)
     },
     async deleteRecipe({commit, state}, id) {
-        console.log(`Action deleteRecipe(${id})`)
         let url = "/recipe/" + id
         await axios.delete(url)
         router.push("/")
     },
     async saveRecipe({commit, state}, recipe) {
-        console.log(`action recipe save: ${JSON.stringify(recipe)}`)
         let url = "/recipe/" + recipe._id;
         await axios.put(url, recipe)
         commit('setRecipe', recipe)
@@ -49,40 +45,41 @@ const actions = {
         commit('setCopy', null)
     },
     async createRecipe({commit, state}, recipe) {
-        console.log(`action recipe create: ${JSON.stringify(recipe)}`)
         let url = "/recipe"
         const result = await axios.post(url, recipe)
-        commit('setRecipe', result)
+        commit('setRecipe', result.data)
     },
     async cancelEdit({commit, state}) {
-        console.log((`Action cancelEdit()`))
         commit('setCopy', null)
     },
     newRecipe({commit}) {
-        console.log("Action newRecipe()")
-        commit('setRecipe', {ingredients: [], servings: 1})
+        // commit('setRecipe', {ingredients: [], servings: 1})
+        commit('setRecipe', null)
+        commit('setCopy', null)
     },
     async edit({commit, state}, recipe) {
-        console.log(`action recipe edit: ${JSON.stringify(recipe)}`)
         commit('setCopy', recipe)
+        // commit('setRecipe', recipe)
+    },
+    async create({commit, state}, recipe) {
+        let url = "/recipe"
+        await axios.post(url, recipe)
+        commit('setCopy', null) // Close Dialog
+        this.dispatch("toc/queryRecipes", {}, {root: true})
     }
 }
 
 const mutations = {
     setRecipe(state, recipe) {
-        console.log(`Mutation setRecipe(${JSON.stringify(recipe)})`)
         Vue.set(state, 'recipe', cloneDeep(recipe))
     },
     setCopy(state, copy) {
-        console.log(`Mutation setCopy(${JSON.stringify(copy)})`)
         Vue.set(state, 'copy', cloneDeep(copy))
     },
     setServings(state, servings) {
-        console.log(`Mutation setServings(${servings})`)
         state.servings = servings
     },
     setIngredients(state, ingredients) {
-        console.log(`mutation recipe setIngredients(${JSON.stringify(ingredients)}`)
         state.ingredients = ingredients
     }
 }

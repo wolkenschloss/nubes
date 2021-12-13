@@ -3,11 +3,9 @@ import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
 import store from './store'
-import VueHotkey from 'v-hotkey'
 
 Vue.config.productionTip = true
-Vue.use(VueHotkey)
-
+Vue.use(require('vue-shortkey'))
 new Vue({
   router,
   vuetify,

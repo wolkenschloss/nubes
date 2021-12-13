@@ -1,8 +1,12 @@
 <template>
-  <v-dialog role="dialog" scrollable max-width="560px" v-model="dialog" :fullscreen="$vuetify.breakpoint.mobile" @click:outside="closeDialog">
+  <v-dialog role="dialog" scrollable max-width="560px"
+            v-model="dialog"
+            :fullscreen="$vuetify.breakpoint.mobile"
+            @click:outside="close"
+            @keydown.esc="close">
     <v-card class="fab-container" height="560px" v-if="value">
       <v-toolbar>
-        <v-btn icon @click="closeDialog">
+        <v-btn icon @click="close">
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -128,6 +132,7 @@ export default {
       },
       set(value) {
         console.log(`edit: set dialog(${JSON.stringify(value)})`)
+        // this.value = null
       }
     }
   },
@@ -144,8 +149,9 @@ export default {
     }
   },
   methods: {
-    closeDialog() {
-      this.$emit('cancel')
+    close() {
+      console.log(`edit.vue close dialog`)
+      this.$emit('cancel', null)
     },
     save() {
       this.$emit('change', this.value)
