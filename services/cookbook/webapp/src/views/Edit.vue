@@ -127,12 +127,10 @@ export default {
     },
     dialog: {
       get() {
-        console.log(`edit: get dialog=${JSON.stringify(this.value)}`)
         return this.value !== null
       },
       set(value) {
-        console.log(`edit: set dialog(${JSON.stringify(value)})`)
-        // this.value = null
+        // ???
       }
     }
   },
@@ -151,10 +149,10 @@ export default {
   methods: {
     close() {
       console.log(`edit.vue close dialog`)
-      this.$emit('cancel', null)
+      this.$emit('input', null)
     },
     save() {
-      this.$emit('change', this.value)
+      this.$emit('input', this.value)
     },
     addIngredient() {
       console.info("add ingredient")

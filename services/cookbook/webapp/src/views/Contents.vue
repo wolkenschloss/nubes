@@ -5,12 +5,11 @@
       <v-btn color="secondary"  @click="edit({ingredients: [], servings: 1})">
         New Recipe
       </v-btn>
-      <edit fab-icon="mdi-plus" title="New Recipe"
-            @input="input"
-            @change="create"
-            v-bind:value.sync="copy"
-            @cancel="edit">
-      </edit>&nbsp;
+<!--      @change="create"-->
+<!--      @cancel="edit"-->
+<!--      v-bind:value.sync="copy"-->
+<!--      @input="input"-->
+      <edit fab-icon="mdi-plus" title="New Recipe" v-model:value="recipe" />&nbsp;
       <import-dialog/>&nbsp;
 <!--      v-shortcut:focus="['ctrl', 'f']"-->
       <v-text-field v-model="search"
@@ -120,13 +119,17 @@ export default {
   computed: {
     ...mapGetters('toc', ['toc', 'total']),
 
-    copy: {
+    recipe: {
       get() {
         return this.$store.getters['recipe/copy']
       },
       set(value) {
-        console.log(`contents set copy ${value}`)
-        this.$store.commit('recipe/setCopy', value)
+        console.log(`!!!! contents set copy ${JSON.stringify(value)}`)
+        if(value) {
+          this.create(value)
+        }
+        this.edit(null)
+        // this.$store.commit('recipe/setCopy', value)
       }
     },
     pagination: {
@@ -173,16 +176,16 @@ export default {
     onItemClick(item) {
       this.$router.push({name: 'details', params: {id: item['recipeId']}})
     },
-    async change(recipe) {
-      console.log(`contents change: ${JSON.stringify(recipe)}`)
-      this.edit(null)
-      await this.createRecipe(recipe)
-      this.newRecipe()
-      this.queryRecipes()
-    },
-    input(param) {
-      console.log(`contents input: ${JSON.stringify(param)}`)
-    }
+    // async change(recipe) {
+    //   console.log(`contents change: ${JSON.stringify(recipe)}`)
+    //   this.edit(null)
+    //   await this.createRecipe(recipe)
+    //   this.newRecipe()
+    //   this.queryRecipes()
+    // },
+    // input(param) {
+    //   console.log(`contents input: ${JSON.stringify(param)}`)
+    // }
   }
 }
 </script>
