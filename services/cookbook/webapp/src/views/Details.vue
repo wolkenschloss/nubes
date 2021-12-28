@@ -1,6 +1,6 @@
 <template>
 <v-container>
-    <v-card class="ma-4 pa-4" flat>
+    <v-card class="ma-4 pa-4" flat v-if="recipe">
       <v-card-title v-text="recipe.title"></v-card-title>
       <preparation :text="recipe.preparation"></preparation>
 
@@ -33,10 +33,7 @@
       <v-btn color="primary" elevation="2" fab bottom fixed right @click="onEdit" >
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
-      <edit title="Edit Recipe"
-            v-on:change="saveRecipe"
-            v-bind:value.sync="copy"
-            v-on:cancel="cancelEdit"/>
+      <edit title="Edit Recipe" v-model:value="copyx"/>
     </v-card>
 </v-container>
 </template>
@@ -52,13 +49,16 @@ export default {
   components: {Servings, Preparation, Edit},
   props: {id: String},
   computed: {
-    ...mapGetters('recipe', ['recipe', 'servings', 'ingredients']),
-    copy: {
+    ...mapGetters('recipe', ['recipe', 'servings', 'ingredients', 'copy']),
+    copyx: {
       get() {
-        return this.$store.getters['recipe/copy']
+        // return this.$store.getters['recipe/copy']
+        return this.copy
       },
       set(value) {
-        this.$store.commit('recipe/setCopy', value)
+        // this.$store.commit('recipe/setCopy', value)
+        value && this.saveRecipe(value)
+        value || this.cancelEdit()
       }
     },
     servings: {

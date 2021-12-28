@@ -5,7 +5,7 @@
              v-shortcut="'n'">
         New Recipe
       </v-btn>
-      <edit fab-icon="mdi-plus" title="New Recipe" v-model:value="recipe" />&nbsp;
+      <edit title="New Recipe" v-model="recipe" />&nbsp;
       <import-dialog/>&nbsp;
       <v-text-field v-model="search"
                     append-icon="mdi-magnify"

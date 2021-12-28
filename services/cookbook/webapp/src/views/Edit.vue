@@ -94,7 +94,7 @@ import Servings from "@/components/Servings";
 
 export default {
   name: "Edit",
-  props: ['fabIcon', 'title', 'value'],
+  props: ['title', 'value'],
   components: {Servings, EditIngredient},
 
   mounted() {
