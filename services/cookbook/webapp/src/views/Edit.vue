@@ -1,9 +1,7 @@
 <template>
   <v-dialog role="dialog" scrollable max-width="560px"
             v-model="dialog"
-            :fullscreen="$vuetify.breakpoint.mobile"
-            @click:outside="close"
-            @keydown.esc="close">
+            :fullscreen="$vuetify.breakpoint.mobile">
     <v-card class="fab-container" height="560px" v-if="value">
       <v-toolbar>
         <v-btn icon @click="close">
@@ -22,22 +20,15 @@
             <v-tab key="2">Preparation</v-tab>
           </v-tabs>
           <v-fab-transition>
-<!--            <v-btn :disabled="isLastIngredientEmpty" absolute fab small bottom left elevation="4"-->
-<!--                   color="primary"-->
-<!--                   v-hotkey.stop="{insert: addIngredient}"-->
-<!--                   v-if="tab === 1"-->
-<!--                   @click="addIngredient">-->
               <v-btn :disabled="isLastIngredientEmpty" absolute fab small bottom left elevation="4"
                      accesskey="a"
                      color="primary"
                      v-if="tab === 1"
                      @click="addIngredient">
-
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </v-fab-transition>
         </template>
-
       </v-toolbar>
       <v-card-text class="mt-6 fullscreen">
         <v-form v-model="valid" ref="form">
@@ -130,6 +121,9 @@ export default {
         return this.value !== null
       },
       set(value) {
+        if (!value) {
+          this.$emit('cancel')
+        }
         // ???
       }
     }
@@ -149,7 +143,7 @@ export default {
   methods: {
     close() {
       console.log(`edit.vue close dialog`)
-      this.$emit('input', null)
+      this.$emit('cancel', null)
     },
     save() {
       this.$emit('input', this.value)

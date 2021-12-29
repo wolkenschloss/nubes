@@ -5,7 +5,7 @@
              v-shortcut="'n'">
         New Recipe
       </v-btn>
-      <edit title="New Recipe" v-model="recipe" />&nbsp;
+      <edit title="New Recipe" v-bind:value="recipe" @input="create" @cancel="cancel"/>&nbsp;
       <import-dialog/>&nbsp;
       <v-text-field v-model="search"
                     append-icon="mdi-magnify"
@@ -95,7 +95,7 @@ export default {
     }
   },
   created() {
-    this.newRecipe()
+    this.reset()
   },
   mounted() {
     console.log("Mounted")
@@ -103,7 +103,7 @@ export default {
 
   methods: {
     ...mapActions('toc', ["updateQuery", "queryRecipes"]),
-    ...mapActions('recipe', ["newRecipe", 'createRecipe', 'edit', 'create']),
+    ...mapActions('recipe', ["reset", 'edit', 'create', 'cancel']),
 
     async load() {
       this.loading = true
@@ -113,16 +113,6 @@ export default {
     onItemClick(item) {
       this.$router.push({name: 'details', params: {id: item['recipeId']}})
     },
-    // async change(recipe) {
-    //   console.log(`contents change: ${JSON.stringify(recipe)}`)
-    //   this.edit(null)
-    //   await this.createRecipe(recipe)
-    //   this.newRecipe()
-    //   this.queryRecipes()
-    // },
-    // input(param) {
-    //   console.log(`contents input: ${JSON.stringify(param)}`)
-    // }
   }
 }
 </script>

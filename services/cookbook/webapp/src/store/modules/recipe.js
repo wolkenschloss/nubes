@@ -18,25 +18,25 @@ const getters = {
 }
 
 const actions = {
-    async scaleIngredients({commit, state}, servings) {
+    async scale({commit, state}, servings) {
         let url = `/recipe/${state.recipe._id}?servings=${servings}`
         const response = await axios.get(url)
         commit('setServings', servings)
         commit('setIngredients', response.data.ingredients)
     },
-    async loadRecipe({commit, state}, id) {
+    async read({commit, state}, id) {
         let url = "/recipe/" + id
         const response = await axios.get(url)
         commit('setRecipe', response.data)
         commit('setServings', response.data.servings)
         commit('setIngredients', response.data.ingredients)
     },
-    async deleteRecipe({commit, state}, id) {
+    async destroy({commit, state}, id) {
         let url = "/recipe/" + id
         await axios.delete(url)
         router.push("/")
     },
-    async saveRecipe({commit, state}, recipe) {
+    async update({commit, state}, recipe) {
         let url = "/recipe/" + recipe._id;
         await axios.put(url, recipe)
         commit('setRecipe', recipe)
@@ -44,22 +44,15 @@ const actions = {
         commit('setIngredients', recipe.ingredients)
         commit('setCopy', null)
     },
-    async createRecipe({commit, state}, recipe) {
-        let url = "/recipe"
-        const result = await axios.post(url, recipe)
-        commit('setRecipe', result.data)
-    },
-    async cancelEdit({commit, state}) {
+    async cancel({commit, state}) {
         commit('setCopy', null)
     },
-    newRecipe({commit}) {
-        // commit('setRecipe', {ingredients: [], servings: 1})
+    reset({commit}) {
         commit('setRecipe', null)
         commit('setCopy', null)
     },
     async edit({commit, state}, recipe) {
         commit('setCopy', recipe)
-        // commit('setRecipe', recipe)
     },
     async create({commit, state}, recipe) {
         let url = "/recipe"
