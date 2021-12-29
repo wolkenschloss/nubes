@@ -1,7 +1,7 @@
 <template>
   <v-row class="mt-1">
     <v-col cols="2">
-      <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" ></v-text-field>
+      <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" autofocus></v-text-field>
     </v-col>
     <v-col cols="3">
       <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged" ref="editName">

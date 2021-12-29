@@ -5,6 +5,7 @@
                 type="number"
                 persistent-hint
                 :rules="servingRules"
+                autofocus
                 required
                 :hint="hint"/>
 </template>
@@ -12,6 +13,7 @@
 <script>
 
 export default {
+  inheritAttrs: true,
   name: "Servings",
   props: ['value', 'hint'],
   data() {

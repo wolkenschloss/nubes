@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <v-toolbar elevation="0">
-      <edit fab-icon="mdi-plus" title="New Recipe" v-on:change="change" v-bind:value="copy" v-on:cancel="newRecipe">
-        <template v-slot:activator="{on, attrs}">
-          <v-btn v-on="on" v-bind="attrs" color="secondary">New Recipe</v-btn>
-        </template>
-      </edit>&nbsp;
-      <import-dialog/>
+      <v-btn color="secondary"  @click="edit({ingredients: [], servings: 1})"
+             v-shortcut="'n'">
+        New Recipe
+      </v-btn>
+      <edit title="New Recipe" v-bind:value="recipe" @input="create" @cancel="cancel"/>&nbsp;
+      <import-dialog/>&nbsp;
       <v-text-field v-model="search"
                     append-icon="mdi-magnify"
                     label="Search"
@@ -32,8 +32,8 @@
 <script>
 
 import Edit from "@/views/Edit";
-import { debounce } from "lodash";
-import { mapActions, mapGetters } from 'vuex'
+import {debounce} from "lodash";
+import {mapActions, mapGetters} from 'vuex'
 import ImportDialog from "@/components/ImportDialog";
 
 export default {
@@ -55,12 +55,18 @@ export default {
   },
   computed: {
     ...mapGetters('toc', ['toc', 'total']),
-    copy: {
+
+    recipe: {
       get() {
         return this.$store.getters['recipe/copy']
       },
       set(value) {
-        this.$store.commit('recipe/setCopy', value)
+        console.log(`!!!! contents set copy ${JSON.stringify(value)}`)
+        if(value) {
+          this.create(value)
+        }
+        this.edit(null)
+        // this.$store.commit('recipe/setCopy', value)
       }
     },
     pagination: {
@@ -89,11 +95,16 @@ export default {
     }
   },
   created() {
-    this.newRecipe()
+    this.reset()
   },
+  mounted() {
+    console.log("Mounted")
+  },
+
   methods: {
     ...mapActions('toc', ["updateQuery", "queryRecipes"]),
-    ...mapActions('recipe', ["newRecipe", 'createRecipe']),
+    ...mapActions('recipe', ["reset", 'edit', 'create', 'cancel']),
+
     async load() {
       this.loading = true
       await this.queryRecipes()
@@ -102,11 +113,6 @@ export default {
     onItemClick(item) {
       this.$router.push({name: 'details', params: {id: item['recipeId']}})
     },
-    change() {
-      this.createRecipe()
-      this.newRecipe()
-      this.queryRecipes()
-    }
   }
 }
 </script>

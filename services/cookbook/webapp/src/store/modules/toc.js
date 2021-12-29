@@ -18,12 +18,9 @@ const getters = {
 
 const actions = {
     async queryRecipes({ commit, state }) {
-        console.log("Action queryRecipes")
         const {page, itemsPerPage} = state.pagination
         const from = (page - 1) * itemsPerPage;
         const to = from + itemsPerPage - 1;
-
-        console.log(`loading recipes from ${from} to ${to} search '${state.filter || ''}'`)
         const uri = `/recipe?from=${from}&to=${to}&q=${state.filter || ''}`
 
         try {
@@ -34,23 +31,19 @@ const actions = {
         }
     },
     async updateQuery({commit, filter}) {
-        console.log(`Action updateQuery(${filter})`)
         commit('setFilter', filter)
     }
 }
 
 const mutations = {
     setFilter(state, filter) {
-        console.log(`Mutation setFilter(${filter})`)
         state.filter = filter
         state.pagination.page = 1
     },
     setPagination(state, payload){
-        console.log(`Mutation setPagination(${payload}`)
         state.pagination = payload
     },
     setToc(state, {content, total }) {
-        console.log(`Mutation setToc({content: ${content.length}, total: ${total}}`)
         state.toc = content
         state.total = total
     }

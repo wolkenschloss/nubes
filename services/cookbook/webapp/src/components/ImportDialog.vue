@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" max-width="560px">
     <template v-slot:activator="{on, attrs}">
-      <v-btn text v-bind="attrs" v-on="on">Import Recipe</v-btn>
+      <v-btn text v-bind="attrs" v-on="on" v-shortcut="'i'">Import Recipe</v-btn>
     </template>
     <v-card>
       <v-card-title>
@@ -12,7 +12,7 @@
           <v-alert v-if="error" type="error" text>
             {{ error }}
           </v-alert>
-          <v-text-field label="URL" required v-model="url"></v-text-field>
+          <v-text-field label="URL" required v-model="url" autofocus></v-text-field>
         </v-container>
       </v-card-text>
       <v-card-actions>
