@@ -38,9 +38,11 @@ public class RecipeWebsite {
     public static final String SCHEME = "http";
 
     public static UriBuilder orderUriFrom(String path) {
+        var host = System.getProperty(MockServerResource.SERVER_HOST_CONFIG);
+        var port = System.getProperty(MockServerResource.SERVER_PORT_CONFIG);
         return UriBuilder.fromPath(path)
                 .scheme(SCHEME)
-                .host(System.getProperty(MockServerResource.SERVER_HOST_CONFIG))
-                .port(Integer.parseInt(System.getProperty(MockServerResource.SERVER_PORT_CONFIG)));
+                .host(host)
+                .port(Integer.parseInt(port));
     }
 }
