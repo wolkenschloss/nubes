@@ -1,5 +1,6 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.testing.MockServer;
 import family.haschka.wolkenschloss.cookbook.testing.MockServerResource;
 import family.haschka.wolkenschloss.cookbook.testing.RecipeWebsite;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import javax.ws.rs.core.UriBuilder;
 
 @QuarkusIntegrationTest
+@MockServer
 public class RecipeWebsiteTest {
 
     @Test

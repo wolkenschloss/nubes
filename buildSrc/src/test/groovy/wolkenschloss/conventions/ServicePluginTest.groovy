@@ -26,7 +26,7 @@ class ServicePluginTest extends Specification {
         properties << """
             quarkusPlatformGroupId=io.quarkus
             quarkusPlatformArtifactId=quarkus-bom
-            quarkusPlatformVersion=2.5.1.Final
+            quarkusPlatformVersion=2.6.1.Final
             version = 999-SNAPSHOT
             group = family.haschka.wolkenschloss.conventions
             vcs.commit = unspecified
