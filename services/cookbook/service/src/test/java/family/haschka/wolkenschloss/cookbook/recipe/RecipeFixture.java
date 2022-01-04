@@ -51,9 +51,9 @@ public enum RecipeFixture {
         lasagne.ingredients.add(new Ingredient(new Rational(500), "g", "Hackfleisch"));
         lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Zwiebel(n)"));
         lasagne.ingredients.add(new Ingredient(new Rational(2), null, "Knoblauchzehen"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Bund Petersilie oder TK"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "EL Tomatenmark"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Dose Tomaten, geschälte (800g)"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), "Bund", "Petersilie oder TK"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), "EL", "Tomatenmark"));
+        lasagne.ingredients.add(new Ingredient(new Rational(1), "Dose", "Tomaten, geschälte (800g)"));
         lasagne.ingredients.add(new Ingredient(null, null, "Etwas Rotwein"));
 
         return lasagne;
@@ -65,9 +65,7 @@ public enum RecipeFixture {
         Recipe antipasti = new Recipe("Antipasti", LOREM_IPSUM);
         antipasti.ingredients.add(new Ingredient(new Rational(500), "ml", "Olivenöl"));
         antipasti.ingredients.add(new Ingredient(new Rational(4), null, "Knoblauchzehen"));
-
-        // TODO: EL ist eine Einheit.
-        antipasti.ingredients.add(new Ingredient(new Rational(4), null, "EL getrocknete italienische Kräuter"));
+        antipasti.ingredients.add(new Ingredient(new Rational(4), "EL", "getrocknete italienische Kräuter"));
         antipasti.servings = new Servings(4);
 
         return antipasti;

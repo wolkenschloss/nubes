@@ -30,9 +30,8 @@ public class Ingredient {
     public Rational quantity;
 
     public static Ingredient parse(String string) {
-        var regex = "^(?<quant>" + Rational.REGEX + ")?\\s?((?<unit>g|kg|ml|cl|l)?\\s(?<name>.*?))?$";
-        // TODO: rational statt long für quantity
-        //Pattern p = Pattern.compile("(?<quant>[1-9][0-9]*)\\s*(?<unit>g|kg|ml|cl|l)?\\s*(?<name>.*)");
+        var units = Unit.regex();
+        var regex = "^(?<quant>" + Rational.REGEX + ")?\\s?((?<unit>" + units + ")?\\s(?<name>.*?))?$";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(string);
         if (m.find())
