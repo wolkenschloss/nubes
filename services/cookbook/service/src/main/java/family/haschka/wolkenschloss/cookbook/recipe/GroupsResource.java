@@ -10,14 +10,11 @@ public class GroupsResource {
 
     @GET
     public Uni<Groups> list() {
-        var group = new Group("Volumes");
-        var groups = new Groups(group, new Group("Weights"), new Group("Kitchen terms"), new Group("Common Terms"));
+
+        var groups = new Groups(Group.VOLUME, Group.WEIGHT, Group.KITCHEN, Group.COMMON);
         return Uni.createFrom().item(groups);
     }
 
     record Groups(Group... groups) {
-    }
-
-    record Group(String name) {
     }
 }

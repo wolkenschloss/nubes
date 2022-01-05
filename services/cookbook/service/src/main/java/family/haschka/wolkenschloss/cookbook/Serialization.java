@@ -47,6 +47,7 @@ public class Serialization {
                         new UriDeserializer(),
                         new ObjectIdDeserializer())
                 .withSerializers(
+                        new GroupSerializer(),
                         new ServingsSerializer(),
                         new RationalSerializer(),
                         new ObjectIdSerializer())
