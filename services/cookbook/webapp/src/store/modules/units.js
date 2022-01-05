@@ -13,10 +13,12 @@ const actions = {
     async load({ commit, state }) {
 
         try {
-            const result = await axios.get('/units')
-            const entries = result.data.flatMap(u => u.values.map(v => {
-                return {value: u.name, text: v}
-            }))
+            const result = await axios.get('/units/groups')
+            console.log(JSON.stringify(result.data))
+            const entries = result.data.groups.flatMap(g => [
+                {header: g.name},
+                ...g.units.map(u => {return {value: u.name, text: u.name} })
+                ])
 
             commit('setUnits', entries)
         } catch (error) {
