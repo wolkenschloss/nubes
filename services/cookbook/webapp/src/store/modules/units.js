@@ -21,6 +21,7 @@ const actions = {
             console.log(JSON.stringify(result.data))
             const entries = result.data.groups.flatMap(g => [
                 {header: g.name},
+                {divider: true},
                 ...g.units.flatMap(u => unitEntries(u))
                 ])
 
