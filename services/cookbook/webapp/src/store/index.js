@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import recipe from './modules/recipe'
 import toc from './modules/toc'
 import ingredients from './modules/ingredients'
+import units from './modules/units'
 import {createLogger} from 'vuex'
 Vue.use(Vuex)
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
   modules: {
     toc,
     recipe,
-    ingredients
+    ingredients,
+    units
   }
 })
