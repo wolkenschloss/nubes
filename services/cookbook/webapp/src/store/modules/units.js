@@ -9,6 +9,10 @@ const getters = {
     entries: (state) => state.entries,
 }
 
+function unitEntries(unit) {
+    return unit.values.map(u => {return {text: u, value: u}})
+}
+
 const actions = {
     async load({ commit, state }) {
 
@@ -17,7 +21,7 @@ const actions = {
             console.log(JSON.stringify(result.data))
             const entries = result.data.groups.flatMap(g => [
                 {header: g.name},
-                ...g.units.map(u => {return {value: u.name, text: u.name} })
+                ...g.units.flatMap(u => unitEntries(u))
                 ])
 
             commit('setUnits', entries)
