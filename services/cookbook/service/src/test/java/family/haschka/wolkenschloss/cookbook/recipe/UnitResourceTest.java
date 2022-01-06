@@ -52,8 +52,10 @@ public class UnitResourceTest {
 
         var items = RestAssured.given()
                 .when()
+                .log().all()
                 .get(url)
                 .then()
+                .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract().body().as(Item[].class);
 
@@ -65,8 +67,10 @@ public class UnitResourceTest {
     public void listAllAliases(String alias) {
         var items = RestAssured.given()
                 .when()
+                .log().all()
                 .get(url)
                 .then()
+                .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract().body().as(Item[].class);
 

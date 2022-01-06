@@ -3,6 +3,7 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
 
+import javax.enterprise.inject.Vetoed;
 import javax.json.bind.Jsonb;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,17 +24,6 @@ public enum RecipeFixture {
         this.recipe = recipe;
         this.resource = resource;
     }
-
-    @SuppressWarnings("SpellCheckingInspection")
-    public static final String LOREM = """
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
-            et dolore magna aliquyam erat, sed diam voluptua. At rebum.
-                        
-            Duis autem vel eum iriure dolor in hendrerit in vulputate
-            Lorem ipsum dolor sit amet, consectetuer aliquam erat volutpat.
-                        
-            Ut wisi enim ad minim veniam, quis nostrud exerci tation
-            qui blandit praesent luptatum zzril delenit augue facilisi.""";
 
     private final Recipe recipe;
     public final String resource;
@@ -57,7 +47,7 @@ public enum RecipeFixture {
     }
 
     private static Recipe getLasagne() {
-        Recipe lasagne = new Recipe("Lasagne", LOREM);
+        Recipe lasagne = new Recipe("Lasagne", "Preparation");
         lasagne.ingredients.add(new Ingredient(new Rational(500), "g", "Hackfleisch"));
         lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Zwiebel(n)"));
         lasagne.ingredients.add(new Ingredient(new Rational(2), null, "Knoblauchzehen"));

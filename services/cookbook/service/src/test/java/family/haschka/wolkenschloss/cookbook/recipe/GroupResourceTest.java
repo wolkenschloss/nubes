@@ -7,6 +7,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,7 +48,9 @@ public class GroupResourceTest {
                 .when()
                 .get(url)
                 .then()
+                .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
+
                 .body("groups.name", hasItem(group));
     }
 
@@ -75,9 +78,11 @@ public class GroupResourceTest {
     @ParameterizedTest
     @EnumSource
     public void unitsPerGroupTest(Testcase testcase) {
-        RestAssured.when()
+        var body = RestAssured.when()
                 .get(url)
                 .then()
+
+                //.getJsonObject(testcase.selector);
                 .body(testcase.selector(), testcase.expectation());
     }
 }

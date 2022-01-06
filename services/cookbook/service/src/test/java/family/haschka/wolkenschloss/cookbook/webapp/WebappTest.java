@@ -12,9 +12,8 @@ public class WebappTest {
     @Test
     public void checkRoot() {
         RestAssured.given()
-                .when()
-                .get("/")
-                .then()
+                .when().get("/")
+                .then().log().all()
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 }
