@@ -14,6 +14,7 @@ dependencies {
     implementation("io.quarkus:quarkus-vertx")
     implementation("io.smallrye.reactive:smallrye-mutiny-vertx-web-client")
     implementation("io.quarkus:quarkus-smallrye-reactive-messaging")
+    implementation("io.quarkus:quarkus-resteasy-reactive-qute")
     implementation("org.jsoup:jsoup:1.14.1")
 
     implementation(project(":services:cookbook:webapp"))
