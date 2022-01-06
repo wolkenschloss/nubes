@@ -3,8 +3,8 @@
     <v-col cols="2">
       <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" autofocus></v-text-field>
     </v-col>
-    <v-col cols="3">
-      <v-select dense :items="units" label="Unit" v-model="value.unit" clearable @change="unitChanged" ref="editName">
+    <v-col cols="4">
+      <v-select dense :items="entries" label="Unit" v-model="value.unit" clearable @change="unitChanged" ref="editName" type="text">
         <template v-slot:selection="{item}">
           <span>{{ item.value }}</span>
         </template>
@@ -42,36 +42,6 @@ export default {
       loading: false,
       search: null,
       items: [],
-      units: [
-
-        {header: "Volumes"},
-
-        {value: "t", text: "teaspoon"},
-        {value: "T", text: "tablespoon"},
-        {value: "fl oz", text: "fluid ounce"},
-        {value: "gill", text: "gill"},
-        {value: "c", text: "cup"},
-        {value: "pt", text: "pint"},
-        {value: "qt", text: "quart"},
-        {value: "gal", text: "gallon"},
-        {value: "ml", text: "milliliter"},
-        {value: "l", text: "litre"},
-        {value: "dl", text: "deciliter"},
-        {value: "cl", text: "centiliter"},
-
-        {header: "Mass and Weight"},
-        {value: "lb", text: "pound"},
-        {value: "oz", text: "ounce"},
-        {value: "mg", text: "milligram"},
-        {value: "g", text: "gram"},
-        {value: "kg", text: "kilogram"},
-
-        {header: "Length"},
-        {value: "mm", text: "millimeter"},
-        {value: "cm", text: "centimeter"},
-        {value: "m", text: "meter"},
-        {value: "in", text: "inch"}
-      ],
       nameRules: [
           v => !!v || 'Name is required'
       ],
@@ -96,9 +66,11 @@ export default {
   },
   computed: {
     ...mapGetters('ingredients', ['toc', 'total']),
+    ...mapGetters('units', ['entries'])
   },
   methods: {
     ...mapActions('ingredients', ["queryIngredients"]),
+
     async load() {
       this.loading = true
       await this.queryIngredients()
