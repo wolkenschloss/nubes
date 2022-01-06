@@ -9,7 +9,7 @@ plugins {
 
 tasks {
     named<NpmTask>(NpmInstallTask.NAME) {
-        args.add("--silent")
+//        args.add("--silent")
     }
 }
 
