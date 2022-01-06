@@ -1,7 +1,9 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // https://www.kochwiki.org/wiki/Zubereitung:Ma%C3%9Fe_und_Gewichte
 public enum Unit {
@@ -42,8 +44,8 @@ public enum Unit {
     ;
 
 
-    private final String unit;
-    private final String[] aliases;
+    final String unit;
+    final String[] aliases;
 
     Unit(String unit, String... aliases) {
         this.unit = unit;
@@ -55,7 +57,15 @@ public enum Unit {
     }
 
     public static String regex() {
-        return Arrays.stream(Unit.values()).map(v -> v.pattern())
+        return Arrays.stream(Unit.values()).map(Unit::pattern)
                 .collect(Collectors.joining("|"));
+    }
+
+    static public Stream<String> stream() {
+        return Arrays.stream(Unit.values()).flatMap(u -> Arrays.stream(u.aliases));
+    }
+
+    static public List<String> list() {
+        return stream().collect(Collectors.toList());
     }
 }

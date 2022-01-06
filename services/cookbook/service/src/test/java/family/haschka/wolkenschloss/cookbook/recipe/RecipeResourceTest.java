@@ -85,7 +85,6 @@ public class RecipeResourceTest {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("content.size()", is(recipes.size()));
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(service, Mockito.times(1)).list(0, 4, null);
     }
 
@@ -113,7 +112,6 @@ public class RecipeResourceTest {
                     return equalTo(expected.toString());
                 });
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(creator, Mockito.times(1)).save(recipe);
         Mockito.verifyNoMoreInteractions(service);
         Mockito.verifyNoMoreInteractions(creator);
@@ -137,7 +135,6 @@ public class RecipeResourceTest {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body(is(jsonb.toJson(recipe)));
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(service, Mockito.times(1)).get(recipe._id.toHexString(), Optional.empty());
     }
 
@@ -152,7 +149,6 @@ public class RecipeResourceTest {
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(service, Mockito.times(1)).delete(id.toHexString());
     }
 
@@ -171,7 +167,6 @@ public class RecipeResourceTest {
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(service, Mockito.times(1)).update(recipe);
     }
 }
