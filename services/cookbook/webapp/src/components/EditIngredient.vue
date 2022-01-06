@@ -42,36 +42,6 @@ export default {
       loading: false,
       search: null,
       items: [],
-      units: [],
-      // units: [
-      //
-      //   {header: "Volumes"},
-      //   {value: "t", text: "teaspoon"},
-      //   {value: "T", text: "tablespoon"},
-      //   {value: "fl oz", text: "fluid ounce"},
-      //   {value: "gill", text: "gill"},
-      //   {value: "c", text: "cup"},
-      //   {value: "pt", text: "pint"},
-      //   {value: "qt", text: "quart"},
-      //   {value: "gal", text: "gallon"},
-      //   {value: "ml", text: "milliliter"},
-      //   {value: "l", text: "litre"},
-      //   {value: "dl", text: "deciliter"},
-      //   {value: "cl", text: "centiliter"},
-      //
-      //   {header: "Mass and Weight"},
-      //   {value: "lb", text: "pound"},
-      //   {value: "oz", text: "ounce"},
-      //   {value: "mg", text: "milligram"},
-      //   {value: "g", text: "gram"},
-      //   {value: "kg", text: "kilogram"},
-      //
-      //   {header: "Length"},
-      //   {value: "mm", text: "millimeter"},
-      //   {value: "cm", text: "centimeter"},
-      //   {value: "m", text: "meter"},
-      //   {value: "in", text: "inch"}
-      // ],
       nameRules: [
           v => !!v || 'Name is required'
       ],

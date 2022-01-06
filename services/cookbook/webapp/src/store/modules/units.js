@@ -2,11 +2,18 @@ import axios from 'axios'
 import Vue from "vue";
 
 const state = () => ({
-    entries: [],
+    groups: []
 })
 
 const getters = {
-    entries: (state) => state.entries,
+    // groups -> items for v-select
+    entries: (state) => {
+        return state.groups.flatMap(g => [
+            {header: g.name},
+            {divider: true},
+            ...g.units.flatMap(u => unitEntries(u))
+        ])
+    }
 }
 
 function unitEntries(unit) {
@@ -14,18 +21,12 @@ function unitEntries(unit) {
 }
 
 const actions = {
-    async load({ commit, state }) {
+    async load({ commit }) {
 
         try {
             const result = await axios.get('/units/groups')
             console.log(JSON.stringify(result.data))
-            const entries = result.data.groups.flatMap(g => [
-                {header: g.name},
-                {divider: true},
-                ...g.units.flatMap(u => unitEntries(u))
-                ])
-
-            commit('setUnits', entries)
+            commit('setGroups', result.data.groups)
         } catch (error) {
             console.log(error)
         }
@@ -33,8 +34,8 @@ const actions = {
 }
 
 const mutations = {
-    setUnits(state, entries) {
-        Vue.set(state, 'entries', entries)
+    setGroups(state, groups) {
+        Vue.set(state, 'groups', groups)
     }
 }
 
