@@ -33,7 +33,7 @@ public class IngredientTest {
         QUANTITY_FRACTION_UNIT_NAME7("1⅛ l Sahne", new Ingredient(new Rational(9,8), "l", "Sahne")),
         NO_SPACES_BETWEEN_QUANTITY_AND_UNIT1("20g Moon Sugar", new Ingredient(new Rational(20), "g", "Moon Sugar")),
         NO_SPACES_BETWEEN_QUANTITY_AND_UNIT2("2⅒g Moon Sugar", new Ingredient(new Rational(21, 10), "g", "Moon Sugar"));
-;
+
         private final String string;
         private final Ingredient ingredient;
 
@@ -77,5 +77,26 @@ public class IngredientTest {
     void scaleTests(ServingsTestcase testcase) {
         var actual = testcase.ingredient.scale(testcase.factor);
         Assertions.assertEquals(testcase.expected, actual);
+    }
+
+    public enum PrintIngredientTestcase {
+        EMPTY(new Ingredient(null, null, null), ""),
+        FULL(new Ingredient(new Rational(5, 2), "St.", "Zwiebeln"), "2 ½ St. Zwiebeln"),
+        NAME(new Ingredient(null, null, "Rotwein"), "Rotwein"),
+        QUANTITY(new Ingredient(new Rational(42), null, "Blaubeeren"), "42 Blaubeeren");
+
+        final Ingredient ingredient;
+        final String expectation;
+
+        PrintIngredientTestcase(Ingredient ingredient, String expectation) {
+
+            this.ingredient = ingredient;
+            this.expectation = expectation;
+        }
+    }
+    @ParameterizedTest
+    @EnumSource
+    public void shouldDisplayAsString(PrintIngredientTestcase testcase) {
+        Assertions.assertEquals(testcase.expectation, testcase.ingredient.toString());
     }
 }
