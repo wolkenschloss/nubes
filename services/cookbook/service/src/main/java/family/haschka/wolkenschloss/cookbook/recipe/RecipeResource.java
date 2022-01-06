@@ -1,5 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
+import io.quarkus.qute.CheckedTemplate;
+import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
@@ -12,6 +14,8 @@ import java.util.Optional;
 
 @Path("/recipe")
 public class RecipeResource {
+
+    public static final String TEXT_MARKDOWN = "text/markdown";
 
     @Inject
     RecipeService service;
@@ -47,6 +51,22 @@ public class RecipeResource {
     public Uni<Recipe> get(@PathParam("id") String id, @QueryParam("servings") Integer servings) {
         return service.get(id, Optional.ofNullable(servings).map(Servings::new))
                 .map(or -> or.orElseThrow(NotFoundException::new));
+    }
+
+    @GET
+    @Produces(TEXT_MARKDOWN)
+    @Path("{id}")
+    public Uni<String> getMarkdown(@PathParam("id") String id) {
+        return service.get(id, Optional.empty())
+                .map(or -> or.orElseThrow(NotFoundException::new))
+                .onItem().transformToUni(i -> Templates.recipe()
+                        .data("recipe", i)
+                        .createUni());
+    }
+
+    @CheckedTemplate
+    public static class Templates {
+        public static native TemplateInstance recipe();
     }
 
     @DELETE

@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Ingredient {
 
@@ -52,11 +54,10 @@ public class Ingredient {
 
     @Override
     public String toString() {
-        return "Ingredient{" +
-                "name='" + name + '\'' +
-                ", unit='" + unit + '\'' +
-                ", quantity=" + quantity +
-                '}';
+        return Stream.of(quantity, unit, name)
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .collect(Collectors.joining(" "));
     }
 
     @Override
