@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 
 public record Rational(int numerator, int denominator)  {
 
@@ -21,38 +22,48 @@ public record Rational(int numerator, int denominator)  {
         this(numerator + number * denominator, denominator);
     }
 
-    private static final Map<Rational, Character> codes;
+    private static final Map<Rational, Character> unicodes;
     private static final Map<String, Rational> fractions;
+    private static String fractionCharacterClass;
     public static final String REGEX;
     private static final Pattern pattern;
 
     static {
-        codes = new HashMap<>();
-        codes.put(new Rational(1, 2), '\u00bd');
-        codes.put(new Rational(1, 3), '\u2153');
-        codes.put(new Rational(2, 3), '\u2154');
-        codes.put(new Rational(1, 4), '\u00bc');
-        codes.put(new Rational(3, 4), '\u00be');
-        codes.put(new Rational(1, 5), '\u2155');
-        codes.put(new Rational(2, 5), '\u2156');
-        codes.put(new Rational(3, 5), '\u2157');
-        codes.put(new Rational(4, 5), '\u2158');
-        codes.put(new Rational(1, 6), '\u2159');
-        codes.put(new Rational(5, 6), '\u215a');
-        codes.put(new Rational(1, 7), '\u2150');
-        codes.put(new Rational(1, 8), '\u215b');
-        codes.put(new Rational(3, 8), '\u215c');
-        codes.put(new Rational(5, 8), '\u215d');
-        codes.put(new Rational(7, 8), '\u215e');
-        codes.put(new Rational(1, 9), '\u2151');
-        codes.put(new Rational(1, 10), '\u2152');
+        unicodes = new HashMap<>();
+        unicodes.put(new Rational(1, 2), '\u00bd');
+        unicodes.put(new Rational(1, 3), '\u2153');
+        unicodes.put(new Rational(2, 3), '\u2154');
+        unicodes.put(new Rational(1, 4), '\u00bc');
+        unicodes.put(new Rational(3, 4), '\u00be');
+        unicodes.put(new Rational(1, 5), '\u2155');
+        unicodes.put(new Rational(2, 5), '\u2156');
+        unicodes.put(new Rational(3, 5), '\u2157');
+        unicodes.put(new Rational(4, 5), '\u2158');
+        unicodes.put(new Rational(1, 6), '\u2159');
+        unicodes.put(new Rational(5, 6), '\u215a');
+        unicodes.put(new Rational(1, 7), '\u2150');
+        unicodes.put(new Rational(1, 8), '\u215b');
+        unicodes.put(new Rational(3, 8), '\u215c');
+        unicodes.put(new Rational(5, 8), '\u215d');
+        unicodes.put(new Rational(7, 8), '\u215e');
+        unicodes.put(new Rational(1, 9), '\u2151');
+        unicodes.put(new Rational(1, 10), '\u2152');
 
-        REGEX = "((?<number>-?(0|[1-9]\\d*)(?<!-0))[ ]?)?(((?<numerator>-?(0|[1-9]\\d*)(?<!-0))([/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?";
+        fractionCharacterClass = fractionCharacterClass();
+
+        REGEX = "((?<number>-?(0|[1-9]\\d*)(?<!-0))[ ]?)?(((?<numerator>-?(0|[1-9]\\d*)(?<!-0))([\\/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?";
+
+//        REGEX = "((?<number>[-]?(0|[1-9]\\d*))\\s?)?(((?<numerator>[-]?[0-9]+)(/(?<denominator>[0-9]+))?)|"
+//                + "(?<fraction>" + fractionCharacterClass + "))+";
+
+//        REGEX = "((?<number>[-]?(0|[1-9]\\d*)))?((\\s(?<numerator>[-]?[0-9]+)(/(?<denominator>[0-9]+))?)|(\\s*"
+//                + "(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒])))?";
+
         pattern = Pattern.compile("^" + REGEX + "$");
 
         fractions = new HashMap<>();
-        for (Rational r : codes.keySet()) {
-            fractions.put(codes.get(r).toString(), r);
+        for (Rational r : unicodes.keySet()) {
+            fractions.put(unicodes.get(r).toString(), r);
         }
     }
 
@@ -67,6 +78,19 @@ public record Rational(int numerator, int denominator)  {
 
     public Rational multiply(Rational b) {
         return new Rational(numerator * b.numerator, denominator * b.denominator);
+    }
+
+    public static String fractionCharacterClass() {
+        var result = new StringBuilder();
+        result.append('[');
+        var allFractions = unicodes.values().stream().collect(Collector.of(
+                StringBuilder::new,
+                StringBuilder::append,
+                StringBuilder::append,
+                StringBuilder::toString));
+        result.append(allFractions);
+        result.append(']');
+        return result.toString();
     }
 
     public static Rational parse(String input) {
@@ -125,8 +149,8 @@ public record Rational(int numerator, int denominator)  {
     }
 
     private void appendRational(StringBuilder builder, Rational rest) {
-        if (codes.containsKey(rest)) {
-            builder.append(codes.get(rest));
+        if (unicodes.containsKey(rest)) {
+            builder.append(unicodes.get(rest));
         } else {
             builder.append(rest.numerator);
             builder.append("/");
