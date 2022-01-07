@@ -9,9 +9,14 @@ plugins {
 }
 
 node {
-    version.set("14.17.1")
+    version.set("16.13.1") // latest lts version
     download.set(true)
-    npmInstallCommand.set("ci")
+
+    if (System.getenv().keys.contains("CI")) {
+        npmInstallCommand.set("ci")
+    } else {
+        npmInstallCommand.set("install")
+    }
 }
 
 val destination = file("$buildDir/classes/java/main/META-INF/resources/")
@@ -23,6 +28,7 @@ sourceSets {
 }
 
 tasks {
+
     val vue by register<NpxTask>("vue") {
         group = "build"
         description = "build vue application"
@@ -101,6 +107,10 @@ tasks {
 
     named("check") {
         dependsOn(unit, e2e)
+    }
+
+    named<NpmTask>(NpmInstallTask.NAME) {
+        args.addAll("--no-audit")
     }
 }
 
