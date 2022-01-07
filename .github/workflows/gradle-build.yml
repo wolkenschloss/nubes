@@ -47,7 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-all-
       - name: Build with Gradle
-        run: ./gradlew build --project-prop vcs.commit=$GITHUB_SHA --project-prop vcs.ref=$GITHUB_REF -i
+        run: ./gradlew build --project-prop vcs.commit=$GITHUB_SHA --project-prop vcs.ref=$GITHUB_REF
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock

@@ -1,4 +1,5 @@
 import com.github.gradle.node.npm.task.NpmInstallTask
+import com.github.gradle.node.npm.task.NpmTask
 import com.github.gradle.node.npm.task.NpxTask
 
 plugins {
@@ -51,7 +52,8 @@ tasks {
 
         command.set("vue-cli-service")
         args.set(listOf("test:unit"))
-        inputs.files("package.json", "package-lock.json", "vue.config.js")
+
+        inputs.files("package.json", "package-lock.json", "vue.config.js", "jest.config.json")
             .withPropertyName("configFiles")
             .withPathSensitivity(PathSensitivity.RELATIVE)
 
@@ -99,5 +101,14 @@ tasks {
 
     named("check") {
         dependsOn(unit, e2e)
+    }
+}
+
+tasks {
+    withType<NpmTask>().configureEach {
+        logging.captureStandardOutput(LogLevel.INFO)
+    }
+    withType<NpxTask>().configureEach {
+        logging.captureStandardOutput(LogLevel.INFO)
     }
 }
