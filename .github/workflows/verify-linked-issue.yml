@@ -20,7 +20,7 @@ jobs:
         with:
           query: |
             {
-              repository(name: repo, owner: $owner) {
+              repository(name: "nubes", owner: "wolkenschloss") {
                 pullRequest(number: 267) {
                   titleHTML
                   closingIssuesReferences(first: 10) {
