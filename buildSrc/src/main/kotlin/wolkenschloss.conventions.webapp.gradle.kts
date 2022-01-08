@@ -35,7 +35,7 @@ tasks {
         dependsOn(NpmInstallTask.NAME)
 
         command.set("vue-cli-service")
-        args.set(listOf("build", "--dest", destination.absolutePath))
+        args.set(listOf("build", "--silent", "--dest", destination.absolutePath))
 
         inputs.files("package.json", "package-lock.json", "vue.config.js")
             .withPropertyName("configFiles")
@@ -110,7 +110,7 @@ tasks {
     }
 
     named<NpmTask>(NpmInstallTask.NAME) {
-        args.addAll("--no-audit")
+        args.addAll("--no-audit", "--fund=false", "--loglevel=error")
     }
 }
 
