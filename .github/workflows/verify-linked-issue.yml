@@ -14,15 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Ensure Pull Request has a linked issue.
     steps:
-      - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
       - name: Verify Linked Issue
         id: issues
         uses: octokit/graphql-action@v2.x
         with:
           query: |
             {
-              repository(name: "nubes", owner: "wolkenschloss") {
+              repository(name: $repo, owner: $owner) {
                 pullRequest(number: 267) {
                   titleHTML
                   closingIssuesReferences(first: 10) {
@@ -34,7 +32,7 @@ jobs:
                 }
               }
             }
-          owner: ${{ github.event.repository.owner.name }}
+          owner: ${{ github.event.repository.owner.login }}
           repo: ${{ github.event.repository.name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
