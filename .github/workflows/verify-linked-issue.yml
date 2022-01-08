@@ -40,4 +40,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           echo 'linked issues - ${{steps.issues.outputs.data }}'
-          echo '${{steps.issues.outputs.data }}' | jq  '.repository.pullRequest.closingIssuesReferences.nodes[].number'
+          echo '${{steps.issues.outputs.data }}' | jq  '.repository.pullRequest.closingIssuesReferences.nodes[].number | tostring | "linked issue #" + .'
+          echo '${{steps.issues.outputs.data }}' | jq  '[.repository.pullRequest.closingIssuesReferences.nodes[].number | tostring | "#" + .] | length | if . == 0 then error("No Issue Linked") else . end'
