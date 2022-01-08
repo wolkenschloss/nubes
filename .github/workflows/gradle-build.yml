@@ -16,16 +16,15 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Find Linked Issues
-        id: linked_issues
-        uses: hossainemruz/linked-issues@main
-        with:
-          pr_url: ${{github.event.pull_request.html_url}}
-          format: IssueNumber
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
       - id: login
-        name: "Show Issues"
+        name: "Show Pull Request"
         run: |
-          echo issues: ${{ steps.linked_issues.outputs.issue }}
+          echo opened by ${{ github.event.pull_request.user.login }}.
+          echo label ${{ github.event.label }}.
+          echo base is ${{ github.event.pull_request.base.ref }}          
+          echo head is ${{ github.event.pull_request.head.ref }}
   build:
     runs-on: ubuntu-latest
     permissions:
