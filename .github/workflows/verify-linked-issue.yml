@@ -21,7 +21,7 @@ jobs:
           query: |
             query ($repo: String!, $owner: String!, $number: Int!) {           
               repository(name: $repo, owner: $owner) {
-                pullRequest(number: 267) {
+                pullRequest(number: $number) {
                   titleHTML
                   closingIssuesReferences(first: 10) {
                     nodes {
