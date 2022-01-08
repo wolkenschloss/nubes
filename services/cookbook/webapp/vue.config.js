@@ -24,5 +24,20 @@ module.exports = {
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
       "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
     }
+  },
+  css: {
+    extract: {ignoreOrder: true}
+  },
+  configureWebpack: {
+    performance: {
+      maxEntrypointSize: 700000,
+      maxAssetSize: 512000
+    },
+    optimization: {
+      splitChunks: {
+        minSize: 10000,
+        maxSize: 250000
+      }
+    }
   }
 }
