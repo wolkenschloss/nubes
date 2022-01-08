@@ -20,7 +20,7 @@ jobs:
         with:
           query: |
             {
-              repository(name: $name, owner: $owner) {
+              repository(name: repo, owner: $owner) {
                 pullRequest(number: 267) {
                   titleHTML
                   closingIssuesReferences(first: 10) {
