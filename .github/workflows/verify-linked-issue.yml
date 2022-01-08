@@ -15,6 +15,25 @@ jobs:
     name: Ensure Pull Request has a linked issue.
     steps:
       - name: Verify Linked Issue
-        uses: hattan/verify-linked-issue-action@v1.1.5
+        id: issues
+        uses: octokit/graphql-action@v2.x
+        with:
+          query: |
+            {
+              repository(name: $name, owner: $owner) {
+                pullRequest(number: 267) {
+                  titleHTML
+                  closingIssuesReferences(first: 10) {
+                    nodes {
+                      number
+                      title
+                    }
+                  }
+                }
+              }
+            }
+          owner: ${{ github.event.repository.owner.name }}
+          repo: ${{ github.event.repository.name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: "echo 'linked issues - ${{steps.issues.outputs.data }}'"
