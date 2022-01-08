@@ -16,11 +16,14 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
       - id: login
         name: "Show Pull Request"
         run: |
           echo opened by ${{ github.event.pull_request.user.login }}.
           echo label ${{ github.event.label }}.
+          echo label ${{ github.event }}.
   build:
     runs-on: ubuntu-latest
     permissions:
