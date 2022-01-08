@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Ensure Pull Request has a linked issue.
     steps:
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
       - name: Verify Linked Issue
         id: issues
         uses: octokit/graphql-action@v2.x
@@ -36,4 +38,6 @@ jobs:
           repo: ${{ github.event.repository.name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: "echo 'linked issues - ${{steps.issues.outputs.data }}'"
+      - run: |
+          echo 'linked issues - ${{steps.issues.outputs.data }}'
+          echo '${{steps.issues.outputs.data }}' | jq  '.repository.pullRequest.closingIssuesReferences.nodes[].number'
