@@ -7,11 +7,12 @@ on:
       - synchronize
       - opened
       - reopened
+  check_run:
+
 jobs:
   verify-linked-issue:
     runs-on: ubuntu-latest
-    permissions:
-      issues: read
+    name: Ensure Pull Request has a linked issue.
     steps:
       - name: Verify Linked Issue
         uses: hattan/verify-linked-issue-action@v1.1.5
