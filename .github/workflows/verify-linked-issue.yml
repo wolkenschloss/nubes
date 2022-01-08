@@ -1,0 +1,43 @@
+name: Verify Linked Issue
+
+on:
+  pull_request:
+    types:
+      - edited
+      - synchronize
+      - opened
+      - reopened
+  check_run:
+
+jobs:
+  verify-linked-issue:
+    runs-on: ubuntu-latest
+    name: Ensure pull request has a linked issue
+    steps:
+      - name: Collect linked issues
+        id: issues
+        uses: octokit/graphql-action@v2.x
+        with:
+          query: |
+            query ($repo: String!, $owner: String!, $number: Int!) {           
+              repository(name: $repo, owner: $owner) {
+                pullRequest(number: $number) {
+                  titleHTML
+                  closingIssuesReferences(first: 10) {
+                    nodes {
+                      number
+                      title
+                    }
+                  }
+                }
+              }
+            }
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          number: ${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Count linked issues
+        run: |
+          echo '${{steps.issues.outputs.data }}' | jq  '.repository.pullRequest.closingIssuesReferences.nodes[].number | tostring | "linked issue #" + .'
+          echo '${{steps.issues.outputs.data }}' | jq  '[.repository.pullRequest.closingIssuesReferences.nodes[].number | tostring | "#" + .] | length | if . == 0 then error("No Issue Linked") else . end'
