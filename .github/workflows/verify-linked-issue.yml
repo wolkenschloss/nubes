@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Ensure Pull Request has a linked issue.
     steps:
-      - name: Verify Linked Issue
+      - name: Collect Linked Issues
         id: issues
         uses: octokit/graphql-action@v2.x
         with:
           query: |
-            query ($repo: String!, $owner: String!) {           
+            query ($repo: String!, $owner: String!, $number: Int!) {           
               repository(name: $repo, owner: $owner) {
                 pullRequest(number: 267) {
                   titleHTML
@@ -34,6 +34,7 @@ jobs:
             }
           owner: ${{ github.event.repository.owner.login }}
           repo: ${{ github.event.repository.name }}
+          numer: ${{ github.event.pull_request.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
