@@ -23,7 +23,8 @@ jobs:
         run: |
           echo opened by ${{ github.event.pull_request.user.login }}.
           echo label ${{ github.event.label }}.
-          echo label ${{ github.event }}.
+          echo base is ${{ github.event.pull_request.base.ref }}          
+          echo head is ${{ github.event.pull_request.head.ref }}
   build:
     runs-on: ubuntu-latest
     permissions:
