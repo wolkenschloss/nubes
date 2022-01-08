@@ -13,19 +13,6 @@ on:
       - release-*
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Verify Linked Issue
-        uses: hattan/verify-linked-issue-action@v1.1.5
-      - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1
-      - id: login
-        name: "Show Pull Request"
-        run: |
-          echo opened by ${{ github.event.pull_request.user.login }}.
-          echo base is ${{ github.event.pull_request.base.ref }}          
-          echo head is ${{ github.event.pull_request.head.ref }}
   build:
     runs-on: ubuntu-latest
     permissions:
