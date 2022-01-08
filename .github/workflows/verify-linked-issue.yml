@@ -19,7 +19,7 @@ jobs:
         uses: octokit/graphql-action@v2.x
         with:
           query: |
-            {
+            query ($repo: String!, $owner: String!) {           
               repository(name: $repo, owner: $owner) {
                 pullRequest(number: 267) {
                   titleHTML
