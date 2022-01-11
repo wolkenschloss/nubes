@@ -95,7 +95,6 @@ export default {
   },
   watch: {
     dialog(value) {
-      console.log(`edit watching dialog ${JSON.stringify(value)}`)
       if (value) {
         this.tab = null
         this.ingredientPanel = null
