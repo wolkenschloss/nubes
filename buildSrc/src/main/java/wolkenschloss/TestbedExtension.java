@@ -19,6 +19,7 @@ import java.util.Map;
 public abstract class TestbedExtension  {
 
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
+    public static final String DEFAULT_HOSTS_FILE_NAME = "hosts";
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
 
     @SuppressWarnings("UnstableApiUsage")
@@ -39,6 +40,7 @@ public abstract class TestbedExtension  {
         getDomain().initialize(
                 sharedServices,
                 getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME),
+                getRunDirectory().file(DEFAULT_HOSTS_FILE_NAME),
                 getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
 
         return this;
@@ -76,11 +78,6 @@ public abstract class TestbedExtension  {
         action.execute(getTransformation());
     }
 
-    /**
-     * Liefert die Beschreibung des Prüfstandes als Map
-     * @param objects Tja
-     * @return
-     */
     public Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
         var property = objects.mapProperty(String.class, Object.class);
 

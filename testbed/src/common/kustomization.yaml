@@ -1,0 +1,3 @@
+resources:
+  - dashboard-ingress.yaml
+  - registry-ingress.yaml

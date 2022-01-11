@@ -71,6 +71,7 @@ abstract public class BuildPool extends DefaultTask {
             }
 
             var uuid = poolOperations.create(getPoolDescriptionFile());
+
             Files.writeString(runFile.toPath(), uuid.toString());
 
         } catch (Exception e) {

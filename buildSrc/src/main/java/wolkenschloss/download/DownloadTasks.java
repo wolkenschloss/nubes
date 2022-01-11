@@ -23,6 +23,7 @@ public class DownloadTasks {
                     task.getDistributionName().convention(baseImage.getName());
                     task.getBaseImage().convention(baseImage.getBaseImageFile());
                     task.getDistributionDir().convention(baseImage.getDistributionDir());
+                    task.getOutputs().upToDateWhen(spec -> task.getDistributionDir().get().getAsFile().exists());
                 });
     }
 }

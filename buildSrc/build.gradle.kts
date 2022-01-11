@@ -50,6 +50,9 @@ val quarkusPluginVersion: String by project
 val quarkusPluginArtifactId: String by project
 
 dependencies {
+    implementation("com.github.docker-java:docker-java-core:3.2.12")
+    implementation("com.github.docker-java:docker-java-transport-zerodep:3.2.12")
+
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
     implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
@@ -69,7 +72,7 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    enabled = true
+    enabled = false
     testLogging {
         // options for log level LIFECYCLE.
         // LIFECYCLE is gradle's default log level.

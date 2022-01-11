@@ -45,6 +45,7 @@ public abstract class PoolOperations implements BuildService<PoolOperations.Para
 
         try {
             pool.create(0);
+            pool.setAutostart(-1);
             return UUID.fromString(pool.getUUIDString());
         } finally {
             pool.free();

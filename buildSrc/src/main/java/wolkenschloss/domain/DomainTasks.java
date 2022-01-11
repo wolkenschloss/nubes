@@ -51,6 +51,8 @@ public class DomainTasks {
                     task.getPort().convention(port);
                     task.getXmlDescription().convention(domainDescription);
                     task.getKnownHostsFile().convention(domain.getKnownHostsFile());
+                    task.getHostsFile().convention(domain.getHostsFile());
+                    task.getFqdn().convention(domain.getFqdn());
                     task.getDomainOperations().set(domain.getDomainOperations());
                 });
     }

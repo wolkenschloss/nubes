@@ -7,11 +7,9 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
+import org.gradle.work.DisableCachingByDefault;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -25,7 +23,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-@CacheableTask
+@DisableCachingByDefault
 abstract public class DownloadDistribution extends DefaultTask {
 
     public DownloadDistribution() {
@@ -46,7 +44,8 @@ abstract public class DownloadDistribution extends DefaultTask {
     @Internal
     abstract public RegularFileProperty getBaseImage();
 
-    @Internal
+//    @Internal
+    @OutputDirectory
     abstract public DirectoryProperty getDistributionDir();
 
     private URL getBaseImageUrl() throws MalformedURLException {

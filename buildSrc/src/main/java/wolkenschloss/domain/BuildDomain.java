@@ -33,6 +33,9 @@ abstract public class BuildDomain extends DefaultTask {
     @Internal
     abstract public Property<Integer> getPort();
 
+    @Input
+    abstract public Property<String> getFqdn();
+
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
     abstract public RegularFileProperty getXmlDescription();
@@ -43,6 +46,9 @@ abstract public class BuildDomain extends DefaultTask {
     @OutputFile
     @Nonnull
     abstract public RegularFileProperty getKnownHostsFile();
+
+    @OutputFile
+    abstract public RegularFileProperty getHostsFile();
 
     @Internal
     abstract public Property<DomainOperations> getDomainOperations();
@@ -66,9 +72,11 @@ abstract public class BuildDomain extends DefaultTask {
 
         var serverKey = waitForCallback();
         updateKnownHosts(serverKey);
+        updateHosts();
     }
 
     private void updateKnownHosts(String serverKey) throws IOException, LibvirtException, InterruptedException {
+        getLogger().info("create known_hosts file");
         DomainOperations domainOperations = getDomainOperations().get();
 
         var ip = domainOperations.getIpAddress();
@@ -80,8 +88,34 @@ abstract public class BuildDomain extends DefaultTask {
 
         Files.writeString(
                 file.toAbsolutePath(),
-                String.format("%s %s", ip, serverKey),
+                String.format("%s %s%n", ip, serverKey),
                 StandardOpenOption.WRITE);
+
+        Files.writeString(
+                file.toAbsolutePath(),
+                String.format("%s %s%n", getFqdn().get(), serverKey),
+                StandardOpenOption.APPEND);
+    }
+
+    private void updateHosts() throws IOException, LibvirtException, InterruptedException {
+        getLogger().info("create hosts file");
+        DomainOperations domainOperations = getDomainOperations().get();
+
+        var ip = domainOperations.getIpAddress();
+
+
+        var path = getHostsFile().get().getAsFile().toPath();
+        var file = Files.createFile(path);
+
+        this.getLogger().info("Writing hosts file: {}", path.toAbsolutePath());
+
+        writeHost("127.0.0.1", "localhost");
+        writeHost(ip, getFqdn().get());
+    }
+
+    private void writeHost(String ip, String host) throws IOException {
+        var path = getHostsFile().get().getAsFile().toPath().toAbsolutePath();
+        Files.writeString(path, String.format("%s\t%s%n", ip, host), StandardOpenOption.APPEND);
     }
 
     private String waitForCallback() {
