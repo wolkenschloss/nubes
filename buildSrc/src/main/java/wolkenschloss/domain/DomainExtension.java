@@ -11,12 +11,14 @@ abstract public class DomainExtension {
     @SuppressWarnings("UnstableApiUsage")
     public void initialize(BuildServiceRegistry sharedServices,
                            Provider<RegularFile> knownHostsFile,
-                           Provider<RegularFile> kubeConfig) {
+                           Provider<RegularFile> kubeConfig,
+                           Provider<RegularFile> dockerConfig) {
         getName().convention("testbed");
         getFqdn().convention("testbed.wolkenschloss.local");
         getLocale().convention(System.getenv("LANG"));
         getKnownHostsFile().convention(knownHostsFile);
         getKubeConfigFile().convention(kubeConfig);
+        getDockerConfigFile().convention(dockerConfig);
 
         getDomainOperations().set(sharedServices.registerIfAbsent(
                 "domainops",
@@ -38,4 +40,6 @@ abstract public class DomainExtension {
     abstract public RegularFileProperty getKubeConfigFile();
 
     abstract public Property<DomainOperations> getDomainOperations();
+
+    abstract public RegularFileProperty getDockerConfigFile();
 }
