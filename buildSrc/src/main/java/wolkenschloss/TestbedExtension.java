@@ -20,6 +20,7 @@ public abstract class TestbedExtension  {
 
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
+    public static final String DEFAULT_DOCKER_CONFIG_FILE_NAME = "docker/config.json";
 
     @SuppressWarnings("UnstableApiUsage")
     public TestbedExtension configure(Project project) {
@@ -39,7 +40,9 @@ public abstract class TestbedExtension  {
         getDomain().initialize(
                 sharedServices,
                 getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME),
-                getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME));
+                getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME),
+                getRunDirectory().file(DEFAULT_DOCKER_CONFIG_FILE_NAME)
+        );
 
         return this;
     }
@@ -79,7 +82,7 @@ public abstract class TestbedExtension  {
     /**
      * Liefert die Beschreibung des Prüfstandes als Map
      * @param objects Tja
-     * @return
+     * @return Eine Karte mit den Eigenschaften des Prüfstandes
      */
     public Provider<Map<String, Object>> asPropertyMap(ObjectFactory objects) {
         var property = objects.mapProperty(String.class, Object.class);
