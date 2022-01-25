@@ -84,7 +84,7 @@ public abstract class TestbedExtension  {
         property.put("user", getUser().getName());
         property.put("sshKey", getUser().getSshKey());
         property.put("hostname", getDomain().getName());
-        property.put("fqdn", getDomain().getFqdn());
+        property.put("fqdn", getDomain().getTestbedVmFqdn());
         property.put("locale", getDomain().getLocale());
 
         var callback = objects.mapProperty(String.class, Object.class);

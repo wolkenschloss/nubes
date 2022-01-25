@@ -7,24 +7,17 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.logging.Logger
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 
 abstract class DockerRunTask : DockerBaseTask() {
 
-    class FrameReaderCallback(
-        private val logger: Logger,
-        private val level: LogLevel
-    ) : ResultCallback.Adapter<Frame>() {
-
-        val log = StringBuilder()
+    class ConsoleLogger : ResultCallback.Adapter<Frame>() {
 
         override fun onNext(item: Frame?) {
             if (item != null) {
-                logger.log(level, String(item.payload))
-                log.append(String(item.payload))
+                print(String(item.payload))
             }
 
             super.onNext(item)
@@ -50,6 +43,7 @@ abstract class DockerRunTask : DockerBaseTask() {
     @TaskAction
     fun execute() {
 
+        logging.captureStandardOutput(containerLogLevel.get())
         val mounts = configuration.mounts.get()
 
         val hostConfig = HostConfig.newHostConfig()
@@ -69,7 +63,7 @@ abstract class DockerRunTask : DockerBaseTask() {
 
         logger.debug("attach container")
 
-        FrameReaderCallback(logger, containerLogLevel.get()).use { callback ->
+        ConsoleLogger().use { callback ->
 
             docker.attachContainerCmd(container.id)
                 .withStdOut(true)
@@ -88,7 +82,6 @@ abstract class DockerRunTask : DockerBaseTask() {
             logger.debug("wait container: {}", status)
 
             if (status != 0) {
-                logger.error(callback.log.toString())
                 throw GradleException("Container exited with status code $status")
             }
         }

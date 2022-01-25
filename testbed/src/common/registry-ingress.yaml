@@ -6,16 +6,14 @@ metadata:
   namespace: container-registry
   annotations:
     cert-manager.io/cluster-issuer: ca-issuer
-    cert-manager.io/common-name: registry.nubes.local
-#    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/proxy-body-size: "5g"
-#    nginx.ingress.kubernetes.io/proxy-ssl-protocols: "TLSv1.3"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     kubernetes.io/ingress.class: public
+    nginx.ingress.kubernetes.io/proxy-body-size: "5g"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
 spec:
   tls:
     - hosts:
-      - registry.nubes.local
+      - registry.wolkenschloss.local
       secretName: registry-cert
   rules:
     - host: registry.nubes.local
@@ -27,5 +25,4 @@ spec:
               service:
                 name: registry
                 port:
-                  number: 5000
-#  ingressClassName: nginx
+                  number: 443

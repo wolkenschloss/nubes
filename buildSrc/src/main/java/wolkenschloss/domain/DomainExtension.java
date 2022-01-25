@@ -2,6 +2,7 @@ package wolkenschloss.domain;
 
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.services.BuildServiceRegistry;
@@ -14,7 +15,8 @@ abstract public class DomainExtension {
                            Provider<RegularFile> hostsFile,
                            Provider<RegularFile> kubeConfig) {
         getName().convention("testbed");
-        getFqdn().convention("testbed.wolkenschloss.local");
+//        getFqdn().convention("testbed.wolkenschloss.local");
+        getDomainSuffix().convention("wolkenschloss.local");
         getLocale().convention(System.getenv("LANG"));
         getKnownHostsFile().convention(knownHostsFile);
         getHostsFile().convention(hostsFile);
@@ -33,7 +35,14 @@ abstract public class DomainExtension {
 
     public abstract Property<String> getLocale();
 
-    public abstract Property<String> getFqdn();
+//    public abstract Property<String> getFqdn();
+    public String getTestbedVmFqdn() {
+        return String.format("%s.%s", getName().get(), getDomainSuffix().get());
+    }
+
+    public abstract ListProperty<String> getHosts();
+
+    public abstract Property<String> getDomainSuffix();
 
     abstract public RegularFileProperty getKnownHostsFile();
 

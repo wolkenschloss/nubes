@@ -1,8 +1,9 @@
-# Testbed clients
+# Testbed Client
 
 ## client
 
-Base Image with kubectl and openssl
+The client for the testbed is a Docker container with kubectl, cmctl and ssh client.
+Administration tasks for the test bench can be carried out with the client.
 
 ```bash
 docker build -t nubes/client:latest .

@@ -5,6 +5,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
@@ -23,6 +24,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CacheableTask
 abstract public class BuildDomain extends DefaultTask {
@@ -34,7 +37,10 @@ abstract public class BuildDomain extends DefaultTask {
     abstract public Property<Integer> getPort();
 
     @Input
-    abstract public Property<String> getFqdn();
+    public abstract ListProperty<String> getHosts();
+
+    @Input
+    public abstract Property<String> getDomainSuffix();
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -93,29 +99,29 @@ abstract public class BuildDomain extends DefaultTask {
 
         Files.writeString(
                 file.toAbsolutePath(),
-                String.format("%s %s%n", getFqdn().get(), serverKey),
+                String.format("%s.%s %s%n", getDomain().get(), getDomainSuffix().get(), serverKey),
                 StandardOpenOption.APPEND);
     }
 
     private void updateHosts() throws IOException, LibvirtException, InterruptedException {
         getLogger().info("create hosts file");
-        DomainOperations domainOperations = getDomainOperations().get();
 
+        var domainOperations = getDomainOperations().get();
         var ip = domainOperations.getIpAddress();
-
-
         var path = getHostsFile().get().getAsFile().toPath();
         var file = Files.createFile(path);
 
         this.getLogger().info("Writing hosts file: {}", path.toAbsolutePath());
 
-        writeHost("127.0.0.1", "localhost");
-        writeHost(ip, getFqdn().get());
-    }
+        var hosts = Stream.concat(
+                        Stream.of(ip),
+                        Stream.concat(
+                                        Stream.of(getDomain().get()),
+                                        getHosts().get().stream())
+                                .map(host -> String.format("%s.%s", host, getDomainSuffix().get())))
+                .collect(Collectors.joining(" "));
 
-    private void writeHost(String ip, String host) throws IOException {
-        var path = getHostsFile().get().getAsFile().toPath().toAbsolutePath();
-        Files.writeString(path, String.format("%s\t%s%n", ip, host), StandardOpenOption.APPEND);
+        Files.writeString(file, hosts, StandardOpenOption.WRITE);
     }
 
     private String waitForCallback() {

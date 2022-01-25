@@ -19,6 +19,8 @@ testbed {
 
     domain {
         name.set("testbed")
+        domainSuffix.set("wolkenschloss.local")
+        hosts.addAll("dashboard", "registry")
     }
 
     pool {
@@ -31,7 +33,32 @@ testbed {
 }
 
 tasks {
+    val buildDomain = named<wolkenschloss.domain.BuildDomain>(DomainTasks.BUILD_DOMAIN_TASK_NAME)
     val copyKubeConfig = named<CopyKubeConfig>(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
+
+    val testbed: wolkenschloss.TestbedExtension by project.extensions
+    val userHome = Paths.get(System.getProperty("user.home"))
+
+    withType(DockerRunTask::class) {
+        this.volumes {
+            input {
+                source.set(copyKubeConfig.get().kubeConfigFile)
+                target.set(userHome.resolve(Paths.get(".kube/config")).toAbsolutePath().toString())
+            }
+            input {
+                source.set(buildDomain.get().knownHostsFile)
+                target.set(userHome.resolve(Paths.get(".ssh/known_hosts")).toAbsolutePath().toString())
+            }
+            input {
+                source.set(testbed.user.privateSshKeyFile)
+                target.set(userHome.resolve(Paths.get(".ssh", testbed.user.privateSshKeyFile.asFile.get().name)).toAbsolutePath().toString())
+            }
+            input {
+                source.set(buildDomain.get().hostsFile)
+                target.set("/etc/hosts")
+            }
+        }
+    }
 
     val buildClientImage by registering(DockerBuildTask::class) {
         inputDir.set(layout.projectDirectory.dir("docker/client/"))
@@ -72,26 +99,26 @@ tasks {
             }
         }
 
-        cmd.addAll("rm", "-Rf", "/mnt/app/testbed/pki")
+        cmd.addAll("rm", "-Rf", "/mnt/app/testbed/ca")
     }
 
     val createRootCa by registering(DockerRunTask::class) {
 
         val home = System.getProperty("user.home")
         val userDataDir = System.getenv().getOrDefault("XDG_DATA_HOME", "$home/.local/share")
-        val userPkiDir = Paths.get(userDataDir, "testbed", "pki")
+        val userPkiDir = Paths.get(userDataDir, "testbed", "ca")
 
-        val src = layout.projectDirectory.dir("src/pki")
-        containerLogLevel.set(LogLevel.QUIET)
+        val src = layout.projectDirectory.dir("src/ca")
+        containerLogLevel.set(LogLevel.INFO)
         volumes {
             input {
-                source.set(src.file("pki.bash"))
-                target.set("/usr/local/bin/pki.bash")
+                source.set(src.file("ca.bash"))
+                target.set("/usr/local/bin/ca.bash")
             }
 
             input {
-                source.set(src.file("root-ca.conf"))
-                target.set("/opt/app/root-ca.conf")
+                source.set(src.file("ca.conf"))
+                target.set("/opt/app/ca.conf")
             }
 
             input {
@@ -101,39 +128,25 @@ tasks {
 
             output {
                 source.set(userPkiDir.toFile())
-                target.set("/mnt/app/pki")
+                target.set("/mnt/app/ca")
             }
         }
 
-        cmd.addAll("pki.bash", "/mnt/app/pki")
-    }
+        cmd.addAll("ca.bash", "/mnt/app/ca")
 
-    val buildDomain = named<wolkenschloss.domain.BuildDomain>(DomainTasks.BUILD_DOMAIN_TASK_NAME)
-    val testbed: wolkenschloss.TestbedExtension by project.extensions
-
-    val userHome = Paths.get("/home", System.getProperty("user.name"))
-    withType(DockerRunTask::class) {
-        this.volumes {
-            input {
-                source.set(copyKubeConfig.get().kubeConfigFile)
-                target.set(userHome.resolve(Paths.get(".kube/config")).toAbsolutePath().toString())
-            }
-            input {
-                source.set(buildDomain.get().knownHostsFile)
-                target.set(userHome.resolve(Paths.get(".ssh/known_hosts")).toAbsolutePath().toString())
-            }
-            input {
-                source.set(testbed.user.privateSshKeyFile)
-                target.set(userHome.resolve(Paths.get(".ssh", testbed.user.privateSshKeyFile.asFile.get().name)).toAbsolutePath().toString())
-            }
-            input {
-                source.set(buildDomain.get().hostsFile)
-                target.set("/etc/hosts")
-            }
+        doLast {
+            logger.quiet("# To complete installation of testbed execute following tasks:")
+            logger.quiet("# Copy and install CA with")
+            logger.quiet("sudo cp ${userPkiDir.toAbsolutePath()}/ca.crt /usr/local/share/ca-certificates")
+            logger.quiet("sudo update-ca-certificates")
+            logger.quiet("# Add entry for local DNS lookup:")
+            logger.quiet("sudo nano /etc/hosts")
+            logger.quiet("# restart systemd resolver")
+            logger.quiet("sudo systemctl restart systemd-resolved")
         }
     }
 
-    val installCommonServices by registering(DockerRunTask::class) {
+    val applyCommonServices by registering(DockerRunTask::class) {
 
         val src = layout.projectDirectory.dir("src/common")
         image.set(buildClientImage.get().image)
@@ -160,16 +173,22 @@ tasks {
     }
 
     val readRootCa by registering(DockerRunTask::class) {
-        image.set(buildClientImage.get().image)
         containerLogLevel.set(LogLevel.QUIET)
-        cmd.addAll("/bin/bash", "-c", "kubectl get secret -n cert-manager nubes-ca -o json | jq -r '.data.\"tls.crt\"' | base64 -d | openssl x509")
-        doNotTrackState("Prints Root CA Certificate")
+        cmd.addAll("/bin/bash", "-c", "kubectl get secrets -n cert-manager nubes-ca -o 'go-template={{index .data \"tls.crt\"}}' | base64 -d | openssl x509")
+        doNotTrackState("For side effects only")
+    }
+
+    val getCertificate by registering(DockerRunTask::class) {
+        containerLogLevel.set(LogLevel.QUIET)
+        cmd.addAll("/bin/bash", "-c", "kubectl get secrets -n container-registry registry-cert -o 'go-template={{index .data \"tls.crt\"}}' | base64 -d | openssl x509 -text")
+        doNotTrackState("For side effects only")
     }
 
     val reset by registering(DockerRunTask::class) {
         containerLogLevel.set(LogLevel.QUIET)
-        cmd.addAll("/bin/bash", "-c", "ssh -v testbed.wolkenschloss.local microk8s status")
-        cmd.addAll("/bin/bash", "-c", "ssh -v testbed.wolkenschloss.local microk8s reset")
+        val host = "${testbed.domain.name.get()}.${testbed.domain.domainSuffix.get()}"
+
+        cmd.addAll("/bin/bash", "-c", "ssh $host microk8s status")
         doNotTrackState("For side effects only")
     }
 

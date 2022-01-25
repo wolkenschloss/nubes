@@ -13,10 +13,11 @@ export SSL_DIR
 echo "SSL Directory is $1"
 
 cert_manager_version="v1.7.0-beta.0"
-root_ca_conf="root-ca.conf"
-root_ca_csr="$SSL_DIR/root-ca.csr"
-root_ca_crt="$SSL_DIR/root-ca.crt"
-root_ca_key="$SSL_DIR/private/root-ca.key"
+root_ca_conf="ca.conf"
+root_ca_csr="$SSL_DIR/ca.csr"
+root_ca_crt="$SSL_DIR/ca.crt"
+root_ca_key="$SSL_DIR/private/ca.key"
+root_ca_crl="$SSL_DIR/ca.crl"
 
 echo "running checks"
 kubectl get secret nubes-ca -n cert-manager > /dev/null
@@ -48,7 +49,7 @@ function create_ca() {
   echo "creating root ca"
   openssl req -new -config $root_ca_conf -out "$root_ca_csr" -keyout "$root_ca_key" -nodes
   openssl ca -selfsign -config $root_ca_conf -in "$root_ca_csr" -out "$root_ca_crt" -extensions ca_ext -batch
-  openssl ca -gencrl -config $root_ca_conf -out "$SSL_DIR"/root-ca.crl
+  openssl ca -gencrl -config $root_ca_conf -out "$root_ca_crl"
 }
 
 function create_secret() {
