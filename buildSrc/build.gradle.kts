@@ -37,6 +37,10 @@ gradlePlugin {
             id = "wolkenschloss.testbed"
             implementationClass = "wolkenschloss.TestbedPlugin"
         }
+        create("DockerPlugin") {
+            id = "wolkenschloss.gradle.docker"
+            implementationClass = "wolkenschloss.gradle.docker.DockerPlugin"
+        }
     }
 }
 
@@ -65,6 +69,18 @@ dependencies {
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0") {
         exclude(group = "org.codehaus.groovy")
     }
+
+    testImplementation(platform("org.junit:junit-bom:5.8.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    // Waiting for Gradle update to use kotlin version 1.6.
+    // Then the current version of kotest can also be used.
+    // https://github.com/kotest/kotest/issues/2666
+    testImplementation(platform("io.kotest:kotest-bom:4.6.3"))
+    testImplementation("io.kotest:kotest-runner-junit5")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm")
+    testImplementation("io.kotest:kotest-assertions-core")
 }
 
 tasks.withType<Test> {
