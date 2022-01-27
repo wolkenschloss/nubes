@@ -3,6 +3,7 @@ package wolkenschloss.gradle.docker
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
@@ -22,17 +23,23 @@ abstract class BuildImageTask : DefaultTask() {
     @get:Internal
     abstract val dockerService: Property<DockerService>
 
+    @get:Input
+    abstract val args: MapProperty<String, String>
+
+
     @TaskAction
     fun execute() {
         imageId.get().asFile.parentFile.mkdirs()
 
         val docker by dockerService
-        val id = docker.client.buildImageCmd()
+        val builder = docker.client.buildImageCmd()
             .withBaseDirectory(inputDir.get().asFile)
             .withDockerfile(inputDir.file("Dockerfile").get().asFile)
             .withTags(tags.get())
-            .start()
-            .awaitImageId()
+
+        args.get().forEach {entry -> builder.withBuildArg(entry.key, entry.value) }
+
+        val id = builder.start().awaitImageId()
 
         imageId.get().asFile.writeText(id)
     }

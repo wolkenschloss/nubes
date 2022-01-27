@@ -1,6 +1,7 @@
 package wolkenschloss.gradle.docker
 
 import com.github.dockerjava.api.DockerClient
+import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.zerodep.ZerodepDockerHttpClient
@@ -35,8 +36,11 @@ abstract class DockerService : BuildService<BuildServiceParameters.None>, AutoCl
     override fun close() {
         println("Closing Docker Service")
         client.close()
-
     }
+
+    fun listImages(): List<Image> = client.listImagesCmd()
+        .withShowAll(true)
+        .exec()
 
     companion object {
         private const val NAME = "docker"
