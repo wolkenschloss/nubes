@@ -66,6 +66,9 @@ dependencies {
     implementation("com.google.cloud.tools:jib-core:0.19.0")
     implementation("com.jayway.jsonpath:json-path:2.6.0")
 
+    implementation("com.github.docker-java:docker-java-core:3.2.12")
+    implementation("com.github.docker-java:docker-java-transport-zerodep:3.2.12")
+
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0") {
         exclude(group = "org.codehaus.groovy")
     }

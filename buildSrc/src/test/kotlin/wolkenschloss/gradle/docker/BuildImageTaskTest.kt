@@ -40,6 +40,7 @@ class BuildImageTaskTest : DescribeSpec({
                 }
                 it("should have a default tags") {
                     val tags = imagename.get().tags.get()
+
                     tags.shouldContainAll(
                         "$PROJECT_NAME/imagename:$PROJECT_VERSION",
                         "$PROJECT_NAME/imagename:latest"
