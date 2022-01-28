@@ -14,6 +14,11 @@ class DockerPlugin : Plugin<Project> {
             tags.convention(defaultTags)
             dockerService.set(DockerService.getInstance(target.gradle))
         }
+
+        target.tasks.withType(RunContainerTask::class.java).configureEach {
+            dockerService.set(DockerService.getInstance(target.gradle))
+            imageId.convention("busybox")
+        }
     }
 
     companion object {

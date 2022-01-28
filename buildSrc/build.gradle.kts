@@ -13,6 +13,8 @@ plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
     java
+    id("idea")
+    id("org.unbroken-dome.test-sets") version "4.0.0"
 }
 
 val JAVA_VERSION = JavaLanguageVersion.of(11)
@@ -105,5 +107,17 @@ tasks.withType<Test> {
     reports {
         junitXml.required.set(true)
         html.required.set(true)
+    }
+}
+testSets {
+    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
+}
+idea {
+    module {
+        val functionalTest by testSets
+        testSourceDirs = testSourceDirs.plus(functionalTest.sourceSet.java.srcDirs)
+        testResourceDirs = testResourceDirs.plus(functionalTest.sourceSet.resources.srcDirs)
+//        testSourceDirs = testSourceDirs.plus(sourceSets["functionalTest"].java.srcDirs)
+//        testResourceDirs = testResourceDirs.plus(sourceSets["functionalTest"].resources.srcDirs)
     }
 }
