@@ -95,7 +95,8 @@ tasks.withType<Test> {
     // fixture noch nicht mit dabei. Test sollte das
     // verzeichnis nach tmp kopieren. node_modules
     // sollten nicht von gradle überwacht werden.
-    inputs.files(project.layout.projectDirectory.dir("fixtures"))
+    val fixtures = project.layout.projectDirectory.dir("fixtures")
+    inputs.files(fixtures)
         .withPropertyName("fixtures")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
@@ -118,14 +119,18 @@ tasks.withType<Test> {
         junitXml.required.set(true)
         html.required.set(true)
     }
+
+    systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
 }
+
 testSets {
-//    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
+    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
 }
+
 idea {
     module {
-//        val functionalTest by testSets
-//        testSourceDirs = testSourceDirs.plus(functionalTest.sourceSet.java.srcDirs)
-//        testResourceDirs = testResourceDirs.plus(functionalTest.sourceSet.resources.srcDirs)
+        val functionalTest by testSets
+        testSourceDirs = testSourceDirs.plus(functionalTest.sourceSet.java.srcDirs)
+        testResourceDirs = testResourceDirs.plus(functionalTest.sourceSet.resources.srcDirs)
     }
 }

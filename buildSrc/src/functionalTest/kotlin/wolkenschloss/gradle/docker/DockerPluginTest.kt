@@ -7,17 +7,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.gradle.docker.testing.build
+import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.build
 import java.io.File
 
 class DockerPluginTest : DescribeSpec({
 
-    val fixtures = File("fixtures").absoluteFile
-    val fixture = tempdir()
-
     describe("DockerPlugin applied to a gradle project with ImageBuildTask") {
-        fixtures.resolve("image")
-            .copyRecursively(fixture)
+        val fixture = Fixtures("image").clone(tempdir())
 
         it("should build image") {
             val result = fixture.build("base")

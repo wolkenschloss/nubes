@@ -27,9 +27,3 @@ fun TaskProvider<BuildImageTask>.forceRemoveImage() {
 operator fun <T : FileSystemLocation> FileSystemLocationProperty<T>.minus(projectDir: File): String {
     return get().asFile.relativeToOrNull(projectDir).toString()
 }
-
-fun File.build(vararg args: String): BuildResult = GradleRunner.create()
-    .withProjectDir(this)
-    .withArguments(*args)
-    .withPluginClasspath()
-    .build()
