@@ -14,16 +14,13 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.gradle.docker.testing.forceRemoveImage
-import wolkenschloss.gradle.docker.testing.minus
-import wolkenschloss.gradle.docker.testing.shortId
 import java.io.File
 
 class BuildImageTaskTest : DescribeSpec({
 
     val fixtures = File("src/test/fixtures").absoluteFile
 
-    xdescribe("A project with DockerPlugin applied") {
+    describe("A project with DockerPlugin applied") {
         val projectDir = tempdir()
         val project = ProjectBuilder.builder()
             .withProjectDir(projectDir)

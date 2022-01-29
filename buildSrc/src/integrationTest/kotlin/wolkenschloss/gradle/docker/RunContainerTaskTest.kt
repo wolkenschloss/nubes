@@ -9,9 +9,8 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.kotlin.dsl.*
 import java.lang.StringBuilder
 
-@Suppress("unused")
 class RunContainerTaskTest : DescribeSpec ({
-    xdescribe("A project with DockerPlugin applied") {
+    describe("A project with DockerPlugin applied") {
         val log = CaptureStandardOutput()
         val projectDir = tempdir()
         val project = ProjectBuilder.builder()

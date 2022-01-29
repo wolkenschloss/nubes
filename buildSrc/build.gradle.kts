@@ -18,7 +18,18 @@ plugins {
 }
 
 testSets {
-    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
+    libraries {
+        create("testCommon") {
+            dirName = "testing"
+        }
+    }
+
+    @Suppress("UNUSED_VARIABLE") val functionalTest by creating {
+        imports("testCommon")
+    }
+    @Suppress("UNUSED_VARIABLE") val integrationTest by creating {
+        imports("testCommon")
+    }
 }
 
 idea {
@@ -51,6 +62,7 @@ kotlin {
 
 gradlePlugin {
 //    testSourceSets.add(project.sourceSets["functionalTest"])
+//    testSourceSets.add(project.sourceSets["integrationTest"])
     plugins {
         create("simplePlugin") {
             id = "wolkenschloss.testbed"
@@ -72,6 +84,9 @@ repositories {
 val quarkusPluginVersion: String by project
 val quarkusPluginArtifactId: String by project
 
+val testCommonImplementation: Configuration by configurations.getting
+val testCommonApi: Configuration by configurations.getting
+
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
     implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
@@ -85,8 +100,9 @@ dependencies {
     implementation("com.google.cloud.tools:jib-core:0.19.0")
     implementation("com.jayway.jsonpath:json-path:2.6.0")
 
-    implementation("com.github.docker-java:docker-java-core:3.2.12")
-    implementation("com.github.docker-java:docker-java-transport-zerodep:3.2.12")
+    implementation(platform("com.github.docker-java:docker-java-bom:3.2.12"))
+    implementation("com.github.docker-java:docker-java-core")
+    implementation("com.github.docker-java:docker-java-transport-zerodep")
 
     testImplementation(platform("org.junit:junit-bom:5.8.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -99,6 +115,10 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5")
     testImplementation("io.kotest:kotest-runner-junit5-jvm")
     testImplementation("io.kotest:kotest-assertions-core")
+
+    testCommonApi(gradleApi())
+    testCommonImplementation("com.github.docker-java:docker-java-core:3.2.12")
+    testCommonImplementation(gradleTestKit())
 }
 
 tasks.withType<Test> {
