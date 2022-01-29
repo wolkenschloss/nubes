@@ -12,7 +12,6 @@ tasks {
     // see directory docker/base
     val cat by registering(RunContainerTask::class) {
         doNotTrackState("Only side effect")
-        logfile.set(project.layout.buildDirectory.file("hosts"))
         imageId.set(base.flatMap { it.imageId })
         command.addAll("cat", "hello.txt")
     }

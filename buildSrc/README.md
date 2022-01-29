@@ -1,7 +1,14 @@
 # Running Tests in buildSrc
 
-```java
-:test --tests "wolkenschloss.conventions.CorePluginTest" -p buildSrc
+```bash
+# Execute all functional test
+./gradlew functionalTest -p buildSrc
+
+# Execute single functional test
+./gradlew functionalTest --test "wolkenschloss.conventions.CoreTest" -p buildSrc
+
+# Execute single unit test
+./gradlew test --tests "wolkenschloss.FormDataTests" -p buildSrc
 ```
 
 # Webapp Convention Plugin
@@ -346,6 +353,11 @@ angefügt.
 ./gradlew ':test -p buildSrc
 ```
 
+# Docker Gradle Plugin
+
+Erzeugt Docker Images und führt Container aus.
+
+
 [k8s]: https://kubernetes.io/
 [microk8s]: https://microk8s.io/docs
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -354,3 +366,5 @@ angefügt.
 [Vue.js]: https://vuejs.org/
 [npm]: https://www.npmjs.com/
 [Vue CLI]: https://cli.vuejs.org/
+
+

@@ -9,7 +9,6 @@ import io.kotest.matchers.string.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.Fixtures
 import wolkenschloss.testing.build
-import java.io.File
 
 class DockerPluginTest : DescribeSpec({
 
@@ -30,7 +29,6 @@ class DockerPluginTest : DescribeSpec({
 
             result.task(":cat")!!.outcome shouldBe TaskOutcome.SUCCESS
             result.output shouldContain "Hello Cat"
-            fixture.resolve("build/hosts").readText() shouldBe "Hello Cat"
         }
 
         it("should capture output with log level info") {
@@ -52,14 +50,15 @@ class DockerPluginTest : DescribeSpec({
             result.output shouldContain "Hello Silence"
         }
 
-        xit("should write container output to logfile") {
+
+        // see https://unix.stackexchange.com/questions/18743/whats-the-point-in-adding-a-new-line-to-the-end-of-a-file
+        it("should append new line to container output logfile") {
             val result = fixture.build("log", "--rerun-tasks", "-i")
 
             println(result.output)
             result.task(":log")?.outcome shouldBe TaskOutcome.SUCCESS
-            fixture.resolve("build/log").readText() shouldBe "Hello Logfile"
+            fixture.resolve("build/log").readText() shouldBe "Hello Logfile\n"
         }
     }
-}) {
-}
+})
 
