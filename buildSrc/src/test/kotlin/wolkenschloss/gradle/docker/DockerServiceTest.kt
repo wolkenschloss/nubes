@@ -18,7 +18,7 @@ class DockerServiceTest : DescribeSpec({
 
     val fixtures = File("src/test/fixtures").absoluteFile
 
-    describe("A project using DockerPlugin") {
+    xdescribe("A project using DockerPlugin") {
         val projectDir = tempdir()
 
         val project = ProjectBuilder.builder()

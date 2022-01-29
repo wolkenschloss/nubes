@@ -1,5 +1,6 @@
 package wolkenschloss.gradle.docker
 
+import com.github.dockerjava.api.model.Image
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -30,6 +31,7 @@ abstract class BuildImageTask : DefaultTask() {
     @TaskAction
     fun execute() {
         imageId.get().asFile.parentFile.mkdirs()
+        logger.info("creating docker image: build context '${inputDir.get().asFile.absolutePath}'")
 
         val docker by dockerService
         val builder = docker.client.buildImageCmd()
@@ -42,5 +44,9 @@ abstract class BuildImageTask : DefaultTask() {
         val id = builder.start().awaitImageId()
 
         imageId.get().asFile.writeText(id)
+        logger.info("image $id created with tags ${tags.get().joinToString(", ")}")
     }
 }
+
+val Image.shortId: String
+    get() = id.removePrefix("sha256:").take(12)

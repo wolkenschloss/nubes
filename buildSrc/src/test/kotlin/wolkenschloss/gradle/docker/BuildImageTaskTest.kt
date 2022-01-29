@@ -23,7 +23,7 @@ class BuildImageTaskTest : DescribeSpec({
 
     val fixtures = File("src/test/fixtures").absoluteFile
 
-    describe("A project with DockerPlugin applied") {
+    xdescribe("A project with DockerPlugin applied") {
         val projectDir = tempdir()
         val project = ProjectBuilder.builder()
             .withProjectDir(projectDir)

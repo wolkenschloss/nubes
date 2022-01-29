@@ -11,7 +11,7 @@ import java.lang.StringBuilder
 
 @Suppress("unused")
 class RunContainerTaskTest : DescribeSpec ({
-    describe("A project with DockerPlugin applied") {
+    xdescribe("A project with DockerPlugin applied") {
         val log = CaptureStandardOutput()
         val projectDir = tempdir()
         val project = ProjectBuilder.builder()

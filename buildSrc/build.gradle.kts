@@ -34,6 +34,7 @@ kotlin {
 }
 
 gradlePlugin {
+//    testSourceSets.add(project.sourceSets["functionalTest"])
     plugins {
         create("simplePlugin") {
             id = "wolkenschloss.testbed"
@@ -89,6 +90,15 @@ dependencies {
 }
 
 tasks.withType<Test> {
+
+    // trigger build, if fixture changes
+    // fixture noch nicht mit dabei. Test sollte das
+    // verzeichnis nach tmp kopieren. node_modules
+    // sollten nicht von gradle überwacht werden.
+    inputs.files(project.layout.projectDirectory.dir("fixtures"))
+        .withPropertyName("fixtures")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
     useJUnitPlatform()
     enabled = true
     testLogging {
@@ -110,14 +120,12 @@ tasks.withType<Test> {
     }
 }
 testSets {
-    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
+//    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
 }
 idea {
     module {
-        val functionalTest by testSets
-        testSourceDirs = testSourceDirs.plus(functionalTest.sourceSet.java.srcDirs)
-        testResourceDirs = testResourceDirs.plus(functionalTest.sourceSet.resources.srcDirs)
-//        testSourceDirs = testSourceDirs.plus(sourceSets["functionalTest"].java.srcDirs)
-//        testResourceDirs = testResourceDirs.plus(sourceSets["functionalTest"].resources.srcDirs)
+//        val functionalTest by testSets
+//        testSourceDirs = testSourceDirs.plus(functionalTest.sourceSet.java.srcDirs)
+//        testResourceDirs = testResourceDirs.plus(functionalTest.sourceSet.resources.srcDirs)
     }
 }

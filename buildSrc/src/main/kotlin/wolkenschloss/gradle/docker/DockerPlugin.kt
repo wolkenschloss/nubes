@@ -17,7 +17,7 @@ class DockerPlugin : Plugin<Project> {
 
         target.tasks.withType(RunContainerTask::class.java).configureEach {
             dockerService.set(DockerService.getInstance(target.gradle))
-            imageId.convention("busybox")
+            imageTag.convention("busybox")
         }
     }
 
