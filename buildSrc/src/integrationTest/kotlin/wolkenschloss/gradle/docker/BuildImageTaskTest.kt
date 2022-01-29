@@ -14,11 +14,9 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import java.io.File
+import wolkenschloss.testing.Fixtures
 
 class BuildImageTaskTest : DescribeSpec({
-
-    val fixtures = File("src/test/fixtures").absoluteFile
 
     describe("A project with DockerPlugin applied") {
         val projectDir = tempdir()
@@ -70,8 +68,9 @@ class BuildImageTaskTest : DescribeSpec({
                     )
                 }
                 describe("Dockerfile with arguments") {
+                    val fixture = Fixtures("docker/withargs").clone(tempdir())
                     val imagewithargs by registering(BuildImageTask::class) {
-                        inputDir.set(fixtures.resolve("docker/withargs"))
+                        inputDir.set(fixture)
                     }
 
                     afterTest { imagewithargs.forceRemoveImage() }

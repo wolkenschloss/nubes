@@ -61,6 +61,7 @@ kotlin {
 }
 
 gradlePlugin {
+    testSourceSets(project.sourceSets["functionalTest"], project.sourceSets["integrationTest"])
 //    testSourceSets.add(project.sourceSets["functionalTest"])
 //    testSourceSets.add(project.sourceSets["integrationTest"])
     plugins {
@@ -153,5 +154,11 @@ tasks.withType<Test> {
     }
 
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
+}
+
+tasks {
+    register("ci") {
+        dependsOn("build", "integrationTest", "functionalTest")
+    }
 }
 

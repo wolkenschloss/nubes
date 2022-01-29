@@ -1,13 +1,10 @@
 package wolkenschloss.gradle.docker
 
-import com.github.dockerjava.api.model.Image
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.file.FileSystemLocationProperty
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
-val Image.shortId: String
-    get() = id.removePrefix("sha256:").take(12)
 
 fun TaskProvider<BuildImageTask>.forceRemoveImage() {
     val task = get()

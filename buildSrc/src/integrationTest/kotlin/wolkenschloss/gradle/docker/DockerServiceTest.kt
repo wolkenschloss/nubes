@@ -10,12 +10,9 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-
-import java.io.File
+import wolkenschloss.testing.Fixtures
 
 class DockerServiceTest : DescribeSpec({
-
-    val fixtures = File("src/test/fixtures").absoluteFile
 
     describe("A project using DockerPlugin") {
         val projectDir = tempdir()
@@ -41,12 +38,13 @@ class DockerServiceTest : DescribeSpec({
                 }
 
                 describe("configured with base directory") {
+                    val fixture = Fixtures("docker/hello").clone(tempdir())
                     afterTest {
                         hello.forceRemoveImage()
                     }
 
                     hello {
-                        inputDir.set(fixtures.resolve("docker/hello"))
+                        inputDir.set(fixture)
                     }
 
                     it("should build docker image") {
