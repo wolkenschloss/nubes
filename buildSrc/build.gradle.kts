@@ -17,6 +17,22 @@ plugins {
     id("org.unbroken-dome.test-sets") version "4.0.0"
 }
 
+testSets {
+    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
+}
+
+idea {
+    module {
+//        val functionalTest by testSets
+//        testSourceDirs.addAll(functionalTest.sourceSet.allSource)
+//        testResourceDirs.addAll(functionalTest.sourceSet.resources.srcDirs)
+//
+//        val unitTest by testSets
+//        testSourceDirs.addAll(unitTest.sourceSet.allSource)
+//        testResourceDirs.addAll(unitTest.sourceSet.resources.srcDirs)
+    }
+}
+
 val JAVA_VERSION = JavaLanguageVersion.of(11)
 
 java {
@@ -72,10 +88,6 @@ dependencies {
     implementation("com.github.docker-java:docker-java-core:3.2.12")
     implementation("com.github.docker-java:docker-java-transport-zerodep:3.2.12")
 
-    testImplementation("org.spockframework:spock-core:2.0-groovy-3.0") {
-        exclude(group = "org.codehaus.groovy")
-    }
-
     testImplementation(platform("org.junit:junit-bom:5.8.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -123,14 +135,3 @@ tasks.withType<Test> {
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
 }
 
-testSets {
-    @Suppress("UNUSED_VARIABLE") val functionalTest by creating
-}
-
-idea {
-    module {
-        val functionalTest by testSets
-        testSourceDirs = testSourceDirs.plus(functionalTest.sourceSet.java.srcDirs)
-        testResourceDirs = testResourceDirs.plus(functionalTest.sourceSet.resources.srcDirs)
-    }
-}
