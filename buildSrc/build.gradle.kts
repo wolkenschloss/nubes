@@ -5,6 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 group = "com.github.wolkenschloss.gradle"
 
 repositories {
+    mavenLocal()
     gradlePluginPortal()
     mavenCentral()
 }
@@ -114,6 +115,8 @@ sourceSets.test {
             kotlin.setSrcDirs(testDir.unit.kotlin)
         }
     }
+
+    groovy.setSrcDirs(emptyList<RegularFile>())
 }
 
 idea {
@@ -162,12 +165,6 @@ gradlePlugin {
             implementationClass = "wolkenschloss.gradle.docker.DockerPlugin"
         }
     }
-}
-
-repositories {
-    mavenLocal()
-    gradlePluginPortal()
-    mavenCentral()
 }
 
 val quarkusPluginVersion: String by project
