@@ -1,7 +1,7 @@
 import wolkenschloss.gradle.docker.RunContainerTask
 
 plugins {
-    id("wolkenschloss.gradle.docker")
+    id("com.github.wolkenschloss.docker")
 }
 
 tasks {

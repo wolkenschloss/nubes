@@ -1,5 +1,5 @@
 plugins {
-    id("wolkenschloss.testbed")
+    id("com.github.wolkenschloss.testbed")
 }
 
 defaultTasks("start")
