@@ -1,3 +1,4 @@
+import org.gradle.plugins.ide.idea.model.IdeaModule
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -9,40 +10,128 @@ buildscript {
 }
 
 plugins {
-    groovy
     `kotlin-dsl`
     `java-gradle-plugin`
     java
     id("idea")
-    id("org.unbroken-dome.test-sets") version "4.0.0"
+//    kotlin("jvm") version "1.5.31"
 }
 
-testSets {
-    libraries {
-        create("testCommon") {
-            dirName = "testing"
+val testDir = project.layout.projectDirectory.dir("src/test")
+
+val Directory.java : Iterable<RegularFile>
+    get() = listOf(this.file("java"))
+
+val Directory.kotlin : Iterable<RegularFile>
+    get() = listOf(this.file("kotlin"))
+
+val Directory.resources : Iterable<RegularFile>
+    get() = listOf(this.file("resources"))
+
+val testing: SourceSet by sourceSets.creating {
+    val name = this.name
+    val testing = testDir.dir("testing")
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+    java.setSrcDirs(testing.java)
+    resources.setSrcDirs(listOf(testing.resources))
+
+    kotlin {
+        sourceSets["testing"].apply {
+            kotlin.setSrcDirs(listOf(testing.kotlin))
         }
     }
+}
 
-    @Suppress("UNUSED_VARIABLE") val functionalTest by creating {
-        imports("testCommon")
+val testingImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.implementation.get())
+}
+
+val testingRuntimeOnly: Configuration by configurations.getting {
+    extendsFrom(configurations.runtimeOnly.get())
+}
+
+val integration: SourceSet by sourceSets.creating {
+    val name = this.name
+    val base = testDir.dir(name)
+    compileClasspath += sourceSets.main.get().output //+ testing.output
+    runtimeClasspath += sourceSets.main.get().output //+ testing.output
+    java.setSrcDirs(listOf(base.java))
+    resources.setSrcDirs(listOf(base.resources))
+
+    kotlin {
+        sourceSets["integration"].apply {
+            kotlin.setSrcDirs(listOf(base.kotlin))
+        }
     }
-    @Suppress("UNUSED_VARIABLE") val integrationTest by creating {
-        imports("testCommon")
+}
+
+val integrationImplementation by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val integrationRuntimeOnly by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val functional: SourceSet by sourceSets.creating {
+    val name = this.name
+    val base = testDir.dir(name)
+    compileClasspath += sourceSets.main.get().output + testing.output
+    runtimeClasspath += sourceSets.main.get().output + testing.output
+    java.setSrcDirs(listOf(base.java))
+    resources.setSrcDirs(listOf(base.resources))
+
+    kotlin {
+        sourceSets[name].apply {
+            kotlin.setSrcDirs(listOf(base.kotlin))
+        }
     }
+}
+
+val functionalImplementation by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val functionalRuntimeOnly by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+sourceSets.test {
+    val name = this.name
+    val base = testDir.dir("unit")
+    compileClasspath += testing.output
+    runtimeClasspath += testing.output
+    java.setSrcDirs(listOf(base.java))
+    resources.setSrcDirs(listOf(base.resources))
+
+    kotlin {
+        sourceSets[name].apply {
+            kotlin.setSrcDirs(listOf(base.kotlin))
+        }
+    }
+}
+
+fun IdeaModule.registerSourceSet(sourceSet: SourceSet) {
+    val module = this
+    module.testSourceDirs = module.testSourceDirs.plus(sourceSet.java.srcDirs)
 }
 
 idea {
     module {
-//        val functionalTest by testSets
-//        testSourceDirs.addAll(functionalTest.sourceSet.allSource)
-//        testResourceDirs.addAll(functionalTest.sourceSet.resources.srcDirs)
-//
-//        val unitTest by testSets
-//        testSourceDirs.addAll(unitTest.sourceSet.allSource)
-//        testResourceDirs.addAll(unitTest.sourceSet.resources.srcDirs)
-    }
+        listOf(sourceSets.test.get(), testing, integration, functional).forEach {
+            registerSourceSet(it)
+        }
+
+        kotlin {
+            sourceSets["integration"].apply {
+            testSourceDirs = testSourceDirs.plus(this.kotlin.srcDirs)
+            }
+        }
+
+        }
 }
+
 
 val JAVA_VERSION = JavaLanguageVersion.of(11)
 
@@ -61,9 +150,8 @@ kotlin {
 }
 
 gradlePlugin {
-    testSourceSets(project.sourceSets["functionalTest"], project.sourceSets["integrationTest"])
-//    testSourceSets.add(project.sourceSets["functionalTest"])
-//    testSourceSets.add(project.sourceSets["integrationTest"])
+    testSourceSets(testing, integration, functional)
+
     plugins {
         create("simplePlugin") {
             id = "wolkenschloss.testbed"
@@ -84,9 +172,6 @@ repositories {
 
 val quarkusPluginVersion: String by project
 val quarkusPluginArtifactId: String by project
-
-val testCommonImplementation: Configuration by configurations.getting
-val testCommonApi: Configuration by configurations.getting
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
@@ -117,9 +202,9 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm")
     testImplementation("io.kotest:kotest-assertions-core")
 
-    testCommonApi(gradleApi())
-    testCommonImplementation("com.github.docker-java:docker-java-core:3.2.12")
-    testCommonImplementation(gradleTestKit())
+//    testingApi(gradleApi())
+    testingImplementation("com.github.docker-java:docker-java-core:3.2.12")
+    testingImplementation(gradleTestKit())
 }
 
 tasks.withType<Test> {
@@ -157,8 +242,24 @@ tasks.withType<Test> {
 }
 
 tasks {
+    val integration by registering(Test::class) {
+        description = "Runs integration tests."
+        group = "verification"
+        testClassesDirs = integration.output.classesDirs
+        classpath = integration.runtimeClasspath
+        shouldRunAfter("test")
+    }
+
+    val ft by registering(Test::class) {
+        description = "Runs functional tests."
+        group = "verification"
+        testClassesDirs = functional.output.classesDirs
+        classpath = functional.runtimeClasspath
+        shouldRunAfter("it")
+    }
+
     register("ci") {
-        dependsOn("build", "integrationTest", "functionalTest")
+        dependsOn("build", integration, "ft")
     }
 }
 

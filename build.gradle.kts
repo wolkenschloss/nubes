@@ -1,5 +1,3 @@
-
-
 buildscript {
     val quarkusPluginVersion: String by project
     val quarkusPluginArtifactId: String by project
