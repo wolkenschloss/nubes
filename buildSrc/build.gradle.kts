@@ -8,6 +8,7 @@ repositories {
     mavenLocal()
     gradlePluginPortal()
     mavenCentral()
+
 }
 
 plugins {
@@ -15,6 +16,7 @@ plugins {
     `java-gradle-plugin`
     java
     groovy
+    kotlin("jvm") version "1.5.31"
     id("idea")
 }
 
@@ -32,16 +34,23 @@ val Directory.resources: Iterable<RegularFile>
 val Directory.unit: Directory
     get() = this.dir("unit")
 
+val Directory.none: Iterable<RegularFile>
+  get() = emptyList<RegularFile>()
+
 val testing: SourceSet by sourceSets.creating {
     val testing = testDir.dir(this.name)
     compileClasspath += sourceSets.main.get().output
     runtimeClasspath += sourceSets.main.get().output
     java.setSrcDirs(testing.java)
     resources.setSrcDirs(testing.resources)
+    val javaDestination = project.layout.buildDirectory.dir("classes/java/test/$name")
+    java.destinationDirectory.set(javaDestination)
 
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(testing.kotlin)
+            val destination = project.layout.buildDirectory.dir("classes/kotlin/test/$name")
+            this.kotlin.destinationDirectory.set(destination)
         }
     }
 
@@ -56,40 +65,55 @@ val testingRuntimeOnly: Configuration by configurations.getting {
     extendsFrom(configurations.runtimeOnly.get())
 }
 
+val testingApi: Configuration by configurations.getting {
+    extendsFrom(configurations.api.get())
+}
+
 val integration: SourceSet by sourceSets.creating {
     val base = testDir.dir(name)
-    compileClasspath += sourceSets.main.get().output + testing.output
-    runtimeClasspath += sourceSets.main.get().output + testing.output
+
+    compileClasspath += sourceSets.main.get().output
+    compileClasspath += testing.output
+
+    runtimeClasspath += sourceSets.main.get().output
+    runtimeClasspath += testing.output
+
     java.setSrcDirs(base.java)
     resources.setSrcDirs(base.resources)
 
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(base.kotlin)
+//            kotlin.setSrcDirs(emptyList<RegularFile>())
         }
     }
 
     groovy.setSrcDirs(emptyList<RegularFile>())
 }
 
+
 val integrationImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations.testImplementation.get())
+    extendsFrom(configurations["testingImplementation"])
 }
 
 val integrationRuntimeOnly: Configuration by configurations.getting {
-    extendsFrom(configurations.testImplementation.get())
+    extendsFrom(configurations["testingRuntimeOnly"])
+
 }
 
 val functional: SourceSet by sourceSets.creating {
     val base = testDir.dir(name)
     compileClasspath += sourceSets.main.get().output + testing.output
     runtimeClasspath += sourceSets.main.get().output + testing.output
-    java.setSrcDirs(base.java)
+    java.setSrcDirs(base.java +  base.kotlin)
+//    java.setSrcDirs(base.java)
     resources.setSrcDirs(base.resources)
 
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(base.kotlin)
+//            kotlin.setSrcDirs(emptyList<RegularFile>())
+//            kotlin.destinationDirectory.set(project.layout.buildDirectory.dir("build/classes/kotlin/test/functional"))
         }
     }
 
@@ -97,44 +121,37 @@ val functional: SourceSet by sourceSets.creating {
 }
 
 val functionalImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations.testImplementation.get())
+    extendsFrom(configurations["testingImplementation"])
 }
 
 val functionalRuntimeOnly: Configuration by configurations.getting {
-    extendsFrom(configurations.testImplementation.get())
+    extendsFrom(configurations["testingRuntimeOnly"])
 }
 
 sourceSets.test {
-    compileClasspath += testing.output
-    runtimeClasspath += testing.output
-    java.setSrcDirs(testDir.unit.java)
+    compileClasspath += testing.compileClasspath
+    runtimeClasspath += testing.runtimeClasspath
+    java.setSrcDirs(testDir.unit.java + testDir.unit.kotlin)
     resources.setSrcDirs(testDir.unit.resources)
+
+    val javaDestination = project.layout.buildDirectory.dir("classes/java/test/$name")
+    java.destinationDirectory.set(javaDestination)
 
     kotlin {
         sourceSets[this@test.name].apply {
-            kotlin.setSrcDirs(testDir.unit.kotlin)
+//            kotlin.setSrcDirs(testDir.unit.kotlin)
+            kotlin.setSrcDirs(emptyList<RegularFile>())
+
+            val destination = project.layout.buildDirectory.dir("classes/kotlin/test/$name")
+            this.kotlin.destinationDirectory.set(destination)
         }
     }
 
     groovy.setSrcDirs(emptyList<RegularFile>())
 }
 
-idea {
-    module {
-        listOf(sourceSets.test.get(), testing, integration, functional).forEach {
-            testSourceDirs = testSourceDirs.plus(it.java.srcDirs)
-        }
 
-        kotlin {
-            sourceSets[integration.name].apply {
-                testSourceDirs = testSourceDirs.plus(this.kotlin.srcDirs)
-            }
-            sourceSets[functional.name].apply {
-                testSourceDirs = testSourceDirs.plus(this.kotlin.srcDirs)
-            }
-        }
-    }
-}
+
 
 val javaLanguageVersion = JavaLanguageVersion.of(11)
 
@@ -146,8 +163,9 @@ java {
 }
 
 gradlePlugin {
-    testSourceSets(testing, integration, functional)
+//    testSourceSets(testing, integration, functional)
 
+    testSourceSets(functional)
     val namespace = "com.github.wolkenschloss"
 
     plugins {
@@ -188,20 +206,42 @@ dependencies {
     implementation("com.github.docker-java:docker-java-core")
     implementation("com.github.docker-java:docker-java-transport-zerodep")
 
-    testImplementation(platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+
+//    implementation(platform("io.kotest:kotest-bom:4.6.3"))
+//    implementation("io.kotest:kotest-runner-junit5")
+//    implementation("io.kotest:kotest-runner-junit5-jvm")
+//    implementation("io.kotest:kotest-assertions-core")
+//    implementation("io.kotest:kotest-framework-engine-jvm")
+
+    // testing
+    testingImplementation("com.github.docker-java:docker-java-core:3.2.12")
+    testingImplementation(gradleTestKit())
+    testingImplementation(gradleApi())
+    testingImplementation(gradleKotlinDsl())
+
+    testingImplementation(platform("org.junit:junit-bom:5.8.1"))
+    testingApi("org.junit.jupiter:junit-jupiter-api")
+    testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
 
     // Waiting for Gradle update to use kotlin version 1.6.
     // Then the current version of kotest can also be used.
     // https://github.com/kotest/kotest/issues/2666
-    testImplementation(platform("io.kotest:kotest-bom:4.6.3"))
-    testImplementation("io.kotest:kotest-runner-junit5")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm")
-    testImplementation("io.kotest:kotest-assertions-core")
+    testingImplementation(platform("io.kotest:kotest-bom:4.6.3"))
+    testingApi("io.kotest:kotest-runner-junit5")
+    testingApi("io.kotest:kotest-runner-junit5-jvm")
+    testingApi("io.kotest:kotest-assertions-core")
+    testingApi("io.kotest:kotest-framework-engine-jvm")
+    testingApi("io.kotest:kotest-framework-api-jvm")
 
-    testingImplementation("com.github.docker-java:docker-java-core:3.2.12")
-    testingImplementation(gradleTestKit())
+
+    integrationImplementation("io.kotest:kotest-framework-api-jvm")
+    integrationImplementation(gradleApi())
+    integrationImplementation(gradleTestKit())
+    integrationImplementation(gradleKotlinDsl())
+
+    functionalImplementation("io.kotest:kotest-framework-api-jvm")
 }
 
 tasks.withType<Test> {
@@ -238,18 +278,22 @@ tasks.withType<Test> {
 
 tasks {
     val integration by registering(Test::class) {
+        doNotTrackState("mach das immer")
         description = "Runs integration tests."
         group = VERIFICATION_GROUP
         testClassesDirs = integration.output.classesDirs
         classpath = integration.runtimeClasspath
-        shouldRunAfter("test")
     }
 
     val functional by registering(Test::class) {
+        kotlin {
+//            sourceSets[functional.name].kotlin.
+        }
         description = "Runs functional tests."
         group = VERIFICATION_GROUP
         testClassesDirs = functional.output.classesDirs
         classpath = functional.runtimeClasspath
+
         shouldRunAfter(integration)
     }
 
@@ -260,3 +304,10 @@ tasks {
     }
 }
 
+idea {
+    module {
+        listOf(integration, functional, ).forEach {
+            testSourceDirs = testSourceDirs.plus(it.java.srcDirs)
+        }
+    }
+}
