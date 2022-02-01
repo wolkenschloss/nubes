@@ -8,7 +8,6 @@ repositories {
     mavenLocal()
     gradlePluginPortal()
     mavenCentral()
-
 }
 
 plugins {
@@ -16,7 +15,7 @@ plugins {
     `java-gradle-plugin`
     java
     groovy
-    kotlin("jvm") version "1.5.31"
+//    kotlin("jvm") version "1.5.31"
     id("idea")
 }
 
