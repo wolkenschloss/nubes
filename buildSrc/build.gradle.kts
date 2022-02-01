@@ -198,10 +198,7 @@ dependencies {
     // https://github.com/kotest/kotest/issues/2666
     testingImplementation(platform("io.kotest:kotest-bom:4.6.3"))
     testingApi("io.kotest:kotest-runner-junit5")
-    testingApi("io.kotest:kotest-runner-junit5-jvm")
     testingApi("io.kotest:kotest-assertions-core")
-    testingRuntimeOnly("io.kotest:kotest-framework-engine-jvm")
-    testingApi("io.kotest:kotest-framework-api-jvm")
 
     // Allow integration tests to use kotlin dsl
     integrationImplementation(gradleKotlinDsl())
