@@ -84,7 +84,6 @@ val integration: SourceSet by sourceSets.creating {
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(base.kotlin)
-//            kotlin.setSrcDirs(emptyList<RegularFile>())
         }
     }
 
@@ -106,14 +105,11 @@ val functional: SourceSet by sourceSets.creating {
     compileClasspath += sourceSets.main.get().output + testing.output
     runtimeClasspath += sourceSets.main.get().output + testing.output
     java.setSrcDirs(base.java +  base.kotlin)
-//    java.setSrcDirs(base.java)
     resources.setSrcDirs(base.resources)
 
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(base.kotlin)
-//            kotlin.setSrcDirs(emptyList<RegularFile>())
-//            kotlin.destinationDirectory.set(project.layout.buildDirectory.dir("build/classes/kotlin/test/functional"))
         }
     }
 
@@ -139,9 +135,7 @@ sourceSets.test {
 
     kotlin {
         sourceSets[this@test.name].apply {
-//            kotlin.setSrcDirs(testDir.unit.kotlin)
             kotlin.setSrcDirs(emptyList<RegularFile>())
-
             val destination = project.layout.buildDirectory.dir("classes/kotlin/test/$name")
             this.kotlin.destinationDirectory.set(destination)
         }
@@ -149,9 +143,6 @@ sourceSets.test {
 
     groovy.setSrcDirs(emptyList<RegularFile>())
 }
-
-
-
 
 val javaLanguageVersion = JavaLanguageVersion.of(11)
 
@@ -163,7 +154,6 @@ java {
 }
 
 gradlePlugin {
-//    testSourceSets(testing, integration, functional)
 
     testSourceSets(functional)
     val namespace = "com.github.wolkenschloss"
@@ -206,14 +196,6 @@ dependencies {
     implementation("com.github.docker-java:docker-java-core")
     implementation("com.github.docker-java:docker-java-transport-zerodep")
 
-
-
-//    implementation(platform("io.kotest:kotest-bom:4.6.3"))
-//    implementation("io.kotest:kotest-runner-junit5")
-//    implementation("io.kotest:kotest-runner-junit5-jvm")
-//    implementation("io.kotest:kotest-assertions-core")
-//    implementation("io.kotest:kotest-framework-engine-jvm")
-
     // testing
     testingImplementation("com.github.docker-java:docker-java-core:3.2.12")
     testingImplementation(gradleTestKit())
@@ -224,7 +206,6 @@ dependencies {
     testingApi("org.junit.jupiter:junit-jupiter-api")
     testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-
     // Waiting for Gradle update to use kotlin version 1.6.
     // Then the current version of kotest can also be used.
     // https://github.com/kotest/kotest/issues/2666
@@ -234,7 +215,6 @@ dependencies {
     testingApi("io.kotest:kotest-assertions-core")
     testingApi("io.kotest:kotest-framework-engine-jvm")
     testingApi("io.kotest:kotest-framework-api-jvm")
-
 
     integrationImplementation("io.kotest:kotest-framework-api-jvm")
     integrationImplementation(gradleApi())
@@ -286,9 +266,6 @@ tasks {
     }
 
     val functional by registering(Test::class) {
-        kotlin {
-//            sourceSets[functional.name].kotlin.
-        }
         description = "Runs functional tests."
         group = VERIFICATION_GROUP
         testClassesDirs = functional.output.classesDirs
@@ -300,7 +277,7 @@ tasks {
     register("ci") {
         description = "Continuous Integration"
         group = VERIFICATION_GROUP
-        dependsOn("build", integration, functional)
+        dependsOn("build", functional)
     }
 }
 
