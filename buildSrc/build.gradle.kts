@@ -15,7 +15,6 @@ plugins {
     `java-gradle-plugin`
     java
     groovy
-//    kotlin("jvm") version "1.5.31"
     id("idea")
 }
 
@@ -42,14 +41,10 @@ val testing: SourceSet by sourceSets.creating {
     runtimeClasspath += sourceSets.main.get().output
     java.setSrcDirs(testing.java)
     resources.setSrcDirs(testing.resources)
-    val javaDestination = project.layout.buildDirectory.dir("classes/java/test/$name")
-    java.destinationDirectory.set(javaDestination)
 
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(testing.kotlin)
-            val destination = project.layout.buildDirectory.dir("classes/kotlin/test/$name")
-            this.kotlin.destinationDirectory.set(destination)
         }
     }
 
@@ -91,11 +86,11 @@ val integration: SourceSet by sourceSets.creating {
 
 
 val integrationImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations["testingImplementation"])
+    extendsFrom(testingImplementation)
 }
 
 val integrationRuntimeOnly: Configuration by configurations.getting {
-    extendsFrom(configurations["testingRuntimeOnly"])
+    extendsFrom(testingRuntimeOnly)
 
 }
 
@@ -116,11 +111,11 @@ val functional: SourceSet by sourceSets.creating {
 }
 
 val functionalImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations["testingImplementation"])
+    extendsFrom(testingImplementation)
 }
 
 val functionalRuntimeOnly: Configuration by configurations.getting {
-    extendsFrom(configurations["testingRuntimeOnly"])
+    extendsFrom(testingRuntimeOnly)
 }
 
 sourceSets.test {
@@ -129,14 +124,9 @@ sourceSets.test {
     java.setSrcDirs(testDir.unit.java + testDir.unit.kotlin)
     resources.setSrcDirs(testDir.unit.resources)
 
-    val javaDestination = project.layout.buildDirectory.dir("classes/java/test/$name")
-    java.destinationDirectory.set(javaDestination)
-
     kotlin {
         sourceSets[this@test.name].apply {
             kotlin.setSrcDirs(emptyList<RegularFile>())
-            val destination = project.layout.buildDirectory.dir("classes/kotlin/test/$name")
-            this.kotlin.destinationDirectory.set(destination)
         }
     }
 
@@ -197,9 +187,7 @@ dependencies {
 
     // testing
     testingImplementation("com.github.docker-java:docker-java-core:3.2.12")
-    testingImplementation(gradleTestKit())
-    testingImplementation(gradleApi())
-    testingImplementation(gradleKotlinDsl())
+
 
     testingImplementation(platform("org.junit:junit-bom:5.8.1"))
     testingApi("org.junit.jupiter:junit-jupiter-api")
@@ -212,15 +200,11 @@ dependencies {
     testingApi("io.kotest:kotest-runner-junit5")
     testingApi("io.kotest:kotest-runner-junit5-jvm")
     testingApi("io.kotest:kotest-assertions-core")
-    testingApi("io.kotest:kotest-framework-engine-jvm")
+    testingRuntimeOnly("io.kotest:kotest-framework-engine-jvm")
     testingApi("io.kotest:kotest-framework-api-jvm")
 
-    integrationImplementation("io.kotest:kotest-framework-api-jvm")
-//    integrationImplementation(gradleApi())
-//    integrationImplementation(gradleTestKit())
-//    integrationImplementation(gradleKotlinDsl())
-
-    functionalImplementation("io.kotest:kotest-framework-api-jvm")
+    // Allow integration tests to use kotlin dsl
+    integrationImplementation(gradleKotlinDsl())
 }
 
 tasks.withType<Test> {
@@ -251,6 +235,18 @@ tasks.withType<Test> {
         junitXml.required.set(true)
         html.required.set(true)
     }
+
+    addTestListener(object : TestListener {
+
+        override fun beforeSuite(suite: TestDescriptor) {}
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            logger.lifecycle("${suite.displayName}: composite ${suite.isComposite}, has parent: ${suite.parent!=null}")
+            logger.lifecycle("Test summary: ${suite.displayName} ${result.testCount} tests, ${result.successfulTestCount} succeeded, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped")
+        }
+
+        override fun beforeTest(testDescriptor: TestDescriptor?) {}
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+    })
 
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
 }

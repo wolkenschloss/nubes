@@ -1,8 +1,8 @@
-import org.gradle.internal.impldep.org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class JunitTest {
-@Test
-public void hello() {
+    @Test
+    public void hello() {
 
-}
+    }
 }
