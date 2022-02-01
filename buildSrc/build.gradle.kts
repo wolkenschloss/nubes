@@ -78,7 +78,7 @@ val integration: SourceSet by sourceSets.creating {
     runtimeClasspath += sourceSets.main.get().output
     runtimeClasspath += testing.output
 
-    java.setSrcDirs(base.java)
+    java.setSrcDirs(base.java + base.kotlin)
     resources.setSrcDirs(base.resources)
 
     kotlin {
@@ -155,7 +155,7 @@ java {
 
 gradlePlugin {
 
-    testSourceSets(functional)
+    testSourceSets(integration, functional)
     val namespace = "com.github.wolkenschloss"
 
     plugins {
@@ -217,9 +217,9 @@ dependencies {
     testingApi("io.kotest:kotest-framework-api-jvm")
 
     integrationImplementation("io.kotest:kotest-framework-api-jvm")
-    integrationImplementation(gradleApi())
-    integrationImplementation(gradleTestKit())
-    integrationImplementation(gradleKotlinDsl())
+//    integrationImplementation(gradleApi())
+//    integrationImplementation(gradleTestKit())
+//    integrationImplementation(gradleKotlinDsl())
 
     functionalImplementation("io.kotest:kotest-framework-api-jvm")
 }
@@ -277,7 +277,7 @@ tasks {
     register("ci") {
         description = "Continuous Integration"
         group = VERIFICATION_GROUP
-        dependsOn("build", functional)
+        dependsOn("build", integration, functional)
     }
 }
 
