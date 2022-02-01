@@ -32,8 +32,7 @@ val Directory.resources: Iterable<RegularFile>
 val Directory.unit: Directory
     get() = this.dir("unit")
 
-val Directory.none: Iterable<RegularFile>
-  get() = emptyList<RegularFile>()
+val empty = emptyList<RegularFile>()
 
 val testing: SourceSet by sourceSets.creating {
     val testing = testDir.dir(this.name)
@@ -48,7 +47,7 @@ val testing: SourceSet by sourceSets.creating {
         }
     }
 
-    groovy.setSrcDirs(emptyList<RegularFile>())
+    groovy.setSrcDirs(empty)
 }
 
 val testingImplementation: Configuration by configurations.getting {
@@ -57,10 +56,6 @@ val testingImplementation: Configuration by configurations.getting {
 
 val testingRuntimeOnly: Configuration by configurations.getting {
     extendsFrom(configurations.runtimeOnly.get())
-}
-
-val testingApi: Configuration by configurations.getting {
-    extendsFrom(configurations.api.get())
 }
 
 val integration: SourceSet by sourceSets.creating {
@@ -81,7 +76,7 @@ val integration: SourceSet by sourceSets.creating {
         }
     }
 
-    groovy.setSrcDirs(emptyList<RegularFile>())
+    groovy.setSrcDirs(empty)
 }
 
 val integrationImplementation: Configuration by configurations.getting {
@@ -106,7 +101,7 @@ val functional: SourceSet by sourceSets.creating {
         }
     }
 
-    groovy.setSrcDirs(emptyList<RegularFile>())
+    groovy.setSrcDirs(empty)
 }
 
 val functionalImplementation: Configuration by configurations.getting {
@@ -125,11 +120,11 @@ sourceSets.test {
 
     kotlin {
         sourceSets[this@test.name].apply {
-            kotlin.setSrcDirs(emptyList<RegularFile>())
+            kotlin.setSrcDirs(empty)
         }
     }
 
-    groovy.setSrcDirs(emptyList<RegularFile>())
+    groovy.setSrcDirs(empty)
 }
 
 val javaLanguageVersion = JavaLanguageVersion.of(11)
@@ -186,15 +181,15 @@ dependencies {
 
     // testing
     testingImplementation(platform("org.junit:junit-bom:5.8.1"))
-    testingApi("org.junit.jupiter:junit-jupiter-api")
+    testingImplementation("org.junit.jupiter:junit-jupiter-api")
     testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // Waiting for Gradle update to use kotlin version 1.6.
     // Then the current version of kotest can also be used.
     // https://github.com/kotest/kotest/issues/2666
     testingImplementation(platform("io.kotest:kotest-bom:4.6.3"))
-    testingApi("io.kotest:kotest-runner-junit5")
-    testingApi("io.kotest:kotest-assertions-core")
+    testingImplementation("io.kotest:kotest-runner-junit5")
+    testingImplementation("io.kotest:kotest-assertions-core")
 
     // Allow integration tests to use kotlin dsl
     integrationImplementation(gradleKotlinDsl())
@@ -271,7 +266,7 @@ tasks {
 
 idea {
     module {
-        listOf(integration, functional, ).forEach {
+        listOf(integration, functional).forEach {
             testSourceDirs = testSourceDirs.plus(it.java.srcDirs)
         }
     }
