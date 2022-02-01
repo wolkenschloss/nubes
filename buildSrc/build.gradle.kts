@@ -84,7 +84,6 @@ val integration: SourceSet by sourceSets.creating {
     groovy.setSrcDirs(emptyList<RegularFile>())
 }
 
-
 val integrationImplementation: Configuration by configurations.getting {
     extendsFrom(testingImplementation)
 }
@@ -186,9 +185,6 @@ dependencies {
     implementation("com.github.docker-java:docker-java-transport-zerodep")
 
     // testing
-    testingImplementation("com.github.docker-java:docker-java-core:3.2.12")
-
-
     testingImplementation(platform("org.junit:junit-bom:5.8.1"))
     testingApi("org.junit.jupiter:junit-jupiter-api")
     testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
