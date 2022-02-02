@@ -32,12 +32,8 @@ abstract class ContainerMounts {
             inputs.map(Mountable::toMount) + inputDirs.map(Mountable::toMount)+ outputs.map(Mountable::toMount)
         }
 
-    fun input(block: InputFileMount.() -> Unit) {
-        inputs.add(objectFactory.newInstance(InputFileMount::class.java).apply(block))
-    }
-
-    fun directory(block: InputDirectoryMount.() -> Unit) {
-        inputDirs.add(objectFactory.newInstance(InputDirectoryMount::class.java).also(block))
+    fun input(block: InputMounts.() -> Unit) {
+        block(InputMounts(inputs, inputDirs, objectFactory))
     }
 
     fun output(block: OutputDirectoryMount.() -> Unit) {
