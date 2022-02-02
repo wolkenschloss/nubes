@@ -41,6 +41,30 @@ class RunContainerTaskTest : DescribeSpec ({
                     hello.get().execute()
                     log.output shouldBe  "hello world"
                 }
+
+                it("should accept mount volumes") {
+                    hello {
+                        mount {
+                            input {
+                                file {
+                                    source.set(project.layout.projectDirectory.file("hello"))
+                                    target.set("/mnt/hello")
+                                }
+                                directory {
+                                    source.set(project.layout.projectDirectory.dir("data"))
+                                    target.set("/mnt/data")
+                                }
+                            }
+
+                            output {
+                                source.set(project.layout.buildDirectory.dir("out"))
+                                target.set("/mnt/out")
+                            }
+                        }
+                    }
+
+                    hello.get().mount.mounts.get().count() shouldBe 3
+                }
             }
         }
     }

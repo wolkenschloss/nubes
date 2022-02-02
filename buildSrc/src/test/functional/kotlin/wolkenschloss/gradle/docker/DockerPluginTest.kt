@@ -9,6 +9,7 @@ import io.kotest.matchers.string.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.Fixtures
 import wolkenschloss.testing.build
+import java.io.File
 
 class DockerPluginTest : DescribeSpec({
 
@@ -32,7 +33,7 @@ class DockerPluginTest : DescribeSpec({
         }
 
         it("should capture output with log level info") {
-            val result = fixture.build("echo",  "-i")
+            val result = fixture.build("echo", "-i")
 
             result.task(":echo")?.outcome shouldBe TaskOutcome.SUCCESS
             result.output shouldContain "Hello Echo"
@@ -65,8 +66,27 @@ class DockerPluginTest : DescribeSpec({
 
         it("should read from mounted file") {
 
+            val dataFile = fixture.resolve("volumes/datafile")
+            dataFile.parentFile.mkdirs()
+            dataFile.createNewFile()
+
+            dataFile.writeText("content of mounted file")
+
             val result = fixture.build("cat")
-            result.task(":cat")!!.outcome shouldBe  TaskOutcome.SUCCESS
+            result.task(":cat")!!.outcome shouldBe TaskOutcome.SUCCESS
+            result.output shouldContain "content of mounted file"
+        }
+
+        it("should read from mounted directory") {
+            val relativeDataDirectory = File("volumes/data")
+            val dataFile = fixture.resolve(relativeDataDirectory).resolve("datafile")
+            dataFile.parentFile.mkdirs()
+            dataFile.createNewFile()
+            dataFile.writeText("another content of mounted volume")
+
+            val result = fixture.build("catDir", "-Pvolume=${relativeDataDirectory.path}")
+            result.task(":catDir")!!.outcome shouldBe TaskOutcome.SUCCESS
+            result.output shouldContain "another content of mounted volume"
         }
     }
 })

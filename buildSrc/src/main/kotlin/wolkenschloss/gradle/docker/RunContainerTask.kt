@@ -27,6 +27,13 @@ abstract class RunContainerTask : DefaultTask() {
     @get:InputFile
     abstract val imageId: RegularFileProperty
 
+    @get:Nested
+    abstract val mount: ContainerMounts
+
+    fun mount(block: ContainerMounts.() -> Unit) {
+        block(mount)
+    }
+
     @get:Input
     abstract val command: ListProperty<String>
 
@@ -53,6 +60,7 @@ abstract class RunContainerTask : DefaultTask() {
 
         val hostConfig = HostConfig.newHostConfig()
             .withAutoRemove(true)
+            .withMounts(mount.mounts.get())
 
         logger.info("using image ${image.get()}")
         logger.info("create container")
