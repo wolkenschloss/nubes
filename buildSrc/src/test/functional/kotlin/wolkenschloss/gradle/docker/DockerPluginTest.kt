@@ -19,7 +19,7 @@ class DockerPluginTest : DescribeSpec({
         it("should build image") {
             val result = fixture.build("base")
 
-            result.task(":base")?.outcome shouldBe TaskOutcome.SUCCESS
+            result.task(":base")!!.outcome shouldBe TaskOutcome.SUCCESS
 
             val imageIdFile = fixture.resolve("build/.docker/example/base")
             imageIdFile.shouldExist()

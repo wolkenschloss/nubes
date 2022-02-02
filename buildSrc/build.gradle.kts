@@ -19,7 +19,7 @@ plugins {
 }
 
 val testDir = project.layout.projectDirectory.dir("src/test")
-//val testDir = project.layout.projectDirectory.dir("src")
+
 val Directory.java: Iterable<RegularFile>
     get() = listOf(this.file("java"))
 
@@ -153,6 +153,13 @@ gradlePlugin {
             description = "Creates docker images and executes container"
             implementationClass = "wolkenschloss.gradle.docker.DockerPlugin"
         }
+
+        create("CaPlugin") {
+            id = "$namespace.ca"
+            displayName = "Wolkenschloss CA Plugin"
+            description = "Creates CA for Wolkenschloss"
+            implementationClass = "wolkenschloss.gradle.ca.CaPlugin"
+        }
     }
 }
 
@@ -206,6 +213,11 @@ dependencies {
     integrationRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     integrationImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
     integrationImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")
+
+    functionalImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    functionalRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    functionalImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
+    functionalImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")
 
 }
 
