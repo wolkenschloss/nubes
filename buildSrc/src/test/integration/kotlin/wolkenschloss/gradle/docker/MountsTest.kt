@@ -2,12 +2,10 @@ package wolkenschloss.gradle.docker
 
 import com.github.dockerjava.api.model.Mount
 import com.github.dockerjava.api.model.MountType
-import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldContain
 
-import io.kotest.matchers.shouldNotBe
 import org.gradle.testfixtures.ProjectBuilder
 
 class MountsTest : FunSpec({
@@ -20,65 +18,53 @@ class MountsTest : FunSpec({
 
         val mounts = project.objects.newInstance(ContainerMounts::class.java)
 
-        test("should not be null") {
-            withClue("mounts should not be null") {
-                mounts shouldNotBe null
-            }
-        }
-
-        test("should have object factory") {
-            withClue("getObjectFactory should return not null") {
-                mounts.objectFactory shouldNotBe null
-            }
-        }
-
         test("should add input file mounts") {
-            val t = "/mnt/opt/app/datafile"
-            val s = project.layout.projectDirectory.file("datafile")
+            val containerTargetFile = "/mnt/opt/app/datafile"
+            val projectSourceFile = project.layout.projectDirectory.file("datafile")
 
             mounts.input {
                 file {
-                    target.convention(t)
-                    source.convention(s)
+                    target.convention(containerTargetFile)
+                    source.convention(projectSourceFile)
                 }
             }
 
             mounts.mounts.get() shouldContain Mount()
-                .withSource(s.asFile.absolutePath)
-                .withTarget(t)
+                .withSource(projectSourceFile.asFile.absolutePath)
+                .withTarget(containerTargetFile)
                 .withType(MountType.BIND)
                 .withReadOnly(true)
         }
 
         test("should add input directory mount") {
-            val t = "/mnt/opt/app/dataDir"
-            val s = project.layout.projectDirectory.dir("dataDir")
+            val containerTargetDirectory = "/mnt/opt/app/dataDir"
+            val projectSourceDirectory = project.layout.projectDirectory.dir("dataDir")
 
             mounts.input {
                 directory {
-                    target.convention(t)
-                    source.convention(s)
+                    target.convention(containerTargetDirectory)
+                    source.convention(projectSourceDirectory)
                 }
             }
             mounts.mounts.get() shouldContain Mount()
-                .withSource(s.asFile.absolutePath)
-                .withTarget(t)
+                .withSource(projectSourceDirectory.asFile.absolutePath)
+                .withTarget(containerTargetDirectory)
                 .withType(MountType.BIND)
                 .withReadOnly(true)
         }
 
         test("should add output directory mount") {
-            val s = "/mnt/opt/app/dataDir"
-            val dir = project.layout.buildDirectory.dir("data")
+            val containerTargetDirectory = "/mnt/opt/app/dataDir"
+            val projectBuildOutput = project.layout.buildDirectory.dir("data")
 
             mounts.output {
-                target.convention(s)
-                source.convention(dir)
+                target.convention(containerTargetDirectory)
+                source.convention(projectBuildOutput)
             }
 
             mounts.mounts.get() shouldContain Mount()
-                .withSource(dir.get().asFile.absolutePath)
-                .withTarget(s)
+                .withSource(projectBuildOutput.get().asFile.absolutePath)
+                .withTarget(containerTargetDirectory)
                 .withType(MountType.BIND)
                 .withReadOnly(false)
         }
