@@ -1,5 +1,6 @@
 package wolkenschloss.gradle.docker
 
+import com.sun.security.auth.module.UnixSystem
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
@@ -18,6 +19,8 @@ class DockerPlugin : Plugin<Project> {
         target.tasks.withType(RunContainerTask::class.java).configureEach {
             dockerService.set(DockerService.getInstance(target.gradle))
             imageTag.convention("busybox")
+            val unix = UnixSystem()
+            user.convention("${unix.uid}:${unix.gid}")
         }
     }
 

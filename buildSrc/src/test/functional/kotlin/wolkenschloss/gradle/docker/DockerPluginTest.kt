@@ -72,8 +72,8 @@ class DockerPluginTest : DescribeSpec({
 
             dataFile.writeText("content of mounted file")
 
-            val result = fixture.build("cat")
-            result.task(":cat")!!.outcome shouldBe TaskOutcome.SUCCESS
+            val result = fixture.build("catFile")
+            result.task(":catFile")!!.outcome shouldBe TaskOutcome.SUCCESS
             result.output shouldContain "content of mounted file"
         }
 
@@ -87,6 +87,16 @@ class DockerPluginTest : DescribeSpec({
             val result = fixture.build("catDir", "-Pvolume=${relativeDataDirectory.path}")
             result.task(":catDir")!!.outcome shouldBe TaskOutcome.SUCCESS
             result.output shouldContain "another content of mounted volume"
+        }
+
+        it("should write a file into mounted directory") {
+            val dataDir = fixture.resolve("build/volumes/data").absoluteFile
+            dataDir.mkdirs()
+
+            val result = fixture.build("write", "-P", "text=hello write")
+            result.task(":write")!!.outcome shouldBe TaskOutcome.SUCCESS
+            println(result.output)
+            dataDir.resolve("result").readText() shouldBe "hello write"
         }
     }
 })

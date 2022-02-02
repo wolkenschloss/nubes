@@ -5,7 +5,7 @@ plugins {
 }
 
 tasks {
-    val cat by registering(RunContainerTask::class) {
+    val catFile by registering(RunContainerTask::class) {
         mount {
             input {
                 file {
@@ -31,7 +31,18 @@ tasks {
         }
 
         command.addAll("cat", "/mnt/data/datafile")
+    }
 
-//        command.addAll("cat", "/mnt/data/datafile")
+    val text: String by project
+
+    val write by registering(RunContainerTask::class) {
+        mount {
+            output {
+                source.set(project.layout.buildDirectory.dir("volumes/data"))
+                target.set("/mnt/out")
+            }
+        }
+
+        command.addAll("/bin/sh", "-c", "echo -n \"$text\" > /mnt/out/result && ls -lhaR /mnt")
     }
 }

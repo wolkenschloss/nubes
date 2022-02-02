@@ -3,6 +3,7 @@ package wolkenschloss.gradle.docker
 import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.api.model.HostConfig
+import com.sun.security.auth.module.UnixSystem
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
@@ -26,6 +27,10 @@ abstract class RunContainerTask : DefaultTask() {
     @get:Optional
     @get:InputFile
     abstract val imageId: RegularFileProperty
+
+    @get:Optional
+    @get:Input
+    abstract val user: Property<String>
 
     @get:Nested
     abstract val mount: ContainerMounts
@@ -70,6 +75,7 @@ abstract class RunContainerTask : DefaultTask() {
             .withAttachStderr(true)
             .withAttachStdout(true)
             .withTty(false)
+            .withUser(user.get())
             .exec()
 
         val cb = ConsoleLogger(logger)
