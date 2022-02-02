@@ -10,11 +10,10 @@ pluginManagement {
         }
 }
 include (
-//        "services:cookbook:core",
-//        "services:cookbook:service",
-//        "services:cookbook:webapp",
-//        "testbed",
+        "services:cookbook:core",
+        "services:cookbook:service",
+        "services:cookbook:webapp",
+        "testbed",
 //        "ca",
-//        "newbuild"
 )
 
