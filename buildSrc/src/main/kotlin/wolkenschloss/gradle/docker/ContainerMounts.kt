@@ -35,6 +35,10 @@ abstract class ContainerMounts {
         inputs.add(objectFactory.newInstance(InputFileMount::class.java).apply(block))
     }
 
+    fun directory(block: InputDirectoryMount.() -> Unit) {
+
+    }
+
     fun output(block: OutputDirectoryMount.() -> Unit) {
         outputs.add(objectFactory.newInstance(OutputDirectoryMount::class.java).apply(block))
     }
