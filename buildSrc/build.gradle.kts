@@ -127,11 +127,9 @@ sourceSets.test {
     groovy.setSrcDirs(empty)
 }
 
-val javaLanguageVersion = JavaLanguageVersion.of(11)
-
 java {
     toolchain {
-        languageVersion.set(javaLanguageVersion)
+        languageVersion.set(JavaLanguageVersion.of(11))
         vendor.set(JvmVendorSpec.ADOPTOPENJDK)
     }
 }
@@ -179,7 +177,7 @@ dependencies {
     implementation("com.github.docker-java:docker-java-core")
     implementation("com.github.docker-java:docker-java-transport-zerodep")
 
-    // testing
+    // testing: basic test frameworks promoted to unit [test], integration and functional
     testingImplementation(platform("org.junit:junit-bom:5.8.1"))
     testingImplementation("org.junit.jupiter:junit-jupiter-api")
     testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -193,6 +191,7 @@ dependencies {
 
     // Allow integration tests to use kotlin dsl
     integrationImplementation(gradleKotlinDsl())
+    integrationImplementation("io.kotest:kotest-runner-junit5")
 }
 
 tasks.withType<Test> {
@@ -224,17 +223,17 @@ tasks.withType<Test> {
         html.required.set(true)
     }
 
-    addTestListener(object : TestListener {
-
-        override fun beforeSuite(suite: TestDescriptor) {}
-        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-            logger.lifecycle("${suite.displayName}: composite ${suite.isComposite}, has parent: ${suite.parent!=null}")
-            logger.lifecycle("Test summary: ${suite.displayName} ${result.testCount} tests, ${result.successfulTestCount} succeeded, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped")
-        }
-
-        override fun beforeTest(testDescriptor: TestDescriptor?) {}
-        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
-    })
+//    addTestListener(object : TestListener {
+//
+//        override fun beforeSuite(suite: TestDescriptor) {}
+//        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+//            logger.lifecycle("${suite.displayName}: composite ${suite.isComposite}, has parent: ${suite.parent!=null}")
+//            logger.lifecycle("Test summary: ${suite.displayName} ${result.testCount} tests, ${result.successfulTestCount} succeeded, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped")
+//        }
+//
+//        override fun beforeTest(testDescriptor: TestDescriptor?) {}
+//        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+//    })
 
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
 }
@@ -269,5 +268,7 @@ idea {
         listOf(integration, functional).forEach {
             testSourceDirs = testSourceDirs.plus(it.java.srcDirs)
         }
+
+
     }
 }

@@ -1,28 +1,41 @@
 package wolkenschloss.gradle.docker
 
 import com.github.dockerjava.api.model.Mount
-import org.gradle.api.Action
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.model.ObjectFactory
-
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import javax.inject.Inject
 
-interface ContainerMounts {
+abstract class ContainerMounts {
 
-    @Inject
-    fun getObjectFactory(): ObjectFactory
+    @get:Inject
+    abstract val providerFactory: ProviderFactory
 
-    @Nested
-    fun getInputs(): DomainObjectSet<InputFileMount>
+    @get:Inject
+    abstract val objectFactory: ObjectFactory
 
     @get:Nested
-    val mounts: Provider<List<Mount>>
+    abstract val inputs: DomainObjectSet<InputFileMount>
 
-    fun input(action: Action<in InputFileMount?>) {
-        val mount: InputFileMount = getObjectFactory().newInstance(InputFileMount::class.java)
-        action.execute(mount)
-        getInputs().add(mount)
+    @get:Nested
+    abstract val outputs: DomainObjectSet<OutputDirectoryMount>
+
+    @get:Internal
+    val mounts: Provider<List<Mount>>
+        get() = providerFactory.provider {
+            inputs.map(InputFileMount::toMount) +
+                    outputs.map(OutputDirectoryMount::toMount)
+        }
+
+
+    fun input(block: InputFileMount.() -> Unit) {
+        inputs.add(objectFactory.newInstance(InputFileMount::class.java).apply(block))
+    }
+
+    fun output(block: OutputDirectoryMount.() -> Unit) {
+        outputs.add(objectFactory.newInstance(OutputDirectoryMount::class.java).apply(block))
     }
 }
