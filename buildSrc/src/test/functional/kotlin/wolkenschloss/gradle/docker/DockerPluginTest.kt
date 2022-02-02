@@ -50,7 +50,6 @@ class DockerPluginTest : DescribeSpec({
             result.output shouldContain "Hello Silence"
         }
 
-
         // see https://unix.stackexchange.com/questions/18743/whats-the-point-in-adding-a-new-line-to-the-end-of-a-file
         it("should append new line to container output logfile") {
             val result = fixture.build("log", "--rerun-tasks", "-i")
@@ -58,6 +57,16 @@ class DockerPluginTest : DescribeSpec({
             println(result.output)
             result.task(":log")?.outcome shouldBe TaskOutcome.SUCCESS
             fixture.resolve("build/log").readText() shouldBe "Hello Logfile\n"
+        }
+    }
+
+    describe("DockerPlugin applied to a gradle project mounting volumes") {
+        val fixture = Fixtures("mount").clone(tempdir())
+
+        it("should read from mounted file") {
+
+            val result = fixture.build("cat")
+            result.task(":cat")!!.outcome shouldBe  TaskOutcome.SUCCESS
         }
     }
 })
