@@ -21,22 +21,23 @@ abstract class ContainerMounts {
     abstract val inputs: DomainObjectSet<InputFileMount>
 
     @get:Nested
+    abstract  val inputDirs: DomainObjectSet<InputDirectoryMount>
+
+    @get:Nested
     abstract val outputs: DomainObjectSet<OutputDirectoryMount>
 
     @get:Internal
     val mounts: Provider<List<Mount>>
         get() = providerFactory.provider {
-            inputs.map(InputFileMount::toMount) +
-                    outputs.map(OutputDirectoryMount::toMount)
+            inputs.map(Mountable::toMount) + inputDirs.map(Mountable::toMount)+ outputs.map(Mountable::toMount)
         }
-
 
     fun input(block: InputFileMount.() -> Unit) {
         inputs.add(objectFactory.newInstance(InputFileMount::class.java).apply(block))
     }
 
     fun directory(block: InputDirectoryMount.() -> Unit) {
-
+        inputDirs.add(objectFactory.newInstance(InputDirectoryMount::class.java).also(block))
     }
 
     fun output(block: OutputDirectoryMount.() -> Unit) {
