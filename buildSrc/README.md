@@ -1,3 +1,10 @@
+# Developing Plugins in buildSrc
+
+Open this directory as a root project with IntelliJ. Otherwise, it won't 
+work. **You have been warned!** 
+
+But then git integration does not work anymore.
+
 # Running Tests in buildSrc
 
 ```bash

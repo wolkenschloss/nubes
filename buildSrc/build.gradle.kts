@@ -19,7 +19,7 @@ plugins {
 }
 
 val testDir = project.layout.projectDirectory.dir("src/test")
-
+//val testDir = project.layout.projectDirectory.dir("src")
 val Directory.java: Iterable<RegularFile>
     get() = listOf(this.file("java"))
 
@@ -113,14 +113,14 @@ val functionalRuntimeOnly: Configuration by configurations.getting {
 }
 
 sourceSets.test {
-    compileClasspath += testing.compileClasspath
-    runtimeClasspath += testing.runtimeClasspath
+//    compileClasspath += testing.compileClasspath
+//    runtimeClasspath += testing.runtimeClasspath
     java.setSrcDirs(testDir.unit.java + testDir.unit.kotlin)
     resources.setSrcDirs(testDir.unit.resources)
 
     kotlin {
         sourceSets[this@test.name].apply {
-            kotlin.setSrcDirs(empty)
+            kotlin.setSrcDirs(testDir.unit.kotlin)
         }
     }
 
@@ -159,6 +159,9 @@ gradlePlugin {
 val quarkusPluginVersion: String by project
 val quarkusPluginArtifactId: String by project
 
+//val kotestVersion = "5.1.0"
+val kotestVersion = "4.6.3"
+val junitVersion = "5.6.2"
 dependencies {
     implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
@@ -178,20 +181,32 @@ dependencies {
     implementation("com.github.docker-java:docker-java-transport-zerodep")
 
     // testing: basic test frameworks promoted to unit [test], integration and functional
-    testingImplementation(platform("org.junit:junit-bom:5.8.1"))
+    testingImplementation(platform("org.junit:junit-bom:5.8.2"))
     testingImplementation("org.junit.jupiter:junit-jupiter-api")
     testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // Waiting for Gradle update to use kotlin version 1.6.
     // Then the current version of kotest can also be used.
     // https://github.com/kotest/kotest/issues/2666
-    testingImplementation(platform("io.kotest:kotest-bom:4.6.3"))
-    testingImplementation("io.kotest:kotest-runner-junit5")
-    testingImplementation("io.kotest:kotest-assertions-core")
+//    testingImplementation(platform("io.kotest:kotest-bom:4.6.3"))
+    testingImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
+    testingImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 
     // Allow integration tests to use kotlin dsl
+
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")
+
     integrationImplementation(gradleKotlinDsl())
-    integrationImplementation("io.kotest:kotest-runner-junit5")
+
+    integrationImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    integrationRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    integrationImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
+    integrationImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")
+
 }
 
 tasks.withType<Test> {
@@ -223,24 +238,24 @@ tasks.withType<Test> {
         html.required.set(true)
     }
 
-//    addTestListener(object : TestListener {
-//
-//        override fun beforeSuite(suite: TestDescriptor) {}
-//        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+    addTestListener(object : TestListener {
+
+        override fun beforeSuite(suite: TestDescriptor) {}
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
 //            logger.lifecycle("${suite.displayName}: composite ${suite.isComposite}, has parent: ${suite.parent!=null}")
-//            logger.lifecycle("Test summary: ${suite.displayName} ${result.testCount} tests, ${result.successfulTestCount} succeeded, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped")
-//        }
-//
-//        override fun beforeTest(testDescriptor: TestDescriptor?) {}
-//        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
-//    })
+            logger.lifecycle("Test summary: ${suite.displayName} ${result.testCount} tests, ${result.successfulTestCount} succeeded, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped")
+        }
+
+        override fun beforeTest(testDescriptor: TestDescriptor?) {}
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+    })
 
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
 }
 
 tasks {
     val integration by registering(Test::class) {
-        doNotTrackState("mach das immer")
+//        doNotTrackState("mach das immer")
         description = "Runs integration tests."
         group = VERIFICATION_GROUP
         testClassesDirs = integration.output.classesDirs
@@ -267,8 +282,9 @@ idea {
     module {
         listOf(integration, functional).forEach {
             testSourceDirs = testSourceDirs.plus(it.java.srcDirs)
+            testResourceDirs = testResourceDirs.plus(it.resources)
         }
 
-
+        jdkName = "11"
     }
 }
