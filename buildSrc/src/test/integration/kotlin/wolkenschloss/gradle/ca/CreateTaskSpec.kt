@@ -2,39 +2,48 @@ package wolkenschloss.gradle.ca
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
-import io.kotest.matchers.Matcher
-import io.kotest.matchers.MatcherResult
-import io.kotest.matchers.should
+import io.kotest.extensions.system.withEnvironment
 import io.kotest.matchers.date.shouldBeWithin
-import io.kotest.matchers.date.shouldHaveSameYearAs
+import io.kotest.matchers.shouldBe
 import org.gradle.testfixtures.ProjectBuilder
-import java.io.File
+import java.nio.file.Paths
 import java.time.Duration
-import java.time.Period
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 class CreateTaskSpec : FunSpec({
+
     context("A project with create task") {
-        val projectDir = tempdir()
-        val project = ProjectBuilder.builder()
-            .withProjectDir(projectDir)
-            .withName(PROJECT_NAME)
-            .build()
+        withEnvironment(mapOf("XDG_DATA_HOME" to tempdir().path)) {
+            val applicationHomeDir = Paths.get(
+                System.getenv("XDG_DATA_HOME"),
+                "wolkenschloss",
+                "ca")
 
-        project.pluginManager.apply(CaPlugin::class.java)
+            val projectDir = tempdir()
+            val project = ProjectBuilder.builder()
+                .withProjectDir(projectDir)
+                .withName(PROJECT_NAME)
+                .build()
 
-        test("certificate file defaults to xdg_home_dir/wolkenschloss/ca") {
-            val create = project.tasks.create("create", CreateTask::class.java)
-//            create.execute()
+            project.pluginManager.apply(CaPlugin::class.java)
 
-            create.certificate.get().toFile() shouldEndWithPath ".local/share/wolkenschloss/ca/ca.crt"
-            create.privateKey.get().toFile() shouldEndWithPath ".local/share/wolkenschloss/ca/ca.key"
+            test("certificate file defaults to \$XDG_DATA_HOME/wolkenschloss/ca/ca.crt") {
+                val create = project.tasks.create("create_cert", CreateTask::class.java)
+                create.certificate.get() shouldBe applicationHomeDir.resolve("ca.crt")
+            }
 
-            create.notBefore.get().shouldBeWithin(Duration.ofSeconds(5), ZonedDateTime.now())
-            create.notAfter.get().shouldBeWithin(Duration.ofSeconds(5), ZonedDateTime.now()
-                .plus(CreateTask.DEFAULT_VALIDITY_PERIOD))
-            println(create.certificate.get().toFile().absolutePath)
+            test("private key file defaults to \$XDG_DATA_HOME/wolkenschloss/ca/ca.key") {
+                val create = project.tasks.create("create_key", CreateTask::class.java)
+                create.privateKey.get() shouldBe applicationHomeDir.resolve("ca.key")
+            }
+            test("The default for the start of validity is the current time") {
+                val create = project.tasks.create("create_notBefore", CreateTask::class.java)
+                create.notBefore.get().shouldBeWithin(Duration.ofSeconds(5), ZonedDateTime.now())
+            }
+            test("The default validity period is 5 years") {
+                val create = project.tasks.create("create_notAfter", CreateTask::class.java)
+                create.notAfter.get().shouldBeWithin(Duration.ofSeconds(5), ZonedDateTime.now().plusYears(5))
+            }
         }
     }
 }) {
@@ -42,13 +51,3 @@ class CreateTaskSpec : FunSpec({
         const val PROJECT_NAME = "ca"
     }
 }
-
-private fun endWithPath(suffix: String) = object : Matcher<File> {
-    override fun test(value: File) = MatcherResult(
-        value.absolutePath.endsWith(suffix),
-        "Path $value should end with $suffix",
-        "Path $value should not end with $suffix"
-    )
-}
-
-infix fun File.shouldEndWithPath(suffix: String) = this should endWithPath(suffix)

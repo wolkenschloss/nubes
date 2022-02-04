@@ -1,10 +1,10 @@
 package wolkenschloss.conventions
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldBeADirectory
-import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
@@ -23,16 +23,13 @@ class WebappTest : DescribeSpec({
                 val result = fixture.build("build", "-i")
                 result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
                 result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
-                fixture.resolve("build/libs/webapp-example.jar").shouldExist()
+                fixture.resolve("build/libs/fixture-webapp.jar").shouldExist()
             }
         }
 
         describe("check task") {
             it("should run unit and e2e tasks") {
                 val result = fixture.build("check")
-                result.task(":unit")!!.outcome shouldBe TaskOutcome.SUCCESS
-                result.task(":e2e")!!.outcome shouldBe TaskOutcome.SUCCESS
-                result.task(":check")!!.outcome shouldBe TaskOutcome.SUCCESS
 
                 result.tasks(TaskOutcome.SUCCESS)
                     .map { task -> task.path }
@@ -45,10 +42,11 @@ class WebappTest : DescribeSpec({
                 val result = fixture.build("vue")
 
                 result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
-                val resource = fixture.resolve("build/classes/java/main/META-INF/resources")
-                resource.shouldBeADirectory()
-                resource.resolve("index.html").shouldBeAFile()
-                resource.resolve("js").shouldBeADirectory()
+                assertSoftly(fixture.resolve("build/classes/java/main/META-INF/resources")) {
+                    shouldBeADirectory()
+                    shouldContainFile("index.html")
+                    resolve("js").shouldBeADirectory()
+                }
             }
         }
 
@@ -71,6 +69,5 @@ class WebappTest : DescribeSpec({
                 reports.shouldBeADirectory()
             }
         }
-
     }
 })

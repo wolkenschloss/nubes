@@ -28,7 +28,8 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PublicKey
 import java.security.SecureRandom
-import java.time.*
+import java.time.Period
+import java.time.ZonedDateTime
 import java.util.*
 
 /**
@@ -65,11 +66,6 @@ abstract class CreateTask : DefaultTask() {
     @TaskAction
     fun execute() {
         try {
-            logger.quiet("notBefore = ${notBefore.get()}")
-            logger.quiet("notAfter = ${notAfter.get()}")
-            logger.quiet("Certificate path ${certificate.get()}")
-            logger.quiet("Private key path ${privateKey.get()}")
-            logger.quiet("XDG_DATA_HOME ${System.getenv("XDG_DATA_HOME")}")
             val keyPair = generateKeyPair()
 
             val contentSigner = JcaContentSignerBuilder(SIGNING_ALGORITHM)
@@ -90,11 +86,13 @@ abstract class CreateTask : DefaultTask() {
                 setReadable(true, true)
             }
 
-            certificate.writePem(cert)
+            certificate.writePem(cert) {
+                setWritable(false, false)
+                setReadable(true, false)
+            }
 
         } catch (e: Exception) {
-            println(e.message)
-            throw GradleException("Das ging schief!", e)
+            throw GradleException("Cannot create certificate", e)
         }
     }
 

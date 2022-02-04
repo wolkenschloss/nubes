@@ -1,5 +1,6 @@
 package wolkenschloss.gradle.docker
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.file.shouldExist
@@ -21,7 +22,7 @@ class DockerPluginTest : DescribeSpec({
 
             result.task(":base")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-            val imageIdFile = fixture.resolve("build/.docker/example/base")
+            val imageIdFile = fixture.resolve("build/.docker/fixture-image/base")
             imageIdFile.shouldExist()
         }
 
@@ -55,7 +56,6 @@ class DockerPluginTest : DescribeSpec({
         it("should append new line to container output logfile") {
             val result = fixture.build("log", "--rerun-tasks", "-i")
 
-            println(result.output)
             result.task(":log")?.outcome shouldBe TaskOutcome.SUCCESS
             fixture.resolve("build/log").readText() shouldBe "Hello Logfile\n"
         }
@@ -68,25 +68,24 @@ class DockerPluginTest : DescribeSpec({
 
             val dataFile = fixture.resolve("volumes/datafile")
             dataFile.parentFile.mkdirs()
-            dataFile.createNewFile()
-
             dataFile.writeText("content of mounted file")
 
-            val result = fixture.build("catFile")
-            result.task(":catFile")!!.outcome shouldBe TaskOutcome.SUCCESS
-            result.output shouldContain "content of mounted file"
+            assertSoftly(fixture.build("catFile")) {
+                task(":catFile")!!.outcome shouldBe TaskOutcome.SUCCESS
+                output shouldContain "content of mounted file"
+            }
         }
 
         it("should read from mounted directory") {
             val relativeDataDirectory = File("volumes/data")
             val dataFile = fixture.resolve(relativeDataDirectory).resolve("datafile")
             dataFile.parentFile.mkdirs()
-            dataFile.createNewFile()
             dataFile.writeText("another content of mounted volume")
 
-            val result = fixture.build("catDir", "-Pvolume=${relativeDataDirectory.path}")
-            result.task(":catDir")!!.outcome shouldBe TaskOutcome.SUCCESS
-            result.output shouldContain "another content of mounted volume"
+            assertSoftly(fixture.build("catDir", "-Pvolume=${relativeDataDirectory.path}")) {
+                task(":catDir")!!.outcome shouldBe TaskOutcome.SUCCESS
+                output shouldContain "another content of mounted volume"
+            }
         }
 
         it("should write a file into mounted directory") {
@@ -95,7 +94,6 @@ class DockerPluginTest : DescribeSpec({
 
             val result = fixture.build("write", "-P", "text=hello write")
             result.task(":write")!!.outcome shouldBe TaskOutcome.SUCCESS
-            println(result.output)
             dataDir.resolve("result").readText() shouldBe "hello write"
         }
     }

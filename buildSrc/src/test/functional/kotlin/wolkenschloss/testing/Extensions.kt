@@ -5,7 +5,6 @@ import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 import java.util.*
 
-
 fun File.build(vararg args: String): BuildResult = GradleRunner.create()
     .withProjectDir(this)
     .withArguments(*args)
@@ -18,9 +17,10 @@ fun File.createRunner(): GradleRunner = GradleRunner.create()
 
 fun File.properties(path: String): Properties {
     val properties = Properties()
-    val file = this.resolve(path)
-    file.inputStream().use {
+
+    resolve(path).inputStream().use {
         properties.load(it)
     }
+
     return properties
 }

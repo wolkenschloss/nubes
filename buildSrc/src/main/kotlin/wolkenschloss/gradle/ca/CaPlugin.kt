@@ -14,30 +14,36 @@ class CaPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.tasks.withType(CreateTask::class.java).configureEach {
-            val projectData = project.providers.xdgDataHome.resolve("wolkenschloss/ca")
-            println("Configure CreateTask")
+            val projectData = project.providers.xdgDataHome.resolve(RELATIVE_APPLICATION_DATA_DIR)
+
             notBefore.convention(today)
             notAfter.convention(expireIn())
             certificate.convention(projectData.resolve("ca.crt"))
             privateKey.convention(projectData.resolve("ca.key"))
-            println("Configuration finished")
         }
     }
 
     private val ProviderFactory.xdgDataHome: Provider<Path>
         get() {
-            return environmentVariable("XDG_DATA_HOME")
-                .zip(systemProperty("user.home")) { left, right ->
-                    if (left.isNullOrEmpty()) {
-                        Paths.get(right, ".local", "share")
-                    } else {
-                        Paths.get(left)
-                    }
+
+
+            return this.provider {
+                val xdg = System.getenv("XDG_DATA_HOME")
+                if (xdg.isNullOrEmpty()) {
+                    val home = System.getProperty("user.home")
+                    Paths.get(home, ".local", "share")
+                } else {
+                    Paths.get(xdg)
                 }
+            }
         }
 
     private fun Provider<Path>.resolve(path: String): Provider<Path> {
         return this.map { it.resolve(path) }
+    }
+
+    private fun Provider<Path>.resolve(path: Path): Provider<Path> {
+        return this.map {it.resolve(path)}
     }
 
     private val Provider<Path>.asFile: Provider<File>
@@ -51,5 +57,8 @@ class CaPlugin : Plugin<Project> {
 
     companion object {
         const val NAME = "wolkenschloss.gradle.ca"
+
+        // Relative to $XDG_DATA_HOME
+        val RELATIVE_APPLICATION_DATA_DIR: Path = Paths.get("wolkenschloss", "ca")
     }
 }

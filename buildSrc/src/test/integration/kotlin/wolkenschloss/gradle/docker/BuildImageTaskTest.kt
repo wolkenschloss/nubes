@@ -42,6 +42,7 @@ class BuildImageTaskTest : DescribeSpec({
                     imagename.shouldNotBeNull()
                     imagename.name shouldBe "imagename"
                 }
+
                 it("should have a default tags") {
                     val tags = imagename.get().tags.get()
 
@@ -50,13 +51,16 @@ class BuildImageTaskTest : DescribeSpec({
                         "$PROJECT_NAME/imagename:latest"
                     )
                 }
+
                 it("should have default output file") {
                     imagename.get().imageId - projectDir shouldBe
                             "build/.docker/${project.name}/${imagename.get().name}"
                 }
+
                 it("should have default input directory") {
                     imagename.get().inputDir - projectDir shouldBe "docker/imagename"
                 }
+
                 it("should be possible to override default tags") {
 
                     imagename {
@@ -67,6 +71,7 @@ class BuildImageTaskTest : DescribeSpec({
                         "hello world"
                     )
                 }
+
                 describe("Dockerfile with arguments") {
                     val fixture = Fixtures("docker/withargs").clone(tempdir())
                     val imagewithargs by registering(BuildImageTask::class) {
@@ -87,6 +92,7 @@ class BuildImageTaskTest : DescribeSpec({
                             .map { it.shortId }
                             .shouldContain(imagewithargs.get().imageId.get().asFile.readText())
                     }
+
                     it("should fail with no args") {
                         val exception = shouldThrowExactly<DockerClientException> {
                             imagewithargs.get().execute()

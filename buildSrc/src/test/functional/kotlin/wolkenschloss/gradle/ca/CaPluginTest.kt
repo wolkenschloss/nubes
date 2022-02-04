@@ -23,24 +23,33 @@ class CaPluginTest : FunSpec({
     context("A project using com.github.wolkenschloss.ca gradle plugin") {
         val fixture = Fixtures("ca").clone(tempdir())
 
-        test("should create self signed root ca") {
+        context("executing execute create task") {
             val home = tempdir()
             val result = fixture.createRunner()
                 .withArguments("create")
                 .withEnvironment(mapOf("XDG_DATA_HOME" to home.path))
                 .build()
 
-            result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
+            test("should be successful") {
+                result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
+            }
 
-            println(result.output)
+            test("should create self signed root certificate") {
+                assertSoftly(home.resolve("wolkenschloss/ca/ca.crt").readX509Certificate()) {
+                    basicConstraints shouldBeGreaterThan -1
+                    basicConstraints shouldBe Int.MAX_VALUE
+                    keyUsage[5] shouldBe true
+                    keyUsage[6] shouldBe true
+                    shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
+                    subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
+                }
+            }
 
-            assertSoftly(home.resolve("wolkenschloss/ca/ca.crt").readX509Certificate()) {
-                basicConstraints shouldBeGreaterThan -1
-                basicConstraints shouldBe Int.MAX_VALUE
-                keyUsage[5] shouldBe true
-                keyUsage[6] shouldBe true
-                shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
-                subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
+            test("should create read only certificate") {
+                assertSoftly(home.resolve("wolkenschloss/ca/ca.crt")) {
+                    shouldBeReadable()
+                    shouldNotBeWriteable()
+                }
             }
         }
 
@@ -72,7 +81,6 @@ class CaPluginTest : FunSpec({
                 .withEnvironment(mapOf("XDG_DATA_HOME" to data.path))
                 .build()
 
-            println(result.output)
             result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
 
             assertSoftly(data.resolve("wolkenschloss/ca/ca.key")) {
