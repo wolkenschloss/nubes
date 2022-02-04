@@ -7,6 +7,7 @@ import io.kotest.matchers.string.startWith
 import io.kotest.assertions.throwables.shouldThrowExactly
 import java.util.NoSuchElementException
 
+@Suppress("SpellCheckingInspection")
 class FormDataTest : FunSpec({
     val messageBody = FormData("pub_key_ecdsa=ecdsa-sha2-nistp256+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFeY5xKUNG5uZ0mDXiSuFrUSEqxGjnhQJe1mlFMgUmuYwxbocZE23NUiMglMtYQ64Cn%2BTdOoHqko0baa95FkEVY%3D+root%40testbed%0A&instance_id=iid-local01&hostname=testbed&fqdn=testbed.wolkenschloss.local")
 

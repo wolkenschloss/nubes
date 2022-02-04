@@ -46,6 +46,7 @@ class MountsTest : FunSpec({
                     source.convention(projectSourceDirectory)
                 }
             }
+
             mounts.mounts.get() shouldContain Mount()
                 .withSource(projectSourceDirectory.asFile.absolutePath)
                 .withTarget(containerTargetDirectory)

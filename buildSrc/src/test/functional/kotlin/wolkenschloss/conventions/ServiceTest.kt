@@ -9,7 +9,6 @@ import wolkenschloss.testing.build
 
 class ServiceTest : FunSpec({
 
-
     context("project with quarkus application") {
         val fixture = Fixtures("service").clone(tempdir())
 

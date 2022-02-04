@@ -29,15 +29,9 @@ abstract class DockerService : BuildService<BuildServiceParameters.None>, AutoCl
     @Internal
     val client: DockerClient = DockerClientImpl.getInstance(config, httpClient)
 
-    init {
-        // TODO use logger
-        println("Initialize Docker Service")
-    }
 
     override fun close() {
-        // TODO use logger
-        println("Closing Docker Service")
-        client.close()
+         client.close()
     }
 
     fun listImages(): List<Image> = client.listImagesCmd()

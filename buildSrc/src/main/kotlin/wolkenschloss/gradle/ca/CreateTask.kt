@@ -17,18 +17,19 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 import java.io.StringWriter
 import java.math.BigInteger
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PublicKey
 import java.security.SecureRandom
-import java.time.*
+import java.time.Period
+import java.time.ZonedDateTime
 import java.util.*
 
 /**
@@ -64,12 +65,16 @@ abstract class CreateTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
+        if (certificate.get().toFile().exists()) {
+            throw StopExecutionException("Certificate already exists")
+        }
+
+        if (privateKey.get().toFile().exists()) {
+            throw StopExecutionException("Private key already exists")
+        }
+
         try {
-            logger.quiet("notBefore = ${notBefore.get()}")
-            logger.quiet("notAfter = ${notAfter.get()}")
-            logger.quiet("Certificate path ${certificate.get()}")
-            logger.quiet("Private key path ${privateKey.get()}")
-            logger.quiet("XDG_DATA_HOME ${System.getenv("XDG_DATA_HOME")}")
+
             val keyPair = generateKeyPair()
 
             val contentSigner = JcaContentSignerBuilder(SIGNING_ALGORITHM)
@@ -86,15 +91,17 @@ abstract class CreateTask : DefaultTask() {
                 .getCertificate(holder)
 
             privateKey.writePem(keyPair.private) {
-                setWritable(false, false)
-                setReadable(true, true)
+                val permission = hashSetOf(PosixFilePermission.OWNER_READ)
+                Files.setPosixFilePermissions(this.toPath(), permission)
             }
 
-            certificate.writePem(cert)
+            certificate.writePem(cert) {
+                val permission = hashSetOf(PosixFilePermission.OWNER_READ, PosixFilePermission.GROUP_READ, PosixFilePermission.OTHERS_READ)
+                Files.setPosixFilePermissions(this.toPath(), permission)
+            }
 
         } catch (e: Exception) {
-            println(e.message)
-            throw GradleException("Das ging schief!", e)
+            throw GradleException("Cannot create certificate", e)
         }
     }
 

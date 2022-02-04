@@ -11,7 +11,6 @@ class Fixtures(private val path: String) {
     }
 
     private fun overlay(fixture: File) {
-        println("Using overlay $path")
         val overlay = File(System.getProperty("project.fixture.directory")).resolve(path)
         overlay.copyRecursively(target = fixture, overwrite = false)
     }
@@ -25,6 +24,7 @@ class Fixtures(private val path: String) {
             val inFixture = fixture.resolve(relative)
             if (inFixture.isFile) {
                 println("remove ${inFixture.path}")
+                inFixture.delete()
             }
         }
     }

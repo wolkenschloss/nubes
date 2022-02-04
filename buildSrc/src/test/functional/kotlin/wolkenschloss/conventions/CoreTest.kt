@@ -10,7 +10,6 @@ import wolkenschloss.testing.Fixtures
 import wolkenschloss.testing.build
 import wolkenschloss.testing.properties
 
-
 class CoreTest : FunSpec({
 
     context("project with core library") {
@@ -64,7 +63,7 @@ class CoreTest : FunSpec({
                     "vcs.ref" to REF,
                     "project.version" to "123",
                     "project.group" to "family.haschka.wolkenschloss.conventions",
-                    "project.name" to "core"
+                    "project.name" to "fixture-core"
                 )
             )
         }
