@@ -1,5 +1,8 @@
+
 plugins {
-    id("wolkenschloss.testbed")
+    id("com.github.wolkenschloss.testbed")
+    id("com.github.wolkenschloss.docker")
+    id("com.github.wolkenschloss.ca")
 }
 
 defaultTasks("start")
@@ -20,5 +23,12 @@ testbed {
 
     host {
         callbackPort.set(9292)
+    }
+}
+
+tasks {
+    register("createCa", wolkenschloss.gradle.ca.CreateTask::class.java) {
+//        certificate.set(project.layout.buildDirectory.file("ca/ca.crt").map { it.asFile.toPath() })
+//        privateKey.set(project.layout.buildDirectory.file("ca/ca.key").map { it.asFile.toPath() })
     }
 }

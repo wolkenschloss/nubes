@@ -1,1 +1,1 @@
-rootProject.name = "conventions"
+rootProject.name = "plugins"

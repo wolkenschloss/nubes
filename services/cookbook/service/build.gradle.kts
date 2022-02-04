@@ -4,7 +4,12 @@ plugins {
 }
 
 val mockServerVersion = "5.11.2"
-
+sourceSets {
+    create("meinsourceset") {
+        java.srcDirs.clear()
+        java.setSrcDirs(listOf("mein/sxc/java"))
+    }
+}
 dependencies {
     implementation("io.quarkus:quarkus-container-image-docker")
     implementation("io.quarkus:quarkus-config-yaml")
