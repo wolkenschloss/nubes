@@ -15,17 +15,20 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 import java.io.StringWriter
 import java.math.BigInteger
+import java.nio.file.Path
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PublicKey
 import java.security.SecureRandom
+import java.time.*
 import java.util.*
 
 /**
@@ -36,22 +39,22 @@ import java.util.*
 abstract class CreateTask : DefaultTask() {
 
     @get:Input
-    abstract val notBefore: Property<Date>
+    abstract val notBefore: Property<ZonedDateTime>
 
     @get:Input
-    abstract val notAfter: Property<Date>
+    abstract val notAfter: Property<ZonedDateTime>
 
     /**
      * Dies ist die Datei, in die der private Schlüssel gespeichert wird.
      */
     @get:OutputFile
-    abstract val privateKey: RegularFileProperty
+    abstract val privateKey: Property<Path>
 
     /**
      * Datei, in die das Zertifikat geschrieben wird.
      */
     @get:OutputFile
-    abstract val certificate: RegularFileProperty
+    abstract val certificate: Property<Path>
 
     private val random: SecureRandom by lazy {
         val rnd = SecureRandom()
@@ -62,6 +65,11 @@ abstract class CreateTask : DefaultTask() {
     @TaskAction
     fun execute() {
         try {
+            logger.quiet("notBefore = ${notBefore.get()}")
+            logger.quiet("notAfter = ${notAfter.get()}")
+            logger.quiet("Certificate path ${certificate.get()}")
+            logger.quiet("Private key path ${privateKey.get()}")
+            logger.quiet("XDG_DATA_HOME ${System.getenv("XDG_DATA_HOME")}")
             val keyPair = generateKeyPair()
 
             val contentSigner = JcaContentSignerBuilder(SIGNING_ALGORITHM)
@@ -77,7 +85,11 @@ abstract class CreateTask : DefaultTask() {
                 .setProvider(BouncyCastleProvider())
                 .getCertificate(holder)
 
-            privateKey.writePem(keyPair.private)
+            privateKey.writePem(keyPair.private) {
+                setWritable(false, false)
+                setReadable(true, true)
+            }
+
             certificate.writePem(cert)
 
         } catch (e: Exception) {
@@ -96,8 +108,8 @@ abstract class CreateTask : DefaultTask() {
         return JcaX509v3CertificateBuilder(
             subject,
             randomSerialNumber(),
-            notBefore.get(),
-            notAfter.get(),
+            Date.from(notBefore.get().toInstant()),
+            Date.from(notAfter.get().toInstant()),
             subject,
             keyPair.public
         )
@@ -133,19 +145,23 @@ abstract class CreateTask : DefaultTask() {
             .build()
     }
 
-    private fun RegularFileProperty.writePem(obj: Any) {
-        this.asFile.get().parentFile.mkdirs()
+    private fun Provider<Path>.writePem(obj: Any, function: File.() -> Unit = {}) {
+        val file = get().toFile()
+        file.parentFile.mkdirs()
         val stringWriter = StringWriter()
         JcaPEMWriter(stringWriter).use {
             it.writeObject(obj)
         }
 
-        get().asFile.writeText(stringWriter.toString())
+        file.writeText(stringWriter.toString())
+        function(file)
     }
 
     companion object {
         private const val KEYPAIR_GENERATOR_ALGORITHM = "RSA"
 
         private const val SIGNING_ALGORITHM = "SHA256WithRSA"
+
+        val DEFAULT_VALIDITY_PERIOD: Period = Period.ofYears(5)
     }
 }

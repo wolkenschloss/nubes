@@ -12,6 +12,10 @@ fun File.build(vararg args: String): BuildResult = GradleRunner.create()
     .withPluginClasspath()
     .build()
 
+fun File.createRunner(): GradleRunner = GradleRunner.create()
+    .withProjectDir(this)
+    .withPluginClasspath()
+
 fun File.properties(path: String): Properties {
     val properties = Properties()
     val file = this.resolve(path)
