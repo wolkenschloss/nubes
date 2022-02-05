@@ -4,11 +4,7 @@
       <v-text-field dense label="Quantity" v-model="value.quantity" :rules="quantityRules" ref="editQuantity" autofocus></v-text-field>
     </v-col>
     <v-col cols="4">
-      <v-select dense :items="entries" label="Unit" v-model="value.unit" clearable @change="unitChanged" ref="editName" type="text">
-        <template v-slot:selection="{item}">
-          <span>{{ item.value }}</span>
-        </template>
-      </v-select>
+      <select-unit v-model="value.unit" ref="editName" @change="unitChanged"/>
     </v-col>
     <v-col>
       <v-combobox dense
@@ -33,9 +29,11 @@
 // https://en.wikibooks.org/wiki/Cookbook:Units_of_measurement
 import { debounce } from "lodash";
 import {mapActions, mapGetters} from 'vuex'
+import SelectUnit from "@/components/SelectUnit";
 
 export default {
   name: "EditIngredient",
+  components: {SelectUnit},
   props: ['value'],
   data() {
     return {

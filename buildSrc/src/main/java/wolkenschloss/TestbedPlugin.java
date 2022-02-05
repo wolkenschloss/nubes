@@ -1,6 +1,5 @@
 package wolkenschloss;
 
-import com.github.dockerjava.api.model.Volumes;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -23,8 +22,5 @@ public class TestbedPlugin implements Plugin<Project> {
         var registrar = new Registrar(project, extension);
 
         registrar.register();
-
-        project.getTasks().withType(DockerRunTask.class).configureEach(task ->
-                task.getContainerLogLevel().convention(tce.getContainerLogLevel()));
-    }
+  }
 }
