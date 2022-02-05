@@ -99,8 +99,6 @@ tasks {
     }
 
     val newRootCa by registering(CreateTask::class) {
-//        privateKey.set(project.layout.buildDirectory.file("ca/ca.key").map { it.asFile.toPath() })
-//        certificate.set(project.layout.buildDirectory.file("ca/ca.crt").map { it.asFile.toPath() })
     }
 
      // Aufteilen in:
@@ -109,10 +107,6 @@ tasks {
     // 3. CA installieren
     // DockerRunTask durch neue Fassung ersetzen
     val createRootCa by registering(RunContainerTask::class) {
-
-        val home = System.getProperty("user.home")
-        val userDataDir = System.getenv().getOrDefault("XDG_DATA_HOME", "$home/.local/share")
-        val userPkiDir = Paths.get(userDataDir, "testbed", "ca")
 
         val src = layout.projectDirectory.dir("src/ca")
         logging.captureStandardOutput(LogLevel.QUIET)
