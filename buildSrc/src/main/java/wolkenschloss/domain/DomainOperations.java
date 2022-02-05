@@ -170,7 +170,7 @@ public abstract class DomainOperations implements BuildService<DomainOperations.
         try {
             return new RegistryService(getIpAddress());
         } catch (Throwable throwable) {
-            throw new RuntimeException("Can not create registry service", throwable);
+            throw new GradleException("Can not create registry service", throwable);
         }
     }
 

@@ -13,7 +13,8 @@ abstract public class DomainExtension {
     public void initialize(BuildServiceRegistry sharedServices,
                            Provider<RegularFile> knownHostsFile,
                            Provider<RegularFile> hostsFile,
-                           Provider<RegularFile> kubeConfig) {
+                           Provider<RegularFile> kubeConfig,
+                           Provider<RegularFile> dockerConfig) {
         getName().convention("testbed");
 //        getFqdn().convention("testbed.wolkenschloss.local");
         getDomainSuffix().convention("wolkenschloss.local");
@@ -21,6 +22,7 @@ abstract public class DomainExtension {
         getKnownHostsFile().convention(knownHostsFile);
         getHostsFile().convention(hostsFile);
         getKubeConfigFile().convention(kubeConfig);
+        getDockerConfigFile().convention(dockerConfig);
 
         getDomainOperations().set(sharedServices.registerIfAbsent(
                 "domainops",
@@ -51,4 +53,6 @@ abstract public class DomainExtension {
     abstract public RegularFileProperty getKubeConfigFile();
 
     abstract public Property<DomainOperations> getDomainOperations();
+
+    abstract public RegularFileProperty getDockerConfigFile();
 }

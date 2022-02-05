@@ -11,6 +11,8 @@ public class DomainTasks {
 
     public static final String BUILD_DOMAIN_TASK_NAME = "buildDomain";
     public static final String READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig";
+    public static final String CREATE_DOCKER_CONFIG_TASK_NAME = "createDockerConfig";
+
     public static final String START_TASK_NAME = "start";
 
     private static final String GROUP_NAME = "domain";
@@ -25,8 +27,9 @@ public class DomainTasks {
 
     public void register(TaskContainer tasks) {
         registerBuildDomainTask(tasks);
-        registerReadKubeConfig(tasks);
+        registerReadKubeConfigTasks(tasks);
         registerStartTask(tasks);
+        registerCreateDockerConfigTasks(tasks);
     }
 
     private void registerBuildDomainTask(TaskContainer tasks) {
@@ -59,7 +62,7 @@ public class DomainTasks {
                 });
     }
 
-    private void registerReadKubeConfig(TaskContainer tasks) {
+    private void registerReadKubeConfigTasks(TaskContainer tasks) {
         var knownHostsFile = tasks.named(BUILD_DOMAIN_TASK_NAME, BuildDomain.class)
                 .map(BuildDomain::getKnownHostsFile)
                 .get();
@@ -77,6 +80,19 @@ public class DomainTasks {
                 });
     }
 
+    private void registerCreateDockerConfigTasks(TaskContainer tasks) {
+        tasks.register(
+                CREATE_DOCKER_CONFIG_TASK_NAME,
+                CreateDockerConfig.class,
+                task -> {
+                    task.setGroup(GROUP_NAME);
+                    task.setDescription("Creates a Docker configuration file in order to be able to access the unsecured registration of the test bench.");
+                    task.getDockerConfigFile().convention(domain.getDockerConfigFile());
+                    task.getDomainOperations().set(domain.getDomainOperations());
+                    task.dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME));
+                });
+    }
+
     private static void registerStartTask(TaskContainer tasks) {
         tasks.register(
                 START_TASK_NAME,
@@ -84,7 +100,10 @@ public class DomainTasks {
                 task -> {
                     task.setGroup(GROUP_NAME);
                     task.setDescription("The all in one lifecycle start task. Have a cup of coffee.");
-                    task.dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME));
+                    task.dependsOn(
+                            tasks.named(CREATE_DOCKER_CONFIG_TASK_NAME)
+//                            tasks.named(CREATE_DOCKER_CONFIG_TASK_NAME)
+                    );
                 });
     }
 }

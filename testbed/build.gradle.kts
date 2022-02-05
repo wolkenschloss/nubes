@@ -5,8 +5,11 @@ import wolkenschloss.domain.DomainTasks
 import com.sun.security.auth.module.UnixSystem
 import java.nio.file.Paths
 
+
 plugins {
-    id("wolkenschloss.testbed")
+    id("com.github.wolkenschloss.testbed")
+    id("com.github.wolkenschloss.docker")
+    id("com.github.wolkenschloss.ca")
 }
 
 defaultTasks("start")

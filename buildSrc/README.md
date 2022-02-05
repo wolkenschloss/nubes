@@ -1,10 +1,65 @@
-# Running Tests in buildSrc
+# Developing Plugins and Conventions in buildSrc
 
-```java
-:test --tests "wolkenschloss.conventions.CorePluginTest" -p buildSrc
-```
+> **WARNING:** Open this directory as a root project in your IDE. Otherwise, 
+> it won't work.
 
-# Webapp Convention Plugin
+*...but then git integration and run configurations does not work anymore.*
+
+This project uses additional SourceSets to separate integration and functional
+tests from unit tests. This prevents long loading times when updating build
+scripts and plugins.
+
+The additional SourceSets in [buildSrc] cause difficulties in the IDE. The
+current solution is to load [buildSrc] as the root project in the IDE. Then
+most functions are available for testing. However, the VCS integration
+and the Run Configuration no longer work.
+
+## Q: How do I become root in an innocent buildscript?
+
+Answer: Start a docker container :smile:
+
+## Testpyramide
+
+### Funktionstests
+
+Tests, die mit einem vollständigen Testprojekt ausgeführt werden und damit
+am besten prüfen können, ob ein Plugin oder Konvention funktioniert. 
+Funktionstests benutzen den `GradleRunner` des TestKids, um Testprojekte im
+[fixtures] Ordner auszuführen. Allerdings dauert die Ausführung der Tests 
+relativ lange.
+
+| Task                   | Source Set | Path                                   |
+|:-----------------------|:-----------|:---------------------------------------|
+ | `./gradlew functional` | functional | [test/functional](src/test/functional) |
+
+
+### Integrationstests
+
+Tests, die nur einen Teil der Gradle Ausführungsumgebung benötigen, insbesondere
+aber nicht den `GradleRunner` starten. Stattdessen werden einzelne Komponenten von
+Gradle, zum Beispiel der `ProjectBuilder` verwendet, um Objekte aus der Gradle 
+Umgebung als Kollaborateure im Test zu verwenden.
+
+
+| Task                    | Source Set  | Path                                     |
+|:------------------------|:------------|:-----------------------------------------|
+| `./gradlew integration` | integration | [test/integration](src/test/integration) |
+
+
+### Komponententests
+
+Klassische Komponententests, bei denen die Komponenten einzeln getestet werden, ohne
+Kollaborateure zu verwenden. Abhängigkeiten zu anderen Komponenten, insbesondere
+zu Gradle, sollten durch Mock Objekte ersetzt werden. 
+
+
+| Task             | Source Set | Path                       |
+|:-----------------|:-----------|:---------------------------|
+| `./gradlew test` | test       | [test/unit](src/test/unit) |
+
+## Conventions
+
+### Webapp Convention Plugin
 
 Mit dem *Webapp Convention Plugin* werden die auf [npm] basierenden 
 Erstellungsprozesse von Unterprojekten mit webbasierten Benutzeroberflächen, 
@@ -15,10 +70,10 @@ Das *Webapp Convention Plugin* ergänzt die Projekte, in denen es verwendet
 wird um folgende Aufgaben:
 
 | Gradle Task | vue-cli-service Kommando              | Gradle Lifecycle Task |
-|-------------|---------------------------------------|------------------------|
-| `vue`       | `vue-cli-service build --dest ...`    | `build` |
-| `unit`      | `vue-cli-service test:unit`           | `check` |
-| `e2e`       | `vue-cli-service test:e2e --headless` | `check` |
+|-------------|---------------------------------------|-----------------------|
+| `vue`       | `vue-cli-service build --dest ...`    | `build`               |
+| `unit`      | `vue-cli-service test:unit`           | `check`               |
+| `e2e`       | `vue-cli-service test:e2e --headless` | `check`               |
 
 Um eine neue Webanwendung als Unterprojekt hinzuzufügen, gehe folgendermaßen
 vor:
@@ -85,7 +140,7 @@ dependencies {
 }
 ```
 
-# Core Convention Plugin
+### Core Convention Plugin
 
 Das Core Convention Plugin enthält die gemeinsamen Voreinstellungen für 
 Projekte, die ein Domänen-Modell entsprechend der Zwiebelschalen Architektur 
@@ -104,16 +159,20 @@ plugins {
 }
 ```
 
-# Testbed Gradle Plugin
+## Plugins
+
+### [Testbed]
 
 Das Plugin dient dazu ein Gradle Projekt zu unterstützen, mit dem ein Prüfstand
-aufgebaut werden kann.
+aufgebaut werden kann. Es muss dringend überarbeitet werden. Die Notwendigkeit
+den Prüfstand in einer VM zu starten ist fragwürdig. Es kann auch eine [microk8s]
+Installation auf dem Entwicklerrechner genügen. Dies erfordert weniger Ressourcen.
 
 Der Prüfstand besteht aus einer virtuellen Maschine mit der [microk8s]
 [microk8s] Variante von [Kubernetes][k8s] und kann bei
 Bedarf automatisch erstellt und gestartet werden. 
 
-## Anwendung des Plugins
+#### Anwendung des Plugins
 
 Das Plugin sollte in einem eigenen Gradle (Unter-)Projekt angewendet werden. 
 Erstelle dazu in Deinem Projekt ein Gradle Build Skript, in dem Du das 
@@ -121,11 +180,12 @@ Plugin einbindest:
 
 ```kotlin
 plugins {
-    id("wolkenschloss.testbed")
+    id("com.github.wolkenschloss.testbed")
 }
 ```
 
-## Extension
+
+#### Extension
 
 Im Buildscript `build.gradle` Deines Projektes kannst Du Parameter zur 
 Erstellung des Prüfstandes anpassen. Im folgenden Beispiel werden die 
@@ -139,6 +199,9 @@ testbed {
         callbackPort = 9191
     }
 
+    // TODO: ssh key exklusiv für den Prüfstand, um möglichst
+    // keinen Zugriff auf die Geheimnisse (private key) des
+    // Entwicklers nehmen zu müssen
     user {
         name = "$System.env.USER"
         sshKey = "ssh-rsa AAA...= user@host"
@@ -200,7 +263,7 @@ Das Plugin lädt automatisch die dazugehörenden `SHA256SUMS` und
 `SHA256SUMS.gpg` Dateien herunter, um die Signatur der Prüfsummendatei zu 
 und die Prüfsumme des Basisimages zu verifizieren.
 
-## Gradle Tasks
+#### Gradle Tasks
 
 Das Plugin benutzt absichtlich nicht die Standard-Lebenszyklen von Gradle, um
 den Unterschied zu diesen hervorzuheben. Die Erstellung des Prüfstandes ist eine
@@ -247,7 +310,7 @@ Entwicklungsumgebung für den Zugriff auf den Prüfstand vorzubereiten.
 Zum Erstellen von Snapshots oder Autostarteinstellungen kannst Du weiterhin die
 bekannten Werkzeuge wie zum Beispiel `virsh` benutzen.
 
-### Konfigurationsdateien
+##### Konfigurationsdateien
 
 Die folgenden Dateien müssen im `src` Verzeichnis des Projekts liegen. Sie 
 enthalten Platzhalter, die vom `wolkenschloss.testbed` Plugin durch Werte 
@@ -256,7 +319,7 @@ ersetzt werden, die in den Extensions angegeben sind.
 Die transformierten Dateien werden für die Erstellung der virtuellen 
 Maschine verwendet.
 
-#### user-data
+###### user-data
 
 Die `user-data` Datei beschreibt die bei Installation der virtuellen Maschine
 durchzuführenden Arbeitsschritte und ist Bestandteil der 
@@ -265,12 +328,12 @@ durchzuführenden Arbeitsschritte und ist Bestandteil der
 Weitere Hinweise findest du in der Cloud-Init 
 [Dokumentation](https://cloudinit.readthedocs.io)
 
-#### network-config
+###### network-config
 
 Diese Datei beschreibt die Netzwerkkonfiguration der virtuellen Maschine und 
 ist Bestandteil der Cloud-Init Infrastruktur
 
-#### domain.xml
+###### domain.xml
 
 Hierbei handelt es sich um die XML Beschreibung der virtuellen Maschine 
 (Domain). Anhand dieser Datei wird die virtuelle Maschine erzeugt. Die Datei 
@@ -282,7 +345,7 @@ Hinweis: Die XML Beschreibung einer virtuellen Maschine kannst du mit dem Befehl
 
 Weitere Hinweise zum Umgang mit `libvirt` findest du unter https://libvirt.org/
 
-#### pool.xml
+###### pool.xml
 
 Diese Datei beschreibt den Storage Pool der virtuellen Maschine. Der Storage 
 Pool enthält das Root-Image mit dem Betriebssystem und das Cloud-Init 
@@ -291,12 +354,12 @@ Konfigurationsvolumen `cidata.img`.
 Die Platzhalter in der Datei werden durch das `wolkenschloss.testbed` Plugin 
 mit den Werten aus der Extension ersetzt.
 
-## Anforderungen
+#### Anforderungen
 
 Die Beschreibung der Anforderungen geht von einem Ubuntu 20.04 Desktop System
 aus, das standardmäßig installiert ist. Mit ssh und gpg.
 
-### SSH Schlüsselpar
+##### SSH Schlüsselpaar
 
 Du benötigst ein SSH Schlüsselpaar. Wenn du keinen hast, erzeuge einen mit dem
 Befehl:
@@ -307,9 +370,9 @@ ssh-keygen
 
 Weitere Hinweise dazu findest du unter [Authentifizierung über Public-Keys][ssh]
 
-### GPG Schlüssel importieren
+##### GPG Schlüssel importieren
 
-Zur Überprüfung der Signatur der heruntergeladenen Checksummen-Datei musst du
+Zur Überprüfung der Signatur der heruntergeladenen Checksum-Datei musst du
 den GPG Schlüssel des Herausgebers des Basisimages in dein Schlüsselbund
 importieren. Das erfolgt mit diesem Befehl:
 
@@ -321,7 +384,7 @@ gpg --keyid-format long --keyserver hkp://keyserver.ubuntu.com \
 Weitere Informationen dazu findest du im
 Artikel [Retrieve the correct signature key][gpg]
 
-### Benötigte Pakete
+##### Benötigte Pakete
 
 Damit der Prüfstand automatisch erstellt werden kann, müssen folgende
 Softwarepakete installiert sein (Ubuntu 20.04).
@@ -335,7 +398,7 @@ sudo apt update && sudo apt -y upgrade
 sudo apt install -y qemu-kvm libvirt-daemon-system cloud-image-utils
 ```
 
-## Tests ausführen
+#### Tests ausführen
 
 Um die Tests auszuführen, musst Du das Verzeichnis des Projektes ausdrücklich
 mit der Option `-p` angegeben. Das gilt auch für die
@@ -346,6 +409,22 @@ angefügt.
 ./gradlew ':test -p buildSrc
 ```
 
+### [Docker]
+
+Erzeugt Docker Images und führt Container aus. Es handelt sich eine minimale 
+Implementierung, die speziell auf die Anforderungen des Build Prozesses von 
+*Wolkenschloss* zugeschnitten ist. Die Verwendung von Containern verringert
+die Anforderungen an zu installierenden Paketen auf dem Entwicklungsrechner
+(und ermöglicht ggf. die Ausführung von Aufgaben mit privilegierten Rechten).
+
+Beispiele für die Verwendung des Plugins findest Du im [fixtures](fixtures)
+Verzeichnis.
+
+| Task               | Zweck                                                                  | Beispiel                |
+|--------------------|------------------------------------------------------------------------|-------------------------|
+| [RunContainerTask] | Führt ein einzelnes Kommando in einem Container aus und beenden diesen | [mount](fixtures/mount) |
+| [BuildImageTask]   | Erstellt ein Docker Image.                                             | [image](fixtures/image) |
+
 [k8s]: https://kubernetes.io/
 [microk8s]: https://microk8s.io/docs
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -354,3 +433,9 @@ angefügt.
 [Vue.js]: https://vuejs.org/
 [npm]: https://www.npmjs.com/
 [Vue CLI]: https://cli.vuejs.org/
+[buildSrc]: .
+[fixtures]: fixtures
+[RunContainerTask]: src/main/kotlin/wolkenschloss/gradle/docker/RunContainerTask.kt
+[BuildImageTask]: src/main/kotlin/wolkenschloss/gradle/docker/RunContainerTask.kt
+[Docker]: src/main/kotlin/wolkenschloss/gradle/docker
+[Testbed]: src/main/java/wolkenschloss

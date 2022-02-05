@@ -1,7 +1,8 @@
 import {createLocalVue, mount} from "@vue/test-utils";
 import EditIngredient from "@/components/EditIngredient.vue";
 import Vuetify from "vuetify";
-import {VMessages, VSelect, VCombobox} from "vuetify/lib/components";
+import {VMessages, VCombobox} from "vuetify/lib/components";
+import SelectUnit from "@/components/SelectUnit.vue"
 import Vuex from 'vuex'
 
 describe('EditIngredient.vue', () => {
@@ -29,7 +30,14 @@ describe('EditIngredient.vue', () => {
                     actions: {
                         queryIngredientsdients: () => {}
                     }
-                }}})
+                },
+                units: {
+                    namespaced: true,
+                    getters: {
+                        entries: () => [{text: 'g', value: 'g'}, {text: 'l', value: 'l'}]
+                    }
+                }
+            }})
     })
 
     it("should validate name", async () => {
@@ -73,8 +81,8 @@ describe('EditIngredient.vue', () => {
         await localVue.nextTick()
         expect(messages.vm.value.length).toEqual(0)
 
-        const unitInput = wrapper.findComponent(VSelect)
-        await unitInput.vm.selectItem('g')
+        const unitInput = wrapper.findComponent(SelectUnit)
+        await unitInput.vm.selectItem('l')
         await wrapper.vm.$nextTick()
 
         expect(messages.exists).toBeTruthy()
