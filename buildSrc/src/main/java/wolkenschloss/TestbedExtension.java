@@ -30,7 +30,9 @@ public abstract class TestbedExtension  {
         var buildDirectory = layout.getBuildDirectory();
         var sharedServices = project.getGradle().getSharedServices();
 
-        getRunDirectory().set(buildDirectory.dir("run"));
+        getRunDirectory().convention(buildDirectory.dir("run"));
+        getFailOnError().convention(true);
+
 
         getTransformation().initialize(layout);
         getUser().initialize();
@@ -114,6 +116,8 @@ public abstract class TestbedExtension  {
     }
 
     abstract public DirectoryProperty getRunDirectory();
+
+    abstract public Property<Boolean> getFailOnError();
 
     abstract public Property<SecureShellService> getSecureShellService();
 

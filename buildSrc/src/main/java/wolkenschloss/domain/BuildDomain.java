@@ -10,7 +10,8 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
-
+import wolkenschloss.TestbedExtension;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
@@ -69,7 +70,16 @@ abstract public class BuildDomain extends DefaultTask {
                     knownHostsFile.getPath(),
                     getProject().getName());
 
-            throw new GradleException(message);
+            var extension = Optional.ofNullable(getProject().getExtensions().findByType(TestbedExtension.class));
+
+            var failOnError = extension.map(ext -> ext.getFailOnError().get()).orElse(true);
+
+            if (failOnError) {
+                throw new GradleException(message);
+            }
+
+            getLogger().warn(message);
+            return;
         }
 
         DomainOperations domainOperations = getDomainOperations().get();

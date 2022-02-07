@@ -34,6 +34,8 @@ testbed {
     host {
         callbackPort.set(9292)
     }
+
+    failOnError.set(false)
 }
 
 tasks {
