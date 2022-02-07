@@ -85,7 +85,7 @@ abstract class CreateTask : DefaultTask() {
 
             val holder = createCertificateBuilder(keyPair)
                 .addBasicConstraints(true)
-                .addKeyUsageExtension(KeyUsage.keyCertSign or KeyUsage.digitalSignature or KeyUsage.cRLSign)
+                .addKeyUsageExtension(KeyUsage.keyCertSign or KeyUsage.cRLSign)
                 .addSubjectKeyIdentifierExtension(keyPair.public)
                 .build(contentSigner)
 

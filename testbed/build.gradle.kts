@@ -158,7 +158,8 @@ tasks {
         }
 
         command.addAll("kubectl", "apply", "-k", "/opt/app")
-
+        logging.captureStandardOutput(LogLevel.QUIET)
+        doNotTrackState("For side effects only")
     }
 
     val readRootCa by registering(RunContainerTask::class) {
@@ -184,9 +185,16 @@ tasks {
     val reset by registering(RunContainerTask::class) {
         logging.captureStandardOutput(LogLevel.QUIET)
         val host = "${testbed.domain.name.get()}.${testbed.domain.domainSuffix.get()}"
-        command.addAll("/bin/bash", "-c", "ssh $host microk8s status")
+        command.addAll("/bin/bash", "-c", "ssh $host microk8s reset")
         doNotTrackState("For side effects only")
     }
+
+//    val status by registering(RunContainerTask::class) {
+//        logging.captureStandardOutput(LogLevel.QUIET)
+//        val host = "${testbed.domain.name.get()}.${testbed.domain.domainSuffix.get()}"
+//        command.addAll("/bin/bash", "-c", "ssh $host microk8s status")
+//        doNotTrackState("For side effects only")
+//    }
 
     named("start") {
         dependsOn(createRootCa)

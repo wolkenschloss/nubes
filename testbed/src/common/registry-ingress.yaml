@@ -16,7 +16,7 @@ spec:
       - registry.wolkenschloss.local
       secretName: registry-cert
   rules:
-    - host: registry.nubes.local
+    - host: registry.wolkenschloss.local
       http:
         paths:
           - path: /
