@@ -116,7 +116,7 @@ abstract public class DownloadDistribution extends DefaultTask {
 
     private void downloadFile(URL src) throws IOException {
 
-        getLogger().lifecycle("Downloading file {}", src);
+        getLogger().info("Downloading file {}", src);
 
         var filename = Path.of(src.getFile()).getFileName();
         var dst = getDistributionDir().file(filename.toString()).get().getAsFile();

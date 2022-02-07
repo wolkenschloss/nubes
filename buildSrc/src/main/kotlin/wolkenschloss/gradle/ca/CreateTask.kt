@@ -1,17 +1,14 @@
 package wolkenschloss.gradle.ca
 
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.X500NameBuilder
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.*
-import org.bouncycastle.cert.X509ExtensionUtils
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter
-import org.bouncycastle.operator.bc.BcDigestCalculatorProvider
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -28,7 +25,6 @@ import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyPair
 import java.security.KeyPairGenerator
-import java.security.PublicKey
 import java.security.SecureRandom
 import java.time.Period
 import java.time.ZonedDateTime
@@ -65,6 +61,7 @@ abstract class CreateTask : DefaultTask() {
         rnd
     }
 
+    // see https://stackoverflow.com/questions/29852290/self-signed-x509-certificate-with-bouncy-castle-in-java
     @TaskAction
     fun execute() {
 
@@ -83,10 +80,16 @@ abstract class CreateTask : DefaultTask() {
             val contentSigner = JcaContentSignerBuilder(SIGNING_ALGORITHM)
                 .build(keyPair.private)
 
+            val id =ByteArray(20)
+            random.nextBytes(id)
+
+            val extendedKeyUsage = ExtendedKeyUsage(arrayOf(KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth))
+            val keyUsage = KeyUsage(KeyUsage.keyCertSign or KeyUsage.digitalSignature)
+
             val holder = createCertificateBuilder(keyPair)
-                .addBasicConstraints(true)
-                .addKeyUsageExtension(KeyUsage.keyCertSign or KeyUsage.cRLSign)
-                .addSubjectKeyIdentifierExtension(keyPair.public)
+                .addExtension(Extension.basicConstraints, true, BasicConstraints(true).encoded)
+                .addExtension(Extension.keyUsage, false, keyUsage.encoded)
+                .addExtension(Extension.extendedKeyUsage, false, extendedKeyUsage.encoded)
                 .build(contentSigner)
 
             val cert = JcaX509CertificateConverter()
@@ -104,7 +107,7 @@ abstract class CreateTask : DefaultTask() {
             }
 
         } catch (e: Exception) {
-            throw GradleException("Cannot create certificate", e)
+            throw GradleException("Cannot create certificate: ${e.message}", e)
         }
     }
 
@@ -131,16 +134,6 @@ abstract class CreateTask : DefaultTask() {
 
     private fun X509v3CertificateBuilder.addKeyUsageExtension(usage: Int): X509v3CertificateBuilder {
         return addExtension(Extension.keyUsage, true, KeyUsage(usage))
-    }
-
-    private fun X509v3CertificateBuilder.addSubjectKeyIdentifierExtension(key: PublicKey): X509v3CertificateBuilder {
-        val algorithmIdentifier = AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1)
-        val digestCalculator = BcDigestCalculatorProvider().get(algorithmIdentifier)
-        val extensionUtils = X509ExtensionUtils(digestCalculator)
-        val subjectPublicKey = SubjectPublicKeyInfo.getInstance(key.encoded)
-        val subjectKeyIdentifier = extensionUtils.createSubjectKeyIdentifier(subjectPublicKey)
-
-        return addExtension(Extension.subjectKeyIdentifier, true, subjectKeyIdentifier)
     }
 
     private fun randomSerialNumber(): BigInteger {

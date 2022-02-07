@@ -2,11 +2,6 @@ package wolkenschloss.gradle.ca
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderFactory
-import java.io.File
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
