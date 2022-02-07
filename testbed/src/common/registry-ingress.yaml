@@ -6,6 +6,7 @@ metadata:
   namespace: container-registry
   annotations:
     cert-manager.io/cluster-issuer: ca-issuer
+    cert-manager.io/common-name: registry.wolkenschloss.local
     kubernetes.io/ingress.class: public
     nginx.ingress.kubernetes.io/proxy-body-size: "5g"
 
