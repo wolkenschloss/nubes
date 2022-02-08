@@ -3,6 +3,8 @@ ARG UID=1000
 ARG GID=1000
 ARG UNAME
 
+COPY info.bash /usr/local/bin
+
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     apt-utils \
     openssl \

@@ -24,7 +24,7 @@ testbed {
     domain {
         name.set("testbed")
         domainSuffix.set("wolkenschloss.local")
-        hosts.addAll("dashboard", "registry")
+        hosts.addAll("dashboard", "registry", "grafana", "prometheus")
     }
 
     pool {
@@ -44,6 +44,9 @@ tasks {
 
     val testbed: wolkenschloss.TestbedExtension by project.extensions
     val userHome = Paths.get(System.getProperty("user.home"))
+
+    val newRootCa by registering(CreateTask::class) {
+    }
 
     withType(RunContainerTask::class) {
         mount {
@@ -67,6 +70,10 @@ tasks {
                     source.set(buildDomain.get().hostsFile)
                     target.set("/etc/hosts")
                 }
+                file {
+                    source.set(newRootCa.flatMap { it.certificate })
+                    target.set("/usr/local/share/ca-certificates/ca.crt")
+                }
             }
         }
     }
@@ -86,28 +93,13 @@ tasks {
         imageId.convention(buildClientImage.get().imageId)
     }
 
-    // TODO refactor - move to :testbed:status
-    val opensslversion by registering(RunContainerTask::class) {
+
+    val info by registering(RunContainerTask::class) {
         logging.captureStandardOutput(LogLevel.QUIET)
-        command.addAll("openssl", "version")
-        doNotTrackState("Prints version info")
+        command.addAll("info.bash")
+        doNotTrackState("Prints testbed client info")
     }
 
-    // TODO refactor - move to :testbed:status
-    val kubeversion by registering(RunContainerTask::class) {
-        logging.captureStandardOutput(LogLevel.QUIET)
-        command.addAll("kubectl", "version", "--short")
-        doNotTrackState("Prints version info")
-    }
-
-    val newRootCa by registering(CreateTask::class) {
-    }
-
-     // Aufteilen in:
-    // 1. CA erstellen
-    // 2. Cert-Manager installieren
-    // 3. CA installieren
-    // DockerRunTask durch neue Fassung ersetzen
     val createRootCa by registering(RunContainerTask::class) {
 
         val src = layout.projectDirectory.dir("src/ca")
@@ -174,12 +166,24 @@ tasks {
         doNotTrackState("For side effects only")
     }
 
-    val getCertificate by registering(RunContainerTask::class) {
+    val allCerts by registering(RunContainerTask::class) {
         logging.captureStandardOutput(LogLevel.QUIET)
         command.addAll(
             "/bin/bash",
             "-c",
-            "kubectl get secrets -n container-registry registry-cert -o 'go-template={{index .data \"tls.crt\"}}' | base64 -d | openssl x509 -text"
+            "kubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o 'go-template={{index .data \"tls.crt\"}}'"
+        // | base64 -d | openssl x509 -text
+        )
+        doNotTrackState("For side effects only")
+    }
+
+    val certs by registering(RunContainerTask::class) {
+        logging.captureStandardOutput(LogLevel.QUIET)
+        command.addAll(
+            "/bin/bash", "-c",
+            "kubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o go-template='{{range .items}}{{index .data \"tls.crt\"}}{{\"\\n\"}}{{end}}' | base64 -d |openssl storeutl -noout -text /dev/stdin"
+            // ubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o go-template='{{range .items}}{{index .data "tls.crt"}}{{"\n"}}{{end}}' | base64 -d |openssl storeutl -noout -text /dev/stdin | awk '/Issuer:/{printf $NF"\n"} /Subject: C=/{printf $NF"\n"} /DNS:/{x=gsub(/ *DNS:/, ""); printf "SANS=" $0"\n"}'
+//            "kubectl get secrets --field-selector type=kubernetes.io/tls --all-namespaces"
         )
         doNotTrackState("For side effects only")
     }
@@ -190,13 +194,6 @@ tasks {
         command.addAll("/bin/bash", "-c", "ssh $host microk8s reset")
         doNotTrackState("For side effects only")
     }
-
-//    val status by registering(RunContainerTask::class) {
-//        logging.captureStandardOutput(LogLevel.QUIET)
-//        val host = "${testbed.domain.name.get()}.${testbed.domain.domainSuffix.get()}"
-//        command.addAll("/bin/bash", "-c", "ssh $host microk8s status")
-//        doNotTrackState("For side effects only")
-//    }
 
     named("start") {
         dependsOn(createRootCa)
