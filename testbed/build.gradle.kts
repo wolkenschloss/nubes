@@ -136,17 +136,9 @@ tasks {
 
         mount {
             input {
-                file {
-                    source.set(src.file("dashboard-ingress.yaml"))
-                    target.set("/opt/app/dashboard-ingress.yaml")
-                }
-                file {
-                    source.set(src.file("registry-ingress.yaml"))
-                    target.set("/opt/app/registry-ingress.yaml")
-                }
-                file {
-                    source.set(src.file("kustomization.yaml"))
-                    target.set("/opt/app/kustomization.yaml")
+                directory {
+                    source.set(src)
+                    target.set("/opt/app")
                 }
             }
         }

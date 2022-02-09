@@ -1,3 +1,5 @@
 resources:
   - dashboard-ingress.yaml
   - registry-ingress.yaml
+  - grafana-ingress.yaml
+  - prometheus-ingress.yaml
