@@ -6,19 +6,29 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.file.shouldBeReadable
 import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.file.shouldNotBeWriteable
+import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_clientAuth
+import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_serverAuth
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.Fixtures
 import wolkenschloss.testing.createRunner
 import java.security.cert.X509Certificate
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
+
+private const val digitalSignature = 0
+
+
+private const val keyCertSign = 5
 
 class CaPluginTest : FunSpec({
     context("A project using com.github.wolkenschloss.ca gradle plugin") {
@@ -37,8 +47,9 @@ class CaPluginTest : FunSpec({
                 assertSoftly(fixture.resolve("build/ca/ca.crt").readX509Certificate()) {
                     basicConstraints shouldBeGreaterThan -1
                     basicConstraints shouldBe Int.MAX_VALUE
-                    keyUsage[5] shouldBe true
-                    keyUsage[6] shouldBe true
+                    keyUsage[digitalSignature] shouldBe true
+                    keyUsage[keyCertSign] shouldBe true
+                    extendedKeyUsage.shouldContainExactly(listOf(id_kp_serverAuth.id, id_kp_clientAuth.id))
                     shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
                     subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
                 }
@@ -53,8 +64,16 @@ class CaPluginTest : FunSpec({
         }
 
         test("should customize validity") {
-            val start = ZonedDateTime.of(2022, 2, 4, 0, 0, 0, 0, ZoneOffset.UTC)
-            val end = ZonedDateTime.of(2027, 2, 4, 0, 0, 0, 0, ZoneOffset.UTC)
+
+            val start = ZonedDateTime.of(
+                LocalDate.of(2022, 2, 4),
+                LocalTime.MIDNIGHT,
+                ZoneOffset.UTC)
+
+            val end = ZonedDateTime.of(
+                LocalDate.of(2027, 2, 4),
+                LocalTime.MIDNIGHT,
+                ZoneOffset.UTC)
 
             val result = fixture.createRunner()
                 .withArguments("createWithValidity", "-DnotBefore=$start","-DnotAfter=$end")

@@ -1,8 +1,8 @@
 package wolkenschloss.conventions
 
 import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldBeADirectory
 import io.kotest.matchers.file.shouldContainFile
@@ -11,19 +11,41 @@ import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.Fixtures
 import wolkenschloss.testing.build
+import java.nio.file.Paths
 
 class WebappTest : DescribeSpec({
 
     describe("project with vue application") {
-        val fixture = Fixtures("webapp").clone(tempdir())
-        afterEach { fixture.build("clean") }
+        // It is not possible to use the temporary directories provided by
+        // Kotest or Java for cloned fixtures.
+        //
+        // The node_modules directory contains executable files that are
+        // required for the test. No files may be executed in proper temporary
+        // directories. This leads to an error in the test.
+        val fixture = Paths.get(System.getProperty("user.dir"), "build", "tmp", "fixture").toFile()
+
+        beforeEach {
+            Fixtures("webapp").clone(fixture)
+            fixture.shouldExist()
+        }
+
+        afterEach {
+            fixture.walkBottomUp().forEach {
+                withClue("deleting ${it.path}") {
+                    it.delete() shouldBe true
+                }
+            }
+        }
 
         describe("build task") {
-            it("should create jar far") {
-                val result = fixture.build("build", "-i")
+            it("should create jar file") {
+
+                val result = fixture.build("build")
+
                 result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
                 result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
                 fixture.resolve("build/libs/fixture-webapp.jar").shouldExist()
+
             }
         }
 
@@ -42,6 +64,7 @@ class WebappTest : DescribeSpec({
                 val result = fixture.build("vue")
 
                 result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
+
                 assertSoftly(fixture.resolve("build/classes/java/main/META-INF/resources")) {
                     shouldBeADirectory()
                     shouldContainFile("index.html")
