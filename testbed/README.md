@@ -93,14 +93,21 @@ Sofern Du die Datei `/etc/hosts` so wie oben beschrieben angepasst hast,
 erreichst Du den Prüfstand mit: `ssh testbed.wolkenschloss.de`.
 
 Alternativ kannst Du den Testbed-Client `tbc` verwenden, wenn Du diesen
-installiert hast: `ln -s testbed`
+installiert hast: 
 
+```
+ln -s $(realpath $HOME/.local/bin/tbc) $(realpath testbed/src/client.bash)
+```
 
-Nachdem Du die IP-Adresse des Prüfstandes ermittelt hast, kannst Du Dich 
-einfach durch `ssh $TESTBED_ADDRESS` mit dem Prüfstand verbinden. Ein 
-Benutzer mit dem gleichen Namen wurde bereits angelegt und Dein öffentlicher 
-Schlüssel kopiert. Eine Anmeldung mit Benutzernamen und Kennwort ist weder 
-erforderlich noch möglich.
+Mit dem Befehl `tbc` gelangst Du zu einer Shell in einem Docker Container.
+In diesem Container sind die Client Programme für den Zugriff auf den 
+Prüfstand installiert und konfiguriert:
+
+* kubectl
+* cmctl
+* ssh
+* openssl
+
 
 [k8s]: https://kubernetes.io/
 [microk8s]: https://microk8s.io/docs
