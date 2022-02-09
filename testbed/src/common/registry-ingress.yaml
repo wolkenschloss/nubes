@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry-ingress
+  namespace: container-registry
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+    cert-manager.io/common-name: registry.wolkenschloss.local
+    kubernetes.io/ingress.class: public
+    nginx.ingress.kubernetes.io/proxy-body-size: "5g"
+
+spec:
+  tls:
+    - hosts:
+      - registry.wolkenschloss.local
+      secretName: registry-cert
+  rules:
+    - host: registry.wolkenschloss.local
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: registry
+                port:
+                  name: registry

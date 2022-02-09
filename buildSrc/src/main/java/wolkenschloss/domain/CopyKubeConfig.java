@@ -1,6 +1,7 @@
 package wolkenschloss.domain;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
@@ -43,12 +44,24 @@ public abstract class CopyKubeConfig extends DefaultTask {
             var attributes = PosixFilePermissions.asFileAttribute(permissions);
             var path = getKubeConfigFile().get().getAsFile().toPath();
 
+            var kubeconfig = result.getStdout();
+            if (Files.exists(path)) {
+                try {
+                    if (Files.readString(path).compareTo(kubeconfig) == 0) {
+                        getLogger().info("kubernetes configuration file already exists");
+                        return;
+                    }
+                } catch (IOException e) {
+                    throw new GradleException("Can not read file");
+                }
+            }
+
             Path file;
 
             try {
                 file = Files.createFile(path, attributes);
             } catch (IOException exception) {
-                throw new RuntimeException("Can not create File", exception);
+                throw new GradleException("Can not create File", exception);
             }
 
             try {
@@ -57,7 +70,7 @@ public abstract class CopyKubeConfig extends DefaultTask {
                         result.getStdout(),
                         StandardOpenOption.WRITE);
             } catch (IOException exception) {
-                throw new RuntimeException("Can not write File", exception);
+                throw new GradleException("Can not write File", exception);
             }
         });
     }

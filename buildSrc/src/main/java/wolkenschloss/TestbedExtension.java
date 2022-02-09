@@ -19,6 +19,7 @@ import java.util.Map;
 public abstract class TestbedExtension  {
 
     public static final String DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts";
+    public static final String DEFAULT_HOSTS_FILE_NAME = "hosts";
     public static final String DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig";
     public static final String DEFAULT_DOCKER_CONFIG_FILE_NAME = "docker/config.json";
 
@@ -29,17 +30,20 @@ public abstract class TestbedExtension  {
         var buildDirectory = layout.getBuildDirectory();
         var sharedServices = project.getGradle().getSharedServices();
 
-        getRunDirectory().set(buildDirectory.dir("run"));
+        getRunDirectory().convention(buildDirectory.dir("run"));
+        getFailOnError().convention(true);
+
 
         getTransformation().initialize(layout);
         getUser().initialize();
         getHost().initialize();
         getPool().initialize(sharedServices, buildDirectory, getRunDirectory());
-        getBaseImage().initialize();
+        getBaseImage().initialize(project);
 
         getDomain().initialize(
                 sharedServices,
                 getRunDirectory().file(DEFAULT_KNOWN_HOSTS_FILE_NAME),
+                getRunDirectory().file(DEFAULT_HOSTS_FILE_NAME),
                 getRunDirectory().file(DEFAULT_KUBE_CONFIG_FILE_NAME),
                 getRunDirectory().file(DEFAULT_DOCKER_CONFIG_FILE_NAME)
         );
@@ -90,7 +94,7 @@ public abstract class TestbedExtension  {
         property.put("user", getUser().getName());
         property.put("sshKey", getUser().getSshKey());
         property.put("hostname", getDomain().getName());
-        property.put("fqdn", getDomain().getFqdn());
+        property.put("fqdn", getDomain().getTestbedVmFqdn());
         property.put("locale", getDomain().getLocale());
 
         var callback = objects.mapProperty(String.class, Object.class);
@@ -112,6 +116,8 @@ public abstract class TestbedExtension  {
     }
 
     abstract public DirectoryProperty getRunDirectory();
+
+    abstract public Property<Boolean> getFailOnError();
 
     abstract public Property<SecureShellService> getSecureShellService();
 

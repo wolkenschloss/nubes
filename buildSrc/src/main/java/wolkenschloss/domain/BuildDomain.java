@@ -5,11 +5,13 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.GradleScriptException;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.*;
 import org.gradle.process.ExecOperations;
 import org.libvirt.LibvirtException;
-
+import wolkenschloss.TestbedExtension;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
@@ -23,6 +25,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CacheableTask
 abstract public class BuildDomain extends DefaultTask {
@@ -32,6 +36,12 @@ abstract public class BuildDomain extends DefaultTask {
 
     @Internal
     abstract public Property<Integer> getPort();
+
+    @Input
+    public abstract ListProperty<String> getHosts();
+
+    @Input
+    public abstract Property<String> getDomainSuffix();
 
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -43,6 +53,9 @@ abstract public class BuildDomain extends DefaultTask {
     @OutputFile
     @Nonnull
     abstract public RegularFileProperty getKnownHostsFile();
+
+    @OutputFile
+    abstract public RegularFileProperty getHostsFile();
 
     @Internal
     abstract public Property<DomainOperations> getDomainOperations();
@@ -57,7 +70,16 @@ abstract public class BuildDomain extends DefaultTask {
                     knownHostsFile.getPath(),
                     getProject().getName());
 
-            throw new GradleException(message);
+            var extension = Optional.ofNullable(getProject().getExtensions().findByType(TestbedExtension.class));
+
+            var failOnError = extension.map(ext -> ext.getFailOnError().get()).orElse(true);
+
+            if (failOnError) {
+                throw new GradleException(message);
+            }
+
+            getLogger().warn(message);
+            return;
         }
 
         DomainOperations domainOperations = getDomainOperations().get();
@@ -66,9 +88,11 @@ abstract public class BuildDomain extends DefaultTask {
 
         var serverKey = waitForCallback();
         updateKnownHosts(serverKey);
+        updateHosts();
     }
 
     private void updateKnownHosts(String serverKey) throws IOException, LibvirtException, InterruptedException {
+        getLogger().info("create known_hosts file");
         DomainOperations domainOperations = getDomainOperations().get();
 
         var ip = domainOperations.getIpAddress();
@@ -80,8 +104,34 @@ abstract public class BuildDomain extends DefaultTask {
 
         Files.writeString(
                 file.toAbsolutePath(),
-                String.format("%s %s", ip, serverKey),
+                String.format("%s %s%n", ip, serverKey),
                 StandardOpenOption.WRITE);
+
+        Files.writeString(
+                file.toAbsolutePath(),
+                String.format("%s.%s %s%n", getDomain().get(), getDomainSuffix().get(), serverKey),
+                StandardOpenOption.APPEND);
+    }
+
+    private void updateHosts() throws IOException, LibvirtException, InterruptedException {
+        getLogger().info("create hosts file");
+
+        var domainOperations = getDomainOperations().get();
+        var ip = domainOperations.getIpAddress();
+        var path = getHostsFile().get().getAsFile().toPath();
+        var file = Files.createFile(path);
+
+        this.getLogger().info("Writing hosts file: {}", path.toAbsolutePath());
+
+        var hosts = Stream.concat(
+                        Stream.of(ip),
+                        Stream.concat(
+                                        Stream.of(getDomain().get()),
+                                        getHosts().get().stream())
+                                .map(host -> String.format("%s.%s", host, getDomainSuffix().get())))
+                .collect(Collectors.joining(" "));
+
+        Files.writeString(file, hosts, StandardOpenOption.WRITE);
     }
 
     private String waitForCallback() {

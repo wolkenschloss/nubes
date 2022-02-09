@@ -47,6 +47,20 @@ virsh start testbed
 
 # testbed endgültig löschen und alle Ressourcen freigeben:
 ./gradlew :testbed:destroy
+
+# testbed ingress Konfiguration. Sollte automatisiert werden
+./gradlew :testbed:applyCommonServices
+
+# DNS überlisten:
+sudo cat testbed/build/run/hosts >> /etc/hosts
+sudo echo >> /etc/hosts
+
+# CA installieren (sollte auch irgendwie automatisiert werden):
+sudo copy $HOME/.local/share/wolkenschloss/ca/ca.crt /usr/local/share/ca-certificates
+sudo update-ca-certificates
+sudo systemctl restart docker
+# Zertifikat im Browser installieren
+# Firefox: Einstellungen > Datenschutz & Sicherheit > Zertifikate anzeigen... > Importieren...
 ```
 
 ## IP-Adresse des Prüfstandes ermitteln
@@ -64,30 +78,36 @@ $ virsh domifaddr testbed
 
 ## Kubernetes Dashboard
 
-Der Prüfstand besitzt ein Dashboard mit Weboberfläche. Für den Zugriff 
-solltest du den Ingress für das Dashboard installieren, wenn du nicht den 
-`kubectl proxy` verwenden willst.
+Der Prüfstand besitzt ein Dashboard mit Weboberfläche:
 
-```bash
-kubectl apply -f dashboard-ingress.yaml
-```
-
-Das Dashboard ist danach mit der Adresse `https://$TESTBED_ADDRESS/dashboard` 
-erreichbar, wobei Du `$TESTBED_ADDRESS` durch die zuvor ermittelte IP-Adresse 
-des Prüfstandes ersetzen musst.
+<https://dashboard.wolkenschloss.local/>
 
 Für die Anmeldung am Dashboard benötigst Du eine Kubernetes 
 Konfigurationsdatei oder ein Token (Das Token befindet sich in der 
 Konfigurationsdatei). Die Konfigurationsdatei findest Du in 
-`testbed/build/run/kubeconfig`. 
+[build/run/kubeconfig](build/run/kubeconfig) 
 
 ## SSH Verbindung
 
-Nachdem Du die IP-Adresse des Prüfstandes ermittelt hast, kannst Du Dich 
-einfach durch `ssh $TESTBED_ADDRESS` mit dem Prüfstand verbinden. Ein 
-Benutzer mit dem gleichen Namen wurde bereits angelegt und Dein öffentlicher 
-Schlüssel kopiert. Eine Anmeldung mit Benutzernamen und Kennwort ist weder 
-erforderlich noch möglich.
+Sofern Du die Datei `/etc/hosts` so wie oben beschrieben angepasst hast,
+erreichst Du den Prüfstand mit: `ssh testbed.wolkenschloss.de`.
+
+Alternativ kannst Du den Testbed-Client `tbc` verwenden, wenn Du diesen
+installiert hast: 
+
+```
+ln -s $(realpath $HOME/.local/bin/tbc) $(realpath testbed/src/client.bash)
+```
+
+Mit dem Befehl `tbc` gelangst Du zu einer Shell in einem Docker Container.
+In diesem Container sind die Client Programme für den Zugriff auf den 
+Prüfstand installiert und konfiguriert:
+
+* kubectl
+* cmctl
+* ssh
+* openssl
+
 
 [k8s]: https://kubernetes.io/
 [microk8s]: https://microk8s.io/docs

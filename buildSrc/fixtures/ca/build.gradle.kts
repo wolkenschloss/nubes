@@ -18,9 +18,9 @@ tasks {
     // The certificate and private key output files can be customized
     val createInUserDefinedLocation by registering(CreateTask::class) {
         // default is $XDG_DATA_HOME/wolkenschloss/ca/ca.key
-        privateKey.set(project.layout.buildDirectory.file("ca/ca.key").map {Paths.get(it.asFile.path)})
+        privateKey.set(project.layout.buildDirectory.file("ca/ca.key"))
 
         // default is $XDG_DATA_HOME/wolkenschloss/ca/ca.crt
-        certificate.set(project.layout.buildDirectory.file("ca/ca.crt").map {Paths.get(it.asFile.path)})
+        certificate.set(project.layout.buildDirectory.file("ca/ca.crt"))
     }
 }

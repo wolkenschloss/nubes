@@ -2,7 +2,6 @@ package wolkenschloss.conventions
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldBeADirectory
 import io.kotest.matchers.file.shouldContainFile
@@ -15,58 +14,68 @@ import wolkenschloss.testing.build
 class WebappTest : DescribeSpec({
 
     describe("project with vue application") {
-        val fixture = Fixtures("webapp").clone(tempdir())
-        afterEach { fixture.build("clean") }
+
+        val fixture = autoClose(Fixtures("webapp"))
 
         describe("build task") {
-            it("should create jar far") {
-                val result = fixture.build("build", "-i")
-                result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
-                result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
-                fixture.resolve("build/libs/fixture-webapp.jar").shouldExist()
+            it("should create jar file") {
+                fixture.withClone {
+                    val result = build("build")
+
+                    result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
+                    result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
+                    resolve("build/libs/fixture-webapp.jar").shouldExist()
+                }
             }
         }
 
         describe("check task") {
             it("should run unit and e2e tasks") {
-                val result = fixture.build("check")
+                fixture.withClone {
+                    val result = build("check")
 
-                result.tasks(TaskOutcome.SUCCESS)
-                    .map { task -> task.path }
-                    .shouldContainAll(":unit", ":e2e", ":check")
+                    result.tasks(TaskOutcome.SUCCESS)
+                        .map { task -> task.path }
+                        .shouldContainAll(":unit", ":e2e", ":check")
+                }
             }
         }
 
         describe("vue task") {
             it("should build vue app") {
-                val result = fixture.build("vue")
+                fixture.withClone {
+                    val result = build("vue")
 
-                result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
-                assertSoftly(fixture.resolve("build/classes/java/main/META-INF/resources")) {
-                    shouldBeADirectory()
-                    shouldContainFile("index.html")
-                    resolve("js").shouldBeADirectory()
+                    result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
+
+                    assertSoftly(resolve("build/classes/java/main/META-INF/resources")) {
+                        shouldBeADirectory()
+                        shouldContainFile("index.html")
+                        resolve("js").shouldBeADirectory()
+                    }
                 }
             }
         }
 
         describe("unit task") {
             it("should run unit tests") {
-                val result = fixture.build("unit")
+                fixture.withClone {
+                    val result = build("unit")
 
-                result.task(":unit")!!.outcome shouldBe TaskOutcome.SUCCESS
-                fixture.resolve("build/reports/tests/unit")
-                    .shouldContainFile("junit.xml")
+                    result.task(":unit")!!.outcome shouldBe TaskOutcome.SUCCESS
+                    resolve("build/reports/tests/unit").shouldContainFile("junit.xml")
+                }
             }
         }
 
         describe("e2e task") {
             it("should run e2e tests") {
-                val result = fixture.build("e2e")
+                fixture.withClone {
+                    val result = build("e2e")
 
-                result.task(":e2e")!!.outcome shouldBe TaskOutcome.SUCCESS
-                val reports = fixture.resolve("build/reports/tests/e2e")
-                reports.shouldBeADirectory()
+                    result.task(":e2e")!!.outcome shouldBe TaskOutcome.SUCCESS
+                    resolve("build/reports/tests/e2e").shouldBeADirectory()
+                }
             }
         }
     }

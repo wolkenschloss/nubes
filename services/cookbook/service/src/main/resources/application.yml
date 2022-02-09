@@ -4,7 +4,8 @@ quarkus:
   container-image:
     group: nubes
     name: cookbook
-    tag: latest
+    additional-tags: latest
+    registry: registry.wolkenschloss.local
   http:
     port: 8180
     access-log:

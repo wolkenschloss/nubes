@@ -19,7 +19,7 @@ node {
     }
 }
 
-val destination = file("$buildDir/classes/java/main/META-INF/resources/")
+val destination = project.layout.buildDirectory.file("classes/java/main/META-INF/resources/")
 
 sourceSets {
     main {
@@ -35,7 +35,12 @@ tasks {
         dependsOn(NpmInstallTask.NAME)
 
         command.set("vue-cli-service")
-        args.set(listOf("build", "--silent", "--dest", destination.absolutePath))
+        args.set(listOf(
+            "build",
+            "--silent",
+            "--dest",
+            destination.get().asFile.absolutePath)
+        )
 
         inputs.files("package.json", "package-lock.json", "vue.config.js")
             .withPropertyName("configFiles")

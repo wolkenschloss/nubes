@@ -1,6 +1,6 @@
-import org.gradle.api.plugins.JavaBasePlugin.VERIFICATION_GROUP
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
 
 group = "com.github.wolkenschloss.gradle"
 

@@ -1,12 +1,13 @@
 package wolkenschloss.download;
 
+import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 
 import javax.inject.Inject;
-import java.nio.file.Path;
+import wolkenschloss.Directories;
 
 public abstract class BaseImageExtension {
 
@@ -27,27 +28,19 @@ public abstract class BaseImageExtension {
 
     public abstract RegularFileProperty getBaseImageFile();
 
-    public void initialize() {
+    public void initialize(Project project) {
         getUrl().convention(DEFAULT_DOWNLOAD_URL);
         getName().convention(DEFAULT_DISTRIBUTION_NAME);
 
-        var xdgDataHome = getXdgDataHome().resolve(APP_NAME);
-
-        getDownloadDir().set(xdgDataHome.toFile());
+        getDownloadDir().set(project.getLayout()
+                .getProjectDirectory()
+                .dir(Directories.getTestbedHome().toFile().getAbsolutePath()));
 
         getDistributionDir().convention(getDownloadDir().dir(getName()));
+
         var parts = getUrl().get().split("/");
         var basename = parts[parts.length - 1];
 
         getBaseImageFile().convention(getDistributionDir().file(basename));
-    }
-
-    private Path getXdgDataHome() {
-        var dataDir = System.getenv().get("XDG_DATA_HOME");
-        if (dataDir == null) {
-            return Path.of(System.getenv("HOME"), ".local", "share");
-        } else {
-            return Path.of(dataDir);
-        }
     }
 }
