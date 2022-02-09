@@ -38,7 +38,7 @@ public abstract class TestbedExtension  {
         getUser().initialize();
         getHost().initialize();
         getPool().initialize(sharedServices, buildDirectory, getRunDirectory());
-        getBaseImage().initialize();
+        getBaseImage().initialize(project);
 
         getDomain().initialize(
                 sharedServices,

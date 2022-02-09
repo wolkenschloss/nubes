@@ -5,7 +5,6 @@ import org.gradle.api.file.FileSystemLocationProperty
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
-
 fun TaskProvider<BuildImageTask>.forceRemoveImage() {
     val task = get()
     val file = task.imageId.get().asFile

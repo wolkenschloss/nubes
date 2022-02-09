@@ -6,7 +6,7 @@ import java.nio.file.Paths
 /**
  * Verwaltet Testprojekte für Funktionstests und Integrationstests.
  *
- * Die Testprojekte befinden sich im [/buildSrc/fixtures](/buildSrc/fixtures) Verzeichnis.
+ * Die Testprojekte befinden sich im `/buildSrc/fixtures` Verzeichnis.
  * Für jeden Test wird eine Kopie (Klon) angelegt, damit der Test
  * nicht auf Erzeugnisse eines vorangegangenen Tests stößt, womit
  * Testergebnisse verfälscht würden.

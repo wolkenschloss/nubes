@@ -4,6 +4,7 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
+import io.kotest.extensions.system.withEnvironment
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.collections.shouldContainExactly
@@ -31,93 +32,101 @@ private const val digitalSignature = 0
 private const val keyCertSign = 5
 
 class CaPluginTest : FunSpec({
-    context("A project using com.github.wolkenschloss.ca gradle plugin") {
-        val fixture = Fixtures("ca").clone(tempdir())
 
-        context("executing execute create task") {
-            val result = fixture.createRunner()
-                .withArguments("create")
-                .build()
+        context("A project using com.github.wolkenschloss.ca gradle plugin") {
+            val fixture = Fixtures("ca").clone(tempdir())
+            val xdgDataHome = tempdir()
+            val environment = mapOf("XDG_DATA_HOME" to xdgDataHome.absolutePath)
 
-            test("should be successful") {
+            context("executing execute create task") {
+                val result = fixture.createRunner()
+                    .withArguments("create")
+                    .withEnvironment(environment)
+                    .build()
+
+                test("should be successful") {
+                    result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
+                }
+
+                test("should create self signed root certificate") {
+                    assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.crt").readX509Certificate()) {
+                        basicConstraints shouldBeGreaterThan -1
+                        basicConstraints shouldBe Int.MAX_VALUE
+                        keyUsage[digitalSignature] shouldBe true
+                        keyUsage[keyCertSign] shouldBe true
+                        extendedKeyUsage.shouldContainExactly(listOf(id_kp_serverAuth.id, id_kp_clientAuth.id))
+                        shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
+                        subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
+                    }
+                }
+
+                test("should create read only certificate") {
+                    assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.crt")) {
+                        shouldBeReadable()
+                        shouldNotBeWriteable()
+                    }
+                }
+            }
+
+            test("should customize validity") {
+
+                val start = ZonedDateTime.of(
+                    LocalDate.of(2022, 2, 4),
+                    LocalTime.MIDNIGHT,
+                    ZoneOffset.UTC)
+
+                val end = ZonedDateTime.of(
+                    LocalDate.of(2027, 2, 4),
+                    LocalTime.MIDNIGHT,
+                    ZoneOffset.UTC)
+
+                val result = fixture.createRunner()
+                    .withArguments("createWithValidity", "-DnotBefore=$start","-DnotAfter=$end")
+                    .withEnvironment(environment)
+                    .build()
+
+                result.task(":createWithValidity")!!.outcome shouldBe TaskOutcome.SUCCESS
+
+                val certificate = xdgDataHome.resolve("wolkenschloss/ca/ca.crt")
+                    .readX509Certificate()
+
+                assertSoftly(certificate) {
+                    notBefore.toUtc() shouldBe start
+                    notAfter.toUtc() shouldBe end
+                }
+            }
+
+            test("should create readonly private key") {
+
+                val result = fixture.createRunner()
+                    .withArguments("create")
+                    .withEnvironment(environment)
+                    .build()
+
                 result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
-            }
 
-            test("should create self signed root certificate") {
-                assertSoftly(fixture.resolve("build/ca/ca.crt").readX509Certificate()) {
-                    basicConstraints shouldBeGreaterThan -1
-                    basicConstraints shouldBe Int.MAX_VALUE
-                    keyUsage[digitalSignature] shouldBe true
-                    keyUsage[keyCertSign] shouldBe true
-                    extendedKeyUsage.shouldContainExactly(listOf(id_kp_serverAuth.id, id_kp_clientAuth.id))
-                    shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
-                    subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
-                }
-            }
-
-            test("should create read only certificate") {
-                assertSoftly(fixture.resolve("build/ca/ca.crt")) {
-                    shouldBeReadable()
+                assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.key")) {
                     shouldNotBeWriteable()
+                    shouldBeReadable()
+                    readPrivateKey().algorithm shouldBe "RSA"
+                }
+            }
+
+            test("should create output in user defined location") {
+                val result = fixture.createRunner()
+                    .withArguments("createInUserDefinedLocation")
+                    .withEnvironment(environment)
+                    .build()
+
+                result.task(":createInUserDefinedLocation")!!.outcome shouldBe TaskOutcome.SUCCESS
+
+                assertSoftly(fixture.resolve("build/ca")) {
+                    shouldContainFile("ca.crt")
+                    shouldContainFile("ca.key")
                 }
             }
         }
 
-        test("should customize validity") {
-
-            val start = ZonedDateTime.of(
-                LocalDate.of(2022, 2, 4),
-                LocalTime.MIDNIGHT,
-                ZoneOffset.UTC)
-
-            val end = ZonedDateTime.of(
-                LocalDate.of(2027, 2, 4),
-                LocalTime.MIDNIGHT,
-                ZoneOffset.UTC)
-
-            val result = fixture.createRunner()
-                .withArguments("createWithValidity", "-DnotBefore=$start","-DnotAfter=$end")
-                .build()
-
-            result.task(":createWithValidity")!!.outcome shouldBe TaskOutcome.SUCCESS
-
-            val certificate = fixture.resolve("build/ca/ca.crt")
-                .readX509Certificate()
-
-            assertSoftly(certificate) {
-                notBefore.toUtc() shouldBe start
-                notAfter.toUtc() shouldBe end
-            }
-        }
-
-        test("should create readonly private key") {
-
-            val result = fixture.createRunner()
-                .withArguments("create")
-                .build()
-
-            result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
-
-            assertSoftly(fixture.resolve("build/ca/ca.key")) {
-                shouldNotBeWriteable()
-                shouldBeReadable()
-                readPrivateKey().algorithm shouldBe "RSA"
-            }
-        }
-
-        test("should create output in user defined location") {
-            val result = fixture.createRunner()
-                .withArguments("createInUserDefinedLocation")
-                .build()
-
-            result.task(":createInUserDefinedLocation")!!.outcome shouldBe TaskOutcome.SUCCESS
-
-            assertSoftly(fixture.resolve("build/ca")) {
-                shouldContainFile("ca.crt")
-                shouldContainFile("ca.key")
-            }
-        }
-    }
 }) {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerLeaf
 }
