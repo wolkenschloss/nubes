@@ -1,0 +1,52 @@
+#cloud-config
+
+preserve_hostname: False
+hostname: ${hostname.get()}
+fqdn: ${fqdn.get()}
+manage_etc_hosts: True
+
+ssh_pwauth: False
+
+groups:
+  - microk8s
+
+users:
+  - name: ${user.get()}
+    shell: '/bin/bash'
+    groups:
+      - sudo
+      - microk8s
+    ssh_authorized_keys:
+      - ${sshKey.get()}
+    sudo: 'ALL=(ALL) NOPASSWD: ALL'
+
+locale: ${locale.get()}
+
+# Just for now
+package_update: False
+package_upgrade: False
+
+packages:
+  - acpid
+  - tzdata
+  - openssh-server
+  - curl
+  - qemu-guest-agent
+
+snap:
+  commands:
+    01: snap install microk8s --classic
+    02: microk8s enable dns storage ingress dashboard registry prometheus
+    03: microk8s status --wait-ready
+
+runcmd:
+  - systemctl start qemu-guest-agent
+
+phone_home:
+  url: http://${callback_ip.get()}:${callback_port.get()}/${hostname.get()}
+  post:
+    - pub_key_ecdsa
+    - instance_id
+    - hostname
+    - fqdn
+  tries: 10
