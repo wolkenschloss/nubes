@@ -3,7 +3,7 @@ package wolkenschloss.gradle.testbed
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Nested
@@ -13,27 +13,21 @@ import wolkenschloss.gradle.testbed.domain.SecureShellService
 import wolkenschloss.gradle.testbed.download.BaseImageExtension
 import wolkenschloss.gradle.testbed.pool.PoolExtension
 import wolkenschloss.gradle.testbed.transformation.TransformationExtension
+import javax.inject.Inject
 
-abstract class TestbedExtension : ExtensionAware {
+@Suppress("CdiInjectionPointsInspection")
+abstract class TestbedExtension @Inject constructor(private val layout: ProjectLayout) {
     fun configure(project: Project): TestbedExtension {
-        // Set build directories
-        val layout = project.layout
         val buildDirectory = layout.buildDirectory
         val sharedServices = project.gradle.sharedServices
         runDirectory.convention(buildDirectory.dir("run"))
         failOnError.convention(true)
-        transformation.initialize(layout)
+        transformation.initialize()
         user.initialize()
         host.initialize()
-        pool.initialize(sharedServices, buildDirectory, runDirectory)
-        baseImage.initialize(project)
-        domain.initialize(
-            sharedServices,
-            runDirectory.file(DEFAULT_KNOWN_HOSTS_FILE_NAME),
-            runDirectory.file(DEFAULT_HOSTS_FILE_NAME),
-            runDirectory.file(DEFAULT_KUBE_CONFIG_FILE_NAME),
-            runDirectory.file(DEFAULT_DOCKER_CONFIG_FILE_NAME)
-        )
+        pool.initialize(sharedServices, runDirectory)
+        baseImage.initialize()
+        domain.initialize(sharedServices, runDirectory)
         return this
     }
 
@@ -101,9 +95,6 @@ abstract class TestbedExtension : ExtensionAware {
     abstract val registryService: Property<RegistryService>
 
     companion object {
-        const val DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts"
-        const val DEFAULT_HOSTS_FILE_NAME = "hosts"
-        const val DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig"
-        const val DEFAULT_DOCKER_CONFIG_FILE_NAME = "docker/config.json"
+
     }
 }

@@ -28,7 +28,7 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
             description = "Starts the libvirt domain and waits for the callback."
             domain.convention(extension.name)
             port.convention(port1)
-            xmlDescription.set(transform.domainDescription)
+            xmlDescription.convention(transform.domainDescription)
             knownHostsFile.convention(extension.knownHostsFile)
             hostsFile.convention(extension.hostsFile)
             domainSuffix.convention(extension.domainSuffix)

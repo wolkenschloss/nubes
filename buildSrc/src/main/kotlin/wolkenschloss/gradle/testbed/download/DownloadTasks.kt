@@ -4,7 +4,7 @@ import org.gradle.api.tasks.TaskContainer
 
 class DownloadTasks(private val extension: BaseImageExtension) {
     fun register(tasks: TaskContainer) {
-        tasks.register(DOWNLOAD_DISTRIBUTION_TASK_NAME,DownloadDistribution::class.java) {
+        tasks.register(DOWNLOAD_DISTRIBUTION_TASK_NAME, DownloadDistribution::class.java) {
             group = GROUP_NAME
             description = "Downloads the base image to a cache for later use."
             baseImageLocation.convention(extension.url)

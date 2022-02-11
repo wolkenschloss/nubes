@@ -8,8 +8,8 @@ class TransformationTasks(private val values: Map<String, Provider<*>>,private v
 
     fun register(tasks: TaskContainer) {
         tasks.register("transform", Copy::class.java) {
-            from(extension.sourceDirectory)
-            into(extension.generatedConfigurationDirectory)
+            from(extension.configurationDirectory)
+            into(extension.transformedConfigurationDirectory)
             expand(values)
         }
     }

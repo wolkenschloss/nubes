@@ -1,6 +1,5 @@
 package wolkenschloss.gradle.testbed.pool
 
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
@@ -8,22 +7,19 @@ import org.libvirt.Connect
 import org.libvirt.LibvirtException
 import org.libvirt.StoragePool
 import java.io.File
-import java.io.IOException
-import java.lang.RuntimeException
 import java.nio.file.Files
 import java.util.*
 import java.util.function.Consumer
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-abstract class PoolOperations : BuildService<PoolOperations.Params?>, AutoCloseable {
+abstract class PoolOperations : BuildService<PoolOperations.Params>, AutoCloseable {
     private val connection: Connect = Connect("qemu:///system")
 
     interface Params : BuildServiceParameters {
-        val poolName: Property<String?>
+        val poolName: Property<String>
     }
 
-    @Throws(LibvirtException::class)
     fun destroy(poolId: UUID) {
         fallsPoolExistiert(poolId) { pool: StoragePool ->
             pool.destroy()
@@ -31,7 +27,6 @@ abstract class PoolOperations : BuildService<PoolOperations.Params?>, AutoClosea
         }
     }
 
-    @Throws(IOException::class, LibvirtException::class)
     fun create(xmlDescription: Property<File>): UUID {
         val file = xmlDescription.get().absoluteFile.toPath()
         val xml = Files.readString(file)
@@ -45,8 +40,7 @@ abstract class PoolOperations : BuildService<PoolOperations.Params?>, AutoClosea
         }
     }
 
-    @Throws(LibvirtException::class)
-    fun allPools(): List<String> {
+    private fun allPools(): List<String> {
         return Stream.concat(
             Arrays.stream(connection.listDefinedStoragePools()),
             Arrays.stream(connection.listStoragePools())
@@ -54,8 +48,7 @@ abstract class PoolOperations : BuildService<PoolOperations.Params?>, AutoClosea
             .collect(Collectors.toList())
     }
 
-    @Throws(LibvirtException::class)
-    fun fallsPoolExistiert(poolId: UUID, consumer: StoragePoolConsumer) {
+    private fun fallsPoolExistiert(poolId: UUID, consumer: StoragePoolConsumer) {
         for (poolName in allPools()) {
             val pool = connection.storagePoolLookupByName(poolName)
             try {
@@ -68,7 +61,7 @@ abstract class PoolOperations : BuildService<PoolOperations.Params?>, AutoClosea
         }
     }
 
-    @Throws(LibvirtException::class)
+
     fun exists(): Boolean {
         val poolName = parameters.poolName.get()
         return allPools().contains(poolName)
@@ -90,7 +83,6 @@ abstract class PoolOperations : BuildService<PoolOperations.Params?>, AutoClosea
         }
     }
 
-    @Throws(LibvirtException::class)
     override fun close() {
         connection.close()
     }

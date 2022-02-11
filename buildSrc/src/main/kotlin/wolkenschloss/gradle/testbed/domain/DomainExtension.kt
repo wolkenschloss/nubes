@@ -1,34 +1,30 @@
 package wolkenschloss.gradle.testbed.domain
 
-import org.gradle.api.file.RegularFile
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildServiceRegistry
 
 abstract class DomainExtension {
     fun initialize(
         sharedServices: BuildServiceRegistry,
-        knownHostsFile: Provider<RegularFile>,
-        hostsFile: Provider<RegularFile>,
-        kubeConfig: Provider<RegularFile>,
-        dockerConfig: Provider<RegularFile>
+        runDirectory: DirectoryProperty
     ) {
         name.convention("testbed")
-        //        getFqdn().convention("testbed.wolkenschloss.local");
         domainSuffix.convention("wolkenschloss.local")
         locale.convention(System.getenv("LANG"))
-        this.knownHostsFile.convention(knownHostsFile)
-        this.hostsFile.convention(hostsFile)
-        kubeConfigFile.convention(kubeConfig)
-        dockerConfigFile.convention(dockerConfig)
+        knownHostsFile.convention(runDirectory.file(DEFAULT_KNOWN_HOSTS_FILE_NAME))
+        hostsFile.convention(runDirectory.file(DEFAULT_HOSTS_FILE_NAME))
+        kubeConfigFile.convention(runDirectory.file(DEFAULT_KUBE_CONFIG_FILE_NAME))
+        dockerConfigFile.convention(runDirectory.file(DEFAULT_DOCKER_CONFIG_FILE_NAME))
+
         domainOperations.set(
             sharedServices.registerIfAbsent(
                 "domainops",
                 DomainOperations::class.java) {
                 parameters.domainName.set(name)
-                parameters.knownHostsFile.set(knownHostsFile)
+                parameters.knownHostsFile.set(runDirectory.file(DEFAULT_KNOWN_HOSTS_FILE_NAME))
             }
         )
     }
@@ -46,4 +42,11 @@ abstract class DomainExtension {
     abstract val kubeConfigFile: RegularFileProperty
     abstract val domainOperations: Property<DomainOperations>
     abstract val dockerConfigFile: RegularFileProperty
+
+    companion object {
+        const val DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts"
+        const val DEFAULT_HOSTS_FILE_NAME = "hosts"
+        const val DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig"
+        const val DEFAULT_DOCKER_CONFIG_FILE_NAME = "docker/config.json"
+    }
 }

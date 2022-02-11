@@ -20,6 +20,6 @@ object Directories {
 
     val xdgDataHome: Path
         get() = Optional.ofNullable(System.getenv("XDG_DATA_HOME"))
-            .map { first: String? -> Paths.get(first) }
+            .map { Paths.get(it) }
             .orElse(Paths.get(System.getProperty("user.home"), ".local", "share"))
 }

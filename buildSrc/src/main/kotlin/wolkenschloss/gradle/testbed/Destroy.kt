@@ -9,7 +9,6 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Destroys
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.libvirt.LibvirtException
 import wolkenschloss.gradle.testbed.domain.DomainOperations
 import wolkenschloss.gradle.testbed.pool.PoolOperations
 import java.util.*
@@ -36,15 +35,14 @@ abstract class Destroy : DefaultTask() {
 
     @get:Inject
     abstract val providerFactory: ProviderFactory
+
     @TaskAction
-    @Throws(LibvirtException::class)
     fun destroy() {
         destroyDomain()
         destroyPool()
         deleteBuildDirectory()
     }
 
-    @Throws(LibvirtException::class)
     private fun destroyDomain() {
         val domainOperations: DomainOperations = domainOperations.get()
         val deleted = domainOperations.deleteDomainIfExists(domain)
@@ -53,7 +51,6 @@ abstract class Destroy : DefaultTask() {
         }
     }
 
-    @Throws(LibvirtException::class)
     private fun destroyPool() {
         if (poolRunFile.get().asFile.exists()) {
             val content = providerFactory.fileContents(poolRunFile)

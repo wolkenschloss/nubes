@@ -2,13 +2,15 @@ package wolkenschloss.gradle.testbed.transformation
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
+import javax.inject.Inject
 
-abstract class TransformationExtension {
-    fun initialize(layout: ProjectLayout) {
-        generatedConfigurationDirectory.convention(layout.buildDirectory.dir("config"))
-        sourceDirectory.set(layout.projectDirectory.dir("config"))
+@Suppress("CdiInjectionPointsInspection")
+abstract class TransformationExtension @Inject constructor(private val layout: ProjectLayout) {
+    fun initialize() {
+        transformedConfigurationDirectory.convention(layout.buildDirectory.dir("config"))
+        configurationDirectory.set(layout.projectDirectory.dir("config"))
     }
 
-    abstract val generatedConfigurationDirectory: DirectoryProperty
-    abstract val sourceDirectory: DirectoryProperty
+    abstract val transformedConfigurationDirectory: DirectoryProperty
+    abstract val configurationDirectory: DirectoryProperty
 }
