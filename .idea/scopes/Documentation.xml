@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Documentation" pattern="file:*.md||file[nubes]:doc//*||file:LICENSE.spdx||file:LICENSE||file:COPYRIGHT" />
+</component>
