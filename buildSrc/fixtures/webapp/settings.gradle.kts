@@ -1,4 +1,4 @@
-rootProject.name = 'fixture-webapp'
+rootProject.name = "fixture-webapp"
 
 dependencyResolutionManagement {
     versionCatalogs {
