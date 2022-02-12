@@ -224,6 +224,7 @@ tasks.withType<Test> {
     }
 
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
+    systemProperty("project.catalog.directory", project.rootDir.resolve("../gradle/libs.versions.toml").absolutePath)
 }
 
 tasks {
