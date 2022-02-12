@@ -8,10 +8,13 @@ plugins {
 
 idea {
     module {
-        excludeDirs.plusAssign(files(
-            ".git-hooks",
-            ".github",
-            ".run",
-            "gradle"))
+        // Das funktioniert, macht aber keinen Sinn.
+        // Die Build Verzeichnisse sollten über Scopes
+        // ausgeblendet werden.
+//        excludeDirs.plusAssign(files(
+//            ".git-hooks",
+//            ".github",
+//            ".run",
+//            "gradle"))
     }
 }

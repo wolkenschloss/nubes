@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Build" pattern="file:build.gradle.kts||file:gradle.properties||file:settings.gradle.kts||file:gradlew.bat||file:gradlew||file[nubes.plugins]:gradle//*||file[nubes]:gradle//*||file[nubes]:.git-hooks//*||file[nubes]:.github//*||src[nubes.plugins.main]:wolkenschloss.conventions..*||file:.gitignore||file:.gitmessage||file:git-conventional-commits.json||file[nubes]:.idea/scopes//*" />
+  <scope name="Build" pattern="file:build.gradle.kts||file:gradle.properties||file:settings.gradle.kts||file:gradlew.bat||file:gradlew||file[nubes.plugins]:gradle//*||file[nubes]:gradle//*||file[nubes]:.git-hooks//*||file[nubes]:.github//*||src[nubes.plugins.main]:wolkenschloss.conventions..*||file:.gitignore||file:.gitmessage||file:git-conventional-commits.json||file[nubes]:.idea/scopes//*||file[nubes]:.run//*" />
 </component>
