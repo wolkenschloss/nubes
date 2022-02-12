@@ -5,6 +5,7 @@ jsoup = "1.14.1"
 mockserver = "5.11.2"
 testcontainers = "1.16.3"
 junit = "5.8.2"
+node = "16.13.1"
 
 # Waiting for Gradle update to use kotlin version 1.6.
 # Then the current version of kotest can also be used.
@@ -20,6 +21,7 @@ jsonpath = "2.6.0"
 docker-java = "3.2.12"
 
 [libraries]
+quarkus-bom = { group = "io.quarkus", name = "quarkus-bom", version.ref = "quarkus"}
 awaitility = { group = "org.awaitility", name = "awaitility", version.ref = "awaitility" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 mockserver = { group = "org.mock-server", name = "mockserver-client-java", version.ref = "mockserver" }

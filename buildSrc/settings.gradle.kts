@@ -1,5 +1,4 @@
-enableFeaturePreview("VERSION_CATALOGS")
-
+@file:Suppress("UnstableApiUsage")
 rootProject.name = "plugins"
 
 dependencyResolutionManagement {

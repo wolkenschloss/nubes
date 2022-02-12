@@ -51,15 +51,13 @@ tasks {
     }
 }
 
-val quarkusPlatformGroupId: String by project
-val quarkusPlatformArtifactId: String by project
-val quarkusPlatformVersion: String by project
-
 val catalogs = extensions.getByType<VersionCatalogsExtension>()
 val libs = catalogs.named("libs")
 
 dependencies {
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    libs.findLibrary("quarkus-bom").ifPresent { bom ->
+        implementation(platform(bom))
+    }
 
     libs.findBundle("quarkus-unit").ifPresent {
         testImplementation(it)

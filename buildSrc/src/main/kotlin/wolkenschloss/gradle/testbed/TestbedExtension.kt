@@ -17,9 +17,8 @@ import javax.inject.Inject
 
 @Suppress("CdiInjectionPointsInspection")
 abstract class TestbedExtension @Inject constructor(private val layout: ProjectLayout) {
-    fun configure(project: Project): TestbedExtension {
+    fun configure(): TestbedExtension {
         val buildDirectory = layout.buildDirectory
-        val sharedServices = project.gradle.sharedServices
         runDirectory.convention(buildDirectory.dir("run"))
         failOnError.convention(true)
         transformation.initialize()
