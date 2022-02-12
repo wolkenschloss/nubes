@@ -28,8 +28,9 @@ import java.util.stream.Stream
 
 @CacheableTask
 abstract class BuildDomain : DefaultTask() {
+
     @get:Input
-    abstract val domain: Property<String?>
+    abstract val domain: Property<String>
 
     @get:Internal
     abstract val port: Property<Int?>
@@ -38,7 +39,7 @@ abstract class BuildDomain : DefaultTask() {
     abstract val hosts: ListProperty<String>
 
     @get:Input
-    abstract val domainSuffix: Property<String?>
+    abstract val domainSuffix: Property<String>
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile
@@ -50,8 +51,7 @@ abstract class BuildDomain : DefaultTask() {
     @get:OutputFile
     abstract val hostsFile: RegularFileProperty
 
-    @get:Internal
-    abstract val domainOperations: Property<DomainOperations?>
+
     @TaskAction
     @Throws(IOException::class, LibvirtException::class, InterruptedException::class)
     fun exec() {
@@ -76,7 +76,9 @@ abstract class BuildDomain : DefaultTask() {
             logger.warn(message)
             return
         }
-        val domainOperations = domainOperations.get()
+
+        val domainOperations = DomainOperations.getInstance(project.gradle).get()
+
         val xml = xmlDescription.get().readText()
         domainOperations.create(xml)
         val serverKey = waitForCallback()
@@ -87,8 +89,10 @@ abstract class BuildDomain : DefaultTask() {
     @Throws(IOException::class, LibvirtException::class, InterruptedException::class)
     private fun updateKnownHosts(serverKey: String) {
         logger.info("create known_hosts file")
-        val domainOperations = domainOperations.get()
-        val ip = domainOperations.ipAddress
+
+        val domainOperations = DomainOperations.getInstance(project.gradle).get()
+
+        val ip = domainOperations.ipAddress(domain)
         val permissions = setOf(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ)
         val attributes = PosixFilePermissions.asFileAttribute(permissions)
         val path = knownHostsFile.get().asFile.toPath()
@@ -106,8 +110,10 @@ abstract class BuildDomain : DefaultTask() {
     @Throws(IOException::class, LibvirtException::class, InterruptedException::class)
     private fun updateHosts() {
         logger.info("create hosts file")
-        val domainOperations = domainOperations.get()
-        val ip = domainOperations.ipAddress
+
+        val domainOperations = DomainOperations.getInstance(project.gradle).get()
+
+        val ip = domainOperations.ipAddress(domain)
         val path = hostsFile.get().asFile.toPath()
         val file = Files.createFile(path)
         logger.info("Writing hosts file: {}", path.toAbsolutePath())

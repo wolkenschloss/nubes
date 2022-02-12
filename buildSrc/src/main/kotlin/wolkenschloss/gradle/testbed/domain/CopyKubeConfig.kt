@@ -16,7 +16,10 @@ import javax.inject.Inject
 
 abstract class CopyKubeConfig : DefaultTask() {
     @get:Input
-    abstract val domainName: Property<String>
+    abstract val domain: Property<String>
+
+    @get:InputFile
+    abstract val knownHostsFile: RegularFileProperty
 
     @get:OutputFile
     abstract val kubeConfigFile: RegularFileProperty
@@ -24,13 +27,12 @@ abstract class CopyKubeConfig : DefaultTask() {
     @get:Inject
     abstract val execOperations: ExecOperations
 
-    @get:Internal
-    abstract val domainOperations: Property<DomainOperations>
     @TaskAction
     @Throws(Throwable::class)
     fun read() {
-        val domain = domainOperations.get()
-        val shell: SecureShellService = domain.getShell(execOperations)
+        val domainOperations = DomainOperations.getInstance(project.gradle).get()
+
+        val shell: SecureShellService = domainOperations.getShell(domain, knownHostsFile, execOperations)
         shell.command("microk8s", "config").execute {result ->
             val permissions = setOf(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ)
             val attributes = PosixFilePermissions.asFileAttribute(permissions)

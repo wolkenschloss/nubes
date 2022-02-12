@@ -40,7 +40,6 @@ abstract class DownloadDistribution : DefaultTask() {
     @get:Internal
     abstract val baseImage: RegularFileProperty
 
-    //    @Internal
     @get:OutputDirectory
     abstract val distributionDir: DirectoryProperty
 
@@ -58,7 +57,7 @@ abstract class DownloadDistribution : DefaultTask() {
 
     @get:Throws(MalformedURLException::class, URISyntaxException::class)
     private val gpgFileUrl: URL
-        private get() {
+        get() {
             val location = baseImageUrl.toURI()
             val parent = if (location.path.endsWith("/")) location.resolve("..") else location.resolve(".")
             return parent.resolve("SHA256SUMS.gpg").toURL()

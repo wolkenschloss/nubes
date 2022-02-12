@@ -50,8 +50,8 @@ class RegistryService(ip: String?) {
         return tag
     }
 
-    fun withRegistry(method: Consumer<RegistryService>) {
-        method.accept(this)
+    fun withRegistry(method: (RegistryService) -> Unit) {
+        method(this)
     }
 
     override fun toString(): String {

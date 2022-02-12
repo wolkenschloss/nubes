@@ -29,9 +29,9 @@ class PoolTasks(private val extension: PoolExtension) {
             group = GROUP_NAME
             description =
                 "Defines a virtlib storage pool based on the transformed description file containing a root image and a cloud-init data source volume."
-            poolOperations.set(extension.poolOperations)
             this.poolDescriptionFile.convention(transform.poolDescription)
             poolRunFile.convention(extension.poolRunFile)
+            poolName.convention(extension.name)
             dependsOn(buildRootImage, buildDataSourceImage)
         }
     }

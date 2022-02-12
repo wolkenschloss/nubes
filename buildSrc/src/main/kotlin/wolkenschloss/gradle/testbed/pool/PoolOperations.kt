@@ -1,11 +1,17 @@
 package wolkenschloss.gradle.testbed.pool
 
+import org.gradle.api.Project
+import org.gradle.api.invocation.Gradle
+
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
+import org.gradle.kotlin.dsl.*
 import org.libvirt.Connect
 import org.libvirt.LibvirtException
 import org.libvirt.StoragePool
+import wolkenschloss.gradle.testbed.TestbedExtension
 import java.io.File
 import java.nio.file.Files
 import java.util.*
@@ -13,12 +19,8 @@ import java.util.function.Consumer
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-abstract class PoolOperations : BuildService<PoolOperations.Params>, AutoCloseable {
+abstract class PoolOperations : BuildService<BuildServiceParameters.None>, AutoCloseable {
     private val connection: Connect = Connect("qemu:///system")
-
-    interface Params : BuildServiceParameters {
-        val poolName: Property<String>
-    }
 
     fun destroy(poolId: UUID) {
         fallsPoolExistiert(poolId) { pool: StoragePool ->
@@ -62,17 +64,16 @@ abstract class PoolOperations : BuildService<PoolOperations.Params>, AutoCloseab
     }
 
 
-    fun exists(): Boolean {
-        val poolName = parameters.poolName.get()
+    fun exists(poolName: String): Boolean {
         return allPools().contains(poolName)
     }
 
-    fun run(consumer: Consumer<StoragePool>) {
+    fun run(poolName: String, consumer: (StoragePool) -> Unit) {
         var pool: StoragePool? = null
         try {
             try {
-                pool = connection.storagePoolLookupByName(parameters.poolName.get())
-                consumer.accept(pool)
+                pool = connection.storagePoolLookupByName(poolName)
+                consumer(pool)
             } catch (exception: LibvirtException) {
                 throw RuntimeException("Unknown storage pool", exception)
             } finally {
@@ -86,4 +87,16 @@ abstract class PoolOperations : BuildService<PoolOperations.Params>, AutoCloseab
     override fun close() {
         connection.close()
     }
+
+    companion object {
+        const val POOL_OPERATIONS = "pool-operations"
+
+        fun getInstance(gradle: Gradle): Provider<PoolOperations> {
+
+            return gradle.sharedServices.registerIfAbsent(
+                POOL_OPERATIONS,
+                PoolOperations::class.java) { }
+        }
+    }
+
 }

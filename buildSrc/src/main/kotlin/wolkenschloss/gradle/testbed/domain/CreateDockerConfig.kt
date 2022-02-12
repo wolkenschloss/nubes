@@ -4,6 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -13,16 +14,17 @@ import java.lang.Exception
 
 @Deprecated("Use secure registry")
 abstract class CreateDockerConfig : DefaultTask() {
+
+    @get:Input
+    abstract val domain: Property<String>
+
     @get:OutputFile
     abstract val dockerConfigFile: RegularFileProperty
 
-    @get:Internal
-    abstract val domainOperations: Property<DomainOperations>
-
     @TaskAction
     fun write() {
-        val domainOperations = domainOperations.get()
-        val registryService: RegistryService = domainOperations.registry
+        val domainOperations = DomainOperations.getInstance(project.gradle).get()
+        val registryService: RegistryService = domainOperations.registry(domain)
         val registry = registryService.address
         val configFile = dockerConfigFile.get().asFile
         if (dockerConfigFile.get().asFile.parentFile.mkdirs()) {

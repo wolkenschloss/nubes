@@ -36,11 +36,9 @@ class TestbedPlugin : Plugin<Project> {
 
         tasks.register(DESTROY_TASK_NAME, Destroy::class.java) {
             description = "Destroy testbed and delete all files."
-            poolOperations.set(testbed.pool.poolOperations)
             domain.convention(testbed.domain.name)
             poolRunFile.convention(buildPool.flatMap(BuildPool::poolRunFile))
             buildDir.convention(project.layout.buildDirectory)
-            domainOperations.set(testbed.domain.domainOperations)
         }
     }
 

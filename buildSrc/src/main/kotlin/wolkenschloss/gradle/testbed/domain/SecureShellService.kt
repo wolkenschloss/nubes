@@ -1,6 +1,8 @@
 package wolkenschloss.gradle.testbed.domain
 
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.process.ExecOperations
 import wolkenschloss.gradle.testbed.domain.SecureShellService.ShellCommand
 import java.io.ByteArrayOutputStream
@@ -11,7 +13,7 @@ import java.util.function.Consumer
 class SecureShellService(
     private val execOperations: ExecOperations,
     private val ip: String,
-    private val knownHostsFile: RegularFileProperty
+    private val knownHostsFile: Provider<RegularFile>
 ) {
     class Result(val stdout: String, val stderr: String, val exitValue: Int)
 
@@ -19,22 +21,18 @@ class SecureShellService(
         fun execute(fn: T)
     }
 
-    fun command(vararg args: Any?): ShellCommand<Consumer<Result>> {
+    fun command(vararg args: String): ShellCommand<Consumer<Result>> {
         return ShellCommand { consumer: Consumer<Result> ->
-            val arguments = Vector<Any?>()
-            arguments.addAll(
-                listOf(
+            val arguments = listOf(
                     "-o", String.format("UserKnownHostsFile=%s", knownHostsFile.get().asFile.path),
-                    ip
-                )
-            )
-            arguments.addAll(listOf(*args))
+                    ip)
+
             try {
                 ByteArrayOutputStream().use { stdout ->
                     ByteArrayOutputStream().use { stderr ->
                         val result = execOperations.exec{
                             commandLine("ssh")
-                                .args(arguments)
+                                .args(arguments + args)
                                 .setStandardOutput(stdout).errorOutput = stderr
                         }.assertNormalExitValue()
                         consumer.accept(
@@ -52,7 +50,7 @@ class SecureShellService(
         }
     }
 
-    fun withCommand(vararg args: Any): Consumer<Consumer<Result>> {
-        return Consumer { consumer: Consumer<Result> -> command(*args).execute(consumer) }
+    fun withCommand(args: List<String>, method: (Result) -> Unit) {
+        command(*args.toTypedArray()).execute(method)
     }
 }

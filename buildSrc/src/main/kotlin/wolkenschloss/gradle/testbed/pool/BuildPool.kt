@@ -19,11 +19,11 @@ abstract class BuildPool : DefaultTask() {
     @get:InputFile
     abstract val poolDescriptionFile: Property<File>
 
+    @get:Input
+    abstract val poolName: Property<String>
+
     @get:OutputFile
     abstract val poolRunFile: RegularFileProperty
-
-    @get:Internal
-    abstract val poolOperations: Property<PoolOperations>
 
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
@@ -33,7 +33,7 @@ abstract class BuildPool : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        val poolOperations = poolOperations.get()
+        val poolOperations = PoolOperations.getInstance(project.gradle).get()
         try {
             val runFile = poolRunFile.get().asFile
             val runFileContent = providerFactory.fileContents(poolRunFile)
@@ -44,12 +44,12 @@ abstract class BuildPool : DefaultTask() {
                 fileSystemOperations.delete { delete(poolRunFile) }
                 logger.info("Pool destroyed")
             }
-            if (poolOperations.exists()) {
+            if (poolOperations.exists(poolName.get())) {
                 val message = String.format(
                     "Der Pool %1\$s existiert bereits, aber die Markierung-Datei %2\$s ist nicht vorhanden.%n" +
                             "Löschen Sie ggf. den Storage Pool mit dem Befehl 'virsh pool-destroy %1\$s && virsh " +
                             "pool-undefine %1\$s'",
-                    poolOperations.parameters.poolName.get(),
+                    poolName.get(),
                     runFile.path
                 )
                 throw GradleException(message)

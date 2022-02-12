@@ -33,7 +33,6 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
             hostsFile.convention(extension.hostsFile)
             domainSuffix.convention(extension.domainSuffix)
             hosts.convention(extension.hosts)
-            domainOperations.set(extension.domainOperations)
         }
     }
 
@@ -47,9 +46,9 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
             this.group = GROUP_NAME
 
             description = "Copies the Kubernetes client configuration to the localhost for further use by kubectl."
-            domainName.convention(extension.name)
+            domain.convention(extension.name)
+            knownHostsFile.convention(extension.knownHostsFile)
             kubeConfigFile.convention(extension.kubeConfigFile)
-            domainOperations.set(extension.domainOperations)
             dependsOn(buildDomain)
         }
     }
@@ -62,7 +61,7 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
             group = GROUP_NAME
             description = "Creates a Docker configuration file in order to be able to access the unsecured registration of the test bench."
             dockerConfigFile.convention(extension.dockerConfigFile)
-            domainOperations.set(extension.domainOperations)
+            domain.convention(extension.name)
             dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME))
         }
     }

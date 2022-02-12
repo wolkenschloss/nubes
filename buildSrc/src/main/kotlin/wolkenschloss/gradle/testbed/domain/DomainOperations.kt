@@ -2,8 +2,10 @@ package wolkenschloss.gradle.testbed.domain
 
 import com.jayway.jsonpath.JsonPath
 import org.gradle.api.GradleException
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.RegularFile
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.process.ExecOperations
@@ -11,23 +13,12 @@ import org.libvirt.Connect
 import org.libvirt.Domain
 import org.libvirt.DomainInfo
 import org.libvirt.LibvirtException
-import java.lang.Exception
-import java.lang.RuntimeException
-import java.util.ArrayList
-import java.util.function.Consumer
 
-abstract class DomainOperations : BuildService<DomainOperations.Params?>, AutoCloseable {
+abstract class DomainOperations : BuildService<BuildServiceParameters.None>, AutoCloseable {
     private val connection: Connect = Connect("qemu:///system")
 
-    interface Params : BuildServiceParameters {
-        val domainName: Property<String>
-        val knownHostsFile: RegularFileProperty
-    }
-
-    @get:Throws(LibvirtException::class, InterruptedException::class)
-    val ipAddress: String
-        get() {
-            val result = getInterfaces(10)
+    fun ipAddress(domainName: Provider<String>): String {
+            val result = getInterfaces(domainName.get(), 10)
             val interfaceName = "enp1s0"
             val path = String.format(
                 "$.return[?(@.name==\"%s\")].ip-addresses[?(@.ip-address-type==\"ipv4\")].ip-address",
@@ -50,10 +41,8 @@ abstract class DomainOperations : BuildService<DomainOperations.Params?>, AutoCl
 
     // Erfordert die Installation des Paketes qemu-guest-agent in der VM.
     // Gebe 30 Sekunden Timeout. Der erste Start könnte etwas länger dauern.
-    @Throws(LibvirtException::class, InterruptedException::class)
-    private fun getInterfaces(retries: Int): String {
-        val name = parameters.domainName.get()
-        val domain = connection.domainLookupByName(name)
+    private fun getInterfaces(domainName: String, retries: Int): String {
+        val domain = connection.domainLookupByName(domainName)
         try {
             var retry = retries
             while (true) {
@@ -71,14 +60,13 @@ abstract class DomainOperations : BuildService<DomainOperations.Params?>, AutoCl
         }
     }
 
-    fun withInfo(consumer: Consumer<DomainInfo>) {
-        val name = parameters.domainName.get()
+    fun withInfo(domainName: Provider<String>, consumer: (DomainInfo) -> Unit) {
         try {
             var domain: Domain? = null
             try {
-                domain = connection.domainLookupByName(name)
+                domain = connection.domainLookupByName(domainName.get())
                 val info = domain.info
-                consumer.accept(info)
+                consumer(info)
             } catch (exception: LibvirtException) {
                 throw RuntimeException("Can not process domain info.", exception)
             } finally {
@@ -89,13 +77,12 @@ abstract class DomainOperations : BuildService<DomainOperations.Params?>, AutoCl
         }
     }
 
-    fun <T> withDomain(method: Consumer<DomainOperations>) {
-        val name = parameters.domainName.get()
+    fun withDomain(domainName: Provider<String>, method: (DomainOperations) -> Unit) {
         var domain: Domain? = null
         try {
             try {
-                domain = connection.domainLookupByName(name)
-                method.accept(this)
+                domain = connection.domainLookupByName(domainName.get())
+                method(this)
             } catch (exception: LibvirtException) {
                 throw RuntimeException("Can not lookup domain", exception)
             } finally {
@@ -106,14 +93,12 @@ abstract class DomainOperations : BuildService<DomainOperations.Params?>, AutoCl
         }
     }
 
-    @Throws(LibvirtException::class)
     fun create(xml: String) {
         val domain = connection.domainDefineXML(xml)
         domain.create()
         domain.free()
     }
 
-    @Throws(LibvirtException::class)
     fun deleteDomainIfExists(name: Property<String>): Boolean {
         var deleted = false
         val domainIds = connection.listDomains()
@@ -138,31 +123,37 @@ abstract class DomainOperations : BuildService<DomainOperations.Params?>, AutoCl
     }
 
     @Throws(Throwable::class)
-    fun getShell(execOperations: ExecOperations): SecureShellService {
-        val ip = ipAddress
-        return SecureShellService(execOperations, ip, parameters.knownHostsFile)
+    fun getShell(domainName: Provider<String>, knownHostsFile: Provider<RegularFile>, execOperations: ExecOperations): SecureShellService {
+        val ip = ipAddress(domainName)
+        return SecureShellService(execOperations, ip, knownHostsFile)
     }
 
-    fun withShell(execOperations: ExecOperations): Consumer<Consumer<SecureShellService>> {
-        return Consumer { fn: Consumer<SecureShellService> ->
-            val shell: SecureShellService = try {
-                SecureShellService(execOperations, ipAddress, parameters.knownHostsFile)
-            } catch (throwable: Throwable) {
-                throw RuntimeException(throwable)
-            }
-            fn.accept(shell)
+    fun withShell(domainName: Provider<String>, knownHostsFile: Provider<RegularFile>, execOperations: ExecOperations, method: (SecureShellService) -> Unit) {
+        try {
+            val service = SecureShellService(execOperations, ipAddress(domainName), knownHostsFile)
+            method(service)
+        } catch (throwable: Throwable) {
+            throw GradleException("Can not create secure shell service", throwable)
         }
     }
 
-    val registry: RegistryService
-        get() = try {
-            RegistryService(ipAddress)
+    fun registry(domainName: Provider<String>): RegistryService {
+        try {
+            return RegistryService(ipAddress(domainName))
         } catch (throwable: Throwable) {
             throw GradleException("Can not create registry service", throwable)
         }
+    }
 
-    @Throws(Exception::class)
     override fun close() {
         connection.close()
+    }
+
+    companion object {
+        private const val NAME = "domain-operations"
+
+        fun getInstance(gradle: Gradle) : Provider<DomainOperations> {
+            return gradle.sharedServices.registerIfAbsent(NAME, DomainOperations::class.java) {}
+        }
     }
 }

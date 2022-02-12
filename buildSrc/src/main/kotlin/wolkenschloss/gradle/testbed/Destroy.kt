@@ -27,12 +27,6 @@ abstract class Destroy : DefaultTask() {
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
 
-    @get:Internal
-    abstract val poolOperations: Property<PoolOperations>
-
-    @get:Internal
-    abstract val domainOperations: Property<DomainOperations>
-
     @get:Inject
     abstract val providerFactory: ProviderFactory
 
@@ -44,7 +38,7 @@ abstract class Destroy : DefaultTask() {
     }
 
     private fun destroyDomain() {
-        val domainOperations: DomainOperations = domainOperations.get()
+        val domainOperations: DomainOperations = DomainOperations.getInstance(project.gradle).get()
         val deleted = domainOperations.deleteDomainIfExists(domain)
         if (deleted) {
             logger.info("Domain deleted.")
@@ -52,6 +46,8 @@ abstract class Destroy : DefaultTask() {
     }
 
     private fun destroyPool() {
+
+        val poolOperations = PoolOperations.getInstance(project.gradle)
         if (poolRunFile.get().asFile.exists()) {
             val content = providerFactory.fileContents(poolRunFile)
             val uuid = content.asText.map { name: String? -> UUID.fromString(name) }.get()

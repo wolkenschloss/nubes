@@ -35,9 +35,8 @@ class StatusTasks(domain: DomainExtension, pool: PoolExtension) {
             STATUS_TASK_NAME,
             Status::class.java) {
                 description = "Performs tests to ensure the function of the test bench."
-                poolOperations.set(pool.poolOperations)
-                domainOperations.set(domain.domainOperations)
                 domainName.convention(domain.name)
+                poolName.convention(pool.name)
                 kubeConfigFile.convention(readKubeConfig.get().kubeConfigFile)
                 this.knownHostsFile.convention(knownHostsFile)
                 downloadDir.convention(distributionDir)

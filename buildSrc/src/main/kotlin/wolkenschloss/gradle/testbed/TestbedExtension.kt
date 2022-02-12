@@ -25,9 +25,9 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
         transformation.initialize()
         user.initialize()
         host.initialize()
-        pool.initialize(sharedServices, runDirectory)
+        pool.initialize(runDirectory)
         baseImage.initialize()
-        domain.initialize(sharedServices, runDirectory)
+        domain.initialize(runDirectory)
         return this
     }
 
