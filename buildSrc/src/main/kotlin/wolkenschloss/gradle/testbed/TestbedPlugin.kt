@@ -14,7 +14,7 @@ class TestbedPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.extensions
             .create(TESTBED_EXTENSION_NAME, TestbedExtension::class)
-            .configure(project)
+            .configure()
 
         project.registerTasks()
     }

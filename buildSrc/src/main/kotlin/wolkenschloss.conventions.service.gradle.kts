@@ -51,23 +51,24 @@ tasks {
     }
 }
 
-val quarkusPlatformGroupId: String by project
-val quarkusPlatformArtifactId: String by project
-val quarkusPlatformVersion: String by project
+val catalogs = extensions.getByType<VersionCatalogsExtension>()
+val libs = catalogs.named("libs")
 
 dependencies {
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    testImplementation("io.quarkus:quarkus-junit5")
-    testImplementation("io.quarkus:quarkus-junit5-mockito")
-    testImplementation("io.rest-assured:rest-assured")
+    libs.findLibrary("quarkus-bom").ifPresent { bom ->
+        implementation(platform(bom))
+    }
 
-    testImplementation(platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    libs.findBundle("quarkus-unit").ifPresent {
+        testImplementation(it)
+    }
 
-    integrationTestImplementation(platform("org.junit:junit-bom:5.8.1"))
-    integrationTestImplementation("org.junit.jupiter:junit-jupiter-api")
-    integrationTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    integrationTestImplementation("io.quarkus:quarkus-junit5")
-    integrationTestImplementation("io.rest-assured:rest-assured")
+    libs.findBundle("junit").ifPresent {
+        testImplementation(it)
+        integrationTestImplementation(it)
+    }
+
+    libs.findBundle("quarkus-integration").ifPresent {
+        integrationTestImplementation(it)
+    }
 }

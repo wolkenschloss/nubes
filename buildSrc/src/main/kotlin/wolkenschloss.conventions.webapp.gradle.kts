@@ -8,8 +8,14 @@ plugins {
     id("java-library")
 }
 
+val catalogs = extensions.getByType<VersionCatalogsExtension>()
+val libs = catalogs.named("libs")
+
 node {
-    version.set("16.13.1") // latest lts version
+    libs.findVersion("node").ifPresent {
+        version.set(it.requiredVersion)
+    }
+
     download.set(true)
 
     if (System.getenv().keys.contains("CI")) {

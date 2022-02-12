@@ -1,0 +1,72 @@
+[versions]
+quarkus = "2.7.0.Final"
+awaitility = "4.1.0"
+jsoup = "1.14.1"
+mockserver = "5.11.2"
+testcontainers = "1.16.3"
+junit = "5.8.2"
+node = "16.13.1"
+gradle-node-plugin = "3.1.1"
+# Waiting for Gradle update to use kotlin version 1.6.
+# Then the current version of kotest can also be used.
+# https://github.com/kotest/kotest/issues/2666
+#  kotest  = "5.1.0"
+kotest = "4.6.3"
+
+# buildSrc only
+libvirt = "0.5.2"
+jna = "5.8.0"
+jib = "0.19.0"
+jsonpath = "2.6.0"
+docker-java = "3.2.12"
+
+[libraries]
+quarkus-bom = { group = "io.quarkus", name = "quarkus-bom", version.ref = "quarkus"}
+quarkus-plugin = {group = "io.quarkus", name = "gradle-application-plugin", version.ref = "quarkus"}
+
+quarkus-container-docker = {module = "io.quarkus:quarkus-container-image-docker", version.ref = "quarkus"}
+quarkus-config-yaml = {module = "io.quarkus:quarkus-config-yaml" }
+quarkus-arc = {module = "io.quarkus:quarkus-arc"}
+#quarkus-web
+quarkus-resteasy-reactive-jsonb = {module = "io.quarkus:quarkus-resteasy-reactive-jsonb"}
+quarkus-vertx = {module = "io.quarkus:quarkus-vertx"}
+smallrye-mutiny-vertx-web-client = {module = "io.smallrye.reactive:smallrye-mutiny-vertx-web-client"}
+#quarkus-data
+quarkus-mongodb-panache = {module = "io.quarkus:quarkus-mongodb-panache"}
+#quarkus-messaging
+quarkus-smallrye-reactive-messaging = {module = "io.quarkus:quarkus-smallrye-reactive-messaging"}
+#quarkus-templates
+quarkus-resteasy-reactive-qute = {module = "io.quarkus:quarkus-resteasy-reactive-qute" }
+
+gradle-node-plugin = {module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradle-node-plugin"}
+awaitility = { group = "org.awaitility", name = "awaitility", version.ref = "awaitility" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
+mockserver = { group = "org.mock-server", name = "mockserver-client-java", version.ref = "mockserver" }
+testcontainers = { group = "org.testcontainers", name = "testcontainers-bom", version.ref = "testcontainers" }
+
+junit-api = {module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-engine = {module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+kotest-runner = {module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest-assertions-core = {module = "io.kotest:kotest-assertions-core", version.ref = "kotest"}
+
+quarkus-junit = { module = "io.quarkus:quarkus-junit5", version.ref = "quarkus" }
+quarkus-junit-mockito = { module = "io.quarkus:quarkus-junit5-mockito", version.ref = "quarkus"}
+restassured = { module = "io.rest-assured:rest-assured" }
+
+# buildSrc only
+libvirt = { group = "org.libvirt", name = "libvirt", version.ref = "libvirt" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jib = { module = "com.google.cloud.tools:jib-core", version.ref = "jib" }
+jsonpath = { module = "com.jayway.jsonpath:json-path", version.ref = "jsonpath" }
+dockerjava = { module = "com.github.docker-java:docker-java-bom", version.ref = "docker-java" }
+docker-java-core = {module = "com.github.docker-java:docker-java-core", version.ref = "docker-java"}
+docker-java-zerodep = { module = "com.github.docker-java:docker-java-transport-zerodep", version.ref="docker-java"}
+
+[bundles]
+junit = ["junit-api", "junit-engine"]
+kotest = ["kotest-runner", "kotest-assertions-core"]
+quarkus-unit = ["quarkus-junit", "quarkus-junit-mockito", "restassured"]
+quarkus-integration = ["quarkus-junit", "restassured"]
+
+# buildSrc only
+docker-java = ["docker-java-core", "docker-java-zerodep"]

@@ -3,10 +3,13 @@ plugins {
     id("java-library")
 }
 
+val catalogs = extensions.getByType<VersionCatalogsExtension>()
+val libs = catalogs.named("libs")
+
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    libs.findBundle("junit").ifPresent {
+        testImplementation(it)
+    }
 }
 
 tasks {

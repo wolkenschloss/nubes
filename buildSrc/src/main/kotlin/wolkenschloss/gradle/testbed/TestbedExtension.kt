@@ -17,9 +17,8 @@ import javax.inject.Inject
 
 @Suppress("CdiInjectionPointsInspection")
 abstract class TestbedExtension @Inject constructor(private val layout: ProjectLayout) {
-    fun configure(project: Project): TestbedExtension {
+    fun configure(): TestbedExtension {
         val buildDirectory = layout.buildDirectory
-        val sharedServices = project.gradle.sharedServices
         runDirectory.convention(buildDirectory.dir("run"))
         failOnError.convention(true)
         transformation.initialize()
@@ -63,6 +62,7 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
 
     @get:Nested
     abstract val transformation: TransformationExtension
+    @Suppress("unused")
     fun transformation(action: Action<in TransformationExtension>) {
         action.execute(transformation)
     }
@@ -90,11 +90,5 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
     }
 
     abstract val runDirectory: DirectoryProperty
-    abstract val failOnError: Property<Boolean?>
-    abstract val secureShellService: Property<SecureShellService>
-    abstract val registryService: Property<RegistryService>
-
-    companion object {
-
-    }
+    abstract val failOnError: Property<Boolean>
 }

@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Focus" pattern="file[*]:*//*&amp;&amp;$Project&amp;&amp;!$Build&amp;&amp;!$Documentation" />
+</component>

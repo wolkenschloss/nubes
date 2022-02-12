@@ -3,31 +3,29 @@ plugins {
     id("idea")
 }
 
-val mockServerVersion = "5.11.2"
-
 dependencies {
-    implementation("io.quarkus:quarkus-container-image-docker")
-    implementation("io.quarkus:quarkus-config-yaml")
-    implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-resteasy-reactive-jsonb")
-    implementation("io.quarkus:quarkus-mongodb-panache")
-    implementation("io.quarkus:quarkus-vertx")
-    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-web-client")
-    implementation("io.quarkus:quarkus-smallrye-reactive-messaging")
-    implementation("io.quarkus:quarkus-resteasy-reactive-qute")
-    implementation("org.jsoup:jsoup:1.14.1")
+    implementation(libs.quarkus.container.docker)
+    implementation(libs.quarkus.config.yaml)
+    implementation(libs.quarkus.arc)
+    implementation(libs.quarkus.resteasy.reactive.jsonb)
+    implementation(libs.quarkus.mongodb.panache)
+    implementation(libs.quarkus.vertx)
+    implementation(libs.smallrye.mutiny.vertx.web.client)
+    implementation(libs.quarkus.smallrye.reactive.messaging)
+    implementation(libs.quarkus.resteasy.reactive.qute)
+    implementation(libs.jsoup)
 
     implementation(project(":services:cookbook:webapp"))
 
-    testImplementation("org.awaitility:awaitility:4.1.0")
+    testImplementation(libs.awaitility)
 
-    implementation(platform("org.testcontainers:testcontainers-bom:1.16.3"))
+    implementation(platform(libs.testcontainers))
 
     integrationTestImplementation("org.testcontainers:mongodb")
     integrationTestImplementation("org.testcontainers:mockserver")
     integrationTestImplementation("org.testcontainers:junit-jupiter")
-    integrationTestImplementation("org.mock-server:mockserver-client-java:${mockServerVersion}")
-    integrationTestImplementation("org.awaitility:awaitility:4.1.0")
+    integrationTestImplementation(libs.mockserver)
+    integrationTestImplementation(libs.awaitility)
 }
 
 // Treat custom source set as a test source in IntelliJ IDEA

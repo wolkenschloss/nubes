@@ -113,8 +113,8 @@ val functionalRuntimeOnly: Configuration by configurations.getting {
 }
 
 sourceSets.test {
-//    compileClasspath += testing.compileClasspath
-//    runtimeClasspath += testing.runtimeClasspath
+    compileClasspath += testing.compileClasspath
+    runtimeClasspath += testing.runtimeClasspath
     java.setSrcDirs(testDir.unit.java + testDir.unit.kotlin)
     resources.setSrcDirs(testDir.unit.resources)
 
@@ -163,59 +163,28 @@ gradlePlugin {
     }
 }
 
-val quarkusPluginVersion: String by project
-val quarkusPluginArtifactId: String by project
-
-//val kotestVersion = "5.1.0"
-val kotestVersion = "4.6.3"
-val junitVersion = "5.6.2"
-
 dependencies {
-    implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
+    implementation(libraries.quarkus.plugin) {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
         exclude(group = "org.jboss.slf4j", module = "slf4j-jboss-logmanager")
     }
-    implementation("com.github.node-gradle:gradle-node-plugin:3.1.1")
-    implementation("org.libvirt:libvirt:0.5.2")
-    implementation("net.java.dev.jna:jna:5.8.0")
-    implementation("com.google.cloud.tools:jib-core:0.19.0")
-    implementation("com.jayway.jsonpath:json-path:2.6.0")
 
-    implementation(platform("com.github.docker-java:docker-java-bom:3.2.12"))
-    implementation("com.github.docker-java:docker-java-core")
-    implementation("com.github.docker-java:docker-java-transport-zerodep")
+    implementation(libraries.gradle.node.plugin)
+    implementation(libraries.libvirt)
+    implementation(libraries.jna)
+    implementation(libraries.jib)
+    implementation(libraries.jsonpath)
+
+    implementation(libraries.bundles.docker.java)
 
     // testing: basic test frameworks promoted to unit [test], integration and functional
-    testingImplementation(platform("org.junit:junit-bom:5.8.2"))
-    testingImplementation("org.junit.jupiter:junit-jupiter-api")
-    testingRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
-    // Waiting for Gradle update to use kotlin version 1.6.
-    // Then the current version of kotest can also be used.
-    // https://github.com/kotest/kotest/issues/2666
-//    testingImplementation(platform("io.kotest:kotest-bom:4.6.3"))
-    testingImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
-    testingImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testingImplementation(libraries.bundles.junit)
+    testingImplementation(libraries.bundles.kotest)
 
     // Allow integration tests to use kotlin dsl
-
-    testImplementation(kotlin("gradle-plugin"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")
-
+    // testImplementation(kotlin("gradle-plugin"))
     integrationImplementation(gradleKotlinDsl())
-
-    integrationImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    integrationRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-    integrationImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
-    integrationImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")
-
-    functionalImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    functionalRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-    functionalImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
-    functionalImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")}
+}
 
 tasks.withType<Test> {
 
@@ -247,6 +216,7 @@ tasks.withType<Test> {
     }
 
     systemProperty("project.fixture.directory", fixtures.asFile.absolutePath)
+    systemProperty("project.catalog.directory", project.rootDir.resolve("../gradle/libs.versions.toml").absolutePath)
 }
 
 tasks {
