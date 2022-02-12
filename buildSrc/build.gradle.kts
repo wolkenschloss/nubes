@@ -144,7 +144,7 @@ gradlePlugin {
             id = "$namespace.testbed"
             displayName = "Wolkenschloss Testbed Plugin"
             description = "Manages Testbed for Wolkenschloss"
-            implementationClass = "wolkenschloss.TestbedPlugin"
+            implementationClass = "wolkenschloss.gradle.testbed.TestbedPlugin"
         }
 
         create("DockerPlugin") {
@@ -169,6 +169,7 @@ val quarkusPluginArtifactId: String by project
 //val kotestVersion = "5.1.0"
 val kotestVersion = "4.6.3"
 val junitVersion = "5.6.2"
+
 dependencies {
     implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
@@ -179,9 +180,6 @@ dependencies {
     implementation("net.java.dev.jna:jna:5.8.0")
     implementation("com.google.cloud.tools:jib-core:0.19.0")
     implementation("com.jayway.jsonpath:json-path:2.6.0")
-
-    // TODO: Das steht ganz oben auf der Abschlussliste
-    implementation("com.github.spullara.mustache.java:compiler:0.9.10")
 
     implementation(platform("com.github.docker-java:docker-java-bom:3.2.12"))
     implementation("com.github.docker-java:docker-java-core")
@@ -201,7 +199,7 @@ dependencies {
 
     // Allow integration tests to use kotlin dsl
 
-
+    testImplementation(kotlin("gradle-plugin"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")

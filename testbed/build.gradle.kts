@@ -1,5 +1,3 @@
-import wolkenschloss.domain.CopyKubeConfig
-import wolkenschloss.domain.DomainTasks
 import wolkenschloss.gradle.docker.BuildImageTask
 import wolkenschloss.gradle.docker.RunContainerTask
 import java.nio.file.Paths
@@ -39,10 +37,10 @@ testbed {
 }
 
 tasks {
-    val buildDomain = named<wolkenschloss.domain.BuildDomain>(DomainTasks.BUILD_DOMAIN_TASK_NAME)
-    val copyKubeConfig = named<CopyKubeConfig>(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
+    val buildDomain = named<wolkenschloss.gradle.testbed.domain.BuildDomain>(wolkenschloss.gradle.testbed.domain.DomainTasks.BUILD_DOMAIN_TASK_NAME)
+    val copyKubeConfig = named<wolkenschloss.gradle.testbed.domain.CopyKubeConfig>(wolkenschloss.gradle.testbed.domain.DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
 
-    val testbed: wolkenschloss.TestbedExtension by project.extensions
+    val testbed: wolkenschloss.gradle.testbed.TestbedExtension by project.extensions
     val userHome = Paths.get(System.getProperty("user.home"))
 
     val newRootCa by registering(CreateTask::class) {

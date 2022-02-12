@@ -2,7 +2,7 @@ package wolkenschloss.gradle.ca
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import wolkenschloss.Directories
+import wolkenschloss.gradle.testbed.Directories
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -14,11 +14,11 @@ class CaPlugin : Plugin<Project> {
             notAfter.convention(expireIn())
             certificate.convention(
                 target.layout.projectDirectory.file(
-                Directories.getCertificateAuthorityHome().resolve("ca.crt").toFile().absolutePath))
+                Directories.certificateAuthorityHome.resolve("ca.crt").toFile().absolutePath))
 
             privateKey.convention(
                 target.layout.projectDirectory.file(
-                    Directories.getCertificateAuthorityHome().resolve("ca.key").toFile().absolutePath))
+                    Directories.certificateAuthorityHome.resolve("ca.key").toFile().absolutePath))
         }
     }
 
