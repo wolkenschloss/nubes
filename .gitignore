@@ -13,5 +13,5 @@ node_modules/
 !.idea/externalDependencies.xml
 !.idea/scopes
 !.idea/fileColors.xml
-
+!.idea/icon.svg
 *.hprof
