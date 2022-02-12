@@ -1,7 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.github.wolkenschloss.gradle"
 
@@ -12,7 +11,6 @@ repositories {
 }
 
 plugins {
-    kotlin("jvm")
     `kotlin-dsl`
     `java-gradle-plugin`
     java
@@ -136,14 +134,6 @@ java {
     }
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jetbrains.kotlin") {
-            useVersion(embeddedKotlinVersion)
-        }
-    }
-}
-
 gradlePlugin {
 
     testSourceSets(integration, functional)
@@ -181,7 +171,6 @@ val kotestVersion = "4.6.3"
 val junitVersion = "5.6.2"
 
 dependencies {
-    compileOnly(kotlin("stdlib-jdk8"))
     implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
         exclude(group = "org.jboss.slf4j", module = "slf4j-jboss-logmanager")
@@ -191,9 +180,6 @@ dependencies {
     implementation("net.java.dev.jna:jna:5.8.0")
     implementation("com.google.cloud.tools:jib-core:0.19.0")
     implementation("com.jayway.jsonpath:json-path:2.6.0")
-
-    // TODO: Das steht ganz oben auf der Abschlussliste
-    implementation("com.github.spullara.mustache.java:compiler:0.9.10")
 
     implementation(platform("com.github.docker-java:docker-java-bom:3.2.12"))
     implementation("com.github.docker-java:docker-java-core")
@@ -213,7 +199,6 @@ dependencies {
 
     // Allow integration tests to use kotlin dsl
 
-
     testImplementation(kotlin("gradle-plugin"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
@@ -231,13 +216,6 @@ dependencies {
     functionalRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     functionalImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
     functionalImplementation("org.junit.jupiter:junit-jupiter-api:$kotestVersion")}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs = listOf("-Xjvm-default=enable")
-    }
-}
 
 tasks.withType<Test> {
 
