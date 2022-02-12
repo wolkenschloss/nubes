@@ -6,7 +6,7 @@ mockserver = "5.11.2"
 testcontainers = "1.16.3"
 junit = "5.8.2"
 node = "16.13.1"
-
+gradle-node-plugin = "3.1.1"
 # Waiting for Gradle update to use kotlin version 1.6.
 # Then the current version of kotest can also be used.
 # https://github.com/kotest/kotest/issues/2666
@@ -22,6 +22,23 @@ docker-java = "3.2.12"
 
 [libraries]
 quarkus-bom = { group = "io.quarkus", name = "quarkus-bom", version.ref = "quarkus"}
+quarkus-plugin = {group = "io.quarkus", name = "gradle-application-plugin", version.ref = "quarkus"}
+
+quarkus-container-docker = {module = "io.quarkus:quarkus-container-image-docker", version.ref = "quarkus"}
+quarkus-config-yaml = {module = "io.quarkus:quarkus-config-yaml" }
+quarkus-arc = {module = "io.quarkus:quarkus-arc"}
+#quarkus-web
+quarkus-resteasy-reactive-jsonb = {module = "io.quarkus:quarkus-resteasy-reactive-jsonb"}
+quarkus-vertx = {module = "io.quarkus:quarkus-vertx"}
+smallrye-mutiny-vertx-web-client = {module = "io.smallrye.reactive:smallrye-mutiny-vertx-web-client"}
+#quarkus-data
+quarkus-mongodb-panache = {module = "io.quarkus:quarkus-mongodb-panache"}
+#quarkus-messaging
+quarkus-smallrye-reactive-messaging = {module = "io.quarkus:quarkus-smallrye-reactive-messaging"}
+#quarkus-templates
+quarkus-resteasy-reactive-qute = {module = "io.quarkus:quarkus-resteasy-reactive-qute" }
+
+gradle-node-plugin = {module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradle-node-plugin"}
 awaitility = { group = "org.awaitility", name = "awaitility", version.ref = "awaitility" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 mockserver = { group = "org.mock-server", name = "mockserver-client-java", version.ref = "mockserver" }

@@ -4,15 +4,15 @@ plugins {
 }
 
 dependencies {
-    implementation("io.quarkus:quarkus-container-image-docker")
-    implementation("io.quarkus:quarkus-config-yaml")
-    implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-resteasy-reactive-jsonb")
-    implementation("io.quarkus:quarkus-mongodb-panache")
-    implementation("io.quarkus:quarkus-vertx")
-    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-web-client")
-    implementation("io.quarkus:quarkus-smallrye-reactive-messaging")
-    implementation("io.quarkus:quarkus-resteasy-reactive-qute")
+    implementation(libs.quarkus.container.docker)
+    implementation(libs.quarkus.config.yaml)
+    implementation(libs.quarkus.arc)
+    implementation(libs.quarkus.resteasy.reactive.jsonb)
+    implementation(libs.quarkus.mongodb.panache)
+    implementation(libs.quarkus.vertx)
+    implementation(libs.smallrye.mutiny.vertx.web.client)
+    implementation(libs.quarkus.smallrye.reactive.messaging)
+    implementation(libs.quarkus.resteasy.reactive.qute)
     implementation(libs.jsoup)
 
     implementation(project(":services:cookbook:webapp"))

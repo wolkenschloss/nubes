@@ -163,18 +163,13 @@ gradlePlugin {
     }
 }
 
-val quarkusPluginVersion: String by project
-val quarkusPluginArtifactId: String by project
-
-
-
-
 dependencies {
-    implementation("io.quarkus:${quarkusPluginArtifactId}:${quarkusPluginVersion}") {
+    implementation(libraries.quarkus.plugin) {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
         exclude(group = "org.jboss.slf4j", module = "slf4j-jboss-logmanager")
     }
-    implementation("com.github.node-gradle:gradle-node-plugin:3.1.1")
+
+    implementation(libraries.gradle.node.plugin)
     implementation(libraries.libvirt)
     implementation(libraries.jna)
     implementation(libraries.jib)
@@ -182,15 +177,12 @@ dependencies {
 
     implementation(libraries.bundles.docker.java)
 
-
     // testing: basic test frameworks promoted to unit [test], integration and functional
     testingImplementation(libraries.bundles.junit)
     testingImplementation(libraries.bundles.kotest)
 
     // Allow integration tests to use kotlin dsl
-
-//    testImplementation(kotlin("gradle-plugin"))
-
+    // testImplementation(kotlin("gradle-plugin"))
     integrationImplementation(gradleKotlinDsl())
 }
 
