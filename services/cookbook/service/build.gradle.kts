@@ -21,13 +21,12 @@ dependencies {
 
     testImplementation("org.awaitility:awaitility:4.1.0")
 
-    implementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
+    implementation(platform("org.testcontainers:testcontainers-bom:1.16.3"))
 
     integrationTestImplementation("org.testcontainers:mongodb")
     integrationTestImplementation("org.testcontainers:mockserver")
     integrationTestImplementation("org.testcontainers:junit-jupiter")
     integrationTestImplementation("org.mock-server:mockserver-client-java:${mockServerVersion}")
-    integrationTestImplementation("com.github.tomakehurst:wiremock-jre8:2.29.1")
     integrationTestImplementation("org.awaitility:awaitility:4.1.0")
 }
 
