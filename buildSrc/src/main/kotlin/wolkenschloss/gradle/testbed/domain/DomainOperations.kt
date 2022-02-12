@@ -84,7 +84,7 @@ abstract class DomainOperations : BuildService<BuildServiceParameters.None>, Aut
                 domain = connection.domainLookupByName(domainName.get())
                 method(this)
             } catch (exception: LibvirtException) {
-                throw RuntimeException("Can not lookup domain", exception)
+                throw RuntimeException("Domain does not exist", exception)
             } finally {
                 domain?.free()
             }
