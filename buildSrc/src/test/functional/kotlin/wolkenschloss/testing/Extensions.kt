@@ -9,6 +9,10 @@ fun File.build(vararg args: String): BuildResult = createRunner()
     .withArguments(*args)
     .build()
 
+fun File.buildAndFail(vararg args: String): BuildResult = createRunner()
+    .withArguments(*args)
+    .buildAndFail()
+
 fun File.createRunner(): GradleRunner = GradleRunner.create()
     .withProjectDir(this)
     .withPluginClasspath()

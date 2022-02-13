@@ -56,7 +56,7 @@ val libs = catalogs.named("libs")
 
 dependencies {
     libs.findLibrary("quarkus-bom").ifPresent { bom ->
-        implementation(platform(bom))
+        implementation(enforcedPlatform(bom))
     }
 
     libs.findBundle("quarkus-unit").ifPresent {

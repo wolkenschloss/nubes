@@ -1,3 +1,5 @@
+import wolkenschloss.gradle.testbed.domain.DomainExtension
+
 plugins {
     id("wolkenschloss.conventions.service")
     id("idea")
@@ -26,6 +28,16 @@ dependencies {
     integrationTestImplementation("org.testcontainers:junit-jupiter")
     integrationTestImplementation(libs.mockserver)
     integrationTestImplementation(libs.awaitility)
+}
+
+tasks {
+    quarkusBuild {
+        inputs.property("domain-suffix", System.getProperty(DomainExtension.DOMAIN_SUFFIX_PROPERTY))
+            .optional(false)
+        System.getProperty("quarkus.profile")?.also {
+            inputs.property("profile", it)
+        }
+    }
 }
 
 // Treat custom source set as a test source in IntelliJ IDEA

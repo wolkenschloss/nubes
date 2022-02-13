@@ -8,6 +8,7 @@ import org.gradle.api.logging.LogLevel
 import com.sun.security.auth.module.UnixSystem
 import wolkenschloss.gradle.ca.CreateTask
 import wolkenschloss.gradle.testbed.TestbedExtension
+import wolkenschloss.gradle.testbed.domain.DomainExtension
 
 plugins {
     id("com.github.wolkenschloss.testbed")
@@ -25,7 +26,7 @@ testbed {
 
     domain {
         name.set("testbed")
-        domainSuffix.set("wolkenschloss.local")
+        domainSuffix.set(System.getProperty(DomainExtension.DOMAIN_SUFFIX_PROPERTY))
         hosts.addAll("dashboard", "registry", "grafana", "prometheus")
     }
 
