@@ -5,7 +5,7 @@ quarkus:
     group: nubes
     name: cookbook
     additional-tags: latest
-    registry: registry.wolkenschloss.local
+    registry: registry.${wolkenschloss.domain-suffix:wolkenschloss.local}
   http:
     port: 8180
     access-log:
@@ -31,10 +31,8 @@ quarkus:
     locations:
       - project.properties
 "%prod":
-   quarkus:
      mongodb:
        connection-string: mongodb://${HOST:localhost}:27017/?uuidRepresentation=STANDARD
-
 "%dev":
    quarkus:
      http:

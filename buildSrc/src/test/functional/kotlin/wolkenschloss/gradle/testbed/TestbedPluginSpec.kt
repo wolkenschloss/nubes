@@ -4,9 +4,13 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.TaskOutcome
+import wolkenschloss.gradle.testbed.domain.DomainExtension
 import wolkenschloss.testing.Fixtures
 import wolkenschloss.testing.build
+import wolkenschloss.testing.buildAndFail
+import wolkenschloss.testing.createRunner
 
 class TestbedPluginSpec : FunSpec({
     context("A Project with testbed plugin applied to") {
@@ -48,6 +52,24 @@ class TestbedPluginSpec : FunSpec({
                     root.qcow2
                     cidata.img
                 """.trimIndent()
+            }
+        }
+
+        test("should fail if the domain-suffix system property is missing") {
+            Fixtures("testbed/suffix/missing").withClone {
+                assertSoftly(buildAndFail("help")) {
+                    output shouldContain DomainExtension.ERROR_DOMAIN_SUFFIX_NOT_SET
+                }
+            }
+        }
+
+        test("should build successfully if the domain-suffix system property is passed as a parameter") {
+            Fixtures("testbed/suffix/missing")
+                .withClone {
+                    val result = createRunner()
+                        .withArguments("help", "-D${DomainExtension.DOMAIN_SUFFIX_PROPERTY}=\"host.local\"")
+                        .build()
+                    result.task(":help")!!.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
     }
