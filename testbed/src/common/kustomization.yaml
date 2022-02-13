@@ -3,3 +3,4 @@ resources:
   - registry-ingress.yaml
   - grafana-ingress.yaml
   - prometheus-ingress.yaml
+  - staging-namespace.yaml
