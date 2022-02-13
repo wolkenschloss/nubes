@@ -12,7 +12,8 @@ const routes = [
     props: {
       default: route => ({first: route.query.first || 0, last: route.query.last || 4})
     },
-    name: "contents"
+    name: "contents",
+    meta: { title: "Cookbook" }
   },
   {
     name: "details",
@@ -21,14 +22,16 @@ const routes = [
     components: {
       default: () =>
           import(/* webpackChunkName: "details" */ '../views/Details.vue')
-    }
+    },
+    meta: {title: "Recipe" }
   },
   {
     name: 'ingredients',
     path: '/ingredients',
     components: {
       default: () => import(/* webpackChunkName: "ingredients" */ '../views/Ingredients')
-    }
+    },
+    meta: {title: "Ingredients"}
   }
 ]
 
@@ -36,6 +39,11 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta["title"]
+  next()
 })
 
 export default router
