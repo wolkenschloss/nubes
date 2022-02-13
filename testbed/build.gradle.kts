@@ -1,9 +1,13 @@
 import wolkenschloss.gradle.docker.BuildImageTask
 import wolkenschloss.gradle.docker.RunContainerTask
+import wolkenschloss.gradle.testbed.domain.BuildDomain
+import wolkenschloss.gradle.testbed.domain.DomainTasks
+import wolkenschloss.gradle.testbed.domain.CopyKubeConfig
 import java.nio.file.Paths
 import org.gradle.api.logging.LogLevel
 import com.sun.security.auth.module.UnixSystem
 import wolkenschloss.gradle.ca.CreateTask
+import wolkenschloss.gradle.testbed.TestbedExtension
 
 plugins {
     id("com.github.wolkenschloss.testbed")
@@ -37,10 +41,10 @@ testbed {
 }
 
 tasks {
-    val buildDomain = named<wolkenschloss.gradle.testbed.domain.BuildDomain>(wolkenschloss.gradle.testbed.domain.DomainTasks.BUILD_DOMAIN_TASK_NAME)
-    val copyKubeConfig = named<wolkenschloss.gradle.testbed.domain.CopyKubeConfig>(wolkenschloss.gradle.testbed.domain.DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
+    val buildDomain = named<BuildDomain>(DomainTasks.BUILD_DOMAIN_TASK_NAME)
+    val copyKubeConfig = named<CopyKubeConfig>(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
 
-    val testbed: wolkenschloss.gradle.testbed.TestbedExtension by project.extensions
+    val testbed: TestbedExtension by project.extensions
     val userHome = Paths.get(System.getProperty("user.home"))
 
     val newRootCa by registering(CreateTask::class) {
@@ -98,10 +102,10 @@ tasks {
         doNotTrackState("Prints testbed client info")
     }
 
-    val createRootCa by registering(RunContainerTask::class) {
+    val installCertManager by registering(RunContainerTask::class) {
 
         val src = layout.projectDirectory.dir("src/ca")
-        logging.captureStandardOutput(LogLevel.QUIET)
+        logging.captureStandardOutput(LogLevel.INFO)
 
         mount {
             input {
@@ -144,6 +148,7 @@ tasks {
         command.addAll("kubectl", "apply", "-k", "/opt/app")
         logging.captureStandardOutput(LogLevel.QUIET)
         doNotTrackState("For side effects only")
+        dependsOn(installCertManager)
     }
 
     val readRootCa by registering(RunContainerTask::class) {
@@ -186,6 +191,6 @@ tasks {
     }
 
     named("start") {
-        dependsOn(createRootCa)
+        dependsOn(applyCommonServices)
     }
 }
