@@ -15,8 +15,7 @@ import wolkenschloss.testing.createRunner
 class TestbedPluginSpec : FunSpec({
     context("A Project with testbed plugin applied to") {
         test("transform should copy files") {
-            val fixture = Fixtures("testbed/transform/copy")
-            fixture.withClone {
+            Fixtures("testbed/transform/copy").withClone {
                 val result = build("transform", "-i")
 
                 result.task(":transform")!!.outcome shouldBe TaskOutcome.SUCCESS
@@ -35,8 +34,7 @@ class TestbedPluginSpec : FunSpec({
         }
 
         test("transform should replace content") {
-            val fixture = Fixtures("testbed/transform/replace")
-            fixture.withClone {
+            Fixtures("testbed/transform/replace").withClone {
                 val result = build("transform", "-i")
 
                 result.task(":transform")!!.outcome shouldBe TaskOutcome.SUCCESS
@@ -64,12 +62,11 @@ class TestbedPluginSpec : FunSpec({
         }
 
         test("should build successfully if the domain-suffix system property is passed as a parameter") {
-            Fixtures("testbed/suffix/missing")
-                .withClone {
-                    val result = createRunner()
-                        .withArguments("help", "-D${DomainExtension.DOMAIN_SUFFIX_PROPERTY}=\"host.local\"")
-                        .build()
-                    result.task(":help")!!.outcome shouldBe TaskOutcome.SUCCESS
+            Fixtures("testbed/suffix/missing").withClone {
+                val result = createRunner()
+                    .withArguments("help", "-D${DomainExtension.DOMAIN_SUFFIX_PROPERTY}=\"host.local\"")
+                    .build()
+                result.task(":help")!!.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
     }

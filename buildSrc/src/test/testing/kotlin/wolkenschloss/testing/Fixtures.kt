@@ -1,5 +1,6 @@
 package wolkenschloss.testing
 
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.nio.file.Paths
 
@@ -30,18 +31,42 @@ import java.nio.file.Paths
  */
 class Fixtures(private val path: String) : AutoCloseable {
 
-    @Deprecated(
-        "Useless for fixtures that want to run files in temporary directories.",
-        replaceWith = ReplaceWith("withClone"))
-    fun clone(target: File): File {
-        val fixtures = File(
-            System.getProperty(
-                "project.fixture.directory",
-                defaultFixturePath().absolutePath))
-            .resolve(path)
+    val fixture: File get() = File(System.getProperty("project.fixture.directory",  defaultFixturePath().absolutePath))
+        .resolve(path)
 
-        fixtures.copyRecursively(target)
-        return target
+    /**
+     * Führt einen Code Block mit einer Kopie der Testdaten aus.
+     *
+     * Die Test-fixture wird in ein temporäres Verzeichnis kopiert.
+     * Dem Codeblock [block] wird ein [File] Objekt übergeben, sodass
+     * innerhalb des Codeblocks auf die Kopie zugegriffen werden
+     * kann. Die Kopie wird durch mit [close] gelöscht.
+     */
+    fun withClone(block: suspend File.() -> Unit) = runBlocking {
+        block(clone())
+    }
+
+    fun overlay(fixture: File) {
+        val overlay = File(System.getProperty("project.fixture.directory")).resolve(path)
+        overlay.copyRecursively(target = fixture, overwrite = false)
+    }
+
+    fun removeOverlay(fixture: File) {
+        println("Remove overlay this: ${this.fixture.absolutePath} overlay: ${fixture.absolutePath}")
+        println("this: ${this.fixture.absolutePath}")
+        println("overlay: ${fixture.absolutePath}")
+
+        val overlay = fixture
+
+        overlay.walkBottomUp().forEach {
+            val relative = it.relativeTo(overlay)
+            val inFixture = this.fixture.resolve(relative)
+            println("deleting file ${relative.path} in ${inFixture.absolutePath}")
+
+            if (inFixture.isFile) {
+                inFixture.delete()
+            }
+        }
     }
 
     private val temporaryDirectories = arrayListOf<File>()
@@ -52,47 +77,22 @@ class Fixtures(private val path: String) : AutoCloseable {
         return clone(target)
     }
 
-    /**
-     * Führt einen Code Block mit einer Kopie der Testdaten aus.
-     *
-     * Die Test-fixture wird in ein temporäres Verzeichnis kopiert.
-     * Dem Codeblock [block] wird ein [File] Objekt übergeben, sodass
-     * innerhalb des Codeblocks auf die Kopie zugegriffen werden
-     * kann. Die Kopie wird durch mit [close] gelöscht.
-     */
-    fun withClone(block: File.() -> Unit) {
-        val clone = clone()
-        block(clone)
+    private fun clone(target: File): File {
+        fixture.copyRecursively(target)
+        return target
     }
 
     private fun defaultFixturePath() = userDirectory().resolve("fixtures")
 
-    private fun overlay(fixture: File) {
-        val overlay = File(System.getProperty("project.fixture.directory")).resolve(path)
-        overlay.copyRecursively(target = fixture, overwrite = false)
-    }
-
-    @Deprecated("Funktioniert nicht mir withClone")
-    fun useOverlay(directory: File, function: () -> Unit) {
-        Fixtures(path).overlay(directory)
-        try {
-            function()
-        } finally {
-            Fixtures(path).removeOverlay(directory)
+    /**
+     * Löscht alle mit [withClone] erstellten Kopien der Fixture.
+     */
+    override fun close() {
+        temporaryDirectories.reversed().forEach {directory ->
+            directory.walkBottomUp().forEach { file -> file.delete() }
         }
-    }
 
-    private fun removeOverlay(fixture: File) {
-        val fixtures = File(System.getProperty("project.fixture.directory"))
-        val overlay = fixtures.resolve(path)
-
-        overlay.walkBottomUp().forEach {
-            val relative = it.relativeTo(overlay)
-            val inFixture = fixture.resolve(relative)
-            if (inFixture.isFile) {
-                inFixture.delete()
-            }
-        }
+        temporaryDirectories.clear()
     }
 
     companion object {
@@ -107,16 +107,5 @@ class Fixtures(private val path: String) : AutoCloseable {
         // val fixture = Fixtures.temporaryBuildDirectory()
         private fun temporaryBuildDirectory(): File = userDirectory()
             .resolve(Paths.get("build", "tmp", "fixture").toFile())
-    }
-
-    /**
-     * Löscht alle mit [withClone] erstellten Kopien der Fixture.
-     */
-    override fun close() {
-        temporaryDirectories.reversed().forEach {directory ->
-            directory.walkBottomUp().forEach { file -> file.delete() }
-        }
-
-        temporaryDirectories.clear()
     }
 }

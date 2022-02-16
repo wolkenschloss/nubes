@@ -79,19 +79,17 @@ abstract class Status : DefaultTask() {
                         .ok { path -> path.toString() }
                         .error("missing")
                 }
+            }
+        }
+        val registryService = RegistryService(registry.get(), truststore)
 
-                val registryService = RegistryService(registry.get())
-
-                check("Registry") {
-                        info("Address") { registryService.name }
-                        info("Upload Image") { registryService.uploadImage("hello-world:latest", truststore) }
-                        check("Catalogs", { registryService.listCatalogs(certificate) }) {
-                            check { it.contains("hello-world") }
-                                .ok { java.lang.String.join(", ", it) }
-                                .error("missing catalog hello-world")
-                        }
-
-                }
+        check("Registry") {
+            info("Address") { registryService.name }
+            info("Upload Image") { registryService.push("hello-world:latest", "hello-world:latest") }
+            check("Catalogs", { registryService.listCatalogs(certificate) }) {
+                check { it.contains("hello-world") }
+                    .ok { java.lang.String.join(", ", it) }
+                    .error("missing catalog hello-world")
             }
         }
 
@@ -152,7 +150,6 @@ abstract class Status : DefaultTask() {
             logger.quiet(String.format("✓ %-15s: %s", label, fn.apply()))
         } catch (e: Throwable) {
             logger.error(String.format("✗ %-15s: %s", label, e.message))
-            logger.error("Stacktrace", e)
         }
     }
 }

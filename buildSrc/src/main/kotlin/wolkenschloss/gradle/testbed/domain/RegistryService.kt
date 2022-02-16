@@ -1,12 +1,15 @@
 package wolkenschloss.gradle.testbed.domain
 
-import com.google.cloud.tools.jib.api.*
+import com.google.cloud.tools.jib.api.Containerizer
+import com.google.cloud.tools.jib.api.Jib
+import com.google.cloud.tools.jib.api.RegistryImage
 import com.jayway.jsonpath.JsonPath
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.openssl.PEMParser
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Provider
 import java.io.FileInputStream
 import java.net.URI
@@ -21,7 +24,7 @@ import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
 
-class RegistryService(val name: String) {
+class RegistryService(val name: String, private val truststore: RegularFileProperty) {
 
     private fun loadCertificate(certificate: Provider<RegularFile>): SSLContext {
         certificate.get().asFile.reader().use {
@@ -58,85 +61,81 @@ class RegistryService(val name: String) {
         return parse.read("$.repositories[*]")
     }
 
-    fun uploadImage(image: String, truststore: Provider<RegularFile>): String {
+    fun push(src: String, dst: String): String {
         configureTrustStore(truststore)
-            val tag = String.format("%s/%s", name, image)
-            Jib.from("hello-world")
-                .containerize(
-                    Containerizer.to(RegistryImage.named(tag))
+        Jib.from(src)
+            .containerize(
+                Containerizer.to(RegistryImage.named("$name/$dst"))
+            )
 
-//                    .setAllowInsecureRegistries(true)
-                )
-            return tag
-
+        return "$name/$dst"
     }
 
     private fun configureTrustStore(truststore: Provider<RegularFile>) {
-        val jreTrustManager: X509TrustManager? = getJreTrustManager()
-        val myTrustManager: X509TrustManager? = getMyTrustManager(truststore)
-        val mergedTrustManager: X509TrustManager = createMergedTrustManager(jreTrustManager, myTrustManager)
+        val myTrustManager = getMyTrustManager(truststore)
+        val mergedTrustManager = createMergedTrustManager(this.jreTrustManager, myTrustManager)
         setSystemTrustManager(mergedTrustManager)
     }
 
-    private fun getJreTrustManager(): X509TrustManager? {
-        return findDefaultTrustManager(null)
-    }
+    private val jreTrustManager: X509TrustManager
+        get() {
+            return findDefaultTrustManager(null)
+        }
 
-    private fun getMyTrustManager(truststore: Provider<RegularFile>): X509TrustManager? {
+    private fun getMyTrustManager(truststore: Provider<RegularFile>): X509TrustManager {
         // Adapt to load your keystore
-        FileInputStream(truststore.get().asFile).use { myKeys ->
+        FileInputStream(truststore.get().asFile).use { input ->
             val myTrustStore = KeyStore.getInstance("jks")
-//            myTrustStore.load(myKeys, "password".toCharArray())
-            myTrustStore.load(myKeys, null)
+
+            // TODO: Password für den Keystore für den Buildprozess bereitstellen
+            // Muss irgendwie von außen kommen.
+            // myTrustStore.load(myKeys, "password".toCharArray())
+            myTrustStore.load(input, null)
             return findDefaultTrustManager(myTrustStore)
         }
     }
 
-    private fun findDefaultTrustManager(keyStore: KeyStore?): X509TrustManager? {
+    private fun findDefaultTrustManager(keyStore: KeyStore?): X509TrustManager {
         val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-        tmf.init(keyStore) // If keyStore is null, tmf will be initialized with the default trust store
-        for (tm in tmf.trustManagers) {
-            if (tm is X509TrustManager) {
-                return tm as X509TrustManager
-            }
-        }
-        return null
+        tmf.init(keyStore)
+
+        return tmf.trustManagers
+            .filterIsInstance(X509TrustManager::class.java)
+            .single()
     }
-    private fun setSystemTrustManager(mergedTrustManager: X509TrustManager) {
+
+    private fun setSystemTrustManager(trustManager: X509TrustManager) {
         val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, arrayOf(mergedTrustManager), null)
+        sslContext.init(null, arrayOf(trustManager), null)
 
         // You don't have to set this as the default context,
         // it depends on the library you're using.
         SSLContext.setDefault(sslContext)
     }
 
-    private fun createMergedTrustManager(jreTrustManager: X509TrustManager?, customTrustManager: X509TrustManager?): X509TrustManager {
+    private fun createMergedTrustManager(
+        jreTrustManager: X509TrustManager,
+        customTrustManager: X509TrustManager
+    ): X509TrustManager {
         return object : X509TrustManager {
-            // If you're planning to use client-cert auth,
-            // merge results from "defaultTm" and "myTm".
-
-
             override fun getAcceptedIssuers(): Array<X509Certificate> {
-                return jreTrustManager!!.acceptedIssuers
+                return jreTrustManager.acceptedIssuers
             }
 
-            override fun checkServerTrusted(chain: Array<X509Certificate?>?, authType: String?) {
+            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
                 try {
-                    customTrustManager!!.checkServerTrusted(chain, authType)
+                    customTrustManager.checkServerTrusted(chain, authType)
                 } catch (e: CertificateException) {
-                    // This will throw another CertificateException if this fails too.
-                    jreTrustManager!!.checkServerTrusted(chain, authType)
+                    jreTrustManager.checkServerTrusted(chain, authType)
                 }
             }
 
-            override fun checkClientTrusted(chain: Array<X509Certificate?>?, authType: String?) {
-                // If you're planning to use client-cert auth,
-                // do the same as checking the server.
-                jreTrustManager!!.checkClientTrusted(chain, authType)
+            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
+                jreTrustManager.checkClientTrusted(chain, authType)
             }
         }
     }
+
     override fun toString(): String {
         return "Registry{name='$name'}"
     }

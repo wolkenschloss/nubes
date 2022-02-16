@@ -8,14 +8,12 @@ import java.nio.file.Paths
 import org.gradle.api.logging.LogLevel
 import com.sun.security.auth.module.UnixSystem
 import wolkenschloss.gradle.ca.CreateTask
-import wolkenschloss.gradle.ca.TruststoreTask
 import wolkenschloss.gradle.testbed.TestbedExtension
 import wolkenschloss.gradle.testbed.domain.DomainExtension
 
 plugins {
     id("com.github.wolkenschloss.testbed")
     id("com.github.wolkenschloss.docker")
-    id("com.github.wolkenschloss.ca")
 }
 
 defaultTasks("start")
@@ -99,9 +97,7 @@ tasks {
         imageId.convention(buildClientImage.get().imageId)
     }
 
-    val deployCommonImages by registering(PushImage::class) {
-        images.addAll("mongo:4.0.10", "hello-world")
-    }
+
 
     val info by registering(RunContainerTask::class) {
         logging.captureStandardOutput(LogLevel.QUIET)
@@ -155,7 +151,13 @@ tasks {
         command.addAll("kubectl", "apply", "-k", "/opt/app")
         logging.captureStandardOutput(LogLevel.QUIET)
         doNotTrackState("For side effects only")
-        dependsOn(installCertManager, deployCommonImages)
+        dependsOn(installCertManager)
+    }
+
+    val deployCommonImages by registering(PushImage::class) {
+        images.put("mongo:4.0.10", "mongo:4.0.10")
+        images.put("hello-world", "hello-world")
+        dependsOn(applyCommonServices)
     }
 
     val readRootCa by registering(RunContainerTask::class) {

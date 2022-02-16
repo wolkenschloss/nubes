@@ -26,3 +26,12 @@ fun File.properties(path: String): Properties {
 
     return properties
 }
+
+fun File.overlay(other: String, function: () -> Unit) {
+    Fixtures(other).overlay(File(path))
+    try {
+        function()
+    } finally {
+        Fixtures(path).removeOverlay(Fixtures(other).fixture)
+    }
+}

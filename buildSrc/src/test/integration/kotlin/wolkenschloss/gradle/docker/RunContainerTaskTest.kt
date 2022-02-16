@@ -1,15 +1,17 @@
 package wolkenschloss.gradle.docker
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
-import org.gradle.api.logging.LogLevel
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.kotlin.dsl.*
 
 class RunContainerTaskTest : DescribeSpec ({
     describe("A project with DockerPlugin applied") {
-        val log = CaptureStandardOutput()
         val projectDir = tempdir()
         val project = ProjectBuilder.builder()
             .withProjectDir(projectDir)
@@ -20,26 +22,24 @@ class RunContainerTaskTest : DescribeSpec ({
         }
 
         project.pluginManager.apply(DockerPlugin::class.java)
-        project.gradle.useLogger(log)
 
         describe("with task of type RunTask") {
 
             project.tasks {
                 val hello by registering(RunContainerTask::class)
 
-
                 it("should fail when no image is configured") {
                     hello.get().execute()
                 }
 
-                xit("should execute shell command") {
+                it("should execute shell command") {
                     hello {
                         command.addAll("echo", "hello world")
-                        logging.captureStandardOutput(LogLevel.QUIET)
                     }
 
-                    hello.get().execute()
-                    log.output shouldBe  "hello world"
+                    shouldNotThrowAny {
+                        hello.get().execute()
+                    }
                 }
 
                 it("should accept mount volumes") {

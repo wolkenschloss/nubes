@@ -11,7 +11,7 @@ class CaPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.tasks {
-            val ca by registering(CreateTask::class) {
+            register(CREATE_TASK_NAME, CreateTask::class) {
                 group = CERTIFICATION_AUTHORITY_GROUP
                 notBefore.convention(today)
                 notAfter.convention(expireIn())
@@ -24,9 +24,9 @@ class CaPlugin : Plugin<Project> {
                         Directories.certificateAuthorityHome.resolve("ca.key").toFile().absolutePath))
             }
 
-            val truststore by registering(TruststoreTask::class) {
+            register(TRUSTSTORE_TASK_NAME, TruststoreTask::class) {
                 group = CERTIFICATION_AUTHORITY_GROUP
-                certificate.set(ca.flatMap { it.certificate })
+                certificate.set(project.tasks.named(CREATE_TASK_NAME, CreateTask::class).flatMap { it.certificate })
                 truststore.convention(
                     target.layout.projectDirectory.file(
                         Directories.certificateAuthorityHome.resolve("ca.jks").toFile().absolutePath))
@@ -43,5 +43,7 @@ class CaPlugin : Plugin<Project> {
     companion object {
         const val NAME = "wolkenschloss.gradle.ca"
         const val CERTIFICATION_AUTHORITY_GROUP = "ca"
+        const val CREATE_TASK_NAME = "ca"
+        const val TRUSTSTORE_TASK_NAME = "truststore"
     }
 }

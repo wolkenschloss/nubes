@@ -48,7 +48,7 @@ abstract class TruststoreTask : DefaultTask() {
 
         val keyStore: KeyStore = KeyStore.getInstance("JKS")
         keyStore.load(null, null)
-        keyStore.setCertificateEntry("trustedca", cert)
+        keyStore.setCertificateEntry(ROOT_CA_ENTRY, cert)
         val bOut = ByteArrayOutputStream()
         keyStore.store(bOut, password.toCharArray())
 
@@ -57,5 +57,9 @@ abstract class TruststoreTask : DefaultTask() {
 
         file.writeBytes(bOut.toByteArray())
         function(file)
+    }
+
+    companion object {
+        private const val ROOT_CA_ENTRY = "trustedca"
     }
 }
