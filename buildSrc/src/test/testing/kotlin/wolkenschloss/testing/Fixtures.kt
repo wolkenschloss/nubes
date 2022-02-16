@@ -43,7 +43,19 @@ class Fixtures(private val path: String) : AutoCloseable {
      * kann. Die Kopie wird durch mit [close] gelöscht.
      */
     fun withClone(block: suspend File.() -> Unit) = runBlocking {
-        block(clone())
+        val clone =  Clone.from(fixture)
+        temporaryDirectories.add(clone.target)
+        block(clone.target)
+    }
+
+    class Clone(public val target: File) {
+        companion object {
+            fun from(fixture: File): Clone {
+                val target = temporaryBuildDirectory().resolve(System.currentTimeMillis().toString())
+                fixture.copyRecursively(target)
+                return Clone(target)
+            }
+        }
     }
 
     fun overlay(fixture: File) {
@@ -70,17 +82,6 @@ class Fixtures(private val path: String) : AutoCloseable {
     }
 
     private val temporaryDirectories = arrayListOf<File>()
-
-    private fun clone(): File {
-        val target = temporaryBuildDirectory().resolve(System.currentTimeMillis().toString())
-        temporaryDirectories.add(target)
-        return clone(target)
-    }
-
-    private fun clone(target: File): File {
-        fixture.copyRecursively(target)
-        return target
-    }
 
     private fun defaultFixturePath() = userDirectory().resolve("fixtures")
 
