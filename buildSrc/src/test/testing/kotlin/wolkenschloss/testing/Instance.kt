@@ -5,11 +5,32 @@ import java.nio.file.Paths
 
 class Instance(public val target: File) {
     fun overlay(other: String, function: () -> Unit) {
-        Fixtures(other).overlay(target)
+        overlay(Fixtures(other), target)
         try {
             function()
         } finally {
-            Fixtures(target.path).removeOverlay(Fixtures(other).fixture)
+            removeOverlay(Fixtures(target.path), Fixtures(other).fixture)
+        }
+    }
+
+    fun overlay(fixture: Fixtures, instance: File) {
+        val overlay = File(System.getProperty("project.fixture.directory")).resolve(fixture.path)
+        overlay.copyRecursively(target = instance, overwrite = false)
+    }
+
+    fun removeOverlay(fixture: Fixtures, instance: File) {
+        println("Remove overlay this: ${fixture.fixture.absolutePath} overlay: ${instance.absolutePath}")
+        println("this: ${fixture.fixture.absolutePath}")
+        println("overlay: ${instance.absolutePath}")
+
+        instance.walkBottomUp().forEach {
+            val relative = it.relativeTo(instance)
+            val inFixture = fixture.fixture.resolve(relative)
+            println("deleting file ${relative.path} in ${inFixture.absolutePath}")
+
+            if (inFixture.isFile) {
+                inFixture.delete()
+            }
         }
     }
 

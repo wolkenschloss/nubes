@@ -28,58 +28,33 @@ import java.io.File
  *```
  *
  */
-class Fixtures(private val path: String) : AutoCloseable {
+class Fixtures(val path: String) : AutoCloseable {
 
     val fixture: File get() = File(System.getProperty("project.fixture.directory"))
         .resolve(path)
 
     /**
-     * Führt einen Code Block mit einer Kopie der Testdaten aus.
+     * Führt einen Code Block mit einer Instanz der Testdaten aus.
      *
-     * Die Test-fixture wird in ein temporäres Verzeichnis kopiert.
-     * Dem Codeblock [block] wird ein [File] Objekt übergeben, sodass
-     * innerhalb des Codeblocks auf die Kopie zugegriffen werden
-     * kann. Die Kopie wird durch mit [close] gelöscht.
+     * Die Testdaten werden in ein temporäres Verzeichnis kopiert, auf das die
+     * Testdaten Instanz verweist.
      */
     fun withClone(block: suspend Instance.() -> Unit) = runBlocking {
         val instance =  Instance.from(fixture)
-        temporaryDirectories.add(instance.target)
+        instances.add(instance)
         block(instance)
     }
 
-    fun overlay(instance: File) {
-        val overlay = File(System.getProperty("project.fixture.directory")).resolve(path)
-        overlay.copyRecursively(target = instance, overwrite = false)
-    }
-
-    fun removeOverlay(instance: File) {
-        println("Remove overlay this: ${this.fixture.absolutePath} overlay: ${instance.absolutePath}")
-        println("this: ${this.fixture.absolutePath}")
-        println("overlay: ${instance.absolutePath}")
-
-        val overlay = instance
-
-        overlay.walkBottomUp().forEach {
-            val relative = it.relativeTo(overlay)
-            val inFixture = this.fixture.resolve(relative)
-            println("deleting file ${relative.path} in ${inFixture.absolutePath}")
-
-            if (inFixture.isFile) {
-                inFixture.delete()
-            }
-        }
-    }
-
-    private val temporaryDirectories = arrayListOf<File>()
+    private val instances = arrayListOf<Instance>()
 
     /**
      * Löscht alle mit [withClone] erstellten Kopien der Fixture.
      */
     override fun close() {
-        temporaryDirectories.reversed().forEach {directory ->
-            directory.walkBottomUp().forEach { file -> file.delete() }
+        instances.reversed().forEach { instance ->
+            instance.target.walkBottomUp().forEach { file -> file.delete() }
         }
 
-        temporaryDirectories.clear()
+        instances.clear()
     }
 }
