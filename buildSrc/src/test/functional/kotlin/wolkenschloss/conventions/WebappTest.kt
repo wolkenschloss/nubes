@@ -8,14 +8,14 @@ import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 import wolkenschloss.testing.build
 
 class WebappTest : DescribeSpec({
 
     describe("project with vue application") {
 
-        val fixture = autoClose(Fixtures("webapp"))
+        val fixture = autoClose(Template("webapp"))
 
         describe("build task") {
             it("should create jar file") {
@@ -24,7 +24,7 @@ class WebappTest : DescribeSpec({
 
                     result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
                     result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
-                    target.resolve("build/libs/fixture-webapp.jar").shouldExist()
+                    workingDirectory.resolve("build/libs/fixture-webapp.jar").shouldExist()
                 }
             }
         }
@@ -48,7 +48,7 @@ class WebappTest : DescribeSpec({
 
                     result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                    assertSoftly(target.resolve("build/classes/java/main/META-INF/resources")) {
+                    assertSoftly(workingDirectory.resolve("build/classes/java/main/META-INF/resources")) {
                         shouldBeADirectory()
                         shouldContainFile("index.html")
                         resolve("js").shouldBeADirectory()
@@ -63,7 +63,7 @@ class WebappTest : DescribeSpec({
                     val result = build("unit")
 
                     result.task(":unit")!!.outcome shouldBe TaskOutcome.SUCCESS
-                    target.resolve("build/reports/tests/unit").shouldContainFile("junit.xml")
+                    workingDirectory.resolve("build/reports/tests/unit").shouldContainFile("junit.xml")
                 }
             }
         }
@@ -74,7 +74,7 @@ class WebappTest : DescribeSpec({
                     val result = build("e2e")
 
                     result.task(":e2e")!!.outcome shouldBe TaskOutcome.SUCCESS
-                    target.resolve("build/reports/tests/e2e").shouldBeADirectory()
+                    workingDirectory.resolve("build/reports/tests/e2e").shouldBeADirectory()
                 }
             }
         }

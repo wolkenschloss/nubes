@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.gradle.testbed.domain.DomainExtension
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 import wolkenschloss.testing.build
 import wolkenschloss.testing.buildAndFail
 import wolkenschloss.testing.createRunner
@@ -15,12 +15,12 @@ import wolkenschloss.testing.createRunner
 class TestbedPluginSpec : FunSpec({
     context("A Project with testbed plugin applied to") {
         test("transform should copy files") {
-            Fixtures("testbed/transform/copy").withClone {
+            Template("testbed/transform/copy").withClone {
                 val result = build("transform", "-i")
 
                 result.task(":transform")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                assertSoftly(target.resolve("build/config")) {
+                assertSoftly(workingDirectory.resolve("build/config")) {
                     with(resolve("cloud-init")) {
                         shouldContainFile("user-data")
                         shouldContainFile("network-config")
@@ -34,19 +34,19 @@ class TestbedPluginSpec : FunSpec({
         }
 
         test("transform should replace content") {
-            Fixtures("testbed/transform/replace").withClone {
+            Template("testbed/transform/replace").withClone {
                 val result = build("transform", "-i")
 
                 result.task(":transform")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                target.resolve("build/config/example").readText() shouldBe """
+                workingDirectory.resolve("build/config/example").readText() shouldBe """
                     testbed
                     testbed.wolkenschloss.local
                     ${System.getProperty("user.name")}
                     ${System.getenv("LANG")}
                     ${IpUtil.hostAddress}
                     9191
-                    ${target.resolve("build/pool").absolutePath}
+                    ${workingDirectory.resolve("build/pool").absolutePath}
                     root.qcow2
                     cidata.img
                 """.trimIndent()
@@ -54,7 +54,7 @@ class TestbedPluginSpec : FunSpec({
         }
 
         test("should fail if the domain-suffix system property is missing") {
-            Fixtures("testbed/suffix/missing").withClone {
+            Template("testbed/suffix/missing").withClone {
                 assertSoftly(buildAndFail("help")) {
                     output shouldContain DomainExtension.ERROR_DOMAIN_SUFFIX_NOT_SET
                 }
@@ -62,7 +62,7 @@ class TestbedPluginSpec : FunSpec({
         }
 
         test("should build successfully if the domain-suffix system property is passed as a parameter") {
-            Fixtures("testbed/suffix/missing").withClone {
+            Template("testbed/suffix/missing").withClone {
                 val result = createRunner()
                     .withArguments("help", "-D${DomainExtension.DOMAIN_SUFFIX_PROPERTY}=\"host.local\"")
                     .build()

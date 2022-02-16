@@ -7,20 +7,20 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 import wolkenschloss.testing.build
 import java.io.File
 
 class DockerPluginTest : DescribeSpec({
 
     describe("DockerPlugin applied to a gradle project with ImageBuildTask") {
-        autoClose(Fixtures("image")).withClone {
+        autoClose(Template("image")).withClone {
             it("should build image") {
                 val result = build("base")
 
                 result.task(":base")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                val imageIdFile = target.resolve("build/.docker/fixture-image/base")
+                val imageIdFile = workingDirectory.resolve("build/.docker/fixture-image/base")
                 imageIdFile.shouldExist()
             }
 
@@ -55,17 +55,17 @@ class DockerPluginTest : DescribeSpec({
                 val result = build("log", "--rerun-tasks", "-i")
 
                 result.task(":log")?.outcome shouldBe TaskOutcome.SUCCESS
-                target.resolve("build/log").readText() shouldBe "Hello Logfile\n"
+                workingDirectory.resolve("build/log").readText() shouldBe "Hello Logfile\n"
             }
         }
     }
 
 
     describe("DockerPlugin applied to a gradle project mounting volumes") {
-        autoClose(Fixtures("mount")).withClone {
+        autoClose(Template("mount")).withClone {
             it("should read from mounted file") {
 
-                val dataFile = target.resolve("volumes/datafile")
+                val dataFile = workingDirectory.resolve("volumes/datafile")
                 dataFile.parentFile.mkdirs()
                 dataFile.writeText("content of mounted file")
 
@@ -77,7 +77,7 @@ class DockerPluginTest : DescribeSpec({
 
             it("should read from mounted directory") {
                 val relativeDataDirectory = File("volumes/data")
-                val dataFile = target.resolve(relativeDataDirectory).resolve("datafile")
+                val dataFile = workingDirectory.resolve(relativeDataDirectory).resolve("datafile")
                 dataFile.parentFile.mkdirs()
                 dataFile.writeText("another content of mounted volume")
 
@@ -88,7 +88,7 @@ class DockerPluginTest : DescribeSpec({
             }
 
             it("should write a file into mounted directory") {
-                val dataDir = target.resolve("build/volumes/data").absoluteFile
+                val dataDir = workingDirectory.resolve("build/volumes/data").absoluteFile
                 dataDir.mkdirs()
 
                 val result = build("write", "-P", "text=hello write")

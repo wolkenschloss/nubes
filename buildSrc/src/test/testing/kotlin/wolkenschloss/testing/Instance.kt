@@ -3,10 +3,13 @@ package wolkenschloss.testing
 import java.io.File
 import java.nio.file.Paths
 
-class Instance(val target: File) {
+/**
+ * Instanz einer Projektvorlage.
+ */
+class Instance(val workingDirectory: File) {
 
     fun overlay(overlay: File, function: () -> Unit) {
-        overlay.copyRecursively(target, false)
+        overlay.copyRecursively(workingDirectory, false)
         try {
             function()
         } finally {
@@ -16,7 +19,7 @@ class Instance(val target: File) {
 
     private fun removeOverlay(overlay: File) {
         overlay.walkBottomUp().forEach {
-            val inFixture = target.resolve(it.relativeTo(overlay))
+            val inFixture = workingDirectory.resolve(it.relativeTo(overlay))
 
             if (inFixture.isFile) {
                 inFixture.delete()

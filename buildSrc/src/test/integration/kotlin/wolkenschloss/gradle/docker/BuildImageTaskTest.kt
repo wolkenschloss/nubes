@@ -14,7 +14,7 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 
 class BuildImageTaskTest : DescribeSpec({
 
@@ -73,9 +73,9 @@ class BuildImageTaskTest : DescribeSpec({
                 }
 
                 describe("Dockerfile with arguments") {
-                    autoClose(Fixtures("docker/withargs")).withClone {
+                    autoClose(Template("docker/withargs")).withClone {
                         val imagewithargs by registering(BuildImageTask::class) {
-                            inputDir.set(this@withClone.target)
+                            inputDir.set(this@withClone.workingDirectory)
                         }
 
                         afterTest { imagewithargs.forceRemoveImage() }

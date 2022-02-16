@@ -17,7 +17,7 @@ import io.kotest.matchers.shouldBe
 import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_clientAuth
 import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_serverAuth
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 import wolkenschloss.testing.createRunner
 import java.security.cert.X509Certificate
 import java.time.LocalDate
@@ -32,7 +32,7 @@ private const val keyCertSign = 5
 
 class CaPluginTest : FunSpec({
 
-    autoClose(Fixtures("ca")).withClone {
+    autoClose(Template("ca")).withClone {
         context("A project using com.github.wolkenschloss.ca gradle plugin") {
             val xdgDataHome = tempdir()
             val environment = mapOf("XDG_DATA_HOME" to xdgDataHome.absolutePath)
@@ -128,7 +128,7 @@ class CaPluginTest : FunSpec({
 
                 result.task(":createInUserDefinedLocation")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                assertSoftly(target.resolve("build/ca")) {
+                assertSoftly(workingDirectory.resolve("build/ca")) {
                     shouldContainFile("ca.crt")
                     shouldContainFile("ca.key")
                 }

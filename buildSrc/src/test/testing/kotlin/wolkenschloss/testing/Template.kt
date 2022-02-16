@@ -4,23 +4,26 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 
 /**
- * Verwaltet Testprojekte für Funktionstests und Integrationstests.
+ * Vorlage für Testprojekte, die in Funktionstests und Integrationstests benutzt
+ * werden.
  *
- * Die Testprojekte befinden sich im `/buildSrc/fixtures` Verzeichnis.
- * Für jeden Test wird eine Kopie (Klon) angelegt, damit der Test
- * nicht auf Erzeugnisse eines vorangegangenen Tests stößt, womit
- * Testergebnisse verfälscht würden.
+ * Die Vorlagen befinden sich im `/buildSrc/fixtures` Verzeichnis, auf das die
+ * Systemeigenschaft `project.fixture.directory` verweisen muss. Die Vorlagen
+ * können instanziiert, d.h. in ein temporäres Verzeichnis kopiert werden. Die
+ * Tests verwenden diese Instanzen.
  *
- * Das übliche Schema für die Verwendung von Fixtures ist:
+ * Die Instanzen werden nach Beendigung des Tests automatisch gelöscht.
+ *
+ * Das übliche Schema für die Verwendung von Vorlagen ist:
  *
  * ```kotlin
  * class ExampleSpec : FunSpec({
  *   context("example build convention") {
- *     val fixture = autoClose(Fixture("example"))
+ *     autoClose(Template("example")).withClone {
  *     test("example build test") {
- *       fixture.withClone {
- *         val result = build("build", "-i")
+  *        val result = build("build", "-i")
  *         result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
+ *         workingDirectory.resolve("build/myFile.txt").shouldExist()
  *       }
  *     }
  *   }
@@ -28,7 +31,7 @@ import java.io.File
  *```
  *
  */
-class Fixtures(private val path: String) : AutoCloseable {
+class Template(private val path: String) : AutoCloseable {
 
     /**
      * Führt einen Code Block mit einer Instanz der Testdaten aus.
@@ -49,13 +52,18 @@ class Fixtures(private val path: String) : AutoCloseable {
      */
     override fun close() {
         instances.reversed().forEach { instance ->
-            instance.target.walkBottomUp().forEach { file -> file.delete() }
+            instance.workingDirectory.walkBottomUp().forEach { file -> file.delete() }
         }
 
         instances.clear()
     }
 
     companion object {
+        /**
+         * Löst den Pfad [path] relativ zum Basisverzeichnis der Vorlagen auf.
+         * Das Basisverzeichnis der Vorlagen wird durch die Systemeigenschaft
+         * `project.fixture.directory` bestimmt.
+         */
         fun resolve(path: String): File {
             return File(System.getProperty("project.fixture.directory"))
                 .resolve(path)

@@ -13,13 +13,13 @@ fun Instance.buildAndFail(vararg args: String): BuildResult = createRunner()
     .buildAndFail()
 
 fun Instance.createRunner(): GradleRunner = GradleRunner.create()
-    .withProjectDir(this.target)
+    .withProjectDir(this.workingDirectory)
     .withPluginClasspath()
 
 fun Instance.properties(path: String): Properties {
     val properties = Properties()
 
-    target.resolve(path).inputStream().use {
+    workingDirectory.resolve(path).inputStream().use {
         properties.load(it)
     }
 

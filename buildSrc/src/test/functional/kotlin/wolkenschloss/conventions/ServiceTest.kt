@@ -3,13 +3,13 @@ package wolkenschloss.conventions
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 import wolkenschloss.testing.build
 
 class ServiceTest : FunSpec({
 
     context("project with quarkus application") {
-        autoClose(Fixtures("service")).withClone {
+        autoClose(Template("service")).withClone {
             beforeEach { build("clean") }
 
             test("should build quarkus service"){

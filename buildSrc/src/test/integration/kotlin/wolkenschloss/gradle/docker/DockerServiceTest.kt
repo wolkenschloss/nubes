@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 
 class DockerServiceTest : DescribeSpec({
 
@@ -38,9 +38,9 @@ class DockerServiceTest : DescribeSpec({
                 }
 
                 describe("configured with base directory") {
-                    autoClose(Fixtures("docker/hello")).withClone {
+                    autoClose(Template("docker/hello")).withClone {
                         hello {
-                            inputDir.set(this@withClone.target)
+                            inputDir.set(this@withClone.workingDirectory)
                         }
 
                         it("should build docker image") {
