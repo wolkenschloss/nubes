@@ -16,21 +16,21 @@ class CoreTest : FunSpec({
             beforeEach { build("clean") }
 
             test("Unit tests can use the JUnit 5 framework") {
-                overlay("overlay/core/test") {
+                overlay(Fixtures.resolve("overlay/core/test")) {
                     val result = build("test")
                     result.task(":test")!!.outcome shouldBe TaskOutcome.SUCCESS
                 }
             }
 
             test("Source code can be written in Java with language level 11") {
-                overlay("overlay/core/java11") {
+                overlay(Fixtures.resolve("overlay/core/java11")) {
                     val result = build("build")
                     result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
                 }
             }
 
             test("Source code can be written in Java with language level 16") {
-                overlay("overlay/core/java16") {
+                overlay(Fixtures.resolve("overlay/core/java16")) {
                     val result = build("build")
                     result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
                 }

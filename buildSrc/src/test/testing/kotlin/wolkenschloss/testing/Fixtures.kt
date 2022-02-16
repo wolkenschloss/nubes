@@ -28,10 +28,7 @@ import java.io.File
  *```
  *
  */
-class Fixtures(val path: String) : AutoCloseable {
-
-    val fixture: File get() = File(System.getProperty("project.fixture.directory"))
-        .resolve(path)
+class Fixtures(private val path: String) : AutoCloseable {
 
     /**
      * Führt einen Code Block mit einer Instanz der Testdaten aus.
@@ -40,7 +37,7 @@ class Fixtures(val path: String) : AutoCloseable {
      * Testdaten Instanz verweist.
      */
     fun withClone(block: suspend Instance.() -> Unit) = runBlocking {
-        val instance =  Instance.from(fixture)
+        val instance =  Instance.from(resolve(path))
         instances.add(instance)
         block(instance)
     }
@@ -56,5 +53,12 @@ class Fixtures(val path: String) : AutoCloseable {
         }
 
         instances.clear()
+    }
+
+    companion object {
+        fun resolve(path: String): File {
+            return File(System.getProperty("project.fixture.directory"))
+                .resolve(path)
+        }
     }
 }
