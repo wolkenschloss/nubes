@@ -20,7 +20,7 @@ class TestbedPluginSpec : FunSpec({
 
                 result.task(":transform")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                assertSoftly(resolve("build/config")) {
+                assertSoftly(target.resolve("build/config")) {
                     with(resolve("cloud-init")) {
                         shouldContainFile("user-data")
                         shouldContainFile("network-config")
@@ -39,14 +39,14 @@ class TestbedPluginSpec : FunSpec({
 
                 result.task(":transform")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                resolve("build/config/example").readText() shouldBe """
+                target.resolve("build/config/example").readText() shouldBe """
                     testbed
                     testbed.wolkenschloss.local
                     ${System.getProperty("user.name")}
                     ${System.getenv("LANG")}
                     ${IpUtil.hostAddress}
                     9191
-                    ${resolve("build/pool").absolutePath}
+                    ${target.resolve("build/pool").absolutePath}
                     root.qcow2
                     cidata.img
                 """.trimIndent()

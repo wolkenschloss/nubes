@@ -2,7 +2,6 @@ package wolkenschloss.testing
 
 import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.nio.file.Paths
 
 /**
  * Verwaltet Testprojekte für Funktionstests und Integrationstests.
@@ -15,7 +14,7 @@ import java.nio.file.Paths
  * Das übliche Schema für die Verwendung von Fixtures ist:
  *
  * ```kotlin
-  * class ExampleSpec : FunSpec({
+ * class ExampleSpec : FunSpec({
  *   context("example build convention") {
  *     val fixture = autoClose(Fixture("example"))
  *     test("example build test") {
@@ -31,7 +30,7 @@ import java.nio.file.Paths
  */
 class Fixtures(private val path: String) : AutoCloseable {
 
-    val fixture: File get() = File(System.getProperty("project.fixture.directory",  defaultFixturePath().absolutePath))
+    val fixture: File get() = File(System.getProperty("project.fixture.directory"))
         .resolve(path)
 
     /**
@@ -42,23 +41,23 @@ class Fixtures(private val path: String) : AutoCloseable {
      * innerhalb des Codeblocks auf die Kopie zugegriffen werden
      * kann. Die Kopie wird durch mit [close] gelöscht.
      */
-    fun withClone(block: suspend File.() -> Unit) = runBlocking {
-        val clone =  Clone.from(fixture)
-        temporaryDirectories.add(clone.target)
-        block(clone.target)
+    fun withClone(block: suspend Instance.() -> Unit) = runBlocking {
+        val instance =  Instance.from(fixture)
+        temporaryDirectories.add(instance.target)
+        block(instance)
     }
 
-    fun overlay(fixture: File) {
+    fun overlay(instance: File) {
         val overlay = File(System.getProperty("project.fixture.directory")).resolve(path)
-        overlay.copyRecursively(target = fixture, overwrite = false)
+        overlay.copyRecursively(target = instance, overwrite = false)
     }
 
-    fun removeOverlay(fixture: File) {
-        println("Remove overlay this: ${this.fixture.absolutePath} overlay: ${fixture.absolutePath}")
+    fun removeOverlay(instance: File) {
+        println("Remove overlay this: ${this.fixture.absolutePath} overlay: ${instance.absolutePath}")
         println("this: ${this.fixture.absolutePath}")
-        println("overlay: ${fixture.absolutePath}")
+        println("overlay: ${instance.absolutePath}")
 
-        val overlay = fixture
+        val overlay = instance
 
         overlay.walkBottomUp().forEach {
             val relative = it.relativeTo(overlay)
@@ -73,8 +72,6 @@ class Fixtures(private val path: String) : AutoCloseable {
 
     private val temporaryDirectories = arrayListOf<File>()
 
-    private fun defaultFixturePath() = userDirectory().resolve("fixtures")
-
     /**
      * Löscht alle mit [withClone] erstellten Kopien der Fixture.
      */
@@ -84,19 +81,5 @@ class Fixtures(private val path: String) : AutoCloseable {
         }
 
         temporaryDirectories.clear()
-    }
-
-    companion object {
-        private fun userDirectory(): File = Paths.get(System.getProperty("user.dir")).toFile()
-
-        // It is not possible to use the temporary directories provided by
-        // Kotest or Java for cloned fixtures.
-        //
-        // The node_modules directory contains executable files that are
-        // required for the test. No files may be executed in ordinary temporary
-        // directories. This leads to an error in the test.
-        // val fixture = Fixtures.temporaryBuildDirectory()
-        private fun temporaryBuildDirectory(): File = userDirectory()
-            .resolve(Paths.get("build", "tmp", "fixture").toFile())
     }
 }

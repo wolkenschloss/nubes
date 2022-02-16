@@ -2,36 +2,28 @@ package wolkenschloss.testing
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import java.io.File
 import java.util.*
 
-fun File.build(vararg args: String): BuildResult = createRunner()
+fun Instance.build(vararg args: String): BuildResult = createRunner()
     .withArguments(*args)
     .build()
 
-fun File.buildAndFail(vararg args: String): BuildResult = createRunner()
+fun Instance.buildAndFail(vararg args: String): BuildResult = createRunner()
     .withArguments(*args)
     .buildAndFail()
 
-fun File.createRunner(): GradleRunner = GradleRunner.create()
-    .withProjectDir(this)
+fun Instance.createRunner(): GradleRunner = GradleRunner.create()
+    .withProjectDir(this.target)
     .withPluginClasspath()
 
-fun File.properties(path: String): Properties {
+fun Instance.properties(path: String): Properties {
     val properties = Properties()
 
-    resolve(path).inputStream().use {
+    target.resolve(path).inputStream().use {
         properties.load(it)
     }
 
     return properties
 }
 
-fun File.overlay(other: String, function: () -> Unit) {
-    Fixtures(other).overlay(File(path))
-    try {
-        function()
-    } finally {
-        Fixtures(path).removeOverlay(Fixtures(other).fixture)
-    }
-}
+

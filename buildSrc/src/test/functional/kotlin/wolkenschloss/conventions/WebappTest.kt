@@ -24,7 +24,7 @@ class WebappTest : DescribeSpec({
 
                     result.task(":build")!!.outcome shouldBe TaskOutcome.SUCCESS
                     result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
-                    resolve("build/libs/fixture-webapp.jar").shouldExist()
+                    target.resolve("build/libs/fixture-webapp.jar").shouldExist()
                 }
             }
         }
@@ -48,7 +48,7 @@ class WebappTest : DescribeSpec({
 
                     result.task(":vue")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                    assertSoftly(resolve("build/classes/java/main/META-INF/resources")) {
+                    assertSoftly(target.resolve("build/classes/java/main/META-INF/resources")) {
                         shouldBeADirectory()
                         shouldContainFile("index.html")
                         resolve("js").shouldBeADirectory()
@@ -63,7 +63,7 @@ class WebappTest : DescribeSpec({
                     val result = build("unit")
 
                     result.task(":unit")!!.outcome shouldBe TaskOutcome.SUCCESS
-                    resolve("build/reports/tests/unit").shouldContainFile("junit.xml")
+                    target.resolve("build/reports/tests/unit").shouldContainFile("junit.xml")
                 }
             }
         }
@@ -74,7 +74,7 @@ class WebappTest : DescribeSpec({
                     val result = build("e2e")
 
                     result.task(":e2e")!!.outcome shouldBe TaskOutcome.SUCCESS
-                    resolve("build/reports/tests/e2e").shouldBeADirectory()
+                    target.resolve("build/reports/tests/e2e").shouldBeADirectory()
                 }
             }
         }

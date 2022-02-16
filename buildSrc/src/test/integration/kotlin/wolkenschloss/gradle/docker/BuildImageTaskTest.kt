@@ -75,7 +75,7 @@ class BuildImageTaskTest : DescribeSpec({
                 describe("Dockerfile with arguments") {
                     autoClose(Fixtures("docker/withargs")).withClone {
                         val imagewithargs by registering(BuildImageTask::class) {
-                            inputDir.set(this@withClone)
+                            inputDir.set(this@withClone.target)
                         }
 
                         afterTest { imagewithargs.forceRemoveImage() }

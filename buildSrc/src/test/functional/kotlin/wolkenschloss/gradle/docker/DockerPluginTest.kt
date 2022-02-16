@@ -20,7 +20,7 @@ class DockerPluginTest : DescribeSpec({
 
                 result.task(":base")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                val imageIdFile = resolve("build/.docker/fixture-image/base")
+                val imageIdFile = target.resolve("build/.docker/fixture-image/base")
                 imageIdFile.shouldExist()
             }
 
@@ -55,7 +55,7 @@ class DockerPluginTest : DescribeSpec({
                 val result = build("log", "--rerun-tasks", "-i")
 
                 result.task(":log")?.outcome shouldBe TaskOutcome.SUCCESS
-                resolve("build/log").readText() shouldBe "Hello Logfile\n"
+                target.resolve("build/log").readText() shouldBe "Hello Logfile\n"
             }
         }
     }
@@ -65,7 +65,7 @@ class DockerPluginTest : DescribeSpec({
         autoClose(Fixtures("mount")).withClone {
             it("should read from mounted file") {
 
-                val dataFile = resolve("volumes/datafile")
+                val dataFile = target.resolve("volumes/datafile")
                 dataFile.parentFile.mkdirs()
                 dataFile.writeText("content of mounted file")
 
@@ -77,7 +77,7 @@ class DockerPluginTest : DescribeSpec({
 
             it("should read from mounted directory") {
                 val relativeDataDirectory = File("volumes/data")
-                val dataFile = resolve(relativeDataDirectory).resolve("datafile")
+                val dataFile = target.resolve(relativeDataDirectory).resolve("datafile")
                 dataFile.parentFile.mkdirs()
                 dataFile.writeText("another content of mounted volume")
 
@@ -88,7 +88,7 @@ class DockerPluginTest : DescribeSpec({
             }
 
             it("should write a file into mounted directory") {
-                val dataDir = resolve("build/volumes/data").absoluteFile
+                val dataDir = target.resolve("build/volumes/data").absoluteFile
                 dataDir.mkdirs()
 
                 val result = build("write", "-P", "text=hello write")

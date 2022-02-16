@@ -40,7 +40,7 @@ class DockerServiceTest : DescribeSpec({
                 describe("configured with base directory") {
                     autoClose(Fixtures("docker/hello")).withClone {
                         hello {
-                            inputDir.set(this@withClone)
+                            inputDir.set(this@withClone.target)
                         }
 
                         it("should build docker image") {

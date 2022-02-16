@@ -128,7 +128,7 @@ class CaPluginTest : FunSpec({
 
                 result.task(":createInUserDefinedLocation")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                assertSoftly(resolve("build/ca")) {
+                assertSoftly(target.resolve("build/ca")) {
                     shouldContainFile("ca.crt")
                     shouldContainFile("ca.key")
                 }
