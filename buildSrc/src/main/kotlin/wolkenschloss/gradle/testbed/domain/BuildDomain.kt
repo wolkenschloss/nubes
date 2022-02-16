@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-@CacheableTask
 abstract class BuildDomain : DefaultTask() {
 
     @get:Input

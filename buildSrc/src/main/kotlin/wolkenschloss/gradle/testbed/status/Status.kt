@@ -21,6 +21,9 @@ abstract class Status : DefaultTask() {
     abstract val domainName: Property<String>
 
     @get:Internal
+    abstract val registry: Property<String>
+
+    @get:Internal
     abstract val poolName: Property<String>
 
     @get:Internal
@@ -34,6 +37,12 @@ abstract class Status : DefaultTask() {
 
     @get:Internal
     abstract val kubeConfigFile: RegularFileProperty
+
+    @get:Internal
+    abstract val certificate: RegularFileProperty
+
+    @get:Internal
+    abstract val truststore: RegularFileProperty
 
     @get:Inject
     abstract val execOperations: ExecOperations
@@ -71,36 +80,35 @@ abstract class Status : DefaultTask() {
                         .error("missing")
                 }
 
-                val poolOperations = PoolOperations.getInstance(project.gradle).get()
-
-                check("Pool") {
-                    poolOperations.run(poolName.get()) { p ->
-                        info("Pool Name") { p.name }
-                        info("Pool Autostart") { p.autostart }
-                        info("Pool isActive") { p.isActive }
-                        check("Pool Volumes", { p.listVolumes() }) {
-                            check { vols -> vols.contains("root.qcow2") && vols.contains("cidata.img")}
-                                .ok { vols -> java.lang.String.join(", ", *vols) }
-                                .error("Nicht genau zwei Volumes")
-                        }
-                    }
-                }
-
-                val registryService: RegistryService = domain.registry(domainName)
+                val registryService = RegistryService(registry.get())
 
                 check("Registry") {
-                    registryService.withRegistry { registry ->
-                        info("Address") { registry.address }
-                        info("Upload Image") { registry.uploadImage("hello-world:latest") }
-                        check("Catalogs", { registry.listCatalogs() }) {
+                        info("Address") { registryService.name }
+                        info("Upload Image") { registryService.uploadImage("hello-world:latest", truststore) }
+                        check("Catalogs", { registryService.listCatalogs(certificate) }) {
                             check { it.contains("hello-world") }
                                 .ok { java.lang.String.join(", ", it) }
                                 .error("missing catalog hello-world")
                         }
-                    }
+
                 }
             }
         }
+
+        check("Pool") {
+            val poolOperations = PoolOperations.getInstance(project.gradle).get()
+            poolOperations.run(poolName.get()) { p ->
+                info("Pool Name") { p.name }
+                info("Pool Autostart") { p.autostart }
+                info("Pool isActive") { p.isActive }
+                check("Pool Volumes", { p.listVolumes() }) {
+                    check { vols -> vols.contains("root.qcow2") && vols.contains("cidata.img")}
+                        .ok { vols -> java.lang.String.join(", ", *vols) }
+                        .error("Nicht genau zwei Volumes")
+                }
+            }
+        }
+
         info("Download Directory") { downloadDir.get().asFile.toPath() }
         check("Base image", { baseImageFile.asFile.get().toPath() }) {
             check { path -> Files.exists(path) }
@@ -144,6 +152,7 @@ abstract class Status : DefaultTask() {
             logger.quiet(String.format("✓ %-15s: %s", label, fn.apply()))
         } catch (e: Throwable) {
             logger.error(String.format("✗ %-15s: %s", label, e.message))
+            logger.error("Stacktrace", e)
         }
     }
 }

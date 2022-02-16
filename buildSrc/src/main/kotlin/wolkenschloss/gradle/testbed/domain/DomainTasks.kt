@@ -15,7 +15,6 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
         registerBuildDomainTask(tasks)
         registerReadKubeConfigTasks(tasks)
         registerStartTask(tasks)
-        registerCreateDockerConfigTasks(tasks)
     }
 
     private fun registerBuildDomainTask(tasks: TaskContainer) {
@@ -50,19 +49,6 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
             knownHostsFile.convention(extension.knownHostsFile)
             kubeConfigFile.convention(extension.kubeConfigFile)
             dependsOn(buildDomain)
-        }
-    }
-
-    private fun registerCreateDockerConfigTasks(tasks: TaskContainer) {
-        tasks.register(
-            CREATE_DOCKER_CONFIG_TASK_NAME,
-            CreateDockerConfig::class.java
-        ) {
-            group = GROUP_NAME
-            description = "Creates a Docker configuration file in order to be able to access the unsecured registration of the test bench."
-            dockerConfigFile.convention(extension.dockerConfigFile)
-            domain.convention(extension.name)
-            dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME))
         }
     }
 

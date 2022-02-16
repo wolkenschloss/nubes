@@ -1,15 +1,24 @@
 package wolkenschloss.gradle.ca
 
+import org.bouncycastle.asn1.DERBMPString
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.X500NameBuilder
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
+import org.bouncycastle.pkcs.PKCS12PfxPduBuilder
+import org.bouncycastle.pkcs.PKCS12SafeBag
+import org.bouncycastle.pkcs.PKCS12SafeBagBuilder
+import org.bouncycastle.pkcs.jcajce.JcaPKCS12SafeBagBuilder
+import org.bouncycastle.pkcs.jcajce.JcePKCS12MacCalculatorBuilder
+import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
@@ -25,7 +34,9 @@ import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.PrivateKey
 import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.time.Period
 import java.time.ZonedDateTime
 import java.util.*
@@ -106,6 +117,8 @@ abstract class CreateTask : DefaultTask() {
                 Files.setPosixFilePermissions(this.toPath(), permission)
             }
 
+
+
         } catch (e: Exception) {
             throw GradleException("Cannot create certificate: ${e.message}", e)
         }
@@ -159,6 +172,8 @@ abstract class CreateTask : DefaultTask() {
         file.writeText(stringWriter.toString())
         function(file)
     }
+
+
 
     companion object {
         private const val KEYPAIR_GENERATOR_ALGORITHM = "RSA"
