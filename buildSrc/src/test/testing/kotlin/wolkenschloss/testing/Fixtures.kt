@@ -48,16 +48,6 @@ class Fixtures(private val path: String) : AutoCloseable {
         block(clone.target)
     }
 
-    class Clone(public val target: File) {
-        companion object {
-            fun from(fixture: File): Clone {
-                val target = temporaryBuildDirectory().resolve(System.currentTimeMillis().toString())
-                fixture.copyRecursively(target)
-                return Clone(target)
-            }
-        }
-    }
-
     fun overlay(fixture: File) {
         val overlay = File(System.getProperty("project.fixture.directory")).resolve(path)
         overlay.copyRecursively(target = fixture, overwrite = false)
