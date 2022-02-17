@@ -29,6 +29,7 @@ spec:
         app: database
         selector: mongodb-standalone
     spec:
+      terminationGracePeriodSeconds: 10
       containers:
         - name: mongodb-standlone
           image: localhost:32000/mongo:4.0.10
@@ -47,6 +48,19 @@ spec:
             limits:
               cpu: 500m
               memory: 500Mi
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+      spec:
+        storageClassName: microk8s-hostpath
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
 ---
 apiVersion: v1
 kind: Service
