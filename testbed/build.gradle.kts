@@ -97,8 +97,6 @@ tasks {
         imageId.convention(buildClientImage.get().imageId)
     }
 
-
-
     val info by registering(RunContainerTask::class) {
         logging.captureStandardOutput(LogLevel.QUIET)
         command.addAll("info.bash")
@@ -130,7 +128,6 @@ tasks {
                 }
             }
         }
-
         command.addAll("ca.bash", "/mnt/app")
     }
 
@@ -200,6 +197,6 @@ tasks {
     }
 
     named("start") {
-        dependsOn(applyCommonServices)
+        dependsOn(deployCommonImages)
     }
 }
