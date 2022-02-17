@@ -1,17 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongodb-pvc
-  namespace: staging
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: microk8s-hostpath
-  resources:
-    requests:
-      storage: 2Gi
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
