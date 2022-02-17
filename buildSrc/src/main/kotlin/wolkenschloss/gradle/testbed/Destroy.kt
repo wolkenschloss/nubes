@@ -50,7 +50,7 @@ abstract class Destroy : DefaultTask() {
         val poolOperations = PoolOperations.getInstance(project.gradle)
         if (poolRunFile.get().asFile.exists()) {
             val content = providerFactory.fileContents(poolRunFile)
-            val uuid = content.asText.map { name: String? -> UUID.fromString(name) }.get()
+            val uuid = content.asText.map { name: String -> UUID.fromString(name) }.get()
             poolOperations.get().destroy(uuid)
             fileSystemOperations.delete { delete(poolRunFile) }
         }

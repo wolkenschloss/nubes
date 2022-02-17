@@ -1,5 +1,8 @@
 package wolkenschloss.gradle.testbed.status
 
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import wolkenschloss.gradle.testbed.domain.BuildDomain
@@ -10,14 +13,14 @@ import wolkenschloss.gradle.testbed.download.DownloadDistribution
 import wolkenschloss.gradle.testbed.download.DownloadTasks
 import wolkenschloss.gradle.testbed.pool.PoolExtension
 
-class StatusTasks(domain: DomainExtension, pool: PoolExtension) {
-    val domain: DomainExtension
-    val pool: PoolExtension
 
-    init {
-        this.domain = domain
-        this.pool = pool
-    }
+class StatusTasks(
+    private val domain: DomainExtension,
+    private val pool: PoolExtension,
+    private val registry: Provider<String>,
+    private val certificate: Provider<RegularFile>,
+    private val truststore: Provider<RegularFile>
+) {
 
     fun register(tasks: TaskContainer) {
         val readKubeConfig: TaskProvider<CopyKubeConfig> =
@@ -41,6 +44,9 @@ class StatusTasks(domain: DomainExtension, pool: PoolExtension) {
                 this.knownHostsFile.convention(knownHostsFile)
                 downloadDir.convention(distributionDir)
                 baseImageFile.convention(downloadDistribution.map { d: DownloadDistribution -> d.baseImage.get() })
+                registry.convention(this@StatusTasks.registry)
+                certificate.convention(this@StatusTasks.certificate)
+                truststore.convention(this@StatusTasks.truststore)
             }
     }
 

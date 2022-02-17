@@ -2,6 +2,7 @@ import wolkenschloss.gradle.docker.BuildImageTask
 import wolkenschloss.gradle.docker.RunContainerTask
 import wolkenschloss.gradle.testbed.domain.BuildDomain
 import wolkenschloss.gradle.testbed.domain.DomainTasks
+import wolkenschloss.gradle.testbed.domain.PushImage
 import wolkenschloss.gradle.testbed.domain.CopyKubeConfig
 import java.nio.file.Paths
 import org.gradle.api.logging.LogLevel
@@ -13,10 +14,10 @@ import wolkenschloss.gradle.testbed.domain.DomainExtension
 plugins {
     id("com.github.wolkenschloss.testbed")
     id("com.github.wolkenschloss.docker")
-    id("com.github.wolkenschloss.ca")
 }
 
 defaultTasks("start")
+
 
 testbed {
     base {
@@ -48,8 +49,8 @@ tasks {
     val testbed: TestbedExtension by project.extensions
     val userHome = Paths.get(System.getProperty("user.home"))
 
-    val newRootCa by registering(CreateTask::class) {
-    }
+
+    val ca by existing(CreateTask::class)
 
     withType(RunContainerTask::class) {
         mount {
@@ -74,7 +75,7 @@ tasks {
                     target.set("/etc/hosts")
                 }
                 file {
-                    source.set(newRootCa.flatMap { it.certificate })
+                    source.set(ca.flatMap { it.certificate })
                     target.set("/usr/local/share/ca-certificates/ca.crt")
                 }
             }
@@ -96,7 +97,6 @@ tasks {
         imageId.convention(buildClientImage.get().imageId)
     }
 
-
     val info by registering(RunContainerTask::class) {
         logging.captureStandardOutput(LogLevel.QUIET)
         command.addAll("info.bash")
@@ -115,11 +115,11 @@ tasks {
                     target.set("/usr/local/bin/ca.bash")
                 }
                 file {
-                    source.set(newRootCa.flatMap { it.privateKey })
+                    source.set(ca.flatMap { it.privateKey })
                     target.set("/opt/app/ca.key")
                 }
                 file {
-                    source.set(newRootCa.flatMap { it.certificate })
+                    source.set(ca.flatMap { it.certificate })
                     target.set("/opt/app/ca.crt")
                 }
                 file {
@@ -128,7 +128,6 @@ tasks {
                 }
             }
         }
-
         command.addAll("ca.bash", "/mnt/app")
     }
 
@@ -150,6 +149,12 @@ tasks {
         logging.captureStandardOutput(LogLevel.QUIET)
         doNotTrackState("For side effects only")
         dependsOn(installCertManager)
+    }
+
+    val deployCommonImages by registering(PushImage::class) {
+        images.put("mongo:4.0.10", "mongo:4.0.10")
+        images.put("hello-world", "hello-world")
+        dependsOn(applyCommonServices)
     }
 
     val readRootCa by registering(RunContainerTask::class) {
@@ -192,6 +197,6 @@ tasks {
     }
 
     named("start") {
-        dependsOn(applyCommonServices)
+        dependsOn(deployCommonImages)
     }
 }

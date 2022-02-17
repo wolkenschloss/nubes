@@ -15,7 +15,6 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
         registerBuildDomainTask(tasks)
         registerReadKubeConfigTasks(tasks)
         registerStartTask(tasks)
-        registerCreateDockerConfigTasks(tasks)
     }
 
     private fun registerBuildDomainTask(tasks: TaskContainer) {
@@ -53,23 +52,9 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
         }
     }
 
-    private fun registerCreateDockerConfigTasks(tasks: TaskContainer) {
-        tasks.register(
-            CREATE_DOCKER_CONFIG_TASK_NAME,
-            CreateDockerConfig::class.java
-        ) {
-            group = GROUP_NAME
-            description = "Creates a Docker configuration file in order to be able to access the unsecured registration of the test bench."
-            dockerConfigFile.convention(extension.dockerConfigFile)
-            domain.convention(extension.name)
-            dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME))
-        }
-    }
-
     companion object {
         const val BUILD_DOMAIN_TASK_NAME = "buildDomain"
         const val READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig"
-        const val CREATE_DOCKER_CONFIG_TASK_NAME = "createDockerConfig"
         private const val START_TASK_NAME = "start"
         private const val GROUP_NAME = "domain"
 
@@ -77,7 +62,7 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
             tasks.register(START_TASK_NAME, DefaultTask::class.java) {
                 group = GROUP_NAME
                 description = "The all in one lifecycle start task. Have a cup of coffee."
-                dependsOn(tasks.named(CREATE_DOCKER_CONFIG_TASK_NAME))
+                dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME))
             }
         }
     }

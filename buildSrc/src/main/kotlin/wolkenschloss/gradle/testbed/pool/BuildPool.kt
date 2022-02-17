@@ -13,7 +13,6 @@ import java.nio.file.Files
 import java.util.*
 import javax.inject.Inject
 
-@CacheableTask
 abstract class BuildPool : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile

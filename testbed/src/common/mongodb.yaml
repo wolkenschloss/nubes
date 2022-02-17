@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-standalone
+  namespace: staging
+spec:
+  serviceName: database
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+        selector: mongodb-standalone
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongodb-standlone
+          image: localhost:32000/mongo:4.0.10
+          ports:
+            - containerPort: 27017
+              name: mongodb-port
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: admin
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: password
+          resources:
+            requests:
+              cpu: 300m
+              memory: 300Mi
+            limits:
+              cpu: 500m
+              memory: 500Mi
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+      spec:
+        storageClassName: microk8s-hostpath
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  labels:
+    app: database
+spec:
+  clusterIP: None
+  selector:
+    app: database
+  ports:
+    - port: 27017
+      name: mongodb-port

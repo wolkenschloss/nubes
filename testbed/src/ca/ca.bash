@@ -1,8 +1,6 @@
 #! /usr/bin/env bash
 
-# Creates a self signed root CA and installs cred-manager
-#
-# return ca on stdout
+# Install cert-manager and root ca
 
 SSL_DIR=$(realpath "${1?"usage: xxx BUILD_DIR"}")
 export SSL_DIR
@@ -25,23 +23,23 @@ set -ou pipefail
 echo "setup script functions"
 
 function create_secret() {
-#  if [ $secret_exists -ne 0 ]
-#  then
+  if [ $secret_exists -ne 0 ]
+  then
     echo "creating secret"
     kubectl create secret tls nubes-ca --key "$root_ca_key" --cert "$root_ca_crt" -n cert-manager
-#  fi
+  fi
 }
 
 function install_ca() {
-#  if [ $cert_manager_installed -ne 0 ]
-#  then
+  if [ $cert_manager_installed -ne 0 ]
+  then
       echo "installing cert manager"
 
       kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/$cert_manager_version/cert-manager.yaml
       create_secret
       cmctl check api --wait=10m
       kubectl apply -f /opt/app/ca-issuer.yaml
-#  fi
+  fi
 }
 
 echo "Current working directory: $(pwd)"
@@ -53,4 +51,3 @@ install_ca
 # print certificate to stdout
 #kubectl get secret -n cert-manager nubes-ca -o json | jq -r '.data."tls.crt"' | base64 -d | openssl x509
 # cat "$root_ca_crt"
-

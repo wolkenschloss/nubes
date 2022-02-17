@@ -4,20 +4,20 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
-import io.kotest.extensions.system.withEnvironment
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.file.shouldBeReadable
+import io.kotest.matchers.file.shouldContainFile
+import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.file.shouldNotBeWriteable
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.file.shouldBeReadable
-import io.kotest.matchers.file.shouldContainFile
-import io.kotest.matchers.file.shouldNotBeWriteable
 import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_clientAuth
 import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_serverAuth
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 import wolkenschloss.testing.createRunner
 import java.security.cert.X509Certificate
 import java.time.LocalDate
@@ -28,24 +28,23 @@ import java.util.*
 
 private const val digitalSignature = 0
 
-
 private const val keyCertSign = 5
 
 class CaPluginTest : FunSpec({
 
+    autoClose(Template("ca")).withClone {
         context("A project using com.github.wolkenschloss.ca gradle plugin") {
-            val fixture = Fixtures("ca").clone(tempdir())
             val xdgDataHome = tempdir()
             val environment = mapOf("XDG_DATA_HOME" to xdgDataHome.absolutePath)
 
-            context("executing execute create task") {
-                val result = fixture.createRunner()
-                    .withArguments("create")
+            context("executing ca task") {
+                val result = createRunner()
+                    .withArguments(CaPlugin.CREATE_TASK_NAME)
                     .withEnvironment(environment)
                     .build()
 
                 test("should be successful") {
-                    result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
+                    result.task(":${CaPlugin.CREATE_TASK_NAME}")!!.outcome shouldBe TaskOutcome.SUCCESS
                 }
 
                 test("should create self signed root certificate") {
@@ -66,6 +65,29 @@ class CaPluginTest : FunSpec({
                         shouldNotBeWriteable()
                     }
                 }
+
+                test("should create readonly private key") {
+                    assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.key")) {
+                        shouldNotBeWriteable()
+                        shouldBeReadable()
+                        readPrivateKey().algorithm shouldBe "RSA"
+                    }
+                }
+            }
+
+            context("executing truststore task") {
+                val result = createRunner()
+                    .withArguments(CaPlugin.TRUSTSTORE_TASK_NAME)
+                    .withEnvironment(environment)
+                    .build()
+
+                test("should execute successfully") {
+                    result.task(":${CaPlugin.TRUSTSTORE_TASK_NAME}")!!.outcome shouldBe TaskOutcome.SUCCESS
+                }
+
+                test("should create truststore file") {
+                    xdgDataHome.resolve("wolkenschloss/ca/ca.jks").shouldExist()
+                }
             }
 
             test("should customize validity") {
@@ -73,19 +95,21 @@ class CaPluginTest : FunSpec({
                 val start = ZonedDateTime.of(
                     LocalDate.of(2022, 2, 4),
                     LocalTime.MIDNIGHT,
-                    ZoneOffset.UTC)
+                    ZoneOffset.UTC
+                )
 
                 val end = ZonedDateTime.of(
                     LocalDate.of(2027, 2, 4),
                     LocalTime.MIDNIGHT,
-                    ZoneOffset.UTC)
+                    ZoneOffset.UTC
+                )
 
-                val result = fixture.createRunner()
-                    .withArguments("createWithValidity", "-DnotBefore=$start","-DnotAfter=$end")
+                val result = createRunner()
+                    .withArguments(CaPlugin.CREATE_TASK_NAME, "-DnotBefore=$start", "-DnotAfter=$end")
                     .withEnvironment(environment)
                     .build()
 
-                result.task(":createWithValidity")!!.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":${CaPlugin.CREATE_TASK_NAME}")!!.outcome shouldBe TaskOutcome.SUCCESS
 
                 val certificate = xdgDataHome.resolve("wolkenschloss/ca/ca.crt")
                     .readX509Certificate()
@@ -96,37 +120,21 @@ class CaPluginTest : FunSpec({
                 }
             }
 
-            test("should create readonly private key") {
-
-                val result = fixture.createRunner()
-                    .withArguments("create")
-                    .withEnvironment(environment)
-                    .build()
-
-                result.task(":create")!!.outcome shouldBe TaskOutcome.SUCCESS
-
-                assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.key")) {
-                    shouldNotBeWriteable()
-                    shouldBeReadable()
-                    readPrivateKey().algorithm shouldBe "RSA"
-                }
-            }
-
             test("should create output in user defined location") {
-                val result = fixture.createRunner()
+                val result = createRunner()
                     .withArguments("createInUserDefinedLocation")
                     .withEnvironment(environment)
                     .build()
 
                 result.task(":createInUserDefinedLocation")!!.outcome shouldBe TaskOutcome.SUCCESS
 
-                assertSoftly(fixture.resolve("build/ca")) {
+                assertSoftly(workingDirectory.resolve("build/ca")) {
                     shouldContainFile("ca.crt")
                     shouldContainFile("ca.key")
                 }
             }
         }
-
+    }
 }) {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerLeaf
 }

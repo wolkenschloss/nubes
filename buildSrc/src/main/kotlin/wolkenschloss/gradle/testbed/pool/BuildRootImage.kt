@@ -25,7 +25,6 @@ import javax.inject.Inject
  */
 // Wenn es mal wieder Probleme mit Permission Denied gibt, wenn die
 // VM startet soll: Einfach mal appamor für diese VM ausschalten:
-@CacheableTask
 abstract class BuildRootImage : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputFile

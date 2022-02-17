@@ -8,8 +8,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Nested
 import wolkenschloss.gradle.testbed.domain.DomainExtension
-import wolkenschloss.gradle.testbed.domain.RegistryService
-import wolkenschloss.gradle.testbed.domain.SecureShellService
 import wolkenschloss.gradle.testbed.download.BaseImageExtension
 import wolkenschloss.gradle.testbed.pool.PoolExtension
 import wolkenschloss.gradle.testbed.transformation.TransformationExtension
@@ -27,6 +25,7 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
         pool.initialize(runDirectory)
         baseImage.initialize()
         domain.initialize(runDirectory)
+
         return this
     }
 
@@ -62,6 +61,7 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
 
     @get:Nested
     abstract val transformation: TransformationExtension
+
     @Suppress("unused")
     fun transformation(action: Action<in TransformationExtension>) {
         action.execute(transformation)
@@ -90,5 +90,8 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
     }
 
     abstract val runDirectory: DirectoryProperty
+
     abstract val failOnError: Property<Boolean>
+
+    val registry: Provider<String> get() = domain.domainSuffix.map { "registry.$it" }
 }

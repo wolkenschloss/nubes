@@ -4,3 +4,4 @@ resources:
   - grafana-ingress.yaml
   - prometheus-ingress.yaml
   - staging-namespace.yaml
+  - mongodb.yaml

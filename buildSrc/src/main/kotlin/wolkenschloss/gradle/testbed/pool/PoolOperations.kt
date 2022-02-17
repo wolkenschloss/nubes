@@ -1,21 +1,16 @@
 package wolkenschloss.gradle.testbed.pool
 
-import org.gradle.api.Project
 import org.gradle.api.invocation.Gradle
-
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
-import org.gradle.kotlin.dsl.*
 import org.libvirt.Connect
 import org.libvirt.LibvirtException
 import org.libvirt.StoragePool
-import wolkenschloss.gradle.testbed.TestbedExtension
 import java.io.File
 import java.nio.file.Files
 import java.util.*
-import java.util.function.Consumer
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -23,7 +18,7 @@ abstract class PoolOperations : BuildService<BuildServiceParameters.None>, AutoC
     private val connection: Connect = Connect("qemu:///system")
 
     fun destroy(poolId: UUID) {
-        fallsPoolExistiert(poolId) { pool: StoragePool ->
+        fallsPoolExistiert(poolId) { pool ->
             pool.destroy()
             pool.undefine()
         }
@@ -50,12 +45,12 @@ abstract class PoolOperations : BuildService<BuildServiceParameters.None>, AutoC
             .collect(Collectors.toList())
     }
 
-    private fun fallsPoolExistiert(poolId: UUID, consumer: StoragePoolConsumer) {
+    private fun fallsPoolExistiert(poolId: UUID, consumer: (StoragePool) -> Unit) {
         for (poolName in allPools()) {
             val pool = connection.storagePoolLookupByName(poolName)
             try {
                 if (pool.uuidString == poolId.toString()) {
-                    consumer.accept(pool)
+                    consumer(pool)
                 }
             } finally {
                 pool.free()
@@ -75,7 +70,7 @@ abstract class PoolOperations : BuildService<BuildServiceParameters.None>, AutoC
                 pool = connection.storagePoolLookupByName(poolName)
                 consumer(pool)
             } catch (exception: LibvirtException) {
-                throw RuntimeException("Unknown storage pool", exception)
+                throw RuntimeException("Unknown storage pool $poolName", exception)
             } finally {
                 pool?.free()
             }

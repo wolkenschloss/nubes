@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 
 class DockerServiceTest : DescribeSpec({
 
@@ -38,24 +38,24 @@ class DockerServiceTest : DescribeSpec({
                 }
 
                 describe("configured with base directory") {
-                    val fixture = Fixtures("docker/hello").clone(tempdir())
+                    autoClose(Template("docker/hello")).withClone {
+                        hello {
+                            inputDir.set(this@withClone.workingDirectory)
+                        }
+
+                        it("should build docker image") {
+                            hello.get().execute()
+
+                            val imageId = hello.get().imageId.get().asFile.readText()
+                            val docker = DockerService.getInstance(project.gradle)
+
+                            docker.listImages()
+                                .map {it.shortId}
+                                .shouldContain(imageId)
+                        }
+                    }
                     afterTest {
                         hello.forceRemoveImage()
-                    }
-
-                    hello {
-                        inputDir.set(fixture)
-                    }
-
-                    it("should build docker image") {
-                        hello.get().execute()
-
-                        val imageId = hello.get().imageId.get().asFile.readText()
-                        val docker = DockerService.getInstance(project.gradle)
-
-                        docker.listImages()
-                            .map {it.shortId}
-                            .shouldContain(imageId)
                     }
                 }
             }

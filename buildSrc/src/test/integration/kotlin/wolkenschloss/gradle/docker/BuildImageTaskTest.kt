@@ -14,7 +14,7 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.testing.Fixtures
+import wolkenschloss.testing.Template
 
 class BuildImageTaskTest : DescribeSpec({
 
@@ -73,32 +73,33 @@ class BuildImageTaskTest : DescribeSpec({
                 }
 
                 describe("Dockerfile with arguments") {
-                    val fixture = Fixtures("docker/withargs").clone(tempdir())
-                    val imagewithargs by registering(BuildImageTask::class) {
-                        inputDir.set(fixture)
-                    }
-
-                    afterTest { imagewithargs.forceRemoveImage() }
-
-                    it("should be possible to set args") {
-                        imagewithargs {
-                            args.put("BASE", "scratch")
+                    autoClose(Template("docker/withargs")).withClone {
+                        val imagewithargs by registering(BuildImageTask::class) {
+                            inputDir.set(this@withClone.workingDirectory)
                         }
 
-                        imagewithargs.get().execute()
+                        afterTest { imagewithargs.forceRemoveImage() }
 
-                        DockerService.getInstance(project.gradle)
-                            .listImages()
-                            .map { it.shortId }
-                            .shouldContain(imagewithargs.get().imageId.get().asFile.readText())
-                    }
+                        it("should be possible to set args") {
+                            imagewithargs {
+                                args.put("BASE", "scratch")
+                            }
 
-                    it("should fail with no args") {
-                        val exception = shouldThrowExactly<DockerClientException> {
                             imagewithargs.get().execute()
+
+                            DockerService.getInstance(project.gradle)
+                                .listImages()
+                                .map { it.shortId }
+                                .shouldContain(imagewithargs.get().imageId.get().asFile.readText())
                         }
 
-                        exception.message shouldBe "Could not build image: base name (\${BASE}) should not be blank"
+                        it("should fail with no args") {
+                            val exception = shouldThrowExactly<DockerClientException> {
+                                imagewithargs.get().execute()
+                            }
+
+                            exception.message shouldBe "Could not build image: base name (\${BASE}) should not be blank"
+                        }
                     }
                 }
             }

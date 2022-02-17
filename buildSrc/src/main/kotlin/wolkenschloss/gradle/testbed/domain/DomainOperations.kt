@@ -137,14 +137,6 @@ abstract class DomainOperations : BuildService<BuildServiceParameters.None>, Aut
         }
     }
 
-    fun registry(domainName: Provider<String>): RegistryService {
-        try {
-            return RegistryService(ipAddress(domainName))
-        } catch (throwable: Throwable) {
-            throw GradleException("Can not create registry service", throwable)
-        }
-    }
-
     override fun close() {
         connection.close()
     }
