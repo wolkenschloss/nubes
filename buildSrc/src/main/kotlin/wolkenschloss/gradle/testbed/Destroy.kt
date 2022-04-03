@@ -3,7 +3,6 @@ package wolkenschloss.gradle.testbed
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Destroys
@@ -29,6 +28,7 @@ abstract class Destroy : DefaultTask() {
     fun destroy() {
         project.exec {
             commandLine("multipass", "delete", domain.get())
+            isIgnoreExitValue = true
         }
 
         project.exec {

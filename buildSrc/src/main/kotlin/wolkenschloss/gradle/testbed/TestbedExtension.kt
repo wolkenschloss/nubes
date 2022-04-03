@@ -51,7 +51,6 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
                 .map {hosts: List<String> -> hosts.map { host:String  -> "$host.${domain.domainSuffix.get()}" }}
                 .map { it.joinToString(" ") },
             "dns" to domain.dns.map { it.joinToString(" ") }, //OK
-            "static_ip" to domain.staticIp,
             "cert_manager_version" to domain.certManagerVersion,
             "certificate" to domain.certificate.map { it.asFile.readText() },
             "private_key" to domain.privateKey.map { it.asFile.readText() }

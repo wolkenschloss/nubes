@@ -5,8 +5,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 
-
-class DomainOperations(val execOperations: ExecOperations, val domainName: Provider<String>)  {
+class DomainOperations(private val execOperations: ExecOperations, private val domainName: Provider<String>)  {
 
     fun ipAddress(): String {
         ByteArrayOutputStream().use { stdout ->

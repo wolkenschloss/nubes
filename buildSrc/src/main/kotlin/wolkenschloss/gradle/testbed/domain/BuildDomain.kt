@@ -32,17 +32,13 @@ abstract class BuildDomain : DefaultTask() {
     @get:Input
     abstract val domainSuffix: Property<String>
 
-    @get:Input
-    abstract val staticIp: Property<String>
-
     @get:OutputFile
     abstract val hostsFile: RegularFileProperty
 
     @get:Inject
     abstract val execOperations: ExecOperations
 
-
-    data class Result(val output: String, val exitCode: Int);
+    data class Result(val output: String, val exitCode: Int)
 
     private fun execute(project: Project, action: ExecSpec.() -> Unit): Result {
         ByteArrayOutputStream().use {
@@ -69,27 +65,20 @@ abstract class BuildDomain : DefaultTask() {
 
     @TaskAction
     fun exec() {
-//        if (launch()) return
-        launch()
+        val launched = launch()
+        val ip = DomainOperations(execOperations, domain).ipAddress()
 
-//        val knownHostsFile = knownHostsFile.asFile.get()
-//        if (knownHostsFile.exists()) {
-//            val extension: Optional<TestbedExtension> = Optional.ofNullable(
-//                project.extensions.findByType(TestbedExtension::class.java))
-//
-//            val failOnError = extension
-//                .map { ext: TestbedExtension -> ext.failOnError.get()}
-//                .orElse(true)
-//
-//            return
-//        }
+        if (launched) {
+            updateHosts(ip)
+        }
 
-        updateHosts()
+        logger.lifecycle("Testbed IP Address: {}", ip)
     }
 
     private fun launch(): Boolean {
-        // TODO: Existiert die Testbed Instanz?
+
         logger.quiet("Prüfe, ob Instanz existiert")
+
         val r1 = execute(project) {
             commandLine("multipass", "info", "--format", "json", domain.get())
             isIgnoreExitValue = true
@@ -98,15 +87,15 @@ abstract class BuildDomain : DefaultTask() {
         if (r1.exitCode == 0) {
             val path = "\$.info.testbed.state"
             val state: String = JsonPath.parse(r1.output).read(path)
-            if (state == "Running") {
+            return if (state == "Running") {
                 logger.quiet("Die Instanz läuft bereits")
-                return true
+                false
             } else {
                 logger.quiet("Die Instanz wird gestartet")
                 execute(project) {
                     commandLine("multipass", "start", domain.get())
                 }
-                return true
+                false
             }
         }
 
@@ -123,14 +112,13 @@ abstract class BuildDomain : DefaultTask() {
                 "--cloud-init", "-"
             )
         }
-        return false
+        return true
     }
 
-    private fun updateHosts() {
+    private fun updateHosts(ip: String) {
         logger.info("create hosts file")
 
 
-        val ip = DomainOperations(execOperations, domain).ipAddress() //staticIp.get()
         val path = hostsFile.get().asFile
 
         if (path.exists()) {

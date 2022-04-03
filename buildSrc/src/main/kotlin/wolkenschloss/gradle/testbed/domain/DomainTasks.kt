@@ -20,13 +20,12 @@ class DomainTasks(private val extension: DomainExtension) {
 
         tasks.register(BUILD_DOMAIN_TASK_NAME,BuildDomain::class.java) {
             group = GROUP_NAME
-            description = "Starts the libvirt domain and waits for the callback."
+            description = "Launch testbed instance."
             domain.convention(extension.name)
             hostsFile.convention(extension.hostsFile)
             domainSuffix.convention(extension.domainSuffix)
             hosts.convention(extension.hosts)
             userData.convention(transform.userData)
-            staticIp.convention(extension.staticIp)
         }
     }
 

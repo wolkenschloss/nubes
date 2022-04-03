@@ -2,6 +2,57 @@
 
 Ein Prüfstand für Wolkenschloss zum Testen und Entwickeln.
 
+## TL;DR
+
+It works on my machine:
+
+* Intel Core i7 
+* Ubuntu 20.04, 
+* 16 GB RAM
+* 1 TB SSD.
+
+```bash
+sudo snap install multipass
+
+# testbed Instanz starten
+./gradlew :testbed:start
+
+# DNS überlisten:
+sudo cat testbed/build/run/hosts >> /etc/hosts
+sudo echo >> /etc/hosts
+
+# CA installieren (sollte auch irgendwie automatisiert werden):
+sudo copy $HOME/.local/share/wolkenschloss/ca/ca.crt /usr/local/share/ca-certificates
+sudo update-ca-certificates
+sudo systemctl restart docker
+# Zertifikat im Browser installieren
+# Firefox: Einstellungen > Datenschutz & Sicherheit > Zertifikate anzeigen... > Importieren...
+
+# Testbed Status abfragen:
+./gradlew :testbed:status
+
+# Projekt für Staging Umgebung bauen
+./gradlew build -Dquarkus.profile=staging
+
+# Staging Umgebung starten oder aktualisieren
+# Das ist nicht die beste Lösung. Der oben genannte Befehl sollte bereits
+# die Kubernetes Manifest aktualisieren.
+./gradlew :testbed:staging
+
+# testbed anhalten - Gibt Speicher und Prozessoren frei
+multipass stop testbed
+
+# testbed fortsetzen
+multipass start testbed
+
+# testbed endgültig löschen und alle Ressourcen freigeben:
+./gradlew :testbed:destroy
+
+
+# Shell auf dem Prüfstand öffnen:
+multipass shell testbed
+```
+
 ## Features
 
 ### Root CA
@@ -54,6 +105,15 @@ erreichen:
 
 ### Secure Container Registry
 
+Damit die Container Registry auf deinem Entwicklungsrechner richtig
+funktioniert, muss die Namensauflösung und Root CA eingerichtet sein.
+
+Folgender Aufruf sollte ohne Fehlermeldung ausgeführt werden können:
+
+```bash
+curl https://registry.wolkenschloss.local/v2/_catalog
+```
+
 ### Kubernetes Dashboard
 
 Das Kubernetes Dashboard kannst Du über die URL https://dashboard.wolkenschloss.local erreichen.
@@ -75,107 +135,54 @@ Der Prüfstand besteht aus einer virtuellen Maschine mit der [microk8s]
 [microk8s] Variante von [Kubernetes][k8s] und kann bei
 Bedarf automatisch erstellt und gestartet werden.
 
-## TL;DR
+## Zugriff auf den Prüfstand
 
-Das läuft so auf einem Intel Core i7 mit Ubuntu 20.04, 16 GB 
-RAM und 1 TB SSD.
+Du hast Zugriff auf den Prüfstand mit dem Befehl `multipass shell testbed`.
 
-```bash
-# Falls du keinen SSH Schlüssel besitzt, musst du einen anlegen
-ssh-keygen
+Nach der Einrichtung der Namensauflösung erhälst du Zugriff auf das Kubernetes Dashboard
+über dir URL https://dashboard.wolkenschloss.local
 
-# GPG Schlüssel zur Prüfung der Signatur installieren
-gpg --keyid-format long --keyserver hkp://keyserver.ubuntu.com \
-  --recv-keys 0x1A5D6C4C7DB87C81
-
-# System aktualisieren und benötigte Pakete installieren  
-sudo apt update && sudo apt -y upgrade
-sudo apt install -y qemu-kvm libvirt-daemon-system cloud-image-utils
-
-# Kubernetes Client installieren und konfigurieren
-sudo snap install kubectl --classic
-echo 'source <(kubectl completion bash)' >>~/.bashrc
-
-###############
-# NEU ANMELDEN
-###############
-
-# testbed erstellen
-./gradlew :testbed:start
-export KUBECONFIG=$(realpath testbed/build/run/kubeconfig)
-
-# testbed anhalten
-virsh shutdown testbed
-
-# testbed fortsetzen
-virsh start testbed
-
-# testbed endgültig löschen und alle Ressourcen freigeben:
-./gradlew :testbed:destroy
-
-# testbed ingress Konfiguration. Sollte automatisiert werden
-./gradlew :testbed:applyCommonServices
-
-# DNS überlisten:
-sudo cat testbed/build/run/hosts >> /etc/hosts
-sudo echo >> /etc/hosts
-
-# CA installieren (sollte auch irgendwie automatisiert werden):
-sudo copy $HOME/.local/share/wolkenschloss/ca/ca.crt /usr/local/share/ca-certificates
-sudo update-ca-certificates
-sudo systemctl restart docker
-# Zertifikat im Browser installieren
-# Firefox: Einstellungen > Datenschutz & Sicherheit > Zertifikate anzeigen... > Importieren...
-```
+Für die Anmeldung am Dashboard benötigst Du eine Kubernetes
+Konfigurationsdatei oder ein Token (Das Token befindet sich in der
+Konfigurationsdatei). Die Konfigurationsdatei findest Du in
+[build/run/kubeconfig](build/run/kubeconfig)
 
 ## IP-Adresse des Prüfstandes ermitteln
 
-Um mit ssh auf den Prüfstand zugreifen zu können oder die Oberfläche
-des Kubernetes Dashboards zu erreichen benötigst du die IP-Adresse des 
-Prüfstandes. Mit `virsh` kannst du die IP-Adresse ermitteln:
+Die IP-Adresse des Prüfstandes kannst Du mit dem Befehl `multipass info testbed`
+ermitteln. Die IP-Adresse benötigst Du zur Aktualisierung der Datei */etc/hosts*,
+wenn sich die IP-Adresse des Prüfstandes geändert hat oder Du eine neue Instanz
+erzeugt hast.
 
 ```bash
-$ virsh domifaddr testbed
- Name       MAC address          Protocol     Address
--------------------------------------------------------------------------------
- vnet0      52:54:00:8a:ba:90    ipv4         192.168.123.15/24
+user@develop:~$ multipass info testbed
+Name:           testbed
+State:          Running
+IPv4:           10.85.193.200
+                10.0.1.1
+                10.1.29.64
+Release:        Ubuntu 20.04.4 LTS
+Image hash:     f9b94982abcb (Ubuntu 20.04 LTS)
+Load:           0.84 0.51 0.46
+Disk usage:     3.8G out of 19.2G
+Memory usage:   1.1G out of 3.8G
+Mounts:         --
 ```
 
-## Kubernetes Dashboard
+Alternativ kannst du auch den Befehl `./gradlew :testbed:status` verwenden:
 
-Der Prüfstand besitzt ein Dashboard mit Weboberfläche:
-
-<https://dashboard.wolkenschloss.local/>
-
-Für die Anmeldung am Dashboard benötigst Du eine Kubernetes 
-Konfigurationsdatei oder ein Token (Das Token befindet sich in der 
-Konfigurationsdatei). Die Konfigurationsdatei findest Du in 
-[build/run/kubeconfig](build/run/kubeconfig) 
-
-## SSH Verbindung
-
-Sofern Du die Datei `/etc/hosts` so wie oben beschrieben angepasst hast,
-erreichst Du den Prüfstand mit: `ssh testbed.wolkenschloss.de`.
-
-Alternativ kannst Du den Testbed-Client `tbc` verwenden, wenn Du diesen
-installiert hast: 
-
+```bash
+user@develop:~/src/nubes$ ./gradlew :testbed:status
+> Task :testbed:status
+Status of testbed
+✓ IP Address     : 10.85.193.200
+✓ K8s config     : /home/user/nubes/testbed/build/run/kubeconfig
+✓ Testbed        : OK
+✓ Address        : registry.wolkenschloss.local
+✓ Upload Image   : registry.wolkenschloss.local/hello-world:latest
+✓ Catalogs       : hello-world
+✓ Registry       : OK
 ```
-ln -s $(realpath $HOME/.local/bin/tbc) $(realpath testbed/src/client.bash)
-```
-
-Mit dem Befehl `tbc` gelangst Du zu einer Shell in einem Docker Container.
-In diesem Container sind die Client-Programme für den Zugriff auf den 
-Prüfstand installiert und konfiguriert:
-
-* kubectl
-* cmctl
-* ssh
-* openssl
-
-
-[k8s]: https://kubernetes.io/
-[microk8s]: https://microk8s.io/docs
 
 ## Internas
 
