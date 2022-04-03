@@ -170,8 +170,6 @@ dependencies {
     }
 
     implementation(libraries.gradle.node.plugin)
-    implementation(libraries.libvirt)
-    implementation(libraries.jna)
     implementation(libraries.jib)
     implementation(libraries.jsonpath)
 

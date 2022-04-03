@@ -1,16 +1,14 @@
 package wolkenschloss.gradle.testbed.domain
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.existing
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
-import wolkenschloss.gradle.testbed.transformation.domainDescription
-import wolkenschloss.gradle.testbed.pool.BuildPool
+import wolkenschloss.gradle.testbed.transformation.userData
 
-class DomainTasks(private val extension: DomainExtension, private val port1: Provider<Int>) {
+class DomainTasks(private val extension: DomainExtension) {
     fun register(tasks: TaskContainer) {
         registerBuildDomainTask(tasks)
         registerReadKubeConfigTasks(tasks)
@@ -18,20 +16,17 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
     }
 
     private fun registerBuildDomainTask(tasks: TaskContainer) {
-        val buildPool by tasks.existing(BuildPool::class)
         val transform by tasks.existing(Copy::class)
 
         tasks.register(BUILD_DOMAIN_TASK_NAME,BuildDomain::class.java) {
             group = GROUP_NAME
-            dependsOn(buildPool)
             description = "Starts the libvirt domain and waits for the callback."
             domain.convention(extension.name)
-            port.convention(port1)
-            xmlDescription.convention(transform.domainDescription)
-            knownHostsFile.convention(extension.knownHostsFile)
             hostsFile.convention(extension.hostsFile)
             domainSuffix.convention(extension.domainSuffix)
             hosts.convention(extension.hosts)
+            userData.convention(transform.userData)
+            staticIp.convention(extension.staticIp)
         }
     }
 
@@ -46,7 +41,6 @@ class DomainTasks(private val extension: DomainExtension, private val port1: Pro
 
             description = "Copies the Kubernetes client configuration to the localhost for further use by kubectl."
             domain.convention(extension.name)
-            knownHostsFile.convention(extension.knownHostsFile)
             kubeConfigFile.convention(extension.kubeConfigFile)
             dependsOn(buildDomain)
         }

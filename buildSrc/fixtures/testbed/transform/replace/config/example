@@ -1,9 +1,3 @@
 ${hostname.get()}
 ${fqdn.get()}
-${user.get()}
 ${locale.get()}
-${callback_ip.get()}
-${callback_port.get()}
-${pool_directory.get()}
-${disks_root.get()}
-${disks_cidata.get()}

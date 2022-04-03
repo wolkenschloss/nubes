@@ -1,7 +1,8 @@
 resources:
+  - ca-issuer.yaml
   - dashboard-ingress.yaml
   - registry-ingress.yaml
-  - grafana-ingress.yaml
-  - prometheus-ingress.yaml
+#  - grafana-ingress.yaml
+#  - prometheus-ingress.yaml
   - staging-namespace.yaml
-  - mongodb.yaml
+#  - mongodb.yaml

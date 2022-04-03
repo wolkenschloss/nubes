@@ -24,7 +24,7 @@ docker-java = "3.2.12"
 quarkus-bom = { group = "io.quarkus", name = "quarkus-bom", version.ref = "quarkus"}
 quarkus-plugin = {group = "io.quarkus", name = "gradle-application-plugin", version.ref = "quarkus"}
 
-quarkus-container-docker = {module = "io.quarkus:quarkus-container-image-docker", version.ref = "quarkus"}
+
 quarkus-config-yaml = {module = "io.quarkus:quarkus-config-yaml" }
 quarkus-arc = {module = "io.quarkus:quarkus-arc"}
 #quarkus-web
@@ -37,6 +37,10 @@ quarkus-mongodb-panache = {module = "io.quarkus:quarkus-mongodb-panache"}
 quarkus-smallrye-reactive-messaging = {module = "io.quarkus:quarkus-smallrye-reactive-messaging"}
 #quarkus-templates
 quarkus-resteasy-reactive-qute = {module = "io.quarkus:quarkus-resteasy-reactive-qute" }
+
+#quarkus-deployment
+quarkus-container-docker = {module = "io.quarkus:quarkus-container-image-docker"}
+quarkus-kubernetes = {module = "io.quarkus:quarkus-kubernetes"}
 
 gradle-node-plugin = {module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradle-node-plugin"}
 awaitility = { group = "org.awaitility", name = "awaitility", version.ref = "awaitility" }
@@ -54,8 +58,6 @@ quarkus-junit-mockito = { module = "io.quarkus:quarkus-junit5-mockito", version.
 restassured = { module = "io.rest-assured:rest-assured" }
 
 # buildSrc only
-libvirt = { group = "org.libvirt", name = "libvirt", version.ref = "libvirt" }
-jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jib = { module = "com.google.cloud.tools:jib-core", version.ref = "jib" }
 jsonpath = { module = "com.jayway.jsonpath:json-path", version.ref = "jsonpath" }
 dockerjava = { module = "com.github.docker-java:docker-java-bom", version.ref = "docker-java" }
@@ -67,6 +69,7 @@ junit = ["junit-api", "junit-engine"]
 kotest = ["kotest-runner", "kotest-assertions-core"]
 quarkus-unit = ["quarkus-junit", "quarkus-junit-mockito", "restassured"]
 quarkus-integration = ["quarkus-junit", "restassured"]
+quarkus-deployment = ["quarkus-container-docker", "quarkus-kubernetes"]
 
 # buildSrc only
 docker-java = ["docker-java-core", "docker-java-zerodep"]

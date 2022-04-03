@@ -9,14 +9,9 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Destroys
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import wolkenschloss.gradle.testbed.domain.DomainOperations
-import wolkenschloss.gradle.testbed.pool.PoolOperations
-import java.util.*
 import javax.inject.Inject
 
 abstract class Destroy : DefaultTask() {
-    @get:Destroys
-    abstract val poolRunFile: RegularFileProperty
 
     @get:Destroys
     abstract val buildDir: DirectoryProperty
@@ -32,31 +27,14 @@ abstract class Destroy : DefaultTask() {
 
     @TaskAction
     fun destroy() {
-        destroyDomain()
-        destroyPool()
-        deleteBuildDirectory()
-    }
-
-    private fun destroyDomain() {
-        val domainOperations: DomainOperations = DomainOperations.getInstance(project.gradle).get()
-        val deleted = domainOperations.deleteDomainIfExists(domain)
-        if (deleted) {
-            logger.info("Domain deleted.")
+        project.exec {
+            commandLine("multipass", "delete", domain.get())
         }
-    }
 
-    private fun destroyPool() {
-
-        val poolOperations = PoolOperations.getInstance(project.gradle)
-        if (poolRunFile.get().asFile.exists()) {
-            val content = providerFactory.fileContents(poolRunFile)
-            val uuid = content.asText.map { name: String -> UUID.fromString(name) }.get()
-            poolOperations.get().destroy(uuid)
-            fileSystemOperations.delete { delete(poolRunFile) }
+        project.exec {
+            commandLine("multipass", "purge")
         }
-    }
 
-    private fun deleteBuildDirectory() {
         fileSystemOperations.delete { delete(buildDir) }
     }
 }

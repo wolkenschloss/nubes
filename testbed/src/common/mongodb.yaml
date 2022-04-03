@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: mongodb-standlone
-          image: localhost:32000/mongo:4.0.10
+          image: registry.wolkenschloss.local/mongo:4.0.10
           ports:
             - containerPort: 27017
               name: mongodb-port
