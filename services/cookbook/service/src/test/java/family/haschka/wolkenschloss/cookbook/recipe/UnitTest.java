@@ -2,7 +2,6 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 
 import com.mongodb.assertions.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.regex.Matcher;

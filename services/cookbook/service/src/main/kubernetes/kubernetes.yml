@@ -1,25 +1,25 @@
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dashboard
-  namespace: kube-system
+  name: cookbook-ingress
   annotations:
     cert-manager.io/cluster-issuer: ca-issuer
+    cert-manager.io/common-name: cookbook.wolkenschloss.local
     kubernetes.io/ingress.class: public
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   tls:
-  - hosts:
-      - dashboard.wolkenschloss.local
-    secretName: dashboard-cert
+    - hosts:
+        - cookbook.wolkenschloss.local
+      secretName: cookbook-cert
   rules:
-    - host: dashboard.wolkenschloss.local
+    - host: cookbook.wolkenschloss.local
       http:
         paths:
           - path: /
             pathType: ImplementationSpecific
             backend:
               service:
-                name: kubernetes-dashboard
+                name: cookbook
                 port:
-                  number: 443
+                  name: http

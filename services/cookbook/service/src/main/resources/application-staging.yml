@@ -1,3 +1,7 @@
 quarkus:
+  log:
+    level: INFO
   container-image:
     push: true
+  mongodb:
+    connection-string: mongodb://admin:password@mongodb:27017/?uuidRepresentation=STANDARD

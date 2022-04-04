@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Develop" pattern="src:family.haschka..*||src:wolkenschloss..*||test:family..*||test:wolkenschloss..*" />
+</component>

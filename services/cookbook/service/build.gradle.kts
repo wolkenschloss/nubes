@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.quarkus.container.docker)
+    implementation(libs.bundles.quarkus.deployment)
     implementation(libs.quarkus.config.yaml)
     implementation(libs.quarkus.arc)
     implementation(libs.quarkus.resteasy.reactive.jsonb)

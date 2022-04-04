@@ -23,7 +23,6 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
-
 class RegistryService(val name: String, private val truststore: RegularFileProperty) {
 
     private fun loadCertificate(certificate: Provider<RegularFile>): SSLContext {

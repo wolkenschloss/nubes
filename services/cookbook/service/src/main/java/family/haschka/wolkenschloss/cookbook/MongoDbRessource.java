@@ -1,7 +1,6 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import com.mongodb.client.MongoClient;
-import io.quarkus.arc.profile.UnlessBuildProfile;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;

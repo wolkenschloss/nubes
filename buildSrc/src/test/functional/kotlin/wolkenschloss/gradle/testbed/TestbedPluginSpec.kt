@@ -23,11 +23,6 @@ class TestbedPluginSpec : FunSpec({
                 assertSoftly(workingDirectory.resolve("build/config")) {
                     with(resolve("cloud-init")) {
                         shouldContainFile("user-data")
-                        shouldContainFile("network-config")
-                    }
-                    with(resolve("vm")) {
-                        shouldContainFile("domain.xml")
-                        shouldContainFile("pool.xml")
                     }
                 }
             }
@@ -42,13 +37,8 @@ class TestbedPluginSpec : FunSpec({
                 workingDirectory.resolve("build/config/example").readText() shouldBe """
                     testbed
                     testbed.wolkenschloss.local
-                    ${System.getProperty("user.name")}
                     ${System.getenv("LANG")}
-                    ${IpUtil.hostAddress}
-                    9191
-                    ${workingDirectory.resolve("build/pool").absolutePath}
-                    root.qcow2
-                    cidata.img
+                    
                 """.trimIndent()
             }
         }

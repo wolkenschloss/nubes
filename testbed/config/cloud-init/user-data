@@ -11,13 +11,11 @@ groups:
   - microk8s
 
 users:
-  - name: ${user.get()}
+  - name: ubuntu
     shell: '/bin/bash'
     groups:
       - sudo
       - microk8s
-    ssh_authorized_keys:
-      - ${sshKey.get()}
     sudo: 'ALL=(ALL) NOPASSWD: ALL'
 
 locale: ${locale.get()}
@@ -29,24 +27,73 @@ package_upgrade: False
 packages:
   - acpid
   - tzdata
-  - openssh-server
   - curl
-  - qemu-guest-agent
+  - jq
+
+ca_certs:
+  trusted: |
+${certificate.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
+write_files:
+  - path: /etc/testbed/kustomization.yaml
+    content: |
+      resources:
+        - coredns-config.yaml
+        - https://github.com/jetstack/cert-manager/releases/download/${cert_manager_version.get()}/cert-manager.yaml
+  - path: /etc/testbed/coredns-config.yaml
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: coredns
+        namespace: kube-system
+      data:
+        Corefile: |
+          .:53 {
+              errors
+              health {
+                  lameduck 5s
+              }
+              ready
+              kubernetes cluster.local in-addr.arpa ip6.arpa {
+                  pods insecure
+                  fallthrough in-addr.arpa ip6.arpa
+                  ttl 30
+              }
+              hosts {
+                10.0.1.1 ${hosts.get()}
+                fallthrough
+              }    
+              prometheus :9153
+              forward . /etc/resolv.conf
+              cache 30
+              loop
+              reload
+              loadbalance
+          }
+  - path: /etc/cloud/templates/hosts.debian.tmpl
+    content: |
+      ## template:jinja
+      127.0.1.1 {{fqdn}} {{hostname}}
+      127.0.0.1 localhost
+      10.0.1.1 ${hosts.get()}
+      ::1 localhost ip6-localhost ip6-loopback
+      ff02::1 ip6-allnodes
+      ff02::2 ip6-allrouters
 
 snap:
   commands:
     01: snap install microk8s --classic
-    02: microk8s enable dns storage ingress dashboard registry prometheus
+    02: microk8s enable dns storage ingress dashboard registry host-access
     03: microk8s status --wait-ready
+    04: microk8s.kubectl apply -k /etc/testbed
+    05: microk8s kubectl rollout restart -n kube-system deployment/coredns
 
 runcmd:
-  - systemctl start qemu-guest-agent
+  - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+  - cd /tmp
+  - curl -L -o cmctl.tar.gz https://github.com/jetstack/cert-manager/releases/latest/download/cmctl-linux-amd64.tar.gz
+  - tar xzf cmctl.tar.gz
+  - install cmctl /usr/local/bin
+  - export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+  - cmctl check api --wait=10m
 
-phone_home:
-  url: http://${callback_ip.get()}:${callback_port.get()}/${hostname.get()}
-  post:
-    - pub_key_ecdsa
-    - instance_id
-    - hostname
-    - fqdn
-  tries: 10

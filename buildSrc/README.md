@@ -438,4 +438,4 @@ Verzeichnis.
 [RunContainerTask]: src/main/kotlin/wolkenschloss/gradle/docker/RunContainerTask.kt
 [BuildImageTask]: src/main/kotlin/wolkenschloss/gradle/docker/RunContainerTask.kt
 [Docker]: src/main/kotlin/wolkenschloss/gradle/docker
-[Testbed]: src/main/java/wolkenschloss
+[Testbed]: src/main/kotlin/wolkenschloss/gradle/testbed
