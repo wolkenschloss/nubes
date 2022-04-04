@@ -3,5 +3,8 @@ quarkus:
     level: INFO
   container-image:
     push: true
+  kubernetes:
+    annotations:
+      "linkerd.io/inject": enabled
   mongodb:
     connection-string: mongodb://admin:password@mongodb:27017/?uuidRepresentation=STANDARD
