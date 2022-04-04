@@ -4,6 +4,6 @@ resources:
   - ca-issuer.yaml
   - dashboard-ingress.yaml
   - registry-ingress.yaml
+  - linkerd-ingress.yaml
 #  - grafana-ingress.yaml
 #  - prometheus-ingress.yaml
-#  - mongodb.yaml

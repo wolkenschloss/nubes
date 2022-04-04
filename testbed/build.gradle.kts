@@ -15,7 +15,7 @@ testbed {
     domain {
         name.set("testbed")
         domainSuffix.set(System.getProperty(DomainExtension.DOMAIN_SUFFIX_PROPERTY))
-        hosts.addAll("dashboard", "registry", "grafana", "prometheus", "cookbook")
+        hosts.addAll("dashboard", "registry", "grafana", "prometheus", "cookbook", "linkerd")
     }
 }
 
