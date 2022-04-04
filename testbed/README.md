@@ -15,6 +15,7 @@ It works on my machine:
 sudo snap install multipass
 
 # testbed Instanz starten
+# Run Configuration: testbed start
 ./gradlew :testbed:start
 
 # DNS überlisten:
@@ -29,14 +30,17 @@ sudo systemctl restart docker
 # Firefox: Einstellungen > Datenschutz & Sicherheit > Zertifikate anzeigen... > Importieren...
 
 # Testbed Status abfragen:
+# Run Configuration: testbed status
 ./gradlew :testbed:status
 
 # Projekt für Staging Umgebung bauen
+# Run Configuration: build staging
 ./gradlew build -Dquarkus.profile=staging
 
 # Staging Umgebung starten oder aktualisieren
 # Das ist nicht die beste Lösung. Der oben genannte Befehl sollte bereits
 # die Kubernetes Manifest aktualisieren.
+# Run Configuration: testbed staging
 ./gradlew :testbed:staging
 
 # testbed anhalten - Gibt Speicher und Prozessoren frei
@@ -46,6 +50,7 @@ multipass stop testbed
 multipass start testbed
 
 # testbed endgültig löschen und alle Ressourcen freigeben:
+# Run Configuration: testbed destroy
 ./gradlew :testbed:destroy
 
 

@@ -83,10 +83,11 @@ write_files:
 snap:
   commands:
     01: snap install microk8s --classic
-    02: microk8s enable dns storage ingress dashboard registry host-access
-    03: microk8s status --wait-ready
-    04: microk8s.kubectl apply -k /etc/testbed
-    05: microk8s kubectl rollout restart -n kube-system deployment/coredns
+    02: snap install kubectl --classic
+    03: microk8s enable dns storage ingress dashboard registry host-access
+    04: microk8s status --wait-ready
+    05: microk8s.kubectl apply -k /etc/testbed
+    06: microk8s kubectl rollout restart -n kube-system deployment/coredns
 
 runcmd:
   - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
@@ -96,4 +97,8 @@ runcmd:
   - install cmctl /usr/local/bin
   - export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
   - cmctl check api --wait=10m
+  - sudo -u ubuntu mkdir -p /home/ubuntu/.kube
+  - sudo -u ubuntu `microk8s config > /home/ubuntu/.kube/config`
+  - microk8s enable linkerd
+
 
