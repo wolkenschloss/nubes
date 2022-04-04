@@ -18,7 +18,6 @@ class TransformationTasks(private val values: Map<String, Provider<*>>,private v
     }
 
     companion object {
-        const val TRANSFORM_FILES_NAME = "transform"
         const val USER_DATA_FILE_NAME = "cloud-init/user-data"
     }
 }

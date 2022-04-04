@@ -1,8 +1,6 @@
 package wolkenschloss.gradle.testbed
 
 import com.jayway.jsonpath.JsonPath
-import io.kotest.assertions.shouldFail
-import io.kotest.core.script.describe
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import wolkenschloss.testing.Template

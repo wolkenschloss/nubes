@@ -23,11 +23,6 @@ class TestbedPluginSpec : FunSpec({
                 assertSoftly(workingDirectory.resolve("build/config")) {
                     with(resolve("cloud-init")) {
                         shouldContainFile("user-data")
-                        shouldContainFile("network-config")
-                    }
-                    with(resolve("vm")) {
-                        shouldContainFile("domain.xml")
-                        shouldContainFile("pool.xml")
                     }
                 }
             }
@@ -43,6 +38,7 @@ class TestbedPluginSpec : FunSpec({
                     testbed
                     testbed.wolkenschloss.local
                     ${System.getenv("LANG")}
+                    
                 """.trimIndent()
             }
         }

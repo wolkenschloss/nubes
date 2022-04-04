@@ -11,13 +11,11 @@ groups:
   - microk8s
 
 users:
-  - name: ${user.get()}
+  - name: ubuntu
     shell: '/bin/bash'
     groups:
       - sudo
       - microk8s
-    ssh_authorized_keys:
-      - ${sshKey.get()}
     sudo: 'ALL=(ALL) NOPASSWD: ALL'
 
 locale: ${locale.get()}
@@ -41,12 +39,3 @@ snap:
 
 runcmd:
   - systemctl start qemu-guest-agent
-
-phone_home:
-  url: http://${callback_ip.get()}:${callback_port.get()}/${hostname.get()}
-  post:
-    - pub_key_ecdsa
-    - instance_id
-    - hostname
-    - fqdn
-  tries: 10

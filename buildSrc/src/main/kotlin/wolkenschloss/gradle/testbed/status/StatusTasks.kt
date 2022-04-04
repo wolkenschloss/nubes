@@ -4,7 +4,6 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import wolkenschloss.gradle.testbed.domain.BuildDomain
 import wolkenschloss.gradle.testbed.domain.CopyKubeConfig
 import wolkenschloss.gradle.testbed.domain.DomainExtension
 import wolkenschloss.gradle.testbed.domain.DomainTasks

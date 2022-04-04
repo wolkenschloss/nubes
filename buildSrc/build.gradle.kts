@@ -147,13 +147,6 @@ gradlePlugin {
             implementationClass = "wolkenschloss.gradle.testbed.TestbedPlugin"
         }
 
-        create("DockerPlugin") {
-            id = "$namespace.docker"
-            displayName = "Wolkenschloss Docker Plugin"
-            description = "Creates docker images and executes container"
-            implementationClass = "wolkenschloss.gradle.docker.DockerPlugin"
-        }
-
         create("CaPlugin") {
             id = "$namespace.ca"
             displayName = "Wolkenschloss CA Plugin"

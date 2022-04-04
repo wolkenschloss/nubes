@@ -11,7 +11,7 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
         ByteArrayOutputStream().use { stdout ->
             execOperations.exec {
                 commandLine("multipass", "exec", domainName.get(), "--", "ip", "-p", "-json", "a")
-                standardOutput = stdout;
+                standardOutput = stdout
             }
 
             val path = "\$[?(@.ifname=='enp5s0')].addr_info[?(@.family=='inet')].local"
