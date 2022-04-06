@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - cookbook/service
   - mongodb
+  - gateway.yml
