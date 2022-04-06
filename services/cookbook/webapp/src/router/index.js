@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/',
     components: {
-      default: () => import(/* webpackChunkName: "contents" */ '../views/Contents')
+      default: () => import(/* webpackChunkName: "contents" */ '@/views/Contents')
     },
     props: {
       default: route => ({first: route.query.first || 0, last: route.query.last || 4})
@@ -21,7 +21,7 @@ const routes = [
     props: {default: true},
     components: {
       default: () =>
-          import(/* webpackChunkName: "details" */ '../views/Details.vue')
+          import(/* webpackChunkName: "details" */ '@/views/Details.vue')
     },
     meta: {title: "Recipe" }
   },
@@ -29,7 +29,7 @@ const routes = [
     name: 'ingredients',
     path: '/ingredients',
     components: {
-      default: () => import(/* webpackChunkName: "ingredients" */ '../views/Ingredients')
+      default: () => import(/* webpackChunkName: "ingredients" */ '@/views/Ingredients')
     },
     meta: {title: "Ingredients"}
   }

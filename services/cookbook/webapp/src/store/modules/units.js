@@ -1,5 +1,8 @@
 import axios from 'axios'
 import Vue from "vue";
+import {Resource} from "@/store/modules/resource";
+
+export const resource = new Resource('{+baseUrl}/units/groups')
 
 const state = () => ({
     groups: []
@@ -20,11 +23,12 @@ function unitEntries(unit) {
     return unit.values.map(u => {return {text: u, value: u}})
 }
 
+
 const actions = {
     async load({ commit }) {
 
         try {
-            const result = await axios.get('/units/groups')
+            const result = await axios.get(resource.url())
             console.log(JSON.stringify(result.data))
             commit('setGroups', result.data.groups)
         } catch (error) {

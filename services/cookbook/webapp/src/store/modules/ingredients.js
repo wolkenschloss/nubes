@@ -1,5 +1,7 @@
 import axios from 'axios'
+import {Resource} from "@/store/modules/resource";
 
+export const resource = new Resource("{+baseUrl}/ingredient{?params*}")
 const state = () => ({
     toc: [],
     filter: "",
@@ -24,7 +26,8 @@ const actions = {
         const to = from + itemsPerPage - 1;
 
         console.log(`loading ingredients from ${from} to ${to} search '${state.filter || ''}'`)
-        const uri = `/ingredient?from=${from}&to=${to}&q=${state.filter || ''}`
+        const context = {params: {from, to, q: state.filter || ''}}
+        const uri = resource.url(context)
         try {
             const response = await axios.get(uri)
             commit("setToc", {content: response.data.content, total: response.data.count})

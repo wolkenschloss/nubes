@@ -1,4 +1,7 @@
 import axios from 'axios'
+import {Resource} from "@/store/modules/resource";
+
+export const resource = new Resource("{+baseUrl}/recipe{?params*}")
 
 const state = () => ({
     toc: [],
@@ -21,10 +24,10 @@ const actions = {
         const {page, itemsPerPage} = state.pagination
         const from = (page - 1) * itemsPerPage;
         const to = from + itemsPerPage - 1;
-        const uri = `/recipe?from=${from}&to=${to}&q=${state.filter || ''}`
+        const context = {params: {from, to, q: state.filter || ''}}
 
         try {
-            const response = await axios.get(uri)
+            const response = await axios.get(resource.url(context))
             commit('setToc', {content: response.data.content, total: response.data.total})
         } catch (error) {
             console.log(error)

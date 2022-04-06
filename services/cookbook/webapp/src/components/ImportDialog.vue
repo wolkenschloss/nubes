@@ -31,6 +31,9 @@
 <script>
 import axios from "axios";
 import {mapActions} from 'vuex'
+import {Resource} from "@/store/modules/resource";
+
+const resource = new Resource("{+baseUrl}/job/{id}")
 
 export default {
   name: "ImportDialog",
@@ -48,7 +51,8 @@ export default {
       this.loading = true;
       const job = {order: this.url}
       try {
-        const response = await axios.post("/job", job)
+        const url = resource.url()
+        const response = await axios.post(url, job)
         await this.getJobResult(response.headers['location'])
         await this.queryRecipes();
       } catch (error) {

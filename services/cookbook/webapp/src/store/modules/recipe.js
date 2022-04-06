@@ -2,6 +2,9 @@ import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
 import {cloneDeep} from "lodash";
+import {Resource} from "@/store/modules/resource";
+
+export const resource = new Resource("{+baseUrl}/recipe/{id}{?servings}")
 
 const state = () => ({
     recipe: {},
@@ -19,25 +22,25 @@ const getters = {
 
 const actions = {
     async scale({commit, state}, servings) {
-        let url = `/recipe/${state.recipe._id}?servings=${servings}`
+        let url = resource.url({id: state.recipe._id, servings})
         const response = await axios.get(url)
         commit('setServings', servings)
         commit('setIngredients', response.data.ingredients)
     },
     async read({commit, state}, id) {
-        let url = "/recipe/" + id
+        let url = resource.url({id})
         const response = await axios.get(url)
         commit('setRecipe', response.data)
         commit('setServings', response.data.servings)
         commit('setIngredients', response.data.ingredients)
     },
     async destroy({commit, state}, id) {
-        let url = "/recipe/" + id
+        let url = resource.url({id})
         await axios.delete(url)
         router.push("/")
     },
     async update({commit, state}, recipe) {
-        let url = "/recipe/" + recipe._id;
+        let url = resource.url({id: recipe._id})
         await axios.put(url, recipe)
         commit('setRecipe', recipe)
         commit('setServings', recipe.servings)
@@ -55,7 +58,7 @@ const actions = {
         commit('setCopy', recipe)
     },
     async create({commit, state}, recipe) {
-        let url = "/recipe"
+        let url = resource.url()
         await axios.post(url, recipe)
         commit('setCopy', null) // Close Dialog
         this.dispatch("toc/queryRecipes", {}, {root: true})

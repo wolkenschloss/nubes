@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: ca-issuer
+    kubernetes.io/ingress.class: public
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+spec:
+  tls:
+    - hosts:
+        - staging.wolkenschloss.local
+      secretName: gateway-cert
+  rules:
+    - host: staging.wolkenschloss.local
+      http:
+        paths:
+          - path: /cookbook(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: cookbook
+                port:
+                  number: 80

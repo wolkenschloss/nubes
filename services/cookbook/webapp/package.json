@@ -12,6 +12,7 @@
     "axios": "^0.24.0",
     "jest-standard-reporter": "^2.0.0",
     "lodash": "^4.17.21",
+    "url-template": "^3.0.0",
     "vue": "^2.6.14",
     "vue-router": "^3.5.3",
     "vue-shortkey": "^3.1.7",

@@ -4,3 +4,5 @@ namespace: staging
 resources:
   - namespace.yml
   - ../../services
+patchesStrategicMerge:
+  - gateway.yml
