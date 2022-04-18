@@ -46,11 +46,18 @@ class TestbedPlugin : Plugin<Project> {
             .register(tasks)
 
         registerDestroyTask(testbed)
+        registerApplyTask(testbed)
+    }
+
+    private fun Project.registerApplyTask(testbed: TestbedExtension) {
+        tasks.register(APPLY_TASK_NAME, Apply::class.java) {
+            description = "Runs a kubectl apply -k command."
+            domain.convention(testbed.domain.name)
+            overlay.convention(project.rootProject.layout.projectDirectory.dir("services").asFile.absolutePath)
+        }
     }
 
     private fun Project.registerDestroyTask(testbed: TestbedExtension) {
-
-
         tasks.register(DESTROY_TASK_NAME, Destroy::class.java) {
             description = "Destroy testbed and delete all files."
             domain.convention(testbed.domain.name)
@@ -59,6 +66,7 @@ class TestbedPlugin : Plugin<Project> {
     }
 
     companion object {
+        const val APPLY_TASK_NAME = "apply"
         const val TESTBED_EXTENSION_NAME = "testbed"
         const val DESTROY_TASK_NAME = "destroy"
     }

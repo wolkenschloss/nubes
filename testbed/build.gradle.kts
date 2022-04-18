@@ -10,7 +10,6 @@ plugins {
 
 defaultTasks("start")
 
-
 testbed {
     domain {
         name.set("testbed")
@@ -20,46 +19,28 @@ testbed {
 }
 
 val multipass = listOf("multipass", "exec", testbed.domain.name.get(), "--")
+val docker = multipass + listOf("docker")
 val kubectl = multipass + listOf("microk8s", "kubectl")
+
+fun Project.mount(source: String, target: String, block: () -> Unit) {
+    exec {
+        commandLine = listOf("multipass", "mount", source, "${testbed.domain.name.get()}:${target}")
+    }
+
+    try {
+        block()
+    } finally {
+        exec {
+            commandLine = listOf("multipass", "umount", "${testbed.domain.name.get()}:${target}")
+        }
+    }
+}
+
 
 tasks {
     val buildDomain = named<BuildDomain>(DomainTasks.BUILD_DOMAIN_TASK_NAME)
     val testbed: TestbedExtension by project.extensions
     val ca by existing(CreateTask::class)
-
-//    val readRootCa by registering(Exec::class) {
-//        logging.captureStandardOutput(LogLevel.QUIET)
-//        commandLine = multipass + listOf(
-//            "/bin/bash",
-//            "-c",
-//            "microk8s kubectl get secrets -n cert-manager nubes-ca -o $'go-template={{index .data \\\"tls.crt\\\"}}' | base64 -d | openssl x509 -text"
-//        )
-//        doNotTrackState("For side effects only")
-//    }
-//
-//    val allCerts by registering(Exec::class) {
-//        logging.captureStandardOutput(LogLevel.QUIET)
-//        commandLine = multipass + listOf(
-//            "/bin/bash",
-//            "-c",
-//            "microk8s kubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o $'go-template={{index .data \\\"tls.crt\\\"}}'"
-//            // | base64 -d | openssl x509 -text
-//        )
-//        doNotTrackState("For side effects only")
-//    }
-//
-//    val certs by registering(RunContainerTask::class) {
-//        logging.captureStandardOutput(LogLevel.QUIET)
-//        command.addAll(
-//            "/bin/bash", "-c",
-//            "kubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o go-template='{{range .items}}{{index .data \"tls.crt\"}}{{\"\\n\"}}{{end}}' | base64 -d |openssl storeutl -noout -text /dev/stdin"
-//            // ubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o go-template='{{range .items}}{{index .data "tls.crt"}}{{"\n"}}{{end}}' | base64 -d |openssl storeutl -noout -text /dev/stdin | awk '/Issuer:/{printf $NF"\n"} /Subject: C=/{printf $NF"\n"} /DNS:/{x=gsub(/ *DNS:/, ""); printf "SANS=" $0"\n"}'
-////            "kubectl get secrets --field-selector type=kubernetes.io/tls --all-namespaces"
-//        )
-//        doNotTrackState("For side effects only")
-//    }
-
-    // NEU:
 
     val createSecret by registering(DefaultTask::class) {
         group = "server"
@@ -70,40 +51,27 @@ tasks {
         doLast {
             // TODO: benötigt laufende testbed Instanz
             // TODO: Verzeichnis kann bereits gemounted sein. Das ist aber kein Fehler.
-            project.exec {
-                commandLine = listOf(
-                    "multipass",
-                    "mount",
-                    wolkenschloss.gradle.testbed.Directories.certificateAuthorityHome.toAbsolutePath().toString(),
-                    "${testbed.domain.name.get()}:/home/ubuntu/ca"
-                )
-            }
-
-            // check if secret exists
-            val result = project.exec {
-                commandLine = kubectl + listOf(
-                    "get", "secrets/nubes-ca", "-n", "cert-manager"
-                )
-                isIgnoreExitValue = true
-            }
-
-            if (result.exitValue != 0) {
-                logger.info("Creating new secret nubes-ca.")
-                // TODO: Die Erstellung des Secrets kann fehlschlagen, dann muss umount trotzdem ausgeführt werden.
-                project.exec {
+            project.mount(wolkenschloss.gradle.testbed.Directories.certificateAuthorityHome.toAbsolutePath().toString(),"/home/ubuntu/ca") {
+                val result = project.exec {
                     commandLine = kubectl + listOf(
-                        "create", "secret", "tls", "nubes-ca",
-                        "--key", "/home/ubuntu/ca/ca.key",
-                        "--cert", "/home/ubuntu/ca/ca.crt",
-                        "-n", "cert-manager"
+                        "get", "secrets/nubes-ca", "-n", "cert-manager"
                     )
+                    isIgnoreExitValue = true
                 }
-            } else {
-                logger.info("Secret nubes-ca already exists.")
-            }
 
-            project.exec {
-                commandLine = listOf("multipass", "umount", "${testbed.domain.name.get()}:/home/ubuntu/ca")
+                if (result.exitValue != 0) {
+                    logger.info("Creating new secret nubes-ca.")
+                    project.exec {
+                        commandLine = kubectl + listOf(
+                            "create", "secret", "tls", "nubes-ca",
+                            "--key", "/home/ubuntu/ca/ca.key",
+                            "--cert", "/home/ubuntu/ca/ca.crt",
+                            "-n", "cert-manager"
+                        )
+                    }
+                } else {
+                    logger.info("Secret nubes-ca already exists.")
+                }
             }
         }
     }
@@ -139,21 +107,8 @@ tasks {
         doNotTrackState("For side effects only")
     }
 
-    val waitForRegistry by registering(Exec::class) {
-        doNotTrackState("For side effects only")
-        logging.captureStandardOutput(LogLevel.QUIET)
-        commandLine = kubectl + listOf(
-            "rollout",
-            "status",
-            "deployment/registry",
-            "--timeout=240s",
-            "-n",
-            "container-registry"
-        )
-    }
-
     val start by existing {
-        dependsOn(applyCommonServices, waitForRegistry, DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
+        dependsOn(applyCommonServices, DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
     }
 
     val staging by registering(DefaultTask::class) {
@@ -161,26 +116,39 @@ tasks {
         description = "apply staging overlay"
         logging.captureStandardOutput(LogLevel.QUIET)
         doLast {
-            project.exec {
-                commandLine = listOf(
-                    "multipass",
-                    "mount",
-                    project.rootProject.layout.projectDirectory.asFile.absolutePath,
-                    "${testbed.domain.name.get()}:/home/ubuntu/nubes"
-                )
-            }
+            project.mount(project.rootProject.layout.projectDirectory.asFile.absolutePath, "/home/ubuntu/nubes") {
+                project.exec {
+                    commandLine = docker + listOf("build", "-t", "nubes/generators/db-secret-generator", "/home/ubuntu/nubes/kustomize/db-secret-generator")
+                }
 
-            project.exec {
-                commandLine = kubectl + listOf("apply", "-k", "/home/ubuntu/nubes/overlays/staging")
-            }
-
-            project.exec {
-                commandLine = listOf("multipass", "umount", "${testbed.domain.name.get()}:/home/ubuntu/nubes")
+                project.exec {
+                    commandLine = multipass + listOf(
+                        "/bin/bash",
+                        "-c",
+                        "microk8s kubectl kustomize --enable-alpha-plugins /home/ubuntu/nubes/overlays/staging/ | microk8s kubectl apply -f -"
+                    )
+                }
             }
         }
 
         // Diese Abhängigkeit ist nicht so optimal.
         // Staging ist irgendwie abhängig von allen Service Projekten
-        dependsOn(start)
+//        dependsOn(start)
+    }
+
+    val kustomize by registering(DefaultTask::class) {
+        group = "client"
+        description = "run kubectl kustomize and print result"
+        logging.captureStandardOutput(LogLevel.QUIET)
+        doLast {
+            project.mount(project.rootProject.layout.projectDirectory.asFile.absolutePath, "/home/ubuntu/nubes") {
+                project.exec {
+                    commandLine = docker + listOf("build", "-t", "nubes/generators/db-secret-generator", "/home/ubuntu/nubes/kustomize/db-secret-generator")
+                }
+                project.exec {
+                    commandLine = kubectl + listOf("kustomize", "--enable-alpha-plugins", "/home/ubuntu/nubes/overlays/staging")
+                }
+            }
+        }
     }
 }

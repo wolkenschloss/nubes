@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    cert-manager.io/common-name: staging.wolkenschloss.local
+spec:
+  tls:
+    - hosts:
+        - staging.wolkenschloss.local
+      secretName: gateway-cert

@@ -26,6 +26,12 @@ abstract class Destroy : DefaultTask() {
 
     @TaskAction
     fun destroy() {
+
+        project.exec {
+            commandLine("multipass", "exec", domain.get(), "--", "/bin/bash", "-c",
+            "\"which microk8s && microk8s stop\"")
+            isIgnoreExitValue = true
+        }
         project.exec {
             commandLine("multipass", "delete", domain.get())
             isIgnoreExitValue = true
