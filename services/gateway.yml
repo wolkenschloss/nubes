@@ -16,6 +16,13 @@ spec:
     - host: staging.wolkenschloss.local
       http:
         paths:
+          - path: /dex(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: dex
+                port:
+                  number: 5556
           - path: /cookbook(/|$)(.*)
             pathType: Prefix
             backend:

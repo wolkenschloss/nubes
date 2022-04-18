@@ -3,8 +3,23 @@ quarkus:
     level: INFO
   container-image:
     push: true
+  kubernetes-config:
+    secrets:
+      enabled: true
   kubernetes:
+    env:
+      secrets: [db-secret]
+      mapping:
+        quarkus-mongodb-credentials-username:
+          from-secret: db-secret
+          with-key: username
+        quarkus-mongodb-credentials-password:
+          from-secret: db-secret
+          with-key: password
     annotations:
       "linkerd.io/inject": enabled
   mongodb:
-    connection-string: mongodb://admin:password@mongodb:27017/?uuidRepresentation=STANDARD
+    hosts:
+      - mongodb
+    credentials:
+      auth-source: admin
