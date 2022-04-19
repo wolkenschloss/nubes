@@ -60,6 +60,17 @@ abstract class Status : DefaultTask() {
                     .error("missing catalog hello-world")
             }
         }
+
+        check("TLS Secrets") {
+            domainOperations.readAllTlsSecrets()
+                .forEach {
+                    check(it.toString(), {it} ) {
+                        check {it.certificate.isValid()}
+                            .ok { "Valid until ${it.certificate.notAfter}"}
+                            .error("Expired at ${it.certificate.notAfter}")
+                    }
+                }
+        }
     }
 
     private fun <T> check(label: String, value: T, requiredCondition: Predicate<T>) {
