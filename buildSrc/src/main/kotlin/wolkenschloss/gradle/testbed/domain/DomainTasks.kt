@@ -13,6 +13,15 @@ class DomainTasks(private val extension: DomainExtension) {
         registerBuildDomainTask(tasks)
         registerReadKubeConfigTasks(tasks)
         registerStartTask(tasks)
+        registerTlsSecretsTasks(tasks)
+    }
+
+    private fun registerTlsSecretsTasks(tasks: TaskContainer) {
+        tasks.register(TLS_SECRETS_TASK_NAME, TlsSecretsTask::class.java) {
+            group = "other"
+            description = "Prints all TLS secrets and their certificates"
+            domainName.convention(extension.name)
+        }
     }
 
     private fun registerBuildDomainTask(tasks: TaskContainer) {
@@ -46,6 +55,7 @@ class DomainTasks(private val extension: DomainExtension) {
     }
 
     companion object {
+        const val TLS_SECRETS_TASK_NAME = "tlsSecrets"
         const val BUILD_DOMAIN_TASK_NAME = "buildDomain"
         const val READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig"
         private const val START_TASK_NAME = "start"

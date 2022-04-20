@@ -29,7 +29,7 @@ abstract class Destroy : DefaultTask() {
 
         project.exec {
             commandLine("multipass", "exec", domain.get(), "--", "/bin/bash", "-c",
-            "\"which microk8s && microk8s stop\"")
+            "microk8s stop || true")
             isIgnoreExitValue = true
         }
         project.exec {

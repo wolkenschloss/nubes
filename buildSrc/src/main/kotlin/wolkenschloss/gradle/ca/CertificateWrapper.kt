@@ -10,12 +10,6 @@ import java.io.StringReader
 import java.time.Instant
 import java.util.*
 
-fun parseCertificate(pemEncoding: String): X509CertificateHolder {
-    val parser = PEMParser(StringReader(pemEncoding))
-    val certHolder: X509CertificateHolder = parser.readObject() as X509CertificateHolder
-    return certHolder
-}
-
 class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
 
     val issuer: X500Name

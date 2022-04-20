@@ -31,7 +31,7 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
                 commandLine = multipass.map {
                     it + listOf(
                         "/bin/bash", "-c",
-                        "microk8s kubectl get secrets --all-namespaces --field-selector type=kubernetes.io/tls -o json"
+                        "microk8s kubectl get secrets --all-namespaces -o json"
                     )
                 }.get()
             }
@@ -42,6 +42,7 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
 
             return items
                 .map { it as JSONObject }
+                .filter { TlsSecret.containsCertificate(it) }
                 .map { TlsSecret.parse(it) }
         }
     }
