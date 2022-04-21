@@ -16,8 +16,6 @@ spec:
       app.kubernetes.io/name: dex
   template:
     metadata:
-#      annotations:
-#        linkerd.io/inject: enabled
       labels:
         app.kubernetes.io/version: v1
         app.kubernetes.io/name: dex

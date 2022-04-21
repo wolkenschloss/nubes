@@ -4,7 +4,7 @@ metadata:
   name: dex-config
 data:
   config.yml: |
-    issuer: https://staging.wolkenschloss.local/dex
+    issuer: https://dex.wolkenschloss.local
     
     storage:
       type: sqlite3

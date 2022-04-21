@@ -22,19 +22,43 @@ users:
 
 locale: ${locale.get()}
 
-package_update: True
-package_upgrade: True
+package_update: False
+package_upgrade: False
 
 packages:
-  - acpid
-  - tzdata
-  - curl
   - jq
   - docker.io
 
+snap:
+  commands:
+    - snap install microk8s --channel=1.23/stable --classic
+    - snap install kubectl --channel=1.23/stable --classic
+
+runcmd:
+  - microk8s enable dns storage ingress dashboard registry host-access
+  - microk8s status --wait-ready
+  - microk8s kubectl apply -f /etc/testbed/dns
+  - microk8s kubectl rollout restart -n kube-system deployment/coredns
+  - microk8s kubectl apply -k /etc/testbed/cert-manager
+  - microk8s kubectl rollout status deployment/registry --timeout=240s -n container-registry
+  - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+  - mkdir /run/cmctl && cd /run/cmctl
+  - curl -L -o cmctl.tar.gz https://github.com/jetstack/cert-manager/releases/latest/download/cmctl-linux-amd64.tar.gz
+  - tar xzf cmctl.tar.gz
+  - install cmctl /usr/local/bin
+  - export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+  - cmctl check api --wait=10m
+  - sudo -u ubuntu mkdir -p /home/ubuntu/.kube
+  - microk8s config > /home/ubuntu/.kube/config
+  - chown ubuntu:ubuntu /home/ubuntu/.kube/config
+  - microk8s kubectl apply -f /etc/testbed/linkerd
+  - microk8s kubectl apply -f /etc/testbed/ingress
+  - [ microk8s, enable, "linkerd:identity-external-issuer"]
+
 ca_certs:
-  trusted: |
-${certificate.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
+  trusted:
+    - |
+${certificate.get().split('\n').collect { ' ' * 6 + it }.join('\n')}
 write_files:
   - path: /etc/testbed/cert-manager/kustomization.yaml
     content: |
@@ -44,6 +68,7 @@ write_files:
         - name: nubes-ca
           namespace: cert-manager
           type: "kubernetes.io/tls"
+          files:
             - ca/tls.crt
             - ca/tls.key
       generatorOptions:
@@ -167,6 +192,8 @@ ${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
         ca:
           secretName: nubes-ca
       ---
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress      
       metadata:
         name: dashboard
         namespace: kube-system
@@ -199,6 +226,7 @@ ${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
         namespace: linkerd-viz
       data:
         auth: YWRtaW46JGFwcjEkbjdDdTZnSGwkRTQ3b2dmN0NPOE5SWWpFakJPa1dNLgoK
+      ---
       apiVersion: networking.k8s.io/v1
       kind: Ingress
       metadata:
@@ -268,30 +296,6 @@ ${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
       ff02::1 ip6-allnodes
       ff02::2 ip6-allrouters
 
-snap:
-  commands:
-    01: snap install microk8s --classic
-    02: snap install kubectl --classic
-    03: microk8s enable dns storage ingress dashboard registry host-access
-    04: microk8s status --wait-ready
-    05: microk8s.kubectl apply -f /etc/testbed/dns
-    06: microk8s kubectl rollout restart -n kube-system deployment/coredns
-    07: microk8s kubectl apply -k /etc/testbed/cert-manager
-    08: microk8s kubectl rollout status deployment/registry --timeout=240s -n container-registry
 
-runcmd:
-  - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-  - cd /tmp
-  - curl -L -o cmctl.tar.gz https://github.com/jetstack/cert-manager/releases/latest/download/cmctl-linux-amd64.tar.gz
-  - tar xzf cmctl.tar.gz
-  - install cmctl /usr/local/bin
-  - export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
-  - cmctl check api --wait=10m
-  - sudo -u ubuntu mkdir -p /home/ubuntu/.kube
-  - sudo -u ubuntu microk8s config > /home/ubuntu/.kube/config
-  - microk8s kubectl apply -f /etc/testbed/linkerd
-#  - microk8s enable "linkerd:identity-external-issuer"
-  - microk8s kubectl apply -f /etc/testbed/ingress
-#  - microk8s linkerd viz install | microk8s kubectl apply -f -
 
 
