@@ -22,26 +22,67 @@ users:
 
 locale: ${locale.get()}
 
-package_update: True
-package_upgrade: True
+package_update: False
+package_upgrade: False
 
 packages:
-  - acpid
-  - tzdata
-  - curl
   - jq
-#  - docker.io
+  - docker.io
+
+snap:
+  commands:
+    - snap install microk8s --channel=1.23/stable --classic
+    - snap install kubectl --channel=1.23/stable --classic
+
+runcmd:
+  - microk8s enable dns storage ingress dashboard registry host-access
+  - microk8s status --wait-ready
+  - microk8s kubectl apply -f /etc/testbed/dns
+  - microk8s kubectl rollout restart -n kube-system deployment/coredns
+  - microk8s kubectl apply -k /etc/testbed/cert-manager
+  - microk8s kubectl rollout status deployment/registry --timeout=240s -n container-registry
+  - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+  - mkdir /run/cmctl && cd /run/cmctl
+  - curl -L -o cmctl.tar.gz https://github.com/jetstack/cert-manager/releases/latest/download/cmctl-linux-amd64.tar.gz
+  - tar xzf cmctl.tar.gz
+  - install cmctl /usr/local/bin
+  - export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+  - cmctl check api --wait=10m
+  - sudo -u ubuntu mkdir -p /home/ubuntu/.kube
+  - microk8s config > /home/ubuntu/.kube/config
+  - chown ubuntu:ubuntu /home/ubuntu/.kube/config
+  - microk8s kubectl apply -f /etc/testbed/linkerd
+  - microk8s kubectl apply -f /etc/testbed/ingress
+  - [ microk8s, enable, "linkerd:identity-external-issuer"]
 
 ca_certs:
-  trusted: |
-${certificate.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
+  trusted:
+    - |
+${certificate.get().split('\n').collect { ' ' * 6 + it }.join('\n')}
 write_files:
-  - path: /etc/testbed/kustomization.yaml
+  - path: /etc/testbed/cert-manager/kustomization.yaml
     content: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      secretGenerator:
+        - name: nubes-ca
+          namespace: cert-manager
+          type: "kubernetes.io/tls"
+          files:
+            - ca/tls.crt
+            - ca/tls.key
+      generatorOptions:
+        disableNameSuffixHash: true
       resources:
-        - coredns-config.yaml
         - https://github.com/jetstack/cert-manager/releases/download/${cert_manager_version.get()}/cert-manager.yaml
-  - path: /etc/testbed/coredns-config.yaml
+  - path: /etc/testbed/cert-manager/ca/tls.crt
+    content: |
+${certificate.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
+  - path: /etc/testbed/cert-manager/ca/tls.key
+    content: |
+${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
+
+  - path: /etc/testbed/dns/coredns-config.yaml
     content: |
       apiVersion: v1
       kind: ConfigMap
@@ -72,6 +113,179 @@ write_files:
               reload
               loadbalance
           }
+  - path: /etc/testbed/linkerd/external-issuer.yaml
+    content: |
+      ---
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: linkerd
+      ---
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: linkerd-viz
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: linkerd-trust-anchor
+        namespace: linkerd
+      spec:
+        issuerRef:
+          name: ca-issuer
+          kind: ClusterIssuer
+        secretName: linkerd-trust-anchor
+        duration: 87600h
+        renewBefore: 87500h
+        isCA: true
+        commonName: root.linkerd.cluster.local
+        dnsNames:
+          - root.linkerd.cluster.local
+        privateKey:
+          algorithm: ECDSA
+        usages:
+          - crl sign
+          - cert sign
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: linkerd-trust-anchor
+        namespace: linkerd
+      spec:
+        ca:
+          secretName: linkerd-trust-anchor
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: linkerd-identity-issuer
+        namespace: linkerd
+      spec:
+        secretName: linkerd-identity-issuer
+        duration: 48h
+        renewBefore: 25h
+        issuerRef:
+          name: linkerd-trust-anchor
+          kind: Issuer
+        commonName: identity.linkerd.cluster.local
+        dnsNames:
+          - identity.linkerd.cluster.local
+        isCA: true
+        privateKey:
+          algorithm: ECDSA
+        usages:
+          - cert sign
+          - crl sign
+          - server auth
+          - client auth
+  - path: /etc/testbed/ingress/gateway.yaml
+    content: |
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: ca-issuer
+        namespace: cert-manager
+      spec:
+        ca:
+          secretName: nubes-ca
+      ---
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress      
+      metadata:
+        name: dashboard
+        namespace: kube-system
+        annotations:
+          cert-manager.io/cluster-issuer: ca-issuer
+          kubernetes.io/ingress.class: public
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      spec:
+        tls:
+        - hosts:
+            - dashboard.wolkenschloss.local
+          secretName: dashboard-cert
+        rules:
+          - host: dashboard.wolkenschloss.local
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: kubernetes-dashboard
+                      port:
+                        number: 443
+      ---
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: web-ingress-auth
+        namespace: linkerd-viz
+      data:
+        auth: YWRtaW46JGFwcjEkbjdDdTZnSGwkRTQ3b2dmN0NPOE5SWWpFakJPa1dNLgoK
+      ---
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: linkerd-ingress
+        namespace: linkerd-viz
+        annotations:
+          cert-manager.io/cluster-issuer: ca-issuer
+          kubernetes.io/ingress.class: public
+          nginx.ingress.kubernetes.io/upstream-vhost: web.linkerd-viz.svc.cluster.local:8084
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Origin "";
+            proxy_hide_header l5d-remote-ip;
+            proxy_hide_header l5d-server-id;
+          nginx.ingress.kubernetes.io/auth-type: basic
+          nginx.ingress.kubernetes.io/auth-secret: web-ingress-auth
+          nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+      spec:
+        tls:
+          - hosts:
+              - linkerd.wolkenschloss.local
+            secretName: linkerd-cert
+        rules:
+          - host: linkerd.wolkenschloss.local
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: web
+                      port:
+                        number: 8084
+      ---
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: registry-ingress
+        namespace: container-registry
+        annotations:
+          cert-manager.io/cluster-issuer: ca-issuer
+          cert-manager.io/common-name: registry.wolkenschloss.local
+          kubernetes.io/ingress.class: public
+          nginx.ingress.kubernetes.io/proxy-body-size: "5g"
+      spec:
+        tls:
+          - hosts:
+            - registry.wolkenschloss.local
+            secretName: registry-cert
+        rules:
+          - host: registry.wolkenschloss.local
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: registry
+                      port:
+                        name: registry
   - path: /etc/cloud/templates/hosts.debian.tmpl
     content: |
       ## template:jinja
@@ -82,27 +296,6 @@ write_files:
       ff02::1 ip6-allnodes
       ff02::2 ip6-allrouters
 
-snap:
-  commands:
-    01: snap install microk8s --classic
-    02: snap install kubectl --classic
-    03: microk8s enable dns storage ingress dashboard registry host-access
-    04: microk8s status --wait-ready
-    05: microk8s.kubectl apply -k /etc/testbed
-    06: microk8s kubectl rollout restart -n kube-system deployment/coredns
-    07: microk8s kubectl rollout status deployment/registry --timeout=240s -n container-registry
 
-runcmd:
-  - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-  - cd /tmp
-  - curl -L -o cmctl.tar.gz https://github.com/jetstack/cert-manager/releases/latest/download/cmctl-linux-amd64.tar.gz
-  - tar xzf cmctl.tar.gz
-  - install cmctl /usr/local/bin
-  - export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
-  - cmctl check api --wait=10m
-  - sudo -u ubuntu mkdir -p /home/ubuntu/.kube
-  - sudo -u ubuntu `microk8s config > /home/ubuntu/.kube/config`
-  - microk8s enable linkerd
-  - microk8s linkerd viz install | microk8s kubectl apply -f -
 
 

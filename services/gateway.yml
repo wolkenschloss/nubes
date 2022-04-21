@@ -22,7 +22,7 @@ spec:
               service:
                 name: dex
                 port:
-                  number: 5556
+                  name: web
           - path: /cookbook(/|$)(.*)
             pathType: Prefix
             backend:

@@ -16,8 +16,6 @@ quarkus:
         quarkus-mongodb-credentials-password:
           from-secret: db-secret
           with-key: password
-    annotations:
-      "linkerd.io/inject": enabled
   mongodb:
     hosts:
       - mongodb

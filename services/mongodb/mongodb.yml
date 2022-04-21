@@ -14,8 +14,6 @@ spec:
       labels:
         app: mongodb
         selector: mongodb-standalone
-      annotations:
-        linkerd.io/inject: enabled
     spec:
       terminationGracePeriodSeconds: 10
       containers:

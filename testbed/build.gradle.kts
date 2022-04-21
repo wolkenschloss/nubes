@@ -14,7 +14,7 @@ testbed {
     domain {
         name.set("testbed")
         domainSuffix.set(System.getProperty(DomainExtension.DOMAIN_SUFFIX_PROPERTY))
-        hosts.addAll("dashboard", "registry", "grafana", "prometheus", "cookbook", "linkerd")
+        hosts.addAll("dashboard", "registry", "grafana", "prometheus", "cookbook", "linkerd", "dex")
     }
 }
 
@@ -42,73 +42,8 @@ tasks {
     val testbed: TestbedExtension by project.extensions
     val ca by existing(CreateTask::class)
 
-    val createSecret by registering(DefaultTask::class) {
-        group = "server"
-        description = "create wolkenschloss root CA secret"
-        dependsOn(buildDomain, ca)
-        logging.captureStandardOutput(LogLevel.QUIET)
-
-        doLast {
-            // TODO: benötigt laufende testbed Instanz
-            // TODO: Verzeichnis kann bereits gemounted sein. Das ist aber kein Fehler.
-            project.mount(wolkenschloss.gradle.testbed.Directories.certificateAuthorityHome.toAbsolutePath().toString(),"/home/ubuntu/ca") {
-                val result = project.exec {
-                    commandLine = kubectl + listOf(
-                        "get", "secrets/nubes-ca", "-n", "cert-manager"
-                    )
-                    isIgnoreExitValue = true
-                }
-
-                if (result.exitValue != 0) {
-                    logger.info("Creating new secret nubes-ca.")
-                    project.exec {
-                        commandLine = kubectl + listOf(
-                            "create", "secret", "tls", "nubes-ca",
-                            "--key", "/home/ubuntu/ca/ca.key",
-                            "--cert", "/home/ubuntu/ca/ca.crt",
-                            "-n", "cert-manager"
-                        )
-                    }
-                } else {
-                    logger.info("Secret nubes-ca already exists.")
-                }
-            }
-        }
-    }
-
-    // TODO: Refactor - create Task apply in testbed plugin
-    val applyCommonServices by registering(DefaultTask::class) {
-        group = "server"
-        description = "install ingress for cluster services (dashboard, registry)"
-
-        logging.captureStandardOutput(LogLevel.QUIET)
-        dependsOn(createSecret)
-        doLast {
-            project.exec {
-                workingDir = project.layout.projectDirectory.asFile
-                commandLine = listOf("multipass", "mount", ".", "${testbed.domain.name.get()}:/home/ubuntu/testbed")
-            }
-
-            project.exec {
-                // TODO: benötigt mount
-                commandLine = kubectl + listOf(
-                    "apply",
-                    "-k",
-                    "/home/ubuntu/testbed/src/common"
-                )
-            }
-
-            project.exec {
-                workingDir = project.layout.projectDirectory.asFile
-                commandLine = listOf("multipass", "umount", "${testbed.domain.name.get()}:/home/ubuntu/testbed")
-            }
-        }
-
-        doNotTrackState("For side effects only")
-    }
-
     val start by existing {
-        dependsOn(applyCommonServices, DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
+        dependsOn(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
     }
 
     val staging by registering(DefaultTask::class) {
