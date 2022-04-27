@@ -1,5 +1,5 @@
 [versions]
-quarkus = "2.7.5.Final"
+quarkus = "2.8.2.Final"
 awaitility = "4.1.0"
 jsoup = "1.14.1"
 mockserver = "5.11.2"

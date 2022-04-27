@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.testcontainers.containers.Network;
-import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
 record ContainerNetwork(String id) implements Network {
 

@@ -4,21 +4,6 @@ plugins {
     id("io.quarkus")
 }
 
-sourceSets {
-    create("integrationTest") {
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
-    }
-}
-
-val integrationTestImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations.implementation.get())
-}
-
-val integrationTestRuntimeOnly: Configuration by configurations.getting {
-    extendsFrom(configurations.runtimeOnly.get())
-}
-
 tasks {
     val integrationTest by registering(Test::class) {
         description = "Runs integration tests."
@@ -47,7 +32,7 @@ tasks {
         }
     }
     check {
-        dependsOn(integrationTest.get())
+        dependsOn(integrationTest)
     }
 }
 
