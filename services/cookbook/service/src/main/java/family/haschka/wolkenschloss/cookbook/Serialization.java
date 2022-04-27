@@ -1,8 +1,8 @@
 package family.haschka.wolkenschloss.cookbook;
 
 import family.haschka.wolkenschloss.cookbook.recipe.*;
-import io.quarkus.mongodb.panache.jsonb.ObjectIdDeserializer;
-import io.quarkus.mongodb.panache.jsonb.ObjectIdSerializer;
+import io.quarkus.mongodb.panache.common.jsonb.ObjectIdDeserializer;
+import io.quarkus.mongodb.panache.common.jsonb.ObjectIdSerializer;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
