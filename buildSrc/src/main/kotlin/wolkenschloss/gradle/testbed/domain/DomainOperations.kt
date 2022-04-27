@@ -17,10 +17,13 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
                 standardOutput = stdout
             }
 
-            val path = "\$[?(@.ifname=='enp5s0')].addr_info[?(@.family=='inet')].local"
+            // multipass with qemu => ens3
+            // multipass with lxd => enp5s0
+            val path = "\$[?(@.ifname=='ens3')].addr_info[?(@.family=='inet')].local"
             return JsonPath.parse(stdout.toString()).read<List<String>>(path).single()
         }
     }
+
     fun readAllTlsSecrets(): List<TlsSecret> {
 
         val multipass = domainName.map { listOf("multipass", "exec", it, "--") }

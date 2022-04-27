@@ -19,8 +19,7 @@ sudo snap install multipass
 ./gradlew :testbed:start
 
 # DNS überlisten:
-sudo cat testbed/build/run/hosts >> /etc/hosts
-sudo echo >> /etc/hosts
+cat testbed/build/run/hosts | sudo tee -a /etc/hosts > /dev/null
 
 # CA installieren (sollte auch irgendwie automatisiert werden):
 sudo copy $HOME/.local/share/wolkenschloss/ca/ca.crt /usr/local/share/ca-certificates

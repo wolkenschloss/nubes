@@ -65,17 +65,14 @@ abstract class BuildDomain : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        val launched = launch()
+        launch()
         val ip = DomainOperations(execOperations, domain).ipAddress()
-
-        if (launched) {
-            updateHosts(ip)
-        }
+        updateHosts(ip)
 
         logger.lifecycle("Testbed IP Address: {}", ip)
     }
 
-    private fun launch(): Boolean {
+    private fun launch() {
 
         logger.quiet("Prüfe, ob Instanz existiert")
 
@@ -87,15 +84,15 @@ abstract class BuildDomain : DefaultTask() {
         if (r1.exitCode == 0) {
             val path = "\$.info.testbed.state"
             val state: String = JsonPath.parse(r1.output).read(path)
-            return if (state == "Running") {
+
+            if (state == "Running") {
                 logger.quiet("Die Instanz läuft bereits")
-                false
-            } else {
-                logger.quiet("Die Instanz wird gestartet")
-                execute(project) {
-                    commandLine("multipass", "start", domain.get())
-                }
-                false
+                return
+            }
+
+            logger.quiet("Die Instanz wird gestartet")
+            execute(project) {
+                commandLine("multipass", "start", domain.get())
             }
         }
 
@@ -103,16 +100,15 @@ abstract class BuildDomain : DefaultTask() {
         // Erzeuge:
         execute(project, userData) {
             commandLine(
-                "multipass", "launch",
-                "--cpus", "2",
-                "--disk", "20G",
-                "--mem", "4G",
-                "--name", domain.get(),
-                "--timeout", "900",
-                "--cloud-init", "-"
+                    "multipass", "launch",
+                    "--cpus", "2",
+                    "--disk", "20G",
+                    "--mem", "4G",
+                    "--name", domain.get(),
+                    "--timeout", "900",
+                    "--cloud-init", "-"
             )
         }
-        return true
     }
 
     private fun updateHosts(ip: String) {
@@ -128,13 +124,13 @@ abstract class BuildDomain : DefaultTask() {
         logger.info("Writing hosts file: {}", path.absolutePath)
 
         val hosts = Stream.concat(
-            Stream.of(ip),
-            Stream.concat(
-                Stream.of(domain.get()),
-                hosts.get().stream()
-            )
-                .map { host: String? -> String.format("%s.%s", host, domainSuffix.get()) })
-            .collect(Collectors.joining(" ")) + "\n"
+                Stream.of(ip),
+                Stream.concat(
+                        Stream.of(domain.get()),
+                        hosts.get().stream()
+                )
+                        .map { host: String? -> String.format("%s.%s", host, domainSuffix.get()) })
+                .collect(Collectors.joining(" ")) + "\n"
 
         path.writeText(hosts)
     }
