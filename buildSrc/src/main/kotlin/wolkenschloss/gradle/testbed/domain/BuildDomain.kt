@@ -85,15 +85,18 @@ abstract class BuildDomain : DefaultTask() {
             val path = "\$.info.testbed.state"
             val state: String = JsonPath.parse(r1.output).read(path)
 
+            logger.lifecycle("Testbed instance is in state {}", state)
+
             if (state == "Running") {
                 logger.quiet("Die Instanz läuft bereits")
-                return
             }
 
             logger.quiet("Die Instanz wird gestartet")
             execute(project) {
-                commandLine("multipass", "start", domain.get())
+                commandLine("multipass", "start", "--verbose", domain.get())
             }
+
+            return
         }
 
         logger.quiet("Instanz wird erzeugt")
