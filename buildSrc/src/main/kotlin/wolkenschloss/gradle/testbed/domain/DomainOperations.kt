@@ -13,14 +13,11 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
     fun ipAddress(): String {
         ByteArrayOutputStream().use { stdout ->
             execOperations.exec {
-                commandLine("multipass", "exec", domainName.get(), "--", "ip", "-p", "-json", "a")
+                commandLine(ipAddressCommandLine(domainName.get()))
                 standardOutput = stdout
             }
 
-            // multipass with qemu => ens3
-            // multipass with lxd => enp5s0
-            val path = "\$[?(@.ifname=='ens3')].addr_info[?(@.family=='inet')].local"
-            return JsonPath.parse(stdout.toString()).read<List<String>>(path).single()
+            return JsonPath.parse(stdout.toString()).read<List<String>>(ipAddressJsonPath).single()
         }
     }
 
@@ -48,5 +45,12 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
                 .filter { TlsSecret.containsCertificate(it) }
                 .map { TlsSecret.parse(it) }
         }
+    }
+
+    companion object {
+        // multipass with qemu => ens3
+        // multipass with lxd => enp5s0
+        const val ipAddressJsonPath = "\$[?(@.ifname=='ens3')].addr_info[?(@.family=='inet')].local"
+        fun ipAddressCommandLine(instance: String) = listOf("multipass", "exec", instance, "--", "ip", "-p", "-json", "a")
     }
 }
