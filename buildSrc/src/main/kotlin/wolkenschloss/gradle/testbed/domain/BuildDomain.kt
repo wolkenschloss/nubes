@@ -6,10 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecSpec
 import java.io.ByteArrayOutputStream
@@ -31,6 +28,18 @@ abstract class BuildDomain : DefaultTask() {
 
     @get:Input
     abstract val domainSuffix: Property<String>
+
+    @get:Input
+    abstract val disk: Property<String>
+
+    @get:Input
+    abstract val mem: Property<String>
+
+    @get:Input
+    abstract val cpus: Property<Int>
+
+    @get:Input
+    abstract val image: Property<String>
 
     @get:OutputFile
     abstract val hostsFile: RegularFileProperty
@@ -82,13 +91,14 @@ abstract class BuildDomain : DefaultTask() {
         }
 
         if (r1.exitCode == 0) {
-            val path = "\$.info.testbed.state"
+            val path = "\$.info.${domain.get()}.state"
             val state: String = JsonPath.parse(r1.output).read(path)
 
             logger.lifecycle("Testbed instance is in state {}", state)
 
             if (state == "Running") {
                 logger.quiet("Die Instanz läuft bereits")
+                return
             }
 
             logger.quiet("Die Instanz wird gestartet")
@@ -100,17 +110,19 @@ abstract class BuildDomain : DefaultTask() {
         }
 
         logger.quiet("Instanz wird erzeugt")
+
+        var commands = listOf<String>("multipass", "launch",
+                "--name", domain.get(),
+                "--timeout", "900")
+                .plus(cpus.map { listOf("--cpus", it.toString()) }.getOrElse(emptyList()))
+                .plus(disk.map { listOf("--disk", it) }.getOrElse(emptyList()))
+                .plus(mem.map { listOf("--mem", it) }.getOrElse(emptyList()))
+                .plus(listOf("--cloud-init", "-"))
+                .plus(image.map { listOf(it) }.getOrElse(emptyList()))
+
         // Erzeuge:
         execute(project, userData) {
-            commandLine(
-                    "multipass", "launch",
-                    "--cpus", "2",
-                    "--disk", "20G",
-                    "--mem", "4G",
-                    "--name", domain.get(),
-                    "--timeout", "900",
-                    "--cloud-init", "-"
-            )
+            commandLine = commands;
         }
     }
 

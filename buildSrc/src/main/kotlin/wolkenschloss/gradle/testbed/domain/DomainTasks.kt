@@ -27,7 +27,7 @@ class DomainTasks(private val extension: DomainExtension) {
     private fun registerBuildDomainTask(tasks: TaskContainer) {
         val transform by tasks.existing(Copy::class)
 
-        tasks.register(BUILD_DOMAIN_TASK_NAME,BuildDomain::class.java) {
+        tasks.register(BUILD_DOMAIN_TASK_NAME, BuildDomain::class.java) {
             group = GROUP_NAME
             description = "Launch testbed instance."
             domain.convention(extension.name)
@@ -35,6 +35,10 @@ class DomainTasks(private val extension: DomainExtension) {
             domainSuffix.convention(extension.domainSuffix)
             hosts.convention(extension.hosts)
             userData.convention(transform.userData)
+            disk.convention(extension.disk)
+            mem.convention(extension.mem)
+            cpus.convention(extension.cpus)
+            image.convention(extension.image)
         }
     }
 

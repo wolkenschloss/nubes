@@ -25,6 +25,10 @@ abstract class DomainExtension {
         certManagerVersion.convention("v1.7.1")
         privateKey.set(ca.flatMap { it.privateKey })
         certificate.set(ca.flatMap { it.certificate })
+        disk.convention(DEFAULT_DISK_SIZE)
+        mem.convention(DEFAULT_MEMORY_AMOUNT)
+        cpus.convention(DEFAULT_NUMBER_OF_CPUS)
+        image.convention(DEFAULT_IMAGE)
     }
 
 
@@ -44,7 +48,16 @@ abstract class DomainExtension {
     abstract val kubeConfigFile: RegularFileProperty
     abstract val dns: ListProperty<String>
 
+    abstract val disk: Property<String>
+    abstract val mem: Property<String>
+    abstract val cpus: Property<Int>
+    abstract val image: Property<String>
+
     companion object {
+        const val DEFAULT_IMAGE = "focal"
+        const val DEFAULT_NUMBER_OF_CPUS = 2
+        const val DEFAULT_MEMORY_AMOUNT = "4G"
+        const val DEFAULT_DISK_SIZE = "20G"
         const val DEFAULT_DNS = "8.8.8.8"
         const val DEFAULT_KNOWN_HOSTS_FILE_NAME = "known_hosts"
         const val DEFAULT_HOSTS_FILE_NAME = "hosts"
