@@ -36,7 +36,7 @@ class TestbedPluginSpec : FunSpec({
 
                 workingDirectory.resolve("build/config/example").readText() shouldBe """
                     testbed
-                    testbed.wolkenschloss.local
+                    testbed.wolkenschloss.test
                     ${System.getenv("LANG")}
                     
                 """.trimIndent()
@@ -54,7 +54,7 @@ class TestbedPluginSpec : FunSpec({
         test("should build successfully if the domain-suffix system property is passed as a parameter") {
             Template("testbed/suffix/missing").withClone {
                 val result = createRunner()
-                    .withArguments("help", "-D${DomainExtension.DOMAIN_SUFFIX_PROPERTY}=\"host.local\"")
+                    .withArguments("help", "-D${DomainExtension.DOMAIN_SUFFIX_PROPERTY}=\"host.test\"")
                     .build()
                 result.task(":help")!!.outcome shouldBe TaskOutcome.SUCCESS
             }

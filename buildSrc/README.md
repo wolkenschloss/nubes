@@ -210,7 +210,7 @@ testbed {
 
     domain {
         name = "testbed"
-        fqdn = "testbed.wolkenschloss.local"
+        fqdn = "testbed.wolkenschloss.test"
         locale = "$System.env.LANG"
         knownHostsFile = "$buildDir/run/known_hosts"
         kubeConfigFile = "$buildDir/run/kubeconfig"

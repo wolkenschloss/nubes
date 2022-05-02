@@ -7,13 +7,34 @@ Ein Prüfstand für Wolkenschloss zum Testen und Entwickeln.
 It works on my machine:
 
 * Intel Core i7 
-* Ubuntu 20.04, 
+* Ubuntu 22.04, 
 * 16 GB RAM
 * 1 TB SSD.
 
 ```bash
 sudo snap install multipass
+# Ubuntu 22.04:
+sudo apt install mkcert
 
+mkcert -install
+The local CA is now installed in the system trust store! ⚡️
+The local CA is now installed in the Firefox and/or Chrome/Chromium trust store (requires browser restart)! 🦊
+
+# Das ist wichtig! Es hilft ggf. vorher den Rechner neu zu starten.
+# Ich vermute, dass der Zertifikatsspeicher nicht zum Schreiben geöffnet
+# werden kann, solange der Browser geöffnet ist, bzw. nach dem Schließen
+# des Browser weiterhin Prozesse des Browsers laufen, die das Einspielen
+# des Zertifikats verhindern.
+#
+# Der Befehl mkcert -install ist unzuverlässig! Nach dem Aufruf unbedingt
+# prüfen, ob das Zertifikat im Browser vorhanden ist.
+
+ 
+# Zertifikat erstellen
+./gradlew :testbed:ca
+ cp ~/.local/share/wolkenschloss/ca/ca.crt ~/.local/share/mkcert/rootCA.pem
+ cp ~/.local/share/wolkenschloss/ca/ca.key ~/.local/share/mkcert/rootCA-key.pem
+ 
 # testbed Instanz starten
 # Run Configuration: testbed start
 ./gradlew :testbed:start
@@ -51,7 +72,6 @@ multipass start testbed
 # testbed endgültig löschen und alle Ressourcen freigeben:
 # Run Configuration: testbed destroy
 ./gradlew :testbed:destroy
-
 
 # Shell auf dem Prüfstand öffnen:
 multipass shell testbed
@@ -103,8 +123,8 @@ sudo cat /etc/hosts testbed/build/run/hosts > /etc/hosts
 Danach kannst Du die Dienste des Prüfstandes mit folgenden URLs
 erreichen:
 
-* https://dashboard.wolkenschloss.local
-* https://registry.wolkenschloss.local/v2/_catalog
+* https://dashboard.wolkenschloss.test
+* https://registry.wolkenschloss.test/v2/_catalog
 * ...
 
 ### Secure Container Registry
@@ -115,12 +135,12 @@ funktioniert, muss die Namensauflösung und Root CA eingerichtet sein.
 Folgender Aufruf sollte ohne Fehlermeldung ausgeführt werden können:
 
 ```bash
-curl https://registry.wolkenschloss.local/v2/_catalog
+curl https://registry.wolkenschloss.test/v2/_catalog
 ```
 
 ### Kubernetes Dashboard
 
-Das Kubernetes Dashboard kannst Du über die URL https://dashboard.wolkenschloss.local erreichen.
+Das Kubernetes Dashboard kannst Du über die URL https://dashboard.wolkenschloss.test erreichen.
 
 Für die Anmeldung benötigst Du entweder ein Token oder die Kubernetes
 Konfigurationsdatei.
@@ -143,8 +163,8 @@ Bedarf automatisch erstellt und gestartet werden.
 
 Du hast Zugriff auf den Prüfstand mit dem Befehl `multipass shell testbed`.
 
-Nach der Einrichtung der Namensauflösung erhälst du Zugriff auf das Kubernetes Dashboard
-über dir URL https://dashboard.wolkenschloss.local
+Nach der Einrichtung der Namensauflösung erhältst du Zugriff auf das Kubernetes Dashboard
+über dir URL https://dashboard.wolkenschloss.test
 
 Für die Anmeldung am Dashboard benötigst Du eine Kubernetes
 Konfigurationsdatei oder ein Token (Das Token befindet sich in der
@@ -182,8 +202,8 @@ Status of testbed
 ✓ IP Address     : 10.85.193.200
 ✓ K8s config     : /home/user/nubes/testbed/build/run/kubeconfig
 ✓ Testbed        : OK
-✓ Address        : registry.wolkenschloss.local
-✓ Upload Image   : registry.wolkenschloss.local/hello-world:latest
+✓ Address        : registry.wolkenschloss.test
+✓ Upload Image   : registry.wolkenschloss.test/hello-world:latest
 ✓ Catalogs       : hello-world
 ✓ Registry       : OK
 ```
@@ -230,15 +250,15 @@ Welcome to Ubuntu 20.04.4 LTS (GNU/Linux 5.4.0-1059-kvm x86_64)
 ...
 ubuntu@testbed:~$ microk8s kubectl run xbox -i --tty --rm --image alpine -- sh
 If you don't see a command prompt, try pressing enter.
-/ # nslookup registry.wolkenschloss.local
+/ # nslookup registry.wolkenschloss.test
 Server:		10.152.183.10
 Address:	10.152.183.10:53
 
-Name:	registry.wolkenschloss.local
+Name:	registry.wolkenschloss.test
 Address: 10.0.1.1
 
 ```
 
 Namensauflösung im Host:
 
-`multipass exec testbed -- nslookup registry.wolkenschloss.local`
+`multipass exec testbed -- nslookup registry.wolkenschloss.test`

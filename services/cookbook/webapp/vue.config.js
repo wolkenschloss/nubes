@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
     ? '/cookbook'
@@ -43,5 +41,17 @@ module.exports = {
         maxSize: 250000
       }
     }
+  },
+
+  pwa: {
+    name: 'Cookbook',
+    themeColor: '#009688',
+    msTileColor: '#000000',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+
+    // configure the workbox plugin
+    workboxPluginMode: 'InjectManifest',
+    workboxPluginMode: 'GenerateSW'
   }
 }

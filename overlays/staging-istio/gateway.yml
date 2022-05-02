@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: gateway
   annotations:
-    cert-manager.io/common-name: staging.wolkenschloss.local
+    cert-manager.io/common-name: staging.wolkenschloss.test
 spec:
   tls:
     - hosts:
-        - staging.wolkenschloss.local
+        - staging.wolkenschloss.test
       secretName: gateway-cert

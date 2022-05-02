@@ -56,6 +56,10 @@ tasks {
             .withPropertyName("scripts")
             .withPathSensitivity(PathSensitivity.RELATIVE)
 
+        inputs.dir("public")
+            .withPropertyName("public")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
         outputs.cacheIf { true }
 
         outputs.dir(destination)
