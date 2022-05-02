@@ -1,8 +1,5 @@
-import wolkenschloss.gradle.testbed.TestbedExtension
-import wolkenschloss.gradle.testbed.domain.BuildDomain
 import wolkenschloss.gradle.testbed.domain.DomainExtension
 import wolkenschloss.gradle.testbed.domain.DomainTasks
-import wolkenschloss.gradle.ca.CreateTask
 
 plugins {
     id("com.github.wolkenschloss.testbed")
@@ -38,9 +35,6 @@ fun Project.mount(source: String, target: String, block: () -> Unit) {
 
 
 tasks {
-    val buildDomain = named<BuildDomain>(DomainTasks.BUILD_DOMAIN_TASK_NAME)
-    val testbed: TestbedExtension by project.extensions
-    val ca by existing(CreateTask::class)
 
     val start by existing {
         dependsOn(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
@@ -65,10 +59,6 @@ tasks {
                 }
             }
         }
-
-        // Diese Abhängigkeit ist nicht so optimal.
-        // Staging ist irgendwie abhängig von allen Service Projekten
-//        dependsOn(start)
     }
 
     val kustomize by registering(DefaultTask::class) {

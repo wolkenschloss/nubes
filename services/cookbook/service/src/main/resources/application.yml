@@ -5,7 +5,7 @@ quarkus:
     group: nubes
     name: cookbook
     additional-tags: latest
-    registry: registry.${wolkenschloss.domain-suffix:wolkenschloss.local}
+    registry: registry.${wolkenschloss.domain-suffix:wolkenschloss.test}
   http:
     port: 8180
     access-log:

@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - staging.wolkenschloss.local
+        - staging.wolkenschloss.test
       secretName: gateway-cert
   rules:
-    - host: staging.wolkenschloss.local
+    - host: staging.wolkenschloss.test
       http:
         paths:
           - path: /dex(/|$)(.*)

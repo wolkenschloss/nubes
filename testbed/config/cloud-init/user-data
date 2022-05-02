@@ -204,10 +204,10 @@ ${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
       spec:
         tls:
         - hosts:
-            - dashboard.wolkenschloss.local
+            - dashboard.wolkenschloss.test
           secretName: dashboard-cert
         rules:
-          - host: dashboard.wolkenschloss.local
+          - host: dashboard.wolkenschloss.test
             http:
               paths:
                 - path: /
@@ -246,10 +246,10 @@ ${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
       spec:
         tls:
           - hosts:
-              - linkerd.wolkenschloss.local
+              - linkerd.wolkenschloss.test
             secretName: linkerd-cert
         rules:
-          - host: linkerd.wolkenschloss.local
+          - host: linkerd.wolkenschloss.test
             http:
               paths:
                 - path: /
@@ -267,16 +267,16 @@ ${private_key.get().split('\n').collect { ' ' * 5 + it }.join('\n')}
         namespace: container-registry
         annotations:
           cert-manager.io/cluster-issuer: ca-issuer
-          cert-manager.io/common-name: registry.wolkenschloss.local
+          cert-manager.io/common-name: registry.wolkenschloss.test
           kubernetes.io/ingress.class: public
           nginx.ingress.kubernetes.io/proxy-body-size: "5g"
       spec:
         tls:
           - hosts:
-            - registry.wolkenschloss.local
+            - registry.wolkenschloss.test
             secretName: registry-cert
         rules:
-          - host: registry.wolkenschloss.local
+          - host: registry.wolkenschloss.test
             http:
               paths:
                 - path: /

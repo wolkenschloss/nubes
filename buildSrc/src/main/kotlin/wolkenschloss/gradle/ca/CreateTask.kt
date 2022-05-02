@@ -6,9 +6,11 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter
+import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -83,20 +85,21 @@ abstract class CreateTask : DefaultTask() {
             val id =ByteArray(20)
             random.nextBytes(id)
 
-            val extendedKeyUsage = ExtendedKeyUsage(arrayOf(KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth))
-            val keyUsage = KeyUsage(KeyUsage.keyCertSign or KeyUsage.digitalSignature)
-
+            val keyUsage = KeyUsage(KeyUsage.keyCertSign)
+            val extUtils: JcaX509ExtensionUtils = JcaX509ExtensionUtils()
             val holder = createCertificateBuilder(keyPair)
                 .addExtension(Extension.basicConstraints, true, BasicConstraints(true).encoded)
                 .addExtension(Extension.keyUsage, false, keyUsage.encoded)
-                .addExtension(Extension.extendedKeyUsage, false, extendedKeyUsage.encoded)
+                .addExtension(Extension.subjectKeyIdentifier, false, extUtils.createSubjectKeyIdentifier(keyPair.public))
                 .build(contentSigner)
 
             val cert = JcaX509CertificateConverter()
                 .setProvider(BouncyCastleProvider())
                 .getCertificate(holder)
 
-            privateKey.writePem(keyPair.private) {
+            // mkcert accepts only private keys in pkcs8 format
+            val gen = JcaPKCS8Generator(keyPair.private, null)
+            privateKey.writePem(gen.generate()) {
                 val permission = hashSetOf(PosixFilePermission.OWNER_READ)
                 Files.setPosixFilePermissions(this.toPath(), permission)
             }
@@ -106,8 +109,6 @@ abstract class CreateTask : DefaultTask() {
                 Files.setPosixFilePermissions(this.toPath(), permission)
             }
 
-
-
         } catch (e: Exception) {
             throw GradleException("Cannot create certificate: ${e.message}", e)
         }
@@ -115,7 +116,7 @@ abstract class CreateTask : DefaultTask() {
 
     private fun generateKeyPair(): KeyPair {
         val keyPairGenerator = KeyPairGenerator.getInstance(KEYPAIR_GENERATOR_ALGORITHM)
-        keyPairGenerator.initialize(2048, random)
+        keyPairGenerator.initialize(3072, random)
         return keyPairGenerator.generateKeyPair()
     }
 
@@ -169,6 +170,6 @@ abstract class CreateTask : DefaultTask() {
 
         private const val SIGNING_ALGORITHM = "SHA256WithRSA"
 
-        val DEFAULT_VALIDITY_PERIOD: Period = Period.ofYears(5)
+        val DEFAULT_VALIDITY_PERIOD: Period = Period.ofYears(10)
     }
 }

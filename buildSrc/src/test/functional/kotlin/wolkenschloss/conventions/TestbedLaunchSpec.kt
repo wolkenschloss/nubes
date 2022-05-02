@@ -57,7 +57,7 @@ class TestbedLaunchSpec : FunSpec({
                    workingDirectory
                        .resolve("build/run/hosts")
                        .readText()
-                       .shouldBe("$ipAddress launch.fixture.local dummy1.fixture.local dummy2.fixture.local\n")
+                       .shouldBe("$ipAddress launch.fixture.test dummy1.fixture.test dummy2.fixture.test\n")
                }
 
                process.waitFor(30, TimeUnit.SECONDS).shouldBe(true)

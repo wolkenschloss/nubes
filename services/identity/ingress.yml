@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - dex.wolkenschloss.local
+        - dex.wolkenschloss.test
       secretName: dex-cert
   rules:
-    - host: dex.wolkenschloss.local
+    - host: dex.wolkenschloss.test
       http:
         paths:
           - path: /
