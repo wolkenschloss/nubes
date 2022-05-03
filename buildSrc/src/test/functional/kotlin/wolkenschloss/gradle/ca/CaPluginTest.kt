@@ -51,9 +51,7 @@ class CaPluginTest : FunSpec({
                     assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.crt").readX509Certificate()) {
                         basicConstraints shouldBeGreaterThan -1
                         basicConstraints shouldBe Int.MAX_VALUE
-                        keyUsage[digitalSignature] shouldBe true
                         keyUsage[keyCertSign] shouldBe true
-                        extendedKeyUsage.shouldContainExactly(listOf(id_kp_serverAuth.id, id_kp_clientAuth.id))
                         shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
                         subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
                     }

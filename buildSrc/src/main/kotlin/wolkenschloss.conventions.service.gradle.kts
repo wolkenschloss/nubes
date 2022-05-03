@@ -5,24 +5,6 @@ plugins {
 }
 
 tasks {
-    val integrationTest by registering(Test::class) {
-        description = "Runs integration tests."
-        group = "verification"
-        dependsOn("assemble")
-
-        systemProperty("build.output.directory", buildDir.absolutePath)
-        systemProperty("org.jboss.logging.provider", "slf4j")
-        systemProperty("java.util.logging.SimpleFormatter.format", "[JUNIT] %3\$s %4\$s: %5\$s%6\$s%n")
-
-        testClassesDirs = sourceSets["integrationTest"].output.classesDirs
-        classpath = sourceSets["integrationTest"].runtimeClasspath
-
-        reports {
-            junitXml.required.set(true)
-            html.required.set(true)
-        }
-    }
-
     named<Test>("test") {
         systemProperty("org.jboss.logging.provider", "slf4j")
         systemProperty("java.util.logging.SimpleFormatter.format", "[JUNIT] %3\$s %4\$s: %5\$s%6\$s%n")
@@ -30,9 +12,6 @@ tasks {
             junitXml.required.set(true)
             html.required.set(true)
         }
-    }
-    check {
-        dependsOn(integrationTest)
     }
 }
 

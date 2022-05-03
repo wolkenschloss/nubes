@@ -13,6 +13,9 @@ It works on my machine:
 
 ```bash
 sudo snap install multipass
+#sudo apt install lxd
+#sudo multipass set local.driver=lxd
+#snap connect multipass:lxd lxd
 # Ubuntu 22.04:
 sudo apt install mkcert
 
