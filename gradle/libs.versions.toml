@@ -14,16 +14,13 @@ gradle-node-plugin = "3.1.1"
 kotest = "4.6.3"
 
 # buildSrc only
-libvirt = "0.5.2"
-jna = "5.8.0"
 jib = "0.19.0"
 jsonpath = "2.6.0"
-docker-java = "3.2.12"
+bouncycastle = "1.71"
 
 [libraries]
 quarkus-bom = { group = "io.quarkus", name = "quarkus-bom", version.ref = "quarkus"}
 quarkus-plugin = {group = "io.quarkus", name = "gradle-application-plugin", version.ref = "quarkus"}
-
 
 quarkus-config-yaml = {module = "io.quarkus:quarkus-config-yaml" }
 quarkus-arc = {module = "io.quarkus:quarkus-arc"}
@@ -60,16 +57,14 @@ restassured = { module = "io.rest-assured:rest-assured" }
 # buildSrc only
 jib = { module = "com.google.cloud.tools:jib-core", version.ref = "jib" }
 jsonpath = { module = "com.jayway.jsonpath:json-path", version.ref = "jsonpath" }
-dockerjava = { module = "com.github.docker-java:docker-java-bom", version.ref = "docker-java" }
-docker-java-core = {module = "com.github.docker-java:docker-java-core", version.ref = "docker-java"}
-docker-java-zerodep = { module = "com.github.docker-java:docker-java-transport-zerodep", version.ref="docker-java"}
+bouncycastle-prov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-pkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-tls = { module = "org.bouncycastle:bctls-jdk18on", version.ref = "bouncycastle" }
 
 [bundles]
+bouncycastle = ["bouncycastle-prov", "bouncycastle-pkix", "bouncycastle-tls"]
 junit = ["junit-api", "junit-engine"]
 kotest = ["kotest-runner", "kotest-assertions-core"]
 quarkus-unit = ["quarkus-junit", "quarkus-junit-mockito", "restassured"]
 quarkus-integration = ["quarkus-junit", "restassured"]
 quarkus-deployment = ["quarkus-container-docker", "quarkus-kubernetes"]
-
-# buildSrc only
-docker-java = ["docker-java-core", "docker-java-zerodep"]

@@ -21,8 +21,6 @@
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
     </QsGradleRunConfiguration>
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

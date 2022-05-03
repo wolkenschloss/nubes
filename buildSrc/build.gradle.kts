@@ -165,8 +165,7 @@ dependencies {
     implementation(libraries.gradle.node.plugin)
     implementation(libraries.jib)
     implementation(libraries.jsonpath)
-
-    implementation(libraries.bundles.docker.java)
+    implementation(libraries.bundles.bouncycastle)
 
     // testing: basic test frameworks promoted to unit [test], integration and functional
     testingImplementation(libraries.bundles.junit)

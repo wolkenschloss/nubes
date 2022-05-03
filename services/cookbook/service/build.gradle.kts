@@ -2,7 +2,6 @@ import wolkenschloss.gradle.testbed.domain.DomainExtension
 
 plugins {
     id("wolkenschloss.conventions.service")
-    id("idea")
 }
 
 dependencies {
@@ -37,14 +36,5 @@ tasks {
         System.getProperty("quarkus.profile")?.also {
             inputs.property("profile", it)
         }
-    }
-}
-
-// Treat custom source set as a test source in IntelliJ IDEA
-// https://youtrack.jetbrains.com/issue/IDEA-151925#focus=Comments-27-5115263.0-0
-idea {
-    module {
-        testSourceDirs = testSourceDirs.plus(sourceSets["integrationTest"].java.srcDirs)
-        testResourceDirs = testResourceDirs.plus(sourceSets["integrationTest"].resources.srcDirs)
     }
 }

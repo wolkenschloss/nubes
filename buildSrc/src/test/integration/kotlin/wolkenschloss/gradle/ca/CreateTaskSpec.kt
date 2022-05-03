@@ -57,7 +57,7 @@ class CreateTaskSpec : FunSpec({
             }
             test("The default validity period is 5 years") {
                 val ca by project.tasks.existing(CreateTask::class)
-                ca.get().notAfter.get().shouldBeWithin(Duration.ofSeconds(5), ZonedDateTime.now().plusYears(5))
+                ca.get().notAfter.get().shouldBeWithin(Duration.ofSeconds(5), ZonedDateTime.now().plusYears(10))
             }
             test("should stop execution if certificate already exists") {
                 val certificate = tempfile()

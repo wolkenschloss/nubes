@@ -12,12 +12,12 @@ class ServiceTest : FunSpec({
         autoClose(Template("service")).withClone {
             beforeEach { build("clean") }
 
-            test("should build quarkus service"){
-                val result = build("build")
+            test("should run integrationTest") {
+                val result = build("quarkusIntTest")
 
                 result.tasks(TaskOutcome.SUCCESS)
                     .map { task -> task.path}
-                    .shouldContainAll(":test", ":integrationTest", ":build")
+                    .shouldContainAll(":test", ":quarkusIntTest", ":quarkusBuild")
             }
         }
     }
