@@ -11,17 +11,17 @@ class CaPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.tasks {
-            register(CREATE_TASK_NAME, CreateTask::class) {
+            val create = register(CREATE_TASK_NAME, CreateTask::class) {
                 group = CERTIFICATION_AUTHORITY_GROUP
                 notBefore.convention(today)
                 notAfter.convention(expireIn())
                 certificate.convention(
                     target.layout.projectDirectory.file(
-                        Directories.certificateAuthorityHome.resolve("ca.crt").toFile().absolutePath))
+                        Directories.certificateAuthorityHome.resolve(CA_CERTIFICATE_FILE_NAME).toFile().absolutePath))
 
                 privateKey.convention(
                     target.layout.projectDirectory.file(
-                        Directories.certificateAuthorityHome.resolve("ca.key").toFile().absolutePath))
+                        Directories.certificateAuthorityHome.resolve(CA_PRIVATE_KEY_FILE_NAME).toFile().absolutePath))
             }
 
             register(TRUSTSTORE_TASK_NAME, TruststoreTask::class) {
@@ -30,6 +30,17 @@ class CaPlugin : Plugin<Project> {
                 truststore.convention(
                     target.layout.projectDirectory.file(
                         Directories.certificateAuthorityHome.resolve("ca.jks").toFile().absolutePath))
+            }
+
+            withType(ServerCertificate::class) {
+                caCertificate.convention(create.flatMap { it.certificate })
+                caPrivateKey.convention(create.flatMap { it.privateKey })
+
+                val certPpath = Directories.certificateAuthorityHome.resolve("$name.pem").toAbsolutePath()
+                certificate.convention(target.layout.projectDirectory.file(certPpath.toFile().absolutePath))
+
+                val keyPath = Directories.certificateAuthorityHome.resolve("$name-key.pem").toAbsolutePath()
+                privateKey.convention(target.layout.projectDirectory.file(keyPath.toFile().absolutePath))
             }
         }
     }
@@ -45,5 +56,7 @@ class CaPlugin : Plugin<Project> {
         const val CERTIFICATION_AUTHORITY_GROUP = "ca"
         const val CREATE_TASK_NAME = "ca"
         const val TRUSTSTORE_TASK_NAME = "truststore"
+        const val CA_CERTIFICATE_FILE_NAME = "ca.crt"
+        const val CA_PRIVATE_KEY_FILE_NAME = "ca.key"
     }
 }
