@@ -1,5 +1,6 @@
 package wolkenschloss.gradle.ca
 
+import org.bouncycastle.asn1.x509.GeneralName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import wolkenschloss.gradle.testbed.Directories
@@ -35,12 +36,14 @@ class CaPlugin : Plugin<Project> {
             withType(ServerCertificate::class) {
                 caCertificate.convention(create.flatMap { it.certificate })
                 caPrivateKey.convention(create.flatMap { it.privateKey })
+                subjectAlternativeNames.convention(listOf(ServerCertificate.DnsName(name)))
 
-                val certPpath = Directories.certificateAuthorityHome.resolve("$name.pem").toAbsolutePath()
-                certificate.convention(target.layout.projectDirectory.file(certPpath.toFile().absolutePath))
+                val certPath = this.baseDirectory.map { it.resolve("crt.pem") }
+                certificate.convention(certPath.map { target.layout.projectDirectory.file(it.toAbsolutePath().toString()) } )
 
-                val keyPath = Directories.certificateAuthorityHome.resolve("$name-key.pem").toAbsolutePath()
-                privateKey.convention(target.layout.projectDirectory.file(keyPath.toFile().absolutePath))
+                val keyPath = this.baseDirectory.map { it.resolve("key.pem") }
+                privateKey.convention(keyPath.map { target.layout.projectDirectory.file(it.toAbsolutePath().toString()) })
+                onlyIf { outputs.files.none { it.exists() } }
             }
         }
     }

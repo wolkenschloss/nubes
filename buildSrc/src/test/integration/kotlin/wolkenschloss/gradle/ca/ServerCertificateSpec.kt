@@ -1,5 +1,6 @@
 package wolkenschloss.gradle.ca
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.system.withEnvironment
@@ -9,10 +10,16 @@ import org.gradle.kotlin.dsl.*
 import io.kotest.matchers.shouldBe
 import wolkenschloss.gradle.testbed.Directories
 import io.kotest.matchers.file.shouldStartWithPath
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.openssl.PEMParser
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import java.io.File
+import java.security.PrivateKey
 
 class ServerCertificateSpec : FunSpec({
     context("CA Gradle Plugin applied to a project") {
-        withEnvironment(mapOf("XDG_DATA_HOME" to tempdir().path)) {
+        val xdgDataHome = tempdir()
+        withEnvironment(mapOf("XDG_DATA_HOME" to xdgDataHome.absolutePath)) {
 
             val projectDir = tempdir()
             val project = ProjectBuilder.builder()
@@ -39,13 +46,33 @@ class ServerCertificateSpec : FunSpec({
 
             test("should have default certificate file name") {
                 val localhost by project.tasks.registering(ServerCertificate::class)
-                localhost.get().certificate.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("localhost.pem")
+                localhost.get().certificate.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("localhost/crt.pem")
             }
 
             test("should have default private key file name") {
                 val example by project.tasks.registering(ServerCertificate::class)
-                example.get().privateKey.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("example-key.pem")
+                example.get().privateKey.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("example/key.pem")
             }
+
+            fun File.readPrivateKey(): PrivateKey {
+                return reader().use {
+                    val parser = PEMParser(it)
+                    val convert = JcaPEMKeyConverter()
+                    val keyInfo = PrivateKeyInfo.getInstance(parser.readObject())
+                    convert.getPrivateKey(keyInfo)
+                }
+            }
+
+//            test("should create private key") {
+//                val ca by project.tasks.existing(CreateTask::class)
+//                val nubes by project.tasks.registering(ServerCertificate::class)
+//                println(nubes.get().privateKey.get().asFile.absoluteFile)
+//                ca.get().execute()
+//                nubes.get().create()
+//                assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/nubes-key.pem").readPrivateKey()) {
+//                    algorithm shouldBe "RSA"
+//                }
+//            }
         }
     }
 }) {

@@ -1,48 +1,102 @@
 package wolkenschloss.gradle.ca
 
+import org.bouncycastle.asn1.ASN1IA5String
+import org.bouncycastle.asn1.ASN1InputStream
+import org.bouncycastle.asn1.DEROctetString
+import org.bouncycastle.asn1.util.ASN1Dump
 import org.bouncycastle.asn1.x500.X500Name
+import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.asn1.x509.Extension
-import org.bouncycastle.asn1.x509.GeneralName
-import org.bouncycastle.asn1.x509.GeneralNames
 import org.bouncycastle.cert.X509CertificateHolder
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.openssl.PEMParser
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.gradle.internal.impldep.org.bouncycastle.asn1.DERUTF8String
+import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.StringReader
+import java.security.cert.*
 import java.time.Instant
 import java.util.*
 
-class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
+class CertificateWrapper(public val certificateHolder: X509CertificateHolder) {
 
-    val issuer: X500Name
+    val issuer
         get() = certificateHolder.issuer
 
-    val subject: X500Name
+    val subject
         get() = certificateHolder.subject
 
-    val notBefore: Date
+    val notBefore
         get() = certificateHolder.notBefore
 
-    val notAfter: Date
+    val notAfter
         get() = certificateHolder.notAfter
+
+    val keyUsage
+        get() = KeyUsage.fromExtensions(this.certificateHolder.extensions)
+
+    val extendedKeyUsages
+        get() = ExtendedKeyUsage.fromExtensions(this.certificateHolder.extensions).usages
+
+    val subjectKeyIdentifier
+        get() = SubjectKeyIdentifier.fromExtensions(this.certificateHolder.extensions).keyIdentifier
+
+    val authorityKeyIdentifier
+        get() = AuthorityKeyIdentifier.fromExtensions(this.certificateHolder.extensions)
+
+    val x509Certificate
+        get() = JcaX509CertificateConverter()
+            .setProvider(BouncyCastleProvider())
+            .getCertificate(certificateHolder)
+
+
+    fun validateChain(trustAnchor: CertificateWrapper) {
+        val certchain: List<X509Certificate> = listOf(this.x509Certificate)
+        val certPath = CertificateFactory.getInstance("X.509", BouncyCastleProvider()).generateCertPath(certchain)
+        val certPathValidator = CertPathValidator.getInstance("PKIX", BouncyCastleProvider())
+
+        val trust = hashSetOf(TrustAnchor(trustAnchor.x509Certificate, null))
+        val param = PKIXParameters(trust)
+        param.isRevocationEnabled = false
+        param.date = Date()
+
+        certPathValidator.validate(certPath, param)
+    }
 
     fun isValid(): Boolean {
         val now = Date.from(Instant.now())
         return !(now.before(certificateHolder.notBefore) || now.after(certificateHolder.notAfter))
     }
 
-    fun subjectAlternativeNames(): List<String> {
-        val names = GeneralNames.fromExtensions(
-            this.certificateHolder.extensions,
-            Extension.subjectAlternativeName
-        )
+    val subjectAlternativeNames: List<String>
+        get() {
 
-        if (names == null) {
-            return emptyList()
+            val names = GeneralNames.fromExtensions(
+                this.certificateHolder.extensions,
+                Extension.subjectAlternativeName
+            )
+
+            if (names == null) {
+                return emptyList()
+            }
+
+            return names.names.map {
+                val prim = it.name.toASN1Primitive()
+
+                val value = when (prim) {
+                    is ASN1IA5String -> prim.string
+                    is DEROctetString -> prim.toIpv4Address()
+                    else -> throw UnknownAsn1Primitive(it.name)
+                }
+
+                "${it.tag()}:$value"
+            }
         }
 
-        return names.names.map {
-            "${it.tag()}=${it.name.toASN1Primitive()}"
-        }
-    }
+    private fun DEROctetString.toIpv4Address() =
+        this.octets.map { o -> o.toString() }.joinToString(".")
+
 
     private fun GeneralName.tag(): String {
         return when (this.tagNo) {
@@ -63,13 +117,18 @@ class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
     }
 
     override fun toString(): String {
-        return "Subject: $subject, SAN: ${subjectAlternativeNames().joinToString(", ")}"
+        return "Subject: $subject, SAN: ${subjectAlternativeNames.joinToString(", ")}"
     }
+
     companion object {
         fun parse(pemEncoding: String): CertificateWrapper {
             val parser = PEMParser(StringReader(pemEncoding))
             val certHolder: X509CertificateHolder = parser.readObject() as X509CertificateHolder
             return CertificateWrapper(certHolder)
+        }
+
+        fun read(f: File): CertificateWrapper {
+            return parse(f.readText())
         }
     }
 }

@@ -23,7 +23,7 @@ abstract class TlsSecretsTask : DefaultTask() {
                 logger.lifecycle("${it.namespace}/${it.name}")
                 logger.lifecycle("Type: ${it.type}")
                 logger.lifecycle("Subject: ${it.certificate.subject}")
-                logger.lifecycle("SAN: ${it.certificate.subjectAlternativeNames().joinToString(", ")}")
+                logger.lifecycle("SAN: ${it.certificate.subjectAlternativeNames.joinToString(", ")}")
                 logger.lifecycle("Issuer: ${it.certificate.issuer}")
                 logger.lifecycle("not before: ${it.certificate.notBefore}")
                 logger.lifecycle("not after: ${it.certificate.notAfter}")

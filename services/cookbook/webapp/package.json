@@ -8,7 +8,7 @@
     "generate-maskable-icons": "pwa-asset-generator public/favicon.svg public/images/icons --icon-only --scrape=false",
     "generate-icons": "pwa-asset-generator public/favicon.svg public/images/icons --icon-only --maskable=false --scrape=false",
     "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e"
+    "test:e2e": "vue-cli-service test:e2e --headless"
   },
   "dependencies": {
     "@vue/vue2-jest": "^27.0.0",
@@ -25,7 +25,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
+    "@babel/core": "^7.17.10",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-e2e-cypress": "^5.0.4",
     "@vue/cli-plugin-pwa": "~5.0.4",

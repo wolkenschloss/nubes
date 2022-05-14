@@ -44,6 +44,7 @@ module.exports = {
     configureWebpack: {
         performance: {
             maxEntrypointSize: 700000,
+            // maxEntrypointSize: 819200,
             maxAssetSize: 512000
         },
         optimization: {
