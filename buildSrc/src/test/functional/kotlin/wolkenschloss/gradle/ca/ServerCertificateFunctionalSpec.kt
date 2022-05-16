@@ -8,13 +8,8 @@ import org.gradle.testkit.runner.TaskOutcome
 import io.kotest.matchers.shouldBe
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.*
-import org.bouncycastle.jce.provider.BouncyCastleProvider
-import java.security.cert.*
-import java.time.Instant
-import java.util.*
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
-import io.kotest.matchers.file.shouldExist
 import java.nio.file.Files
 
 class ServerCertificateFunctionalSpec : FunSpec({
@@ -24,7 +19,7 @@ class ServerCertificateFunctionalSpec : FunSpec({
             val xdgDataHome = tempdir()
             val environment = mapOf("XDG_DATA_HOME" to xdgDataHome.absolutePath)
 
-            xcontext("executing localhost task") {
+            context("executing localhost task") {
                 val result = createRunner()
                     .withArguments("localhost", "-i")
                     .withEnvironment(environment)
@@ -47,8 +42,7 @@ class ServerCertificateFunctionalSpec : FunSpec({
                             keyUsage.hasUsages(KeyUsage.digitalSignature or KeyUsage.keyEncipherment) shouldBe true
                             extendedKeyUsages shouldBe arrayOf(KeyPurposeId.id_kp_serverAuth)
                             authorityKeyIdentifier.keyIdentifier shouldBe ca.subjectKeyIdentifier
-                            isValid() shouldBe true
-                            certificateHolder.isValidOn(Date.from(Instant.now())) shouldBe true
+                            isValidNow() shouldBe true
                             validateChain(ca)
                         }
                     }
@@ -64,7 +58,7 @@ class ServerCertificateFunctionalSpec : FunSpec({
                 }
             }
 
-            xcontext("executing example task") {
+            context("executing example task") {
                 val result = createRunner()
                     .withArguments("example", "-i")
                     .withEnvironment(environment)
@@ -106,9 +100,3 @@ class ServerCertificateFunctionalSpec : FunSpec({
 }) {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerLeaf
 }
-
-
-
-
-
-

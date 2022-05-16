@@ -1,25 +1,20 @@
 package wolkenschloss.gradle.ca
 
 import org.bouncycastle.asn1.ASN1IA5String
-import org.bouncycastle.asn1.ASN1InputStream
 import org.bouncycastle.asn1.DEROctetString
-import org.bouncycastle.asn1.util.ASN1Dump
-import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.gradle.internal.impldep.org.bouncycastle.asn1.DERUTF8String
-import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.StringReader
 import java.security.cert.*
 import java.time.Instant
 import java.util.*
 
-class CertificateWrapper(public val certificateHolder: X509CertificateHolder) {
+class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
 
     val issuer
         get() = certificateHolder.issuer
@@ -64,9 +59,9 @@ class CertificateWrapper(public val certificateHolder: X509CertificateHolder) {
         certPathValidator.validate(certPath, param)
     }
 
-    fun isValid(): Boolean {
+    fun isValidNow(): Boolean {
         val now = Date.from(Instant.now())
-        return !(now.before(certificateHolder.notBefore) || now.after(certificateHolder.notAfter))
+        return certificateHolder.isValidOn(now)
     }
 
     val subjectAlternativeNames: List<String>
