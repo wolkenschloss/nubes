@@ -1,0 +1,23 @@
+= Cookbook Webanwendung
+
+== HTTPS Konfiguration
+
+=== Zertifizierungsstelle
+Das Projekt _testbed_ erstellt mit der Aufgabe _ca_ eine Zertifizierungsstelle für die Testumgebung und die Entwicklungsumgebung.
+Im Verzeichnis _$HOME/.local/share/wolkenschloss/ca_ findest du das Zertifikat _ca.crt_ und den privaten Schlüssel _ca.key_ im PEM Format der Zertifizierungsstelle.
+Die Zertifizierungsstelle sollte nur ein einziges Mal erstellt werden. Wenn bereits eine Zertifizierungstelle eingerichtet wurde, wird diese nicht durch einen erneuten Aufruf der Aufgabe _:testbed:ca_ überschrieben.
+Um eine neue Zertifizierungsstelle einzurichten, musst du das Verzeichnis _$HOME/.local/share/wolkenschloss/ca_ löschen bevor du die Aufgabe _:testbed:ca_ erneut aufrufst.
+Dieses selbst signierte Zertifikat der Zertifizierungsstelle musst du in deinem Browser und deinem mobilen Gerät importieren.
+
+=== Serverzertifikat
+Für die Entwicklungsumgebung wird in der Regel das loopback device _localhost_ bzw. _127.0.0.1_ verwendet.
+Mit der Gradle Aufgabe _:testbed:localhost_ erzeugst du ein Serverzertifikat für die Entwicklungsumgebung.
+Mit dem Serverzertifikat kannst du die Anwendung im sicheren Modus mit dem HTTPS Protokoll starten.
+Das ist erforderlich, für den Test der Anwendung als progressive Web-App (PWA).
+
+Im Verzeichnis _$HOME/.local/share/wolkenschloss/ca/localhost+1_ findest du das Serverzertifikat _crt.pem_ und den privaten Schlüssel _key.pem_ nach dem Aufruf der Aufgabe _:testbed:localhost_.
+Beide Dateien benötigst du, um die Anwendung im sicheren Modus mit dem HTTPS Protokoll zu testen.
+Dies ist die Voreinstellung.
+
+Mit den Umgebungsvariablen _WOLKENSCHLOSS_HTTPS_KEY_ und _WOLKENSCHLOSS_HTTPS_CRT_ kannst du die Vorgaben überschreiben.
+

@@ -1,3 +1,4 @@
+import wolkenschloss.gradle.ca.ServerCertificate
 import wolkenschloss.gradle.testbed.domain.DomainExtension
 import wolkenschloss.gradle.testbed.domain.DomainTasks
 
@@ -35,6 +36,13 @@ fun Project.mount(source: String, target: String, block: () -> Unit) {
 
 
 tasks {
+
+    val localhost by registering(ServerCertificate::class) {
+        subjectAlternativeNames.set(listOf(
+            ServerCertificate.DnsName("localhost"),
+            ServerCertificate.IpAddress("127.0.0.1")
+        ))
+    }
 
     val start by existing {
         dependsOn(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)

@@ -1,9 +1,50 @@
+const path = require("path")
+
+console.log("mode: ", process.env.NODE_ENV)
+console.log("https key:", process.env.WOLKENSCHLOSS_HTTPS_KEY)
+console.log("https crt:", process.env.WOLKENSCHLOSS_HTTPS_CRT)
+
+const ca_dir = path.resolve(process.env.HOME, ".local/share/wolkenschloss/ca")
+
 const options = {
-    key: "localhost-key.pem",
-    cert: "localhost.pem"
+    key: process.env.WOLKENSCHLOSS_HTTPS_KEY || path.resolve(ca_dir, "localhost+1/key.pem"),
+    cert: process.env.WOLKENSCHLOSS_HTTPS_CRT || path.resolve(ca_dir, "localhost+1/crt.pem")
 }
-const server = process.env.HTTPS === 'true' ? {type: 'https', options} : {type: 'http'}
-const webSocketURL = process.env.HTTPS === 'true' ? {protocol: 'wss'} : {protocol: 'ws'}
+
+const server = process.env.NODE_ENV === 'production' ? {type: 'https', options} : {type: 'http'}
+const webSocketURL = process.env.NODE_ENV === 'production' ? {protocol: 'wss'} : {protocol: 'ws'}
+
+const proxy_development = {
+    '^/': {
+        ws: false,
+            target: 'http://localhost:8180/',
+            changeOrigin: true,
+            onProxyRes: (proxyRes) => {
+            if (proxyRes.headers.location) {
+                let loc = proxyRes.headers.location;
+                loc = loc.replace('http://localhost:8180', '');
+                proxyRes.headers.location = loc;
+            }
+        }
+    }
+}
+
+const proxy_production = {
+    '^/cookbook': {
+        ws: false,
+        target: 'http://localhost:8180/',
+        changeOrigin: true,
+        logLevel: 'debug',
+        pathRewrite: {"^/cookbook": ""},
+        // onProxyRes: (proxyRes) => {
+        //     if (proxyRes.headers.location) {
+        //         let loc = proxyRes.headers.location;
+        //         loc = loc.replace('http://localhost:8180', '');
+        //         proxyRes.headers.location = loc;
+        //     }
+        // }
+    }
+}
 
 module.exports = {
     publicPath: process.env.NODE_ENV === 'production' ? '/cookbook/' : '',
@@ -18,20 +59,7 @@ module.exports = {
             progress: true,
             webSocketURL,
         },
-        proxy: {
-            '^/': {
-                ws: false,
-                target: 'http://localhost:8180/',
-                changeOrigin: true,
-                onProxyRes: (proxyRes) => {
-                    if (proxyRes.headers.location) {
-                        let loc = proxyRes.headers.location;
-                        loc = loc.replace('http://localhost:8180', '');
-                        proxyRes.headers.location = loc;
-                    }
-                }
-            }
-        },
+        proxy: process.env.NODE_ENV === 'production' ? proxy_production : proxy_development,
         headers: {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -43,8 +71,8 @@ module.exports = {
     },
     configureWebpack: {
         performance: {
-            maxEntrypointSize: 700000,
-            // maxEntrypointSize: 819200,
+            // maxEntrypointSize: 700000,
+            maxEntrypointSize: 819200,
             maxAssetSize: 512000
         },
         optimization: {
