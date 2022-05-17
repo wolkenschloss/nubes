@@ -29,8 +29,6 @@ class TestbedLaunchSpec : FunSpec({
            test("should launch multipass instance") {
                 val result = build(BUILD_DOMAIN_TASK_NAME, "--info")
 
-               println(result.output)
-
                workingDirectory
                        .resolve("build/config/cloud-init/user-data")
                        .shouldExist()

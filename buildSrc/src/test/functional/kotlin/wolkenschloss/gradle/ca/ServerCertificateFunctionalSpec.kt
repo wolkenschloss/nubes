@@ -64,8 +64,6 @@ class ServerCertificateFunctionalSpec : FunSpec({
                     .withEnvironment(environment)
                     .build()
 
-                println(result.output)
-
                 test("should be successful") {
                     result.task(":example")!!.outcome shouldBe TaskOutcome.SUCCESS
                 }
@@ -90,7 +88,6 @@ class ServerCertificateFunctionalSpec : FunSpec({
                     .withEnvironment(environment)
                     .build()
 
-                println(result.output)
                 test("skip execution") {
                     result.task(":localhost")!!.outcome shouldBe TaskOutcome.SKIPPED
                 }

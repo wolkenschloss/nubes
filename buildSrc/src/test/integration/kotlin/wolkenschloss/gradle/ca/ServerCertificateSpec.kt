@@ -54,23 +54,12 @@ class ServerCertificateSpec : FunSpec({
                 example.get().privateKey.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("example/key.pem")
             }
 
-            fun File.readPrivateKey(): PrivateKey {
-                return reader().use {
-                    val parser = PEMParser(it)
-                    val convert = JcaPEMKeyConverter()
-                    val keyInfo = PrivateKeyInfo.getInstance(parser.readObject())
-                    convert.getPrivateKey(keyInfo)
-                }
-            }
-
-//            test("should create private key") {
-//                val ca by project.tasks.existing(CreateTask::class)
-//                val nubes by project.tasks.registering(ServerCertificate::class)
-//                println(nubes.get().privateKey.get().asFile.absoluteFile)
-//                ca.get().execute()
-//                nubes.get().create()
-//                assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/nubes-key.pem").readPrivateKey()) {
-//                    algorithm shouldBe "RSA"
+//            fun File.readPrivateKey(): PrivateKey {
+//                return reader().use {
+//                    val parser = PEMParser(it)
+//                    val convert = JcaPEMKeyConverter()
+//                    val keyInfo = PrivateKeyInfo.getInstance(parser.readObject())
+//                    convert.getPrivateKey(keyInfo)
 //                }
 //            }
         }

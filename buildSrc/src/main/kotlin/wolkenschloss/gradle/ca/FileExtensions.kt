@@ -1,13 +1,13 @@
 package wolkenschloss.gradle.ca
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
-import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
-import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder
-import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter
 import java.io.File
+import java.io.StringWriter
 import java.security.PrivateKey
+import java.security.SecureRandom
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
@@ -25,4 +25,15 @@ fun File.readPrivateKey(): PrivateKey {
         val keyInfo = PrivateKeyInfo.getInstance(parser.readObject())
         convert.getPrivateKey(keyInfo)
     }
+}
+
+fun File.writePem(obj: Any, function: File.() -> Unit) {
+    parentFile.mkdirs()
+    val stringWriter = StringWriter()
+    JcaPEMWriter(stringWriter).use {
+        it.writeObject(obj)
+    }
+
+    writeText(stringWriter.toString())
+    function(this)
 }
