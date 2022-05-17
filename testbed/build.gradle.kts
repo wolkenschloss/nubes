@@ -37,18 +37,18 @@ fun Project.mount(source: String, target: String, block: () -> Unit) {
 
 tasks {
 
-    val localhost by registering(ServerCertificate::class) {
+    register<ServerCertificate>("localhost") {
         subjectAlternativeNames.set(listOf(
             ServerCertificate.DnsName("localhost"),
             ServerCertificate.IpAddress("127.0.0.1")
         ))
     }
 
-    val start by existing {
+    start {
         dependsOn(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
     }
 
-    val staging by registering(DefaultTask::class) {
+    register<DefaultTask>("staging") {
         group = "client"
         description = "apply staging overlay"
         logging.captureStandardOutput(LogLevel.QUIET)
@@ -69,7 +69,7 @@ tasks {
         }
     }
 
-    val kustomize by registering(DefaultTask::class) {
+    register<DefaultTask>("kustomize") {
         group = "client"
         description = "run kubectl kustomize and print result"
         logging.captureStandardOutput(LogLevel.QUIET)

@@ -1,4 +1,5 @@
 {
+  "baseUrl": "https://localhost:8181/cookbook/",
   "pluginsFile": "tests/e2e/plugins/index.js",
   "reporter": "junit",
   "reporterOptions": {

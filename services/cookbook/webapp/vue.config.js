@@ -47,7 +47,8 @@ const proxy_production = {
 }
 
 module.exports = {
-    publicPath: process.env.NODE_ENV === 'production' ? '/cookbook/' : '',
+    // publicPath: process.env.NODE_ENV === 'production' ? '/cookbook/' : '',
+    publicPath: '/cookbook/',
     transpileDependencies: ['vuetify'],
     devServer: {
         historyApiFallback: false,
