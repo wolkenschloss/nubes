@@ -14,7 +14,6 @@ tasks {
 
 idea {
     module {
-//        excludeDirs.plusAssign(file("node_modules"))
         excludeDirs.plusAssign(file("dist"))
     }
 }

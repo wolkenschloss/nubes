@@ -1,4 +1,4 @@
-package wolkenschloss.conventions
+package wolkenschloss.gradle.testbed
 
 import com.jayway.jsonpath.JsonPath
 import io.kotest.core.spec.style.FunSpec
@@ -6,7 +6,6 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.gradle.testbed.TestbedPlugin.Companion.DESTROY_TASK_NAME
 import wolkenschloss.gradle.testbed.domain.DomainOperations
 import wolkenschloss.gradle.testbed.domain.DomainTasks.Companion.BUILD_DOMAIN_TASK_NAME
 import wolkenschloss.testing.Template
@@ -14,7 +13,7 @@ import wolkenschloss.testing.build
 import java.util.concurrent.TimeUnit
 
 class TestbedLaunchSpec : FunSpec({
-   context("testbed project") {
+   xcontext("testbed project") {
        afterSpec {
            ProcessBuilder("multipass", "delete", "launch")
                .start()
@@ -29,8 +28,6 @@ class TestbedLaunchSpec : FunSpec({
 
            test("should launch multipass instance") {
                 val result = build(BUILD_DOMAIN_TASK_NAME, "--info")
-
-               println(result.output)
 
                workingDirectory
                        .resolve("build/config/cloud-init/user-data")

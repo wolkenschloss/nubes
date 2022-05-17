@@ -25,7 +25,7 @@ node {
     }
 }
 
-val destination = project.layout.buildDirectory.file("classes/java/main/META-INF/resources/")
+val destination by extra(project.layout.buildDirectory.dir("classes/java/main/META-INF/resources/"))
 
 sourceSets {
     main {

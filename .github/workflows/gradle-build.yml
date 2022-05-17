@@ -47,6 +47,8 @@ jobs:
           key: ${{ runner.os }}-all-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-all-
+      - name: TLS Certificate
+        run: ./gradlew :testbed:localhost
       - name: Build with Gradle
         run: ./gradlew build --project-prop vcs.commit=$GITHUB_SHA --project-prop vcs.ref=$GITHUB_REF
       - name: Cleanup Gradle Cache

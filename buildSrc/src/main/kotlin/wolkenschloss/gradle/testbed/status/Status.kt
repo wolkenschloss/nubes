@@ -65,7 +65,7 @@ abstract class Status : DefaultTask() {
             domainOperations.readAllTlsSecrets()
                 .forEach {
                     check(it.toString(), {it} ) {
-                        check {it.certificate.isValid()}
+                        check {it.certificate.isValidNow()}
                             .ok { "Valid until ${it.certificate.notAfter}"}
                             .error("Expired at ${it.certificate.notAfter}")
                     }

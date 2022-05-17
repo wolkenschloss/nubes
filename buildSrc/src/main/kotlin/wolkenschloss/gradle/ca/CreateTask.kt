@@ -9,7 +9,6 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.gradle.api.DefaultTask
@@ -21,13 +20,10 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.io.StringWriter
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyPair
-import java.security.KeyPairGenerator
-import java.security.SecureRandom
 import java.time.Period
 import java.time.ZonedDateTime
 import java.util.*
@@ -57,12 +53,6 @@ abstract class CreateTask : DefaultTask() {
     @get:OutputFile
     abstract val certificate: RegularFileProperty
 
-    private val random: SecureRandom by lazy {
-        val rnd = SecureRandom()
-        rnd.setSeed(SecureRandom.getSeed(20))
-        rnd
-    }
-
     // see https://stackoverflow.com/questions/29852290/self-signed-x509-certificate-with-bouncy-castle-in-java
     @TaskAction
     fun execute() {
@@ -77,7 +67,7 @@ abstract class CreateTask : DefaultTask() {
 
         try {
 
-            val keyPair = generateKeyPair()
+            val keyPair = KeyPair()
 
             val contentSigner = JcaContentSignerBuilder(SIGNING_ALGORITHM)
                 .build(keyPair.private)
@@ -99,25 +89,23 @@ abstract class CreateTask : DefaultTask() {
 
             // mkcert accepts only private keys in pkcs8 format
             val gen = JcaPKCS8Generator(keyPair.private, null)
-            privateKey.writePem(gen.generate()) {
+            privateKey.get().asFile.writePem(gen.generate(), fun File.() {
                 val permission = hashSetOf(PosixFilePermission.OWNER_READ)
-                Files.setPosixFilePermissions(this.toPath(), permission)
-            }
+                Files.setPosixFilePermissions(toPath(), permission)
+            })
 
-            certificate.writePem(cert) {
-                val permission = hashSetOf(PosixFilePermission.OWNER_READ, PosixFilePermission.GROUP_READ, PosixFilePermission.OTHERS_READ)
-                Files.setPosixFilePermissions(this.toPath(), permission)
-            }
+            certificate.get().asFile.writePem(cert, fun File.() {
+                val permission = hashSetOf(
+                    PosixFilePermission.OWNER_READ,
+                    PosixFilePermission.GROUP_READ,
+                    PosixFilePermission.OTHERS_READ
+                )
+                Files.setPosixFilePermissions(toPath(), permission)
+            })
 
         } catch (e: Exception) {
             throw GradleException("Cannot create certificate: ${e.message}", e)
         }
-    }
-
-    private fun generateKeyPair(): KeyPair {
-        val keyPairGenerator = KeyPairGenerator.getInstance(KEYPAIR_GENERATOR_ALGORITHM)
-        keyPairGenerator.initialize(3072, random)
-        return keyPairGenerator.generateKeyPair()
     }
 
     private fun createCertificateBuilder(keyPair: KeyPair): X509v3CertificateBuilder {
@@ -151,22 +139,7 @@ abstract class CreateTask : DefaultTask() {
             .build()
     }
 
-    private fun RegularFileProperty.writePem(obj: Any, function: File.() -> Unit = {}) {
-        val file = get().asFile
-        file.parentFile.mkdirs()
-        val stringWriter = StringWriter()
-        JcaPEMWriter(stringWriter).use {
-            it.writeObject(obj)
-        }
-
-        file.writeText(stringWriter.toString())
-        function(file)
-    }
-
-
-
     companion object {
-        private const val KEYPAIR_GENERATOR_ALGORITHM = "RSA"
 
         private const val SIGNING_ALGORITHM = "SHA256WithRSA"
 
