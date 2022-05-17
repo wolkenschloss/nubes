@@ -1,9 +1,5 @@
 const path = require("path")
 
-console.log("mode: ", process.env.NODE_ENV)
-console.log("https key:", process.env.WOLKENSCHLOSS_HTTPS_KEY)
-console.log("https crt:", process.env.WOLKENSCHLOSS_HTTPS_CRT)
-
 const ca_dir = path.resolve(process.env.HOME, ".local/share/wolkenschloss/ca")
 
 const options = {
