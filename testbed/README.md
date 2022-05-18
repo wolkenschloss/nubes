@@ -13,30 +13,12 @@ It works on my machine:
 
 ```bash
 sudo snap install multipass
-#sudo apt install lxd
-#sudo multipass set local.driver=lxd
-#snap connect multipass:lxd lxd
-# Ubuntu 22.04:
-sudo apt install mkcert
-
-mkcert -install
-The local CA is now installed in the system trust store! ⚡️
-The local CA is now installed in the Firefox and/or Chrome/Chromium trust store (requires browser restart)! 🦊
-
-# Das ist wichtig! Es hilft ggf. vorher den Rechner neu zu starten.
-# Ich vermute, dass der Zertifikatsspeicher nicht zum Schreiben geöffnet
-# werden kann, solange der Browser geöffnet ist, bzw. nach dem Schließen
-# des Browser weiterhin Prozesse des Browsers laufen, die das Einspielen
-# des Zertifikats verhindern.
-#
-# Der Befehl mkcert -install ist unzuverlässig! Nach dem Aufruf unbedingt
-# prüfen, ob das Zertifikat im Browser vorhanden ist.
-
  
-# Zertifikat erstellen
+# Wurzel-Zertifikat erstellen
 ./gradlew :testbed:ca
- cp ~/.local/share/wolkenschloss/ca/ca.crt ~/.local/share/mkcert/rootCA.pem
- cp ~/.local/share/wolkenschloss/ca/ca.key ~/.local/share/mkcert/rootCA-key.pem
+ 
+# Server-Zertifikat für localhost erstellen
+./gradlew :testbed:localhost
  
 # testbed Instanz starten
 # Run Configuration: testbed start
@@ -49,6 +31,7 @@ cat testbed/build/run/hosts | sudo tee -a /etc/hosts > /dev/null
 sudo copy $HOME/.local/share/wolkenschloss/ca/ca.crt /usr/local/share/ca-certificates
 sudo update-ca-certificates
 sudo systemctl restart docker
+
 # Zertifikat im Browser installieren
 # Firefox: Einstellungen > Datenschutz & Sicherheit > Zertifikate anzeigen... > Importieren...
 

@@ -46,13 +46,18 @@ class TestbedPlugin : Plugin<Project> {
             .register(tasks)
 
         registerDestroyTask(testbed)
-        registerApplyTask(testbed)
+        registerApplyTask()
+
+        tasks.withType(Apply::class) {
+            domain.convention(testbed.domain.name)
+            overlay.convention(name)
+        }
     }
 
-    private fun Project.registerApplyTask(testbed: TestbedExtension) {
+    private fun Project.registerApplyTask() {
         tasks.register(APPLY_TASK_NAME, Apply::class.java) {
             description = "Runs a kubectl apply -k command."
-            domain.convention(testbed.domain.name)
+            group = "client"
             overlay.convention(project.rootProject.layout.projectDirectory.dir("services").asFile.absolutePath)
         }
     }

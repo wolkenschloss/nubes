@@ -17,15 +17,15 @@ class StatusTasks(
 ) {
 
     fun register(tasks: TaskContainer) {
-        val readKubeConfig: TaskProvider<CopyKubeConfig> =
-            tasks.named(DomainTasks.READ_KUBE_CONFIG_TASK_NAME, CopyKubeConfig::class.java)
+        val copyKubeConfig: TaskProvider<CopyKubeConfig> =
+            tasks.named(DomainTasks.COPY_KUBE_CONFIG_TASK_NAME, CopyKubeConfig::class.java)
 
         tasks.register(
             STATUS_TASK_NAME,
             Status::class.java) {
                 description = "Performs tests to ensure the function of the test bench."
                 domainName.convention(domain.name)
-                kubeConfigFile.convention(readKubeConfig.get().kubeConfigFile)
+                kubeConfigFile.convention(copyKubeConfig.get().kubeConfigFile)
                 registry.convention(this@StatusTasks.registry)
                 certificate.convention(this@StatusTasks.certificate)
                 truststore.convention(this@StatusTasks.truststore)

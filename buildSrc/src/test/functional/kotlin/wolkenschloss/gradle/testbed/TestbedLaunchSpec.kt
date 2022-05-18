@@ -7,7 +7,7 @@ import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.gradle.testbed.domain.DomainOperations
-import wolkenschloss.gradle.testbed.domain.DomainTasks.Companion.BUILD_DOMAIN_TASK_NAME
+import wolkenschloss.gradle.testbed.domain.DomainTasks.Companion.LAUNCH_INSTANCE_TASK_NAME
 import wolkenschloss.testing.Template
 import wolkenschloss.testing.build
 import java.util.concurrent.TimeUnit
@@ -27,7 +27,7 @@ class TestbedLaunchSpec : FunSpec({
        autoClose(Template("testbed/launch")).withClone {
 
            test("should launch multipass instance") {
-                val result = build(BUILD_DOMAIN_TASK_NAME, "--info")
+                val result = build(LAUNCH_INSTANCE_TASK_NAME, "--info")
 
                workingDirectory
                        .resolve("build/config/cloud-init/user-data")

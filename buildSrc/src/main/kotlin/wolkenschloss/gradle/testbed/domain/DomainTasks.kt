@@ -10,8 +10,8 @@ import wolkenschloss.gradle.testbed.transformation.userData
 
 class DomainTasks(private val extension: DomainExtension) {
     fun register(tasks: TaskContainer) {
-        registerBuildDomainTask(tasks)
-        registerReadKubeConfigTasks(tasks)
+        registerLaunchTask(tasks)
+        registerCopyKubeConfigTask(tasks)
         registerStartTask(tasks)
         registerTlsSecretsTasks(tasks)
     }
@@ -24,10 +24,10 @@ class DomainTasks(private val extension: DomainExtension) {
         }
     }
 
-    private fun registerBuildDomainTask(tasks: TaskContainer) {
+    private fun registerLaunchTask(tasks: TaskContainer) {
         val transform by tasks.existing(Copy::class)
 
-        tasks.register(BUILD_DOMAIN_TASK_NAME, BuildDomain::class.java) {
+        tasks.register(LAUNCH_INSTANCE_TASK_NAME, Launch::class.java) {
             group = GROUP_NAME
             description = "Launch testbed instance."
             domain.convention(extension.name)
@@ -42,11 +42,11 @@ class DomainTasks(private val extension: DomainExtension) {
         }
     }
 
-    private fun registerReadKubeConfigTasks(tasks: TaskContainer) {
-        val buildDomain by tasks.existing(BuildDomain::class)
+    private fun registerCopyKubeConfigTask(tasks: TaskContainer) {
+        val launch by tasks.existing(Launch::class)
 
         tasks.register(
-            READ_KUBE_CONFIG_TASK_NAME,
+            COPY_KUBE_CONFIG_TASK_NAME,
             CopyKubeConfig::class.java
         ) {
             this.group = GROUP_NAME
@@ -54,14 +54,14 @@ class DomainTasks(private val extension: DomainExtension) {
             description = "Copies the Kubernetes client configuration to the localhost for further use by kubectl."
             domain.convention(extension.name)
             kubeConfigFile.convention(extension.kubeConfigFile)
-            dependsOn(buildDomain)
+            dependsOn(launch)
         }
     }
 
     companion object {
         const val TLS_SECRETS_TASK_NAME = "tlsSecrets"
-        const val BUILD_DOMAIN_TASK_NAME = "buildDomain"
-        const val READ_KUBE_CONFIG_TASK_NAME = "readKubeConfig"
+        const val LAUNCH_INSTANCE_TASK_NAME = "launch"
+        const val COPY_KUBE_CONFIG_TASK_NAME = "copyKubeConfig"
         private const val START_TASK_NAME = "start"
         private const val GROUP_NAME = "domain"
 
@@ -69,7 +69,7 @@ class DomainTasks(private val extension: DomainExtension) {
             tasks.register(START_TASK_NAME, DefaultTask::class.java) {
                 group = GROUP_NAME
                 description = "The all in one lifecycle start task. Have a cup of coffee."
-                dependsOn(tasks.named(READ_KUBE_CONFIG_TASK_NAME))
+                dependsOn(tasks.named(COPY_KUBE_CONFIG_TASK_NAME))
             }
         }
     }
