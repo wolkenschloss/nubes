@@ -1,4 +1,5 @@
 import wolkenschloss.gradle.ca.ServerCertificate
+import wolkenschloss.gradle.testbed.Apply
 import wolkenschloss.gradle.testbed.domain.DomainExtension
 import wolkenschloss.gradle.testbed.domain.DomainTasks
 
@@ -16,24 +17,6 @@ testbed {
     }
 }
 
-val multipass = listOf("multipass", "exec", testbed.domain.name.get(), "--")
-val docker = multipass + listOf("docker")
-val kubectl = multipass + listOf("microk8s", "kubectl")
-
-fun Project.mount(source: String, target: String, block: () -> Unit) {
-    exec {
-        commandLine = listOf("multipass", "mount", source, "${testbed.domain.name.get()}:${target}")
-    }
-
-    try {
-        block()
-    } finally {
-        exec {
-            commandLine = listOf("multipass", "umount", "${testbed.domain.name.get()}:${target}")
-        }
-    }
-}
-
 
 tasks {
 
@@ -45,43 +28,12 @@ tasks {
     }
 
     start {
-        dependsOn(DomainTasks.READ_KUBE_CONFIG_TASK_NAME)
+        dependsOn(DomainTasks.COPY_KUBE_CONFIG_TASK_NAME)
     }
 
-    register<DefaultTask>("staging") {
+    register<Apply>("staging") {
         group = "client"
         description = "apply staging overlay"
         logging.captureStandardOutput(LogLevel.QUIET)
-        doLast {
-            project.mount(project.rootProject.layout.projectDirectory.asFile.absolutePath, "/home/ubuntu/nubes") {
-                project.exec {
-                    commandLine = docker + listOf("build", "-t", "nubes/generators/db-secret-generator", "/home/ubuntu/nubes/kustomize/db-secret-generator")
-                }
-
-                project.exec {
-                    commandLine = multipass + listOf(
-                        "/bin/bash",
-                        "-c",
-                        "microk8s kubectl kustomize --enable-alpha-plugins /home/ubuntu/nubes/overlays/staging/ | microk8s kubectl apply -f -"
-                    )
-                }
-            }
-        }
-    }
-
-    register<DefaultTask>("kustomize") {
-        group = "client"
-        description = "run kubectl kustomize and print result"
-        logging.captureStandardOutput(LogLevel.QUIET)
-        doLast {
-            project.mount(project.rootProject.layout.projectDirectory.asFile.absolutePath, "/home/ubuntu/nubes") {
-                project.exec {
-                    commandLine = docker + listOf("build", "-t", "nubes/generators/db-secret-generator", "/home/ubuntu/nubes/kustomize/db-secret-generator")
-                }
-                project.exec {
-                    commandLine = kubectl + listOf("kustomize", "--enable-alpha-plugins", "/home/ubuntu/nubes/overlays/staging")
-                }
-            }
-        }
     }
 }

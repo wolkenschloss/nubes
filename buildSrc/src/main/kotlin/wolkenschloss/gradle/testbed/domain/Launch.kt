@@ -15,7 +15,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import javax.inject.Inject
 
-abstract class BuildDomain : DefaultTask() {
+abstract class Launch : DefaultTask() {
 
     @get:Input
     abstract val domain: Property<String>
@@ -83,7 +83,7 @@ abstract class BuildDomain : DefaultTask() {
 
     private fun launch() {
 
-        logger.quiet("Prüfe, ob Instanz existiert")
+        logger.info("Prüfe, ob Instanz existiert")
 
         val r1 = execute(project) {
             commandLine("multipass", "info", "--format", "json", domain.get())
@@ -94,19 +94,13 @@ abstract class BuildDomain : DefaultTask() {
             val path = "\$.info.${domain.get()}.state"
             val state: String = JsonPath.parse(r1.output).read(path)
 
-            logger.lifecycle("Testbed instance is in state {}", state)
+            logger.info("Testbed instance is in state {}", state)
 
-            if (state == "Running") {
-                logger.quiet("Die Instanz läuft bereits")
-                return
+            when(state) {
+                "Running" -> return
+                "Suspended", "Stopped" -> start()
+                else -> throw UnknownState(domain.get(), state)
             }
-
-            logger.quiet("Die Instanz wird gestartet")
-            execute(project) {
-                commandLine("multipass", "start", "--verbose", domain.get())
-            }
-
-            return
         }
 
         logger.quiet("Instanz wird erzeugt")
@@ -123,6 +117,14 @@ abstract class BuildDomain : DefaultTask() {
         // Erzeuge:
         execute(project, userData) {
             commandLine = commands;
+        }
+    }
+
+    private fun start() {
+        // Stopped or Suspended
+        logger.info("Die Instanz wird gestartet")
+        execute(project) {
+            commandLine("multipass", "start", "--verbose", domain.get())
         }
     }
 

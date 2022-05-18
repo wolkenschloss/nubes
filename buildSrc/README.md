@@ -271,28 +271,16 @@ umfangreiche Aufgabe, die mit einem üblichen Erstellungsvorgang nicht zu
 vergleichen ist.
 
 * Domain tasks
-    * *buildDomain* - Starts the libvirt domain and waits for the callback.
-    * *readKubeConfig* - Copies the Kubernetes client configuration to the 
+    * *launch* - Starts the multipass instance.
+    * *copyKubeConfig* - Copies the Kubernetes client configuration to the 
         localhost for further use by kubectl.
     * **start** - The all-in-one lifecycle start task. Have a cup of coffee.
-* Download tasks
-    * *download* - Downloads the base image to a cache for later use.
-* Pool tasks
-    * *buildDataSourceImage* - Generates a cloud-init data source volume 
-        containing the transformed network-config and user-data files.
-    * *buildPool* - Defines a virtlib storage pool based on the transformed 
-        description file containing a root image, and a cloud-init data source volume.
-    * *buildRootImage* - Creates the root image for the later domain from a 
-        downloaded base image.
 
-* Transformation tasks
-    * *transformDomainDescription* - Transforms domain.xml
-    * *transformNetworkConfig* - Transforms network-config template
-    * *transformPoolDescription* - Transforms pool.xml template
-    * *transformUserData* - Transforms user-data template
+
 * Other tasks
     * **destroy** - Destroy testbed and delete all files.
     * **status** - Performs tests to ensure the function of the test bench.
+    * **transform** Transforms user-data template
 
 Die wichtigsten Lebenszyklus-Aufgaben sind:
 
@@ -409,22 +397,6 @@ angefügt.
 ./gradlew ':test -p buildSrc
 ```
 
-### [Docker]
-
-Erzeugt Docker Images und führt Container aus. Es handelt sich eine minimale 
-Implementierung, die speziell auf die Anforderungen des Build Prozesses von 
-*Wolkenschloss* zugeschnitten ist. Die Verwendung von Containern verringert
-die Anforderungen an zu installierenden Paketen auf dem Entwicklungsrechner
-(und ermöglicht ggf. die Ausführung von Aufgaben mit privilegierten Rechten).
-
-Beispiele für die Verwendung des Plugins findest Du im [fixtures](fixtures)
-Verzeichnis.
-
-| Task               | Zweck                                                                  | Beispiel                |
-|--------------------|------------------------------------------------------------------------|-------------------------|
-| [RunContainerTask] | Führt ein einzelnes Kommando in einem Container aus und beenden diesen | [mount](fixtures/mount) |
-| [BuildImageTask]   | Erstellt ein Docker Image.                                             | [image](fixtures/image) |
-
 [k8s]: https://kubernetes.io/
 [microk8s]: https://microk8s.io/docs
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -435,7 +407,4 @@ Verzeichnis.
 [Vue CLI]: https://cli.vuejs.org/
 [buildSrc]: .
 [fixtures]: fixtures
-[RunContainerTask]: src/main/kotlin/wolkenschloss/gradle/docker/RunContainerTask.kt
-[BuildImageTask]: src/main/kotlin/wolkenschloss/gradle/docker/RunContainerTask.kt
-[Docker]: src/main/kotlin/wolkenschloss/gradle/docker
 [Testbed]: src/main/kotlin/wolkenschloss/gradle/testbed
