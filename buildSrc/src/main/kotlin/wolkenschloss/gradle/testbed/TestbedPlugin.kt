@@ -9,15 +9,15 @@ import wolkenschloss.gradle.testbed.domain.PushImage
 import wolkenschloss.gradle.testbed.status.StatusTasks
 import wolkenschloss.gradle.testbed.transformation.TransformationTasks
 import wolkenschloss.gradle.ca.CaPlugin
-import wolkenschloss.gradle.ca.CreateTask
-import wolkenschloss.gradle.ca.TruststoreTask
+import wolkenschloss.gradle.ca.TrustAnchor
+import wolkenschloss.gradle.ca.TrustStore
 
 class TestbedPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(CaPlugin::class.java)
 
-        val ca by project.tasks.existing(CreateTask::class)
-        val truststore by project.tasks.existing(TruststoreTask::class)
+        val ca by project.tasks.existing(TrustAnchor::class)
+        val truststore by project.tasks.existing(TrustStore::class)
 
         val testbed = project.extensions
             .create(TESTBED_EXTENSION_NAME, TestbedExtension::class)
@@ -31,7 +31,7 @@ class TestbedPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.registerTasks(ca: TaskProvider<CreateTask>, truststore: TaskProvider<TruststoreTask>) {
+    private fun Project.registerTasks(ca: TaskProvider<TrustAnchor>, truststore: TaskProvider<TrustStore>) {
         val testbed = the(TestbedExtension::class)
         val values = testbed.asPropertyMap(this)
 

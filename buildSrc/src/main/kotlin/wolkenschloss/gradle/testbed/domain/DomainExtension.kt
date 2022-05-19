@@ -6,10 +6,10 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskProvider
-import wolkenschloss.gradle.ca.CreateTask
+import wolkenschloss.gradle.ca.TrustAnchor
 
 abstract class DomainExtension {
-    fun initialize(runDirectory: DirectoryProperty, ca: TaskProvider<CreateTask>) {
+    fun initialize(runDirectory: DirectoryProperty, ca: TaskProvider<TrustAnchor>) {
         val domainSuffix = System.getProperty(DOMAIN_SUFFIX_PROPERTY)
         if (domainSuffix.isNullOrEmpty()) {
             throw GradleException(ERROR_DOMAIN_SUFFIX_NOT_SET)

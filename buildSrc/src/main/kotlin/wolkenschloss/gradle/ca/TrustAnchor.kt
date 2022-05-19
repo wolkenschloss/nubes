@@ -1,5 +1,6 @@
 package wolkenschloss.gradle.ca
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.X500NameBuilder
 import org.bouncycastle.asn1.x500.style.BCStyle
@@ -33,7 +34,7 @@ import java.util.*
  *
  * Mit dem
  */
-abstract class CreateTask : DefaultTask() {
+abstract class TrustAnchor : DefaultTask() {
 
     @get:Input
     abstract val notBefore: Property<ZonedDateTime>
@@ -110,11 +111,11 @@ abstract class CreateTask : DefaultTask() {
 
     private fun createCertificateBuilder(keyPair: KeyPair): X509v3CertificateBuilder {
         return JcaX509v3CertificateBuilder(
-            subject,
+            X500Name(subject.get()),
             randomSerialNumber(),
             Date.from(notBefore.get().toInstant()),
             Date.from(notAfter.get().toInstant()),
-            subject,
+            X500Name(subject.get()),
             keyPair.public
         )
     }
@@ -131,12 +132,19 @@ abstract class CreateTask : DefaultTask() {
         return BigInteger(160, random)
     }
 
-    private val subject: X500Name by lazy {
-        X500NameBuilder(BCStyle.INSTANCE)
-            .addRDN(BCStyle.C, "DE")
-            .addRDN(BCStyle.O, "Wolkenschloss")
-            .addRDN(BCStyle.CN, "Root CA")
-            .build()
+    @get:Input
+    abstract val subject: Property<String>
+
+    fun subject( block: X500NameBuilder.() -> Unit ) {
+        val builder = X500NameBuilder(BCStyle.INSTANCE)
+        block(builder)
+        val x509Name = builder.build()
+
+        subject.set(project.provider { x509Name.toString() })
+    }
+
+    operator fun X500NameBuilder.set(index: ASN1ObjectIdentifier, value: String) {
+        this.addRDN(index, value)
     }
 
     companion object {

@@ -14,7 +14,7 @@ import java.io.StringReader
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 
-abstract class TruststoreTask : DefaultTask() {
+abstract class TrustStore : DefaultTask() {
     /**
      * Datei, in die das Zertifikat geschrieben wird.
      */
