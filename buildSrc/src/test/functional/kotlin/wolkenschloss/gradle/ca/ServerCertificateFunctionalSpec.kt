@@ -37,7 +37,7 @@ class ServerCertificateFunctionalSpec : FunSpec({
                     test("should have valid subject alternative name") {
                         assertSoftly(bcCert) {
                             subjectAlternativeNames shouldBe listOf("DNS:localhost")
-                            issuer shouldBe X500Name("CN=Root CA, O=Wolkenschloss, C=DE")
+                            issuer shouldBe X500Name(CaPlugin.TRUST_ANCHOR_DEFAULT_SUBJECT)
                             subject shouldBe X500Name("CN=localhost")
                             keyUsage.hasUsages(KeyUsage.digitalSignature or KeyUsage.keyEncipherment) shouldBe true
                             extendedKeyUsages shouldBe arrayOf(KeyPurposeId.id_kp_serverAuth)

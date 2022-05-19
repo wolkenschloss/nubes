@@ -10,11 +10,11 @@ import org.gradle.api.tasks.TaskProvider
 import wolkenschloss.gradle.testbed.domain.DomainExtension
 import wolkenschloss.gradle.testbed.transformation.TransformationExtension
 import javax.inject.Inject
-import wolkenschloss.gradle.ca.CreateTask
+import wolkenschloss.gradle.ca.TrustAnchor
 
 @Suppress("CdiInjectionPointsInspection")
 abstract class TestbedExtension @Inject constructor(private val layout: ProjectLayout) {
-    fun configure(ca: TaskProvider<CreateTask>): TestbedExtension {
+    fun configure(ca: TaskProvider<TrustAnchor>): TestbedExtension {
         val buildDirectory = layout.buildDirectory
         runDirectory.convention(buildDirectory.dir("run"))
         transformation.initialize()

@@ -14,8 +14,10 @@ import io.kotest.matchers.file.shouldNotBeWriteable
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_clientAuth
 import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_serverAuth
+import org.bouncycastle.asn1.x509.KeyUsage
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.Template
 import wolkenschloss.testing.createRunner
@@ -48,12 +50,12 @@ class CaPluginTest : FunSpec({
                 }
 
                 test("should create self signed root certificate") {
-                    assertSoftly(xdgDataHome.resolve("wolkenschloss/ca/ca.crt").readX509Certificate()) {
-                        basicConstraints shouldBeGreaterThan -1
-                        basicConstraints shouldBe Int.MAX_VALUE
-                        keyUsage[keyCertSign] shouldBe true
-                        shouldBeIssuedBy("CN=Root CA,O=Wolkenschloss,C=DE")
-                        subjectX500Principal.name shouldBe "CN=Root CA,O=Wolkenschloss,C=DE"
+                    assertSoftly(CertificateWrapper.read(xdgDataHome.resolve("wolkenschloss/ca/ca.crt"))) {
+                        x509Certificate.basicConstraints shouldBeGreaterThan -1
+                        x509Certificate.basicConstraints shouldBe Int.MAX_VALUE
+                        keyUsage.hasUsages(KeyUsage.keyCertSign) shouldBe true
+                        issuer shouldBe X500Name(CaPlugin.TRUST_ANCHOR_DEFAULT_SUBJECT)
+                        subject shouldBe X500Name(CaPlugin.TRUST_ANCHOR_DEFAULT_SUBJECT)
                     }
                 }
 

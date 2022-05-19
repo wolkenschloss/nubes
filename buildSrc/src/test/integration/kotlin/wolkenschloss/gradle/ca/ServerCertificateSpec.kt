@@ -53,15 +53,6 @@ class ServerCertificateSpec : FunSpec({
                 val example by project.tasks.registering(ServerCertificate::class)
                 example.get().privateKey.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("example/key.pem")
             }
-
-//            fun File.readPrivateKey(): PrivateKey {
-//                return reader().use {
-//                    val parser = PEMParser(it)
-//                    val convert = JcaPEMKeyConverter()
-//                    val keyInfo = PrivateKeyInfo.getInstance(parser.readObject())
-//                    convert.getPrivateKey(keyInfo)
-//                }
-//            }
         }
     }
 }) {
