@@ -1,8 +1,6 @@
 package wolkenschloss.conventions
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.maps.shouldContainAll
-import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.*

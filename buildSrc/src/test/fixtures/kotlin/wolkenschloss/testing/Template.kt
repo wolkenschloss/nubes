@@ -40,7 +40,7 @@ class Template(private val path: String) : AutoCloseable {
      * Testdaten Instanz verweist.
      */
     fun withClone(block: suspend Instance.() -> Unit) = runBlocking {
-        val instance =  Instance.from(resolve(path))
+        val instance = Instance.from(resolve(path))
         instances.add(instance)
         block(instance)
     }

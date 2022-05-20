@@ -6,7 +6,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.file.shouldBeReadable
 import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.file.shouldExist
@@ -15,8 +14,6 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.bouncycastle.asn1.x500.X500Name
-import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_clientAuth
-import org.bouncycastle.asn1.x509.KeyPurposeId.id_kp_serverAuth
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.gradle.testkit.runner.TaskOutcome
 import wolkenschloss.testing.Template
