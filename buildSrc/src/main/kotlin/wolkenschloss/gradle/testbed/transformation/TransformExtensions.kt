@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.transformation
+package family.haschka.wolkenschloss.gradle.testbed.transformation
 
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider

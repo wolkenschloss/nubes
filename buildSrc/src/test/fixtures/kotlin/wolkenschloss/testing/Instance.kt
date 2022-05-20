@@ -1,4 +1,4 @@
-package wolkenschloss.testing
+package family.haschka.wolkenschloss.testing
 
 import java.io.File
 import java.nio.file.Paths

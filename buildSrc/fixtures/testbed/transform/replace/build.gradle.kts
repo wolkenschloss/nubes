@@ -1,3 +1,3 @@
 plugins {
-    id("com.github.wolkenschloss.testbed")
+    id("family.haschka.wolkenschloss.testbed")
 }

@@ -1,9 +1,11 @@
+package family.haschka.wolkenschloss.conventions
+
 import com.github.gradle.node.npm.task.NpmInstallTask
 import com.github.gradle.node.npm.task.NpmTask
 import com.github.gradle.node.npm.task.NpxTask
 
 plugins {
-    id("wolkenschloss.conventions.java")
+    id("family.haschka.wolkenschloss.conventions.java")
     id("com.github.node-gradle.node")
     id("java-library")
 }

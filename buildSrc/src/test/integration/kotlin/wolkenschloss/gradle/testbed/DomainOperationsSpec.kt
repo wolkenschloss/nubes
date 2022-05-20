@@ -1,9 +1,9 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import com.jayway.jsonpath.JsonPath
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.Template
 
 class DomainOperationsSpec : FunSpec({
     context("eine hosts datei") {

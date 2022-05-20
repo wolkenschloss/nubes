@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.X500Name

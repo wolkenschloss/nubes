@@ -1,7 +1,7 @@
-package wolkenschloss.gradle.testbed.domain
-import wolkenschloss.gradle.ca.CertificateWrapper
+package family.haschka.wolkenschloss.gradle.testbed.domain
+import family.haschka.wolkenschloss.gradle.ca.CertificateWrapper
 import net.minidev.json.JSONObject
-import wolkenschloss.gradle.ca.InvalidArgumentException
+import family.haschka.wolkenschloss.gradle.ca.InvalidArgumentException
 import java.util.*
 
 class TlsSecret(val namespace: String, val name: String, val certificate: CertificateWrapper, val type: String) {

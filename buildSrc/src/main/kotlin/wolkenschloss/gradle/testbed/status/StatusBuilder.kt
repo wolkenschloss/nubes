@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.status
+package family.haschka.wolkenschloss.gradle.testbed.status
 
 import org.gradle.api.GradleException
 import java.util.*

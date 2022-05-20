@@ -1,7 +1,7 @@
-import wolkenschloss.gradle.testbed.domain.DomainExtension
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainExtension
 
 plugins {
-    id("wolkenschloss.conventions.service")
+    id("family.haschka.wolkenschloss.conventions.service")
 }
 
 dependencies {

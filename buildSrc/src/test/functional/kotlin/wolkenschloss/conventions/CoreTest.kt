@@ -1,9 +1,10 @@
-package wolkenschloss.conventions
+package family.haschka.wolkenschloss.conventions
 
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.build
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.*
 
 class CoreTest : FunSpec({
 

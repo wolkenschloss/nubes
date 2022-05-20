@@ -1,12 +1,12 @@
-package wolkenschloss.gradle.testbed.transformation
+package family.haschka.wolkenschloss.gradle.testbed.transformation
 
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import wolkenschloss.gradle.ca.TrustAnchor
+import family.haschka.wolkenschloss.gradle.ca.TrustAnchor
 
-class TransformationTasks(private val values: Map<String, Provider<*>>,private val  extension: TransformationExtension, val ca: TaskProvider<TrustAnchor>) {
+class TransformationTasks(private val values: Map<String, Provider<*>>, private val  extension: TransformationExtension, val ca: TaskProvider<TrustAnchor>) {
 
     fun register(tasks: TaskContainer) {
         tasks.register("transform", Copy::class.java) {

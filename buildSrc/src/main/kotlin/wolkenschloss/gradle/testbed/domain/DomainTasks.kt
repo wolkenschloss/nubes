@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.domain
+package family.haschka.wolkenschloss.gradle.testbed.domain
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Copy
@@ -6,7 +6,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.existing
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
-import wolkenschloss.gradle.testbed.transformation.userData
+import family.haschka.wolkenschloss.gradle.testbed.transformation.userData
 
 class DomainTasks(private val extension: DomainExtension) {
     fun register(tasks: TaskContainer) {

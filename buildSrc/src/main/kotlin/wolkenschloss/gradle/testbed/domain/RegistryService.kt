@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.domain
+package family.haschka.wolkenschloss.gradle.testbed.domain
 
 import com.google.cloud.tools.jib.api.Containerizer
 import com.google.cloud.tools.jib.api.Jib

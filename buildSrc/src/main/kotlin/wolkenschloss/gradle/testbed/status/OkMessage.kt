@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.status
+package family.haschka.wolkenschloss.gradle.testbed.status
 
 import java.util.function.Function
 

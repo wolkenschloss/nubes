@@ -1,4 +1,4 @@
-package wolkenschloss.testing
+package family.haschka.wolkenschloss.testing
 
 import kotlinx.coroutines.runBlocking
 import java.io.File

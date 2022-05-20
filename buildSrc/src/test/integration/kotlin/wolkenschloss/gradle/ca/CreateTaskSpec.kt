@@ -1,5 +1,7 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
+import family.haschka.wolkenschloss.gradle.ca.CaPlugin
+import family.haschka.wolkenschloss.gradle.ca.TrustStore
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -14,7 +16,7 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.kotlin.dsl.*
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.gradle.testbed.Directories
+import family.haschka.wolkenschloss.gradle.testbed.Directories
 import java.time.Duration
 import java.time.ZonedDateTime
 

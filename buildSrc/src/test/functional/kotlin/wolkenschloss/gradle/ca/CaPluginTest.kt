@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
@@ -16,8 +16,8 @@ import io.kotest.matchers.shouldBe
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Template
-import wolkenschloss.testing.createRunner
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.createRunner
 import java.security.cert.X509Certificate
 import java.time.LocalDate
 import java.time.LocalTime

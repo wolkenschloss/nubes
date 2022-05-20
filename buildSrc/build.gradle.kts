@@ -3,8 +3,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
+import org.jetbrains.gradle.ext.packagePrefix
+import org.jetbrains.gradle.ext.settings
 
-group = "com.github.wolkenschloss.gradle"
+group = "family.haschka.wolkenschloss"
 
 repositories {
     mavenLocal()
@@ -18,7 +20,7 @@ plugins {
     java
     `jvm-test-suite`
     groovy
-    id("idea")
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.4"
 }
 
 val testDir = project.layout.projectDirectory.dir("src/test")
@@ -131,7 +133,6 @@ val integrationApi: Configuration by configurations.getting {
     extendsFrom(fixturesApi)
 }
 
-
 val functionalImplementation: Configuration by configurations.getting {
     extendsFrom(fixturesImplementation)
 }
@@ -158,21 +159,21 @@ gradlePlugin {
         sourceSets.named("functional").get()
     )
 
-    val namespace = "com.github.wolkenschloss"
+    val namespace = "family.haschka.wolkenschloss"
 
     plugins {
         create("TestbedPlugin") {
             id = "$namespace.testbed"
             displayName = "Wolkenschloss Testbed Plugin"
             description = "Manages Testbed for Wolkenschloss"
-            implementationClass = "wolkenschloss.gradle.testbed.TestbedPlugin"
+            implementationClass = "family.haschka.wolkenschloss.gradle.testbed.TestbedPlugin"
         }
 
         create("CaPlugin") {
             id = "$namespace.ca"
             displayName = "Wolkenschloss CA Plugin"
             description = "Creates CA for Wolkenschloss"
-            implementationClass = "wolkenschloss.gradle.ca.CaPlugin"
+            implementationClass = "family.haschka.wolkenschloss.gradle.ca.CaPlugin"
         }
     }
 }
@@ -237,5 +238,12 @@ tasks {
 idea {
     module {
         jdkName = "11"
+        settings {
+            packagePrefix["src/main/kotlin"] = "family.haschka"
+            packagePrefix["src/test/integration/kotlin"] = "family.haschka"
+            packagePrefix["src/test/functional/kotlin"] = "family.haschka"
+            packagePrefix["src/test/unit/kotlin"] = "family.haschka"
+            packagePrefix["src/test/fixtures/kotlin"] = "family.haschka"
+        }
     }
 }

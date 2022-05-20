@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.domain
+package family.haschka.wolkenschloss.gradle.testbed.domain
 
 data class UnknownState(val instance: String, val state: String) : Throwable() {
 

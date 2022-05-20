@@ -1,8 +1,8 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import wolkenschloss.gradle.testbed.Directories
+import family.haschka.wolkenschloss.gradle.testbed.Directories
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import org.gradle.kotlin.dsl.*

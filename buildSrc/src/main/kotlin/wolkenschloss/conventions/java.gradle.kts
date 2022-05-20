@@ -1,3 +1,5 @@
+package family.haschka.wolkenschloss.conventions
+
 plugins {
     java
 }

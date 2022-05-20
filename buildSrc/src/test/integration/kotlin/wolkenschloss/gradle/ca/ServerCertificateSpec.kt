@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.gradle.testbed.Directories
+import family.haschka.wolkenschloss.gradle.testbed.Directories
 
 class ServerCertificateSpec : FunSpec({
     context("CA Gradle Plugin applied to a project") {

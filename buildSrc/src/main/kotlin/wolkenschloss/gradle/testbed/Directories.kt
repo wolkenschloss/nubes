@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import java.nio.file.Path
 import java.nio.file.Paths

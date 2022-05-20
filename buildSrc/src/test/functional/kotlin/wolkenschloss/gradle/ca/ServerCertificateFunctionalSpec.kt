@@ -1,9 +1,9 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
 import io.kotest.core.spec.style.FunSpec
-import wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.Template
 import io.kotest.engine.spec.tempdir
-import wolkenschloss.testing.createRunner
+import family.haschka.wolkenschloss.testing.createRunner
 import org.gradle.testkit.runner.TaskOutcome
 import io.kotest.matchers.shouldBe
 import org.bouncycastle.asn1.x500.X500Name

@@ -1,3 +1,3 @@
 plugins {
-    id("wolkenschloss.conventions.core")
+    id("family.haschka.wolkenschloss.conventions.core")
 }

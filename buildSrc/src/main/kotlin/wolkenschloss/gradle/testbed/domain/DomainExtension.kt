@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.domain
+package family.haschka.wolkenschloss.gradle.testbed.domain
 
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -6,7 +6,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskProvider
-import wolkenschloss.gradle.ca.TrustAnchor
+import family.haschka.wolkenschloss.gradle.ca.TrustAnchor
 
 abstract class DomainExtension {
     fun initialize(runDirectory: DirectoryProperty, ca: TaskProvider<TrustAnchor>) {
@@ -63,6 +63,6 @@ abstract class DomainExtension {
         const val DEFAULT_HOSTS_FILE_NAME = "hosts"
         const val DEFAULT_KUBE_CONFIG_FILE_NAME = "kubeconfig"
         const val DOMAIN_SUFFIX_PROPERTY = "wolkenschloss.domain-suffix"
-        const val ERROR_DOMAIN_SUFFIX_NOT_SET = "System property '${DOMAIN_SUFFIX_PROPERTY}' not set"
+        const val ERROR_DOMAIN_SUFFIX_NOT_SET = "System property '$DOMAIN_SUFFIX_PROPERTY' not set"
     }
 }

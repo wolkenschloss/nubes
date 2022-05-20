@@ -1,4 +1,4 @@
-package wolkenschloss.testing
+package family.haschka.wolkenschloss.testing
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner

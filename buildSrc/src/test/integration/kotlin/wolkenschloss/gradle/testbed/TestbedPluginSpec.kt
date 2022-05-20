@@ -1,11 +1,11 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import io.kotest.core.script.describe
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.gradle.testfixtures.ProjectBuilder
-import wolkenschloss.gradle.ca.CaPlugin
+import family.haschka.wolkenschloss.gradle.ca.CaPlugin
 
 class TestbedPluginSpec : FunSpec({
    describe("A project with testbed plugin applied to") {

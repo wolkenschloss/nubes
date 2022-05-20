@@ -1,16 +1,16 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
-import wolkenschloss.gradle.testbed.domain.DomainTasks
-import wolkenschloss.gradle.testbed.domain.PushImage
-import wolkenschloss.gradle.testbed.status.StatusTasks
-import wolkenschloss.gradle.testbed.transformation.TransformationTasks
-import wolkenschloss.gradle.ca.CaPlugin
-import wolkenschloss.gradle.ca.TrustAnchor
-import wolkenschloss.gradle.ca.TrustStore
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainTasks
+import family.haschka.wolkenschloss.gradle.testbed.domain.PushImage
+import family.haschka.wolkenschloss.gradle.testbed.status.StatusTasks
+import family.haschka.wolkenschloss.gradle.testbed.transformation.TransformationTasks
+import family.haschka.wolkenschloss.gradle.ca.CaPlugin
+import family.haschka.wolkenschloss.gradle.ca.TrustAnchor
+import family.haschka.wolkenschloss.gradle.ca.TrustStore
 
 class TestbedPlugin : Plugin<Project> {
     override fun apply(project: Project) {

@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.ca
+package family.haschka.wolkenschloss.gradle.ca
 
 import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
@@ -13,7 +13,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.work.Incremental
-import wolkenschloss.gradle.testbed.Directories
+import family.haschka.wolkenschloss.gradle.testbed.Directories
 import java.io.File
 import java.math.BigInteger
 import java.nio.file.Files

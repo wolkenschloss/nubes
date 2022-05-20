@@ -1,3 +1,3 @@
 plugins {
-    id("wolkenschloss.conventions.webapp")
+    id("family.haschka.wolkenschloss.conventions.webapp")
 }

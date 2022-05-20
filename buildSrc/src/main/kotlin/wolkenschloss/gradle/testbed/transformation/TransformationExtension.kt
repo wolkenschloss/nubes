@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.transformation
+package family.haschka.wolkenschloss.gradle.testbed.transformation
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout

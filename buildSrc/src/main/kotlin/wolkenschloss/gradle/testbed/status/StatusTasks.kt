@@ -1,12 +1,12 @@
-package wolkenschloss.gradle.testbed.status
+package family.haschka.wolkenschloss.gradle.testbed.status
 
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import wolkenschloss.gradle.testbed.domain.CopyKubeConfig
-import wolkenschloss.gradle.testbed.domain.DomainExtension
-import wolkenschloss.gradle.testbed.domain.DomainTasks
+import family.haschka.wolkenschloss.gradle.testbed.domain.CopyKubeConfig
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainExtension
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainTasks
 
 
 class StatusTasks(

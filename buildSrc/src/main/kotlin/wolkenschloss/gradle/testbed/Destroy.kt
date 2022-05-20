@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty

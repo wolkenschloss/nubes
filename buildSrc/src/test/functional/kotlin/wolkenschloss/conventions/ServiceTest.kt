@@ -1,10 +1,10 @@
-package wolkenschloss.conventions
+package family.haschka.wolkenschloss.conventions
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Template
-import wolkenschloss.testing.build
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.build
 
 class ServiceTest : FunSpec({
 

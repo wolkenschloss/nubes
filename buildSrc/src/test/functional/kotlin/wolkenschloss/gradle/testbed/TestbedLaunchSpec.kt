@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import com.jayway.jsonpath.JsonPath
 import io.kotest.core.spec.style.FunSpec
@@ -6,10 +6,10 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.gradle.testbed.domain.DomainOperations
-import wolkenschloss.gradle.testbed.domain.DomainTasks.Companion.LAUNCH_INSTANCE_TASK_NAME
-import wolkenschloss.testing.Template
-import wolkenschloss.testing.build
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainOperations
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainTasks.Companion.LAUNCH_INSTANCE_TASK_NAME
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.build
 import java.util.concurrent.TimeUnit
 
 class TestbedLaunchSpec : FunSpec({

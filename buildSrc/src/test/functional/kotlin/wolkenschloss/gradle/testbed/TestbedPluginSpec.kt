@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FunSpec
@@ -6,11 +6,11 @@ import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.gradle.testbed.domain.DomainExtension
-import wolkenschloss.testing.Template
-import wolkenschloss.testing.build
-import wolkenschloss.testing.buildAndFail
-import wolkenschloss.testing.createRunner
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainExtension
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.build
+import family.haschka.wolkenschloss.testing.buildAndFail
+import family.haschka.wolkenschloss.testing.createRunner
 
 class TestbedPluginSpec : FunSpec({
     context("A Project with testbed plugin applied to") {

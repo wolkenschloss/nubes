@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.domain
+package family.haschka.wolkenschloss.gradle.testbed.domain
 
 import com.jayway.jsonpath.JsonPath
 import net.minidev.json.JSONArray

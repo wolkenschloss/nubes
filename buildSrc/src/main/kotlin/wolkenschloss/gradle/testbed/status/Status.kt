@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.status
+package family.haschka.wolkenschloss.gradle.testbed.status
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -6,8 +6,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import wolkenschloss.gradle.testbed.domain.DomainOperations
-import wolkenschloss.gradle.testbed.domain.RegistryService
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainOperations
+import family.haschka.wolkenschloss.gradle.testbed.domain.RegistryService
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.function.Predicate

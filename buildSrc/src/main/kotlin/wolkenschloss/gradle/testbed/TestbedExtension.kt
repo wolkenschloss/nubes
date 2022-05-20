@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -7,10 +7,10 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskProvider
-import wolkenschloss.gradle.testbed.domain.DomainExtension
-import wolkenschloss.gradle.testbed.transformation.TransformationExtension
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainExtension
+import family.haschka.wolkenschloss.gradle.testbed.transformation.TransformationExtension
 import javax.inject.Inject
-import wolkenschloss.gradle.ca.TrustAnchor
+import family.haschka.wolkenschloss.gradle.ca.TrustAnchor
 
 @Suppress("CdiInjectionPointsInspection")
 abstract class TestbedExtension @Inject constructor(private val layout: ProjectLayout) {

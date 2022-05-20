@@ -1,5 +1,7 @@
+package family.haschka.wolkenschloss.conventions
+
 plugins {
-    id("wolkenschloss.conventions.java")
+    id("family.haschka.wolkenschloss.conventions.java")
     id("java-library")
 }
 

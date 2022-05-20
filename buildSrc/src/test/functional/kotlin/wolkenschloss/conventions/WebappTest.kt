@@ -1,4 +1,4 @@
-package wolkenschloss.conventions
+package family.haschka.wolkenschloss.conventions
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.DescribeSpec
@@ -8,8 +8,8 @@ import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.gradle.testkit.runner.TaskOutcome
-import wolkenschloss.testing.Template
-import wolkenschloss.testing.build
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.build
 
 class WebappTest : DescribeSpec({
 

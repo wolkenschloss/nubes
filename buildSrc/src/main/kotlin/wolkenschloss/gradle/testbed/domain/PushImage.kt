@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed.domain
+package family.haschka.wolkenschloss.gradle.testbed.domain
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty

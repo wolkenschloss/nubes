@@ -1,5 +1,5 @@
 plugins {
-    id("wolkenschloss.conventions.service")
+    id("family.haschka.wolkenschloss.conventions.service")
 }
 
 dependencies {

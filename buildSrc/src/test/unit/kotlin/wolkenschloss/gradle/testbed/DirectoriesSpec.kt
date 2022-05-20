@@ -1,4 +1,4 @@
-package wolkenschloss.gradle.testbed
+package family.haschka.wolkenschloss.gradle.testbed
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir

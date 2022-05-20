@@ -1,9 +1,9 @@
-import wolkenschloss.gradle.ca.TrustAnchor
+import family.haschka.wolkenschloss.gradle.ca.TrustAnchor
 import java.time.ZonedDateTime
 import java.util.Optional
 
 plugins {
-    id("com.github.wolkenschloss.ca")
+    id("family.haschka.wolkenschloss.ca")
 }
 tasks {
 
