@@ -236,11 +236,6 @@ tasks {
 
 idea {
     module {
-//        listOf(integration, functional).forEach {
-//            testSourceDirs = testSourceDirs.plus(it.java.srcDirs)
-//            testResourceDirs = testResourceDirs.plus(it.resources)
-//        }
-
         jdkName = "11"
     }
 }
