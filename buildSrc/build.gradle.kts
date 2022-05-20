@@ -64,23 +64,24 @@ val fixturesApi: Configuration by configurations.getting {
 testing {
     suites {
         named("test", JvmTestSuite::class) {
-            useJUnitJupiter()
+            useJUnitJupiter(libraries.versions.junit.get())
             sources {
                 java {
-                    setSrcDirs(listOf("src/test/unit/kotlin"))
+                    setSrcDirs(listOf(testDir.unit.kotlin))
                 }
+
                 compileClasspath += fixtures.output
                 runtimeClasspath += fixtures.output
             }
         }
 
         register("integration", JvmTestSuite::class) {
-            useJUnitJupiter()
+            useJUnitJupiter(libraries.versions.junit.get())
             testType.set(TestSuiteType.INTEGRATION_TEST)
 
             sources {
                 java {
-                    setSrcDirs(listOf("src/test/integration/kotlin"))
+                    setSrcDirs(listOf(testDir.dir(this@register.name).kotlin))
                 }
 
                 compileClasspath += fixtures.output
@@ -94,13 +95,14 @@ testing {
         }
 
         register("functional", JvmTestSuite::class) {
-            useJUnitJupiter()
+            useJUnitJupiter(libraries.versions.junit.get())
             testType.set(TestSuiteType.FUNCTIONAL_TEST)
 
             sources {
                 java {
-                    setSrcDirs(listOf("src/test/functional/kotlin"))
+                    setSrcDirs(listOf(testDir.dir(this@register.name).kotlin))
                 }
+
                 compileClasspath += fixtures.output
                 runtimeClasspath += fixtures.output
             }
@@ -186,7 +188,6 @@ dependencies {
     api(libraries.jsonpath)
     api(libraries.bundles.bouncycastle)
 
-    fixturesImplementation(libraries.bundles.junit)
     fixturesApi(libraries.bundles.kotest)
 }
 

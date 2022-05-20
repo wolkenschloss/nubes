@@ -66,7 +66,6 @@ bouncycastle-tls = { module = "org.bouncycastle:bctls-jdk18on", version.ref = "b
 bouncycastle = ["bouncycastle-prov", "bouncycastle-pkix", "bouncycastle-tls"]
 junit = ["junit-api", "junit-engine"]
 kotest = ["kotest-junit-runner", "kotest-assertions-core"]
-#kotest = ["kotest-framework-runner", "kotest-assertions-core"]
 quarkus-unit = ["quarkus-junit", "quarkus-junit-mockito", "restassured"]
 quarkus-integration = ["quarkus-junit", "restassured"]
 quarkus-deployment = ["quarkus-container-docker", "quarkus-kubernetes"]
