@@ -235,15 +235,17 @@ tasks {
     }
 }
 
+val buildSrcPackagePrefix = "family.haschka.wolkenschloss"
+
 idea {
     module {
         jdkName = "11"
         settings {
-            packagePrefix["src/main/kotlin"] = "family.haschka"
-            packagePrefix["src/test/integration/kotlin"] = "family.haschka"
-            packagePrefix["src/test/functional/kotlin"] = "family.haschka"
-            packagePrefix["src/test/unit/kotlin"] = "family.haschka"
-            packagePrefix["src/test/fixtures/kotlin"] = "family.haschka"
+            packagePrefix["src/main/kotlin"] = buildSrcPackagePrefix
+            packagePrefix["src/test/integration/kotlin"] = buildSrcPackagePrefix
+            packagePrefix["src/test/functional/kotlin"] = buildSrcPackagePrefix
+            packagePrefix["src/test/unit/kotlin"] = buildSrcPackagePrefix
+            packagePrefix["src/test/fixtures/kotlin"] = buildSrcPackagePrefix
         }
     }
 }

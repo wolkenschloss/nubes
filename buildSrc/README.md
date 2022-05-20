@@ -407,4 +407,4 @@ angefügt.
 [Vue CLI]: https://cli.vuejs.org/
 [buildSrc]: .
 [fixtures]: fixtures
-[Testbed]: src/main/kotlin/wolkenschloss/gradle/testbed
+[Testbed]: src/main/kotlin/gradle/testbed
