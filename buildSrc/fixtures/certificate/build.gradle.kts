@@ -1,7 +1,7 @@
-import wolkenschloss.gradle.ca.ServerCertificate
+import family.haschka.wolkenschloss.gradle.ca.ServerCertificate
 
 plugins {
-    id("com.github.wolkenschloss.ca")
+    id("family.haschka.wolkenschloss.ca")
 }
 tasks {
 

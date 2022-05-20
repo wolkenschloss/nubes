@@ -47,7 +47,8 @@ testcontainers = { group = "org.testcontainers", name = "testcontainers-bom", ve
 
 junit-api = {module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-engine = {module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-kotest-runner = {module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest-junit-runner = {module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest-framework-runner = {module = "io.kotest:kotest-framework-engine-jvm", version.ref = "kotest" }
 kotest-assertions-core = {module = "io.kotest:kotest-assertions-core", version.ref = "kotest"}
 
 quarkus-junit = { module = "io.quarkus:quarkus-junit5", version.ref = "quarkus" }
@@ -64,7 +65,7 @@ bouncycastle-tls = { module = "org.bouncycastle:bctls-jdk18on", version.ref = "b
 [bundles]
 bouncycastle = ["bouncycastle-prov", "bouncycastle-pkix", "bouncycastle-tls"]
 junit = ["junit-api", "junit-engine"]
-kotest = ["kotest-runner", "kotest-assertions-core"]
+kotest = ["kotest-junit-runner", "kotest-assertions-core"]
 quarkus-unit = ["quarkus-junit", "quarkus-junit-mockito", "restassured"]
 quarkus-integration = ["quarkus-junit", "restassured"]
 quarkus-deployment = ["quarkus-container-docker", "quarkus-kubernetes"]

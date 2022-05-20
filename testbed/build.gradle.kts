@@ -1,10 +1,10 @@
-import wolkenschloss.gradle.ca.ServerCertificate
-import wolkenschloss.gradle.testbed.Apply
-import wolkenschloss.gradle.testbed.domain.DomainExtension
-import wolkenschloss.gradle.testbed.domain.DomainTasks
+import family.haschka.wolkenschloss.gradle.ca.ServerCertificate
+import family.haschka.wolkenschloss.gradle.testbed.Apply
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainExtension
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainTasks
 
 plugins {
-    id("com.github.wolkenschloss.testbed")
+    id("family.haschka.wolkenschloss.testbed")
 }
 
 defaultTasks("start")
