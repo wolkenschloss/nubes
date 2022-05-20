@@ -41,6 +41,7 @@ val fixtures: SourceSet by sourceSets.creating {
     java {
         setSrcDirs(testDir.dir(this.name).java)
     }
+
     kotlin {
         sourceSets[this@creating.name].apply {
             kotlin.setSrcDirs(testDir.dir(this@creating.name).kotlin)
@@ -56,14 +57,13 @@ val fixturesRuntimeOnly: Configuration by configurations.getting {
     extendsFrom(configurations.runtimeOnly.get())
 }
 
-
 val fixturesApi: Configuration by configurations.getting {
     extendsFrom(configurations.api.get())
 }
 
 testing {
     suites {
-        val test by getting(JvmTestSuite::class) {
+        named("test", JvmTestSuite::class) {
             useJUnitJupiter()
             sources {
                 java {
@@ -72,14 +72,12 @@ testing {
                 compileClasspath += fixtures.output
                 runtimeClasspath += fixtures.output
             }
-            dependencies {
-//                implementation(libraries.bundles.kotest)
-            }
         }
 
-        val integration by registering(JvmTestSuite::class) {
+        register("integration", JvmTestSuite::class) {
             useJUnitJupiter()
             testType.set(TestSuiteType.INTEGRATION_TEST)
+
             sources {
                 java {
                     setSrcDirs(listOf("src/test/integration/kotlin"))
@@ -95,9 +93,10 @@ testing {
             }
         }
 
-        val functional by registering(JvmTestSuite::class) {
+        register("functional", JvmTestSuite::class) {
             useJUnitJupiter()
             testType.set(TestSuiteType.FUNCTIONAL_TEST)
+
             sources {
                 java {
                     setSrcDirs(listOf("src/test/functional/kotlin"))
@@ -105,6 +104,7 @@ testing {
                 compileClasspath += fixtures.output
                 runtimeClasspath += fixtures.output
             }
+
             dependencies {
                 implementation(project)
                 implementation(gradleKotlinDsl())
@@ -185,7 +185,6 @@ dependencies {
     implementation(libraries.jib)
     api(libraries.jsonpath)
     api(libraries.bundles.bouncycastle)
-
 
     fixturesImplementation(libraries.bundles.junit)
     fixturesApi(libraries.bundles.kotest)
