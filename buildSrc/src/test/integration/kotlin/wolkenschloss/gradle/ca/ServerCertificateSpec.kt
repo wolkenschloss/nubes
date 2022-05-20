@@ -1,20 +1,16 @@
 package wolkenschloss.gradle.ca
 
-import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.system.withEnvironment
 import io.kotest.engine.spec.tempdir
-import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.kotlin.dsl.*
-import io.kotest.matchers.shouldBe
-import wolkenschloss.gradle.testbed.Directories
+import io.kotest.extensions.system.withEnvironment
 import io.kotest.matchers.file.shouldStartWithPath
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
-import org.bouncycastle.openssl.PEMParser
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
-import java.io.File
-import java.security.PrivateKey
+import io.kotest.matchers.shouldBe
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.registering
+import org.gradle.testfixtures.ProjectBuilder
+import wolkenschloss.gradle.testbed.Directories
 
 class ServerCertificateSpec : FunSpec({
     context("CA Gradle Plugin applied to a project") {
