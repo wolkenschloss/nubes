@@ -1,7 +1,7 @@
 [versions]
 quarkus = "2.9.1.Final"
 awaitility = "4.1.0"
-jsoup = "1.14.1"
+jsoup = "1.14.2"
 mockserver = "5.11.2"
 testcontainers = "1.17.2"
 junit = "5.8.2"
