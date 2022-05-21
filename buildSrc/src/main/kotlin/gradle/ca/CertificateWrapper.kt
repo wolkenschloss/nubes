@@ -71,11 +71,7 @@ class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
             val names = GeneralNames.fromExtensions(
                 this.certificateHolder.extensions,
                 Extension.subjectAlternativeName
-            )
-
-            if (names == null) {
-                return emptyList()
-            }
+            ) ?: return emptyList()
 
             return names.names.map {
 
@@ -90,7 +86,7 @@ class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
         }
 
     private fun DEROctetString.toIpv4Address() =
-        this.octets.map { o -> o.toString() }.joinToString(".")
+        this.octets.joinToString(".") { o -> o.toString() }
 
 
     private fun GeneralName.tag(): String {
