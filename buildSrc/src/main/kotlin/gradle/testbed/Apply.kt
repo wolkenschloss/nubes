@@ -33,7 +33,6 @@ abstract class Apply : DefaultTask() {
 
     private val multipass = domain.map { listOf("multipass", "exec", it, "--") }
     private val docker = multipass.map { it + listOf("docker") }
-    private val kubectl = multipass.map { it + listOf("microk8s", "kubectl") }
 
     @TaskAction
     fun apply() {

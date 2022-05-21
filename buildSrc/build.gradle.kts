@@ -66,7 +66,7 @@ val fixturesApi: Configuration by configurations.getting {
 testing {
     suites {
         named("test", JvmTestSuite::class) {
-            useJUnitJupiter(libraries.versions.junit.get())
+            useJUnitJupiter(nubesLibs.versions.junit.get())
             sources {
                 java {
                     setSrcDirs(listOf(testDir.unit.kotlin))
@@ -78,7 +78,7 @@ testing {
         }
 
         register("integration", JvmTestSuite::class) {
-            useJUnitJupiter(libraries.versions.junit.get())
+            useJUnitJupiter(nubesLibs.versions.junit.get())
             testType.set(TestSuiteType.INTEGRATION_TEST)
 
             sources {
@@ -97,7 +97,7 @@ testing {
         }
 
         register("functional", JvmTestSuite::class) {
-            useJUnitJupiter(libraries.versions.junit.get())
+            useJUnitJupiter(nubesLibs.versions.junit.get())
             testType.set(TestSuiteType.FUNCTIONAL_TEST)
 
             sources {
@@ -148,7 +148,7 @@ val functionalApi: Configuration by configurations.getting {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(11))
-        vendor.set(JvmVendorSpec.ADOPTOPENJDK)
+        vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
 
@@ -179,17 +179,17 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(libraries.quarkus.plugin) {
+    implementation(nubesLibs.quarkus.plugin) {
         // This exclusion prevents the StaticLoggerBinder from being bound twice in the tests
         exclude(group = "org.jboss.slf4j", module = "slf4j-jboss-logmanager")
     }
 
-    implementation(libraries.gradle.node.plugin)
-    implementation(libraries.jib)
-    api(libraries.jsonpath)
-    api(libraries.bundles.bouncycastle)
+    implementation(nubesLibs.gradle.node.plugin)
+    implementation(nubesLibs.jib)
+    api(nubesLibs.jsonpath)
+    api(nubesLibs.bundles.bouncycastle)
 
-    fixturesApi(libraries.bundles.kotest)
+    fixturesApi(nubesLibs.bundles.kotest)
 }
 
 tasks.withType<Test> {
@@ -240,6 +240,7 @@ val buildSrcPackagePrefix = "family.haschka.wolkenschloss"
 idea {
     module {
         jdkName = "11"
+
         settings {
             packagePrefix["src/main/kotlin"] = buildSrcPackagePrefix
             packagePrefix["src/test/integration/kotlin"] = buildSrcPackagePrefix

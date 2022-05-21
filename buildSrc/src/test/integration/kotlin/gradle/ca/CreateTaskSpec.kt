@@ -2,6 +2,7 @@ package family.haschka.wolkenschloss.gradle.ca
 
 import family.haschka.wolkenschloss.gradle.ca.CaPlugin
 import family.haschka.wolkenschloss.gradle.ca.TrustStore
+import family.haschka.wolkenschloss.gradle.testbed.Directories
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -16,7 +17,6 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.kotlin.dsl.*
 import org.gradle.testfixtures.ProjectBuilder
-import family.haschka.wolkenschloss.gradle.testbed.Directories
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -47,12 +47,12 @@ class CreateTaskSpec : FunSpec({
 
             test("certificate file defaults to \$XDG_DATA_HOME/wolkenschloss/ca/ca.crt") {
                 val create = project.tasks.named(CaPlugin.CREATE_TASK_NAME, TrustAnchor::class.java)
-                create.get().certificate.get().asFile shouldStartWithPath  Directories.certificateAuthorityHome.resolve("ca.crt")
+                create.get().certificate.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("ca.crt")
             }
 
             test("private key file defaults to \$XDG_DATA_HOME/wolkenschloss/ca/ca.key") {
                 val create = project.tasks.named(CaPlugin.CREATE_TASK_NAME, TrustAnchor::class.java)
-                create.get().privateKey.get().asFile shouldStartWithPath  Directories.certificateAuthorityHome.resolve("ca.key")
+                create.get().privateKey.get().asFile shouldStartWithPath Directories.certificateAuthorityHome.resolve("ca.key")
             }
 
             test("The default for the start of validity is the current time") {
