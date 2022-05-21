@@ -72,15 +72,6 @@ abstract class Status : DefaultTask() {
                 }
         }
     }
-
-    private fun <T> check(label: String, value: T, requiredCondition: Predicate<T>) {
-        if (requiredCondition.test(value)) {
-            logger.quiet(String.format("✓ %-15s: %s", label, value))
-        } else {
-            logger.error(String.format("✗ %-15s: %s", label, value))
-        }
-    }
-
     private fun check(label: String, fn: () -> Unit) {
         try {
             fn()
