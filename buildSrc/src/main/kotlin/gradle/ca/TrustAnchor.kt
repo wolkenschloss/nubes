@@ -77,7 +77,7 @@ abstract class TrustAnchor : DefaultTask() {
             random.nextBytes(id)
 
             val keyUsage = KeyUsage(KeyUsage.keyCertSign)
-            val extUtils: JcaX509ExtensionUtils = JcaX509ExtensionUtils()
+            val extUtils = JcaX509ExtensionUtils()
             val holder = createCertificateBuilder(keyPair)
                 .addExtension(Extension.basicConstraints, true, BasicConstraints(true).encoded)
                 .addExtension(Extension.keyUsage, false, keyUsage.encoded)
@@ -90,19 +90,19 @@ abstract class TrustAnchor : DefaultTask() {
 
             // mkcert accepts only private keys in pkcs8 format
             val gen = JcaPKCS8Generator(keyPair.private, null)
-            privateKey.get().asFile.writePem(gen.generate(), fun File.() {
+            privateKey.get().asFile.writePem(gen.generate()) {
                 val permission = hashSetOf(PosixFilePermission.OWNER_READ)
                 Files.setPosixFilePermissions(toPath(), permission)
-            })
+            }
 
-            certificate.get().asFile.writePem(cert, fun File.() {
+            certificate.get().asFile.writePem(cert) {
                 val permission = hashSetOf(
                     PosixFilePermission.OWNER_READ,
                     PosixFilePermission.GROUP_READ,
                     PosixFilePermission.OTHERS_READ
                 )
                 Files.setPosixFilePermissions(toPath(), permission)
-            })
+            }
 
         } catch (e: Exception) {
             throw GradleException("Cannot create certificate: ${e.message}", e)

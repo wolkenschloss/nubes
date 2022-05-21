@@ -111,7 +111,7 @@ abstract class ServerCertificate : DefaultTask() {
         private const val KEYPAIR_GENERATOR_ALGORITHM = "RSA"
         private const val THIRTY_DAYS = 1000L * 60 * 60 * 24 * 30
 
-        fun DnsName(name: String) = GeneralName.dNSName to name
-        fun IpAddress(value: String) = GeneralName.iPAddress to value
+        fun dnsName(name: String) = GeneralName.dNSName to name
+        fun ipAddress(value: String) = GeneralName.iPAddress to value
     }
 }

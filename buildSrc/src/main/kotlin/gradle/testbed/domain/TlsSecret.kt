@@ -18,7 +18,7 @@ class TlsSecret(val namespace: String, val name: String, val certificate: Certif
             }
             if (type == "Opaque") {
                 if (json.containsKey("data")) {
-                    val data = json.get("data") as JSONObject
+                    val data = json["data"] as JSONObject
                     if (data.containsKey("crt.pem")) {
                         return true
                     }
@@ -30,14 +30,14 @@ class TlsSecret(val namespace: String, val name: String, val certificate: Certif
 
         fun parse(json: JSONObject): TlsSecret {
 
-            val metadata = json.get("metadata") as JSONObject
+            val metadata = json["metadata"] as JSONObject
             val name = metadata.getAsString("name")
             val namespace = metadata.getAsString("namespace")
 
             val type = json.getAsString("type")
             if (type == "Opaque") {
                 if (json.containsKey("data")) {
-                    val data = json.get("data") as JSONObject
+                    val data = json["data"] as JSONObject
                     if (data.containsKey("crt.pem")) {
                         val certificate = data.getAsString("crt.pem").decode()
                         return TlsSecret(namespace, name, CertificateWrapper.parse(certificate), type)
@@ -46,7 +46,7 @@ class TlsSecret(val namespace: String, val name: String, val certificate: Certif
             }
 
             if (type == "kubernetes.io/tls") {
-                val data = json.get("data") as JSONObject
+                val data = json["data"] as JSONObject
                 val certificate = data.getAsString("tls.crt").decode()
                 return TlsSecret(namespace, name, CertificateWrapper.parse(certificate), type)
             }

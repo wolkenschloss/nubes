@@ -11,7 +11,7 @@ abstract class Apply : DefaultTask() {
     @get:Input
     abstract val domain: Property<String>
 
-    @get:Option(option = "overlay", description = "Overlay to apply", )
+    @get:Option(option = "overlay", description = "Overlay to apply")
     @get:Input
     abstract val overlay: Property<String>
 

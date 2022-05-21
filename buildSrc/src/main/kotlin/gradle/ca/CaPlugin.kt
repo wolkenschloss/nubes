@@ -44,7 +44,7 @@ class CaPlugin : Plugin<Project> {
             withType(ServerCertificate::class) {
                 caCertificate.convention(create.flatMap { it.certificate })
                 caPrivateKey.convention(create.flatMap { it.privateKey })
-                subjectAlternativeNames.convention(listOf(ServerCertificate.DnsName(name)))
+                subjectAlternativeNames.convention(listOf(ServerCertificate.dnsName(name)))
 
                 val certPath = this.baseDirectory.map { it.resolve("crt.pem") }
                 certificate.convention(certPath.map {
