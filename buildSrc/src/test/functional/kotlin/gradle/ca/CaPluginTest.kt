@@ -137,13 +137,3 @@ private fun Date.toUtc(): ZonedDateTime {
     return ZonedDateTime.ofInstant(this.toInstant(), ZoneOffset.UTC)
 }
 
-fun haveIssuer(issuer: String) = object : Matcher<X509Certificate> {
-    override fun test(value: X509Certificate) = MatcherResult(
-        value.issuerX500Principal.name == issuer,
-        "Certificate issuer '${value.issuerX500Principal.name} does not equal '$issuer'",
-        "Certificate should not be issued by '$issuer'"
-    )
-}
-
-infix fun X509Certificate.shouldBeIssuedBy(issuer: String) = this should haveIssuer(issuer)
-

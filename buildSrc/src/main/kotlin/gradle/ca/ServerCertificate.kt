@@ -108,7 +108,6 @@ abstract class ServerCertificate : DefaultTask() {
     }
 
     companion object {
-        private const val KEYPAIR_GENERATOR_ALGORITHM = "RSA"
         private const val THIRTY_DAYS = 1000L * 60 * 60 * 24 * 30
 
         fun dnsName(name: String) = GeneralName.dNSName to name

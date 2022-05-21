@@ -21,9 +21,6 @@ abstract class Destroy : DefaultTask() {
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
 
-    @get:Inject
-    abstract val providerFactory: ProviderFactory
-
     @TaskAction
     fun destroy() {
 
