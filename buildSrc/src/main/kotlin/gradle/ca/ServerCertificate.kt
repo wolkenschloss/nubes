@@ -34,7 +34,7 @@ abstract class ServerCertificate : DefaultTask() {
     }
 
     @Internal
-    val generalNames = subjectAlternativeNames.map { GeneralNames( it.map { GeneralName(it.first, it.second)}.toTypedArray()) }
+    val generalNames = subjectAlternativeNames.map {sans -> GeneralNames( sans.map { GeneralName(it.first, it.second)}.toTypedArray()) }
 
     @get:Input
     abstract val subjectAlternativeNames: ListProperty<Pair<Int, String>>
@@ -90,10 +90,12 @@ abstract class ServerCertificate : DefaultTask() {
             builder.addExtension(Extension.extendedKeyUsage, false, ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth))
 
             val signer = JcaContentSignerBuilder("SHA256WithRSA").setProvider(BouncyCastleProvider())
-            val caPrivateKey = caPrivateKey.map { it.asFile.readPrivateKey() }
+            val caPrivateKey = caPrivateKey.map { key -> key.asFile.readPrivateKey() }
 
-            caPrivateKey.map {
-                JcaX509CertificateConverter().setProvider(BouncyCastleProvider()).getCertificate(builder.build(signer.build(it)))
+            caPrivateKey.map {key ->
+                JcaX509CertificateConverter()
+                    .setProvider(BouncyCastleProvider())
+                    .getCertificate(builder.build(signer.build(key)))
             }.get()
         }
 

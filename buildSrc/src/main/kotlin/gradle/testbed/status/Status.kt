@@ -1,16 +1,15 @@
 package family.haschka.wolkenschloss.gradle.testbed.status
 
+import family.haschka.wolkenschloss.gradle.testbed.domain.DomainOperations
+import family.haschka.wolkenschloss.gradle.testbed.domain.RegistryService
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import family.haschka.wolkenschloss.gradle.testbed.domain.DomainOperations
-import family.haschka.wolkenschloss.gradle.testbed.domain.RegistryService
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.function.Predicate
 import javax.inject.Inject
 
 abstract class Status : DefaultTask() {
@@ -63,11 +62,11 @@ abstract class Status : DefaultTask() {
 
         check("TLS Secrets") {
             domainOperations.readAllTlsSecrets()
-                .forEach {
-                    check(it.toString(), {it} ) {
+                .forEach {secret ->
+                    check(secret.toString(), {secret} ) {
                         check {it.certificate.isValidNow()}
                             .ok { "Valid until ${it.certificate.notAfter}"}
-                            .error("Expired at ${it.certificate.notAfter}")
+                            .error("Expired")
                     }
                 }
         }
