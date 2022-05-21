@@ -82,7 +82,7 @@ class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
                 val value = when (val prim = it.name.toASN1Primitive()) {
                     is ASN1IA5String -> prim.string
                     is DEROctetString -> prim.toIpv4Address()
-                    else -> throw UnknownAsn1Primitive(it.name)
+                    else -> throw UnprocessedGeneralName(it)
                 }
 
                 "${it.tag()}:$value"
