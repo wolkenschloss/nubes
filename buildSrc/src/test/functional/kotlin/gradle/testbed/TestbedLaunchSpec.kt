@@ -13,52 +13,56 @@ import family.haschka.wolkenschloss.testing.build
 import java.util.concurrent.TimeUnit
 
 class TestbedLaunchSpec : FunSpec({
-   xcontext("testbed project") {
-       afterSpec {
-           ProcessBuilder("multipass", "delete", "launch")
-               .start()
-               .waitFor()
+    // defined in fixtures/test/launch/build.gradle.kts
+    val instanceName = "launch"
 
-           ProcessBuilder("multipass", "purge")
-               .start()
-               .waitFor()
-       }
+    context("testbed project") {
+        afterSpec {
+            ProcessBuilder("multipass", "delete", instanceName)
+                .start()
+                .waitFor()
 
-       autoClose(Template("testbed/launch")).withClone {
+            ProcessBuilder("multipass", "purge")
+                .start()
+                .waitFor()
+        }
 
-           test("should launch multipass instance") {
+        autoClose(Template("testbed/launch")).withClone {
+
+            test("should launch multipass instance") {
                 val result = build(LAUNCH_INSTANCE_TASK_NAME, "--info")
 
-               workingDirectory
-                       .resolve("build/config/cloud-init/user-data")
-                       .shouldExist()
+                workingDirectory
+                    .resolve("build/config/cloud-init/user-data")
+                    .shouldExist()
 
-               workingDirectory
-                       .resolve("build/run/hosts")
-                       .shouldExist()
+                workingDirectory
+                    .resolve("build/run/hosts")
+                    .shouldExist()
 
-               result.tasks(TaskOutcome.SUCCESS)
-                       .map { task -> task.path }
-                       .shouldContainAll(":transform")
-           }
+                result.tasks(TaskOutcome.SUCCESS)
+                    .map { task -> task.path }
+                    .shouldContainAll(":transform")
+            }
 
-           test("should create hosts file") {
-               val process = ProcessBuilder(
-                   DomainOperations.ipAddressCommandLine("launch"))
-                   .start()
+            test("should create hosts file") {
+                val process = ProcessBuilder(
+                    DomainOperations.ipAddressCommandLine(instanceName)
+                )
+                    .start()
 
-               process.inputStream.reader().use {
-                   val json = it.readText()
-                   val ipAddress = JsonPath.parse(json).read<List<String>>(DomainOperations.ipAddressJsonPath).single()
+                process.inputStream.reader().use {
+                    val json = it.readText()
+                    val ipAddress = JsonPath.parse(json).read<List<String>>(DomainOperations.ipAddressJsonPath).single()
 
-                   workingDirectory
-                       .resolve("build/run/hosts")
-                       .readText()
-                       .shouldBe("$ipAddress launch.fixture.test dummy1.fixture.test dummy2.fixture.test\n")
-               }
+                    workingDirectory
+                        .resolve("build/run/hosts")
+                        .readText()
+                        .shouldBe("$ipAddress launch.fixture.test dummy1.fixture.test dummy2.fixture.test\n")
+                }
 
-               process.waitFor(30, TimeUnit.SECONDS).shouldBe(true)
-           }
-       }
-   }
+                process.waitFor(30, TimeUnit.SECONDS).shouldBe(true)
+            }
+        }
+    }
 })
