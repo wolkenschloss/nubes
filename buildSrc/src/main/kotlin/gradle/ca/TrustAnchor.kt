@@ -121,14 +121,6 @@ abstract class TrustAnchor : DefaultTask() {
         )
     }
 
-    private fun X509v3CertificateBuilder.addBasicConstraints(ca: Boolean): X509v3CertificateBuilder {
-        return addExtension(Extension.basicConstraints, true, BasicConstraints(ca))
-    }
-
-    private fun X509v3CertificateBuilder.addKeyUsageExtension(usage: Int): X509v3CertificateBuilder {
-        return addExtension(Extension.keyUsage, true, KeyUsage(usage))
-    }
-
     private fun randomSerialNumber(): BigInteger {
         return BigInteger(160, random)
     }

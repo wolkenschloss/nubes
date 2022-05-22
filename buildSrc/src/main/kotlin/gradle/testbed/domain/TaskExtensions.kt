@@ -30,12 +30,3 @@ fun DefaultTask.execute(action: ExecSpec.() -> Unit): Result {
         }
     }
 }
-
-fun DefaultTask.eval(vararg args: Any): String {
-
-    val result = this.execute {
-        commandLine(*args)
-    }
-    return result.verify().output
-
-}

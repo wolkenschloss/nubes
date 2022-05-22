@@ -1,24 +1,20 @@
 package family.haschka.wolkenschloss.gradle.ca
 
+import family.haschka.wolkenschloss.testing.Template
+import family.haschka.wolkenschloss.testing.createRunner
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
-import io.kotest.matchers.Matcher
-import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.file.shouldBeReadable
 import io.kotest.matchers.file.shouldContainFile
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.file.shouldNotBeWriteable
 import io.kotest.matchers.ints.shouldBeGreaterThan
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.KeyUsage
 import org.gradle.testkit.runner.TaskOutcome
-import family.haschka.wolkenschloss.testing.Template
-import family.haschka.wolkenschloss.testing.createRunner
-import java.security.cert.X509Certificate
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
@@ -136,14 +132,4 @@ class CaPluginTest : FunSpec({
 private fun Date.toUtc(): ZonedDateTime {
     return ZonedDateTime.ofInstant(this.toInstant(), ZoneOffset.UTC)
 }
-
-fun haveIssuer(issuer: String) = object : Matcher<X509Certificate> {
-    override fun test(value: X509Certificate) = MatcherResult(
-        value.issuerX500Principal.name == issuer,
-        "Certificate issuer '${value.issuerX500Principal.name} does not equal '$issuer'",
-        "Certificate should not be issued by '$issuer'"
-    )
-}
-
-infix fun X509Certificate.shouldBeIssuedBy(issuer: String) = this should haveIssuer(issuer)
 
