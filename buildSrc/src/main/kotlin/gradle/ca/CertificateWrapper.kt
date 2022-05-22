@@ -2,6 +2,7 @@ package family.haschka.wolkenschloss.gradle.ca
 
 import org.bouncycastle.asn1.ASN1IA5String
 import org.bouncycastle.asn1.DEROctetString
+import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.*
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.cert.X509CertificateHolder
@@ -16,31 +17,31 @@ import java.util.*
 
 class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
 
-    val issuer
+    val issuer: X500Name
         get() = certificateHolder.issuer
 
-    val subject
+    val subject: X500Name
         get() = certificateHolder.subject
 
-    val notBefore
+    val notBefore: Date
         get() = certificateHolder.notBefore
 
-    val notAfter
+    val notAfter: Date
         get() = certificateHolder.notAfter
 
-    val keyUsage
+    val keyUsage: KeyUsage
         get() = KeyUsage.fromExtensions(this.certificateHolder.extensions)
 
-    val extendedKeyUsages
+    val extendedKeyUsages: Array<KeyPurposeId>
         get() = ExtendedKeyUsage.fromExtensions(this.certificateHolder.extensions).usages
 
-    val subjectKeyIdentifier
+    val subjectKeyIdentifier: ByteArray
         get() = SubjectKeyIdentifier.fromExtensions(this.certificateHolder.extensions).keyIdentifier
 
-    val authorityKeyIdentifier
+    val authorityKeyIdentifier: AuthorityKeyIdentifier
         get() = AuthorityKeyIdentifier.fromExtensions(this.certificateHolder.extensions)
 
-    val x509Certificate
+    val x509Certificate: X509Certificate
         get() = JcaX509CertificateConverter()
             .setProvider(BouncyCastleProvider())
             .getCertificate(certificateHolder)
@@ -77,9 +78,8 @@ class CertificateWrapper(private val certificateHolder: X509CertificateHolder) {
             }
 
             return names.names.map {
-                val prim = it.name.toASN1Primitive()
 
-                val value = when (prim) {
+                val value = when (val prim = it.name.toASN1Primitive()) {
                     is ASN1IA5String -> prim.string
                     is DEROctetString -> prim.toIpv4Address()
                     else -> throw UnknownAsn1Primitive(it.name)

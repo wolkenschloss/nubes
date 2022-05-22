@@ -7,12 +7,18 @@ plugins {
 }
 
 tasks {
-    named<Test>("test") {
+    withType(Test::class) {
         systemProperty("org.jboss.logging.provider", "slf4j")
         systemProperty("java.util.logging.SimpleFormatter.format", "[JUNIT] %3\$s %4\$s: %5\$s%6\$s%n")
         reports {
-            junitXml.required.set(true)
-            html.required.set(true)
+            junitXml.apply{
+                required.set(true)
+                outputLocation.set(layout.buildDirectory.dir("test-results/${this@withType.name}/junit-xml"))
+            }
+            html.apply {
+                required.set(true)
+                outputLocation.set(layout.buildDirectory.dir("test-results/${this@withType.name}/junit-html"))
+            }
         }
     }
 }

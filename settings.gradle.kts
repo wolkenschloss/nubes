@@ -1,14 +1,13 @@
 rootProject.name = "nubes"
 
 pluginManagement {
-        val quarkusPluginVersion: String by settings
-        val quarkusPluginArtifactId: String by settings
-
         repositories {
                 mavenLocal()
                 mavenCentral()
+                gradlePluginPortal()
         }
 }
+
 include (
         "services:cookbook:core",
         "services:cookbook:service",

@@ -39,8 +39,8 @@ abstract class TestbedExtension @Inject constructor(private val layout: ProjectL
 
     /**
      * Liefert die Beschreibung des Prüfstandes als Map
-     * @param objects Tja
-     * @return Eine Karte mit den Eigenschaften des Prüfstandes
+     * @param project Das Gradle Projekt, zu dem diese Erweiterung gehört.
+     * @return Eine Karte mit den Eigenschaften des Prüfstandes.
      */
     fun asPropertyMap(project: Project): Map<String, Provider<*>> {
         return mapOf(

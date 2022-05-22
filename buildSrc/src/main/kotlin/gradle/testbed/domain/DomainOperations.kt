@@ -37,8 +37,8 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
             }
 
             val parser = JSONParser(JSONParser.MODE_JSON_SIMPLE)
-            var json = parser.parse(it.toString()) as JSONObject
-            var items = json.get("items") as JSONArray
+            val json = parser.parse(it.toString()) as JSONObject
+            val items = json["items"] as JSONArray
 
             return items
                 .map { it as JSONObject }

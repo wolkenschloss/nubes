@@ -22,8 +22,8 @@ tasks {
 
     register<ServerCertificate>("localhost") {
         subjectAlternativeNames.set(listOf(
-            ServerCertificate.DnsName("localhost"),
-            ServerCertificate.IpAddress("127.0.0.1")
+            ServerCertificate.dnsName("localhost"),
+            ServerCertificate.ipAddress("127.0.0.1")
         ))
     }
 

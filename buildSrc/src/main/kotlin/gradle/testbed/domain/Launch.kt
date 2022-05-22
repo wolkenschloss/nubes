@@ -105,7 +105,7 @@ abstract class Launch : DefaultTask() {
 
         logger.quiet("Instanz wird erzeugt")
 
-        var commands = listOf<String>("multipass", "launch",
+        val commands = listOf("multipass", "launch",
                 "--name", domain.get(),
                 "--timeout", "900")
                 .plus(cpus.map { listOf("--cpus", it.toString()) }.getOrElse(emptyList()))
@@ -116,7 +116,7 @@ abstract class Launch : DefaultTask() {
 
         // Erzeuge:
         execute(project, userData) {
-            commandLine = commands;
+            commandLine = commands
         }
     }
 

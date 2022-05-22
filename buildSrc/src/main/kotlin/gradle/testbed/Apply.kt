@@ -11,7 +11,7 @@ abstract class Apply : DefaultTask() {
     @get:Input
     abstract val domain: Property<String>
 
-    @get:Option(option = "overlay", description = "Overlay to apply", )
+    @get:Option(option = "overlay", description = "Overlay to apply")
     @get:Input
     abstract val overlay: Property<String>
 
@@ -33,7 +33,6 @@ abstract class Apply : DefaultTask() {
 
     private val multipass = domain.map { listOf("multipass", "exec", it, "--") }
     private val docker = multipass.map { it + listOf("docker") }
-    private val kubectl = multipass.map { it + listOf("microk8s", "kubectl") }
 
     @TaskAction
     fun apply() {

@@ -4,7 +4,9 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.X500NameBuilder
 import org.bouncycastle.asn1.x500.style.BCStyle
-import org.bouncycastle.asn1.x509.*
+import org.bouncycastle.asn1.x509.BasicConstraints
+import org.bouncycastle.asn1.x509.Extension
+import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
@@ -20,7 +22,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
@@ -77,7 +78,7 @@ abstract class TrustAnchor : DefaultTask() {
             random.nextBytes(id)
 
             val keyUsage = KeyUsage(KeyUsage.keyCertSign)
-            val extUtils: JcaX509ExtensionUtils = JcaX509ExtensionUtils()
+            val extUtils = JcaX509ExtensionUtils()
             val holder = createCertificateBuilder(keyPair)
                 .addExtension(Extension.basicConstraints, true, BasicConstraints(true).encoded)
                 .addExtension(Extension.keyUsage, false, keyUsage.encoded)
@@ -90,19 +91,19 @@ abstract class TrustAnchor : DefaultTask() {
 
             // mkcert accepts only private keys in pkcs8 format
             val gen = JcaPKCS8Generator(keyPair.private, null)
-            privateKey.get().asFile.writePem(gen.generate(), fun File.() {
+            privateKey.get().asFile.writePem(gen.generate()) {
                 val permission = hashSetOf(PosixFilePermission.OWNER_READ)
                 Files.setPosixFilePermissions(toPath(), permission)
-            })
+            }
 
-            certificate.get().asFile.writePem(cert, fun File.() {
+            certificate.get().asFile.writePem(cert) {
                 val permission = hashSetOf(
                     PosixFilePermission.OWNER_READ,
                     PosixFilePermission.GROUP_READ,
                     PosixFilePermission.OTHERS_READ
                 )
                 Files.setPosixFilePermissions(toPath(), permission)
-            })
+            }
 
         } catch (e: Exception) {
             throw GradleException("Cannot create certificate: ${e.message}", e)

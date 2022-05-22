@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Plugins" pattern="file[nubes.plugins.main]:kotlin//*||file[nubes.plugins.fixtures]:kotlin//*||file[nubes.plugins.functional]:kotlin//*||file[nubes.plugins.integration]:kotlin//*||file[nubes.plugins.test]:kotlin//*" />
+</component>

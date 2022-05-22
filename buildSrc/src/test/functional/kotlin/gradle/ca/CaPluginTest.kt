@@ -25,10 +25,6 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
 
-private const val digitalSignature = 0
-
-private const val keyCertSign = 5
-
 class CaPluginTest : FunSpec({
 
     autoClose(Template("ca")).withClone {
