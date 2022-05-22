@@ -106,13 +106,15 @@ abstract class Launch : DefaultTask() {
         logger.quiet("Instanz wird erzeugt")
 
         val commands = listOf("multipass", "launch",
-                "--name", domain.get(),
-                "--timeout", "900")
-                .plus(cpus.map { listOf("--cpus", it.toString()) }.getOrElse(emptyList()))
-                .plus(disk.map { listOf("--disk", it) }.getOrElse(emptyList()))
-                .plus(mem.map { listOf("--mem", it) }.getOrElse(emptyList()))
-                .plus(listOf("--cloud-init", "-"))
-                .plus(image.map { listOf(it) }.getOrElse(emptyList()))
+            "--name", domain.get(),
+            "--timeout", "900")
+            .asSequence()
+            .plus(cpus.map { listOf("--cpus", it.toString()) }.getOrElse(emptyList()))
+            .plus(disk.map { listOf("--disk", it) }.getOrElse(emptyList()))
+            .plus(mem.map { listOf("--mem", it) }.getOrElse(emptyList()))
+            .plus(listOf("--cloud-init", "-"))
+            .plus(image.map { listOf(it) }.getOrElse(emptyList()))
+            .toList()
 
         // Erzeuge:
         execute(project, userData) {

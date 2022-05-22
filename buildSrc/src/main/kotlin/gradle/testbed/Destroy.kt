@@ -4,7 +4,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Destroys
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -20,9 +19,6 @@ abstract class Destroy : DefaultTask() {
 
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
-
-    @get:Inject
-    abstract val providerFactory: ProviderFactory
 
     @TaskAction
     fun destroy() {

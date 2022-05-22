@@ -25,9 +25,9 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
 
         val multipass = domainName.map { listOf("multipass", "exec", it, "--") }
 
-        ByteArrayOutputStream().use {
+        ByteArrayOutputStream().use {output ->
             execOperations.exec {
-                standardOutput = it
+                standardOutput = output
                 commandLine = multipass.map {
                     it + listOf(
                         "/bin/bash", "-c",
@@ -37,7 +37,7 @@ class DomainOperations(private val execOperations: ExecOperations, private val d
             }
 
             val parser = JSONParser(JSONParser.MODE_JSON_SIMPLE)
-            val json = parser.parse(it.toString()) as JSONObject
+            val json = parser.parse(output.toString()) as JSONObject
             val items = json["items"] as JSONArray
 
             return items
