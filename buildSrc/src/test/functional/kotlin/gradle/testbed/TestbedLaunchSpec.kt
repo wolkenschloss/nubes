@@ -1,15 +1,17 @@
 package family.haschka.wolkenschloss.gradle.testbed
 
 import com.jayway.jsonpath.JsonPath
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.file.shouldExist
-import io.kotest.matchers.shouldBe
-import org.gradle.testkit.runner.TaskOutcome
 import family.haschka.wolkenschloss.gradle.testbed.domain.DomainOperations
 import family.haschka.wolkenschloss.gradle.testbed.domain.DomainTasks.Companion.LAUNCH_INSTANCE_TASK_NAME
 import family.haschka.wolkenschloss.testing.Template
 import family.haschka.wolkenschloss.testing.build
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.gradle.testkit.runner.TaskOutcome
 import java.util.concurrent.TimeUnit
 
 class TestbedLaunchSpec : FunSpec({
@@ -18,13 +20,14 @@ class TestbedLaunchSpec : FunSpec({
 
     context("testbed project") {
         afterSpec {
-            ProcessBuilder("multipass", "delete", instanceName)
-                .start()
-                .waitFor()
-
-            ProcessBuilder("multipass", "purge")
-                .start()
-                .waitFor()
+            withContext(Dispatchers.IO) {
+                ProcessBuilder("multipass", "delete", instanceName)
+                    .start()
+                    .waitFor()
+                ProcessBuilder("multipass", "purge")
+                    .start()
+                    .waitFor()
+            }
         }
 
         autoClose(Template("testbed/launch")).withClone {
@@ -46,10 +49,10 @@ class TestbedLaunchSpec : FunSpec({
             }
 
             test("should create hosts file") {
-                val process = ProcessBuilder(
-                    DomainOperations.ipAddressCommandLine(instanceName)
-                )
-                    .start()
+                val process = withContext(Dispatchers.IO) {
+                    ProcessBuilder(DomainOperations.ipAddressCommandLine(instanceName))
+                        .start()
+                }
 
                 process.inputStream.reader().use {
                     val json = it.readText()
@@ -61,7 +64,9 @@ class TestbedLaunchSpec : FunSpec({
                         .shouldBe("$ipAddress launch.fixture.test dummy1.fixture.test dummy2.fixture.test\n")
                 }
 
-                process.waitFor(30, TimeUnit.SECONDS).shouldBe(true)
+                withContext(Dispatchers.IO) {
+                    process.waitFor(30, TimeUnit.SECONDS)
+                }.shouldBe(true)
             }
         }
     }
