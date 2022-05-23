@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   name: gateway
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
     cert-manager.io/cluster-issuer: ca-issuer
     kubernetes.io/ingress.class: public
     nginx.ingress.kubernetes.io/service-upstream: "true"
@@ -16,14 +15,14 @@ spec:
     - host: staging.wolkenschloss.test
       http:
         paths:
-          - path: /dex(/|$)(.*)
+          - path: /dex
             pathType: Prefix
             backend:
               service:
                 name: dex
                 port:
                   name: web
-          - path: /cookbook(/|$)(.*)
+          - path: /cookbook
             pathType: Prefix
             backend:
               service:

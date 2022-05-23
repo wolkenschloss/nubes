@@ -1,4 +1,6 @@
 quarkus:
+  http:
+    root-path: /cookbook
   log:
     level: INFO
   container-image:
