@@ -17,7 +17,6 @@ quarkus:
           from-secret: db-secret
           with-key: password
   mongodb:
-    hosts:
-      - mongodb
+    connection-string: mongodb://mongodb:27017/?uuidRepresentation=STANDARD
     credentials:
       auth-source: admin
