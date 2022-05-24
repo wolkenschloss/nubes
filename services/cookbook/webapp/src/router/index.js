@@ -16,6 +16,17 @@ const routes = [
     meta: { title: "Cookbook" }
   },
   {
+    name: 'share-target',
+    path: '/share-target',
+    components: {
+      default: () => import(/* webpackChunkName: "share" */ '@/views/Share')
+    },
+    props: {
+      default: route => ({title: route.query.title, text: route.query.text, url: route.query.url})
+    },
+    meta: {title: 'Share'}
+  },
+  {
     name: "details",
     path: "/recipe/:id",
     props: {default: true},

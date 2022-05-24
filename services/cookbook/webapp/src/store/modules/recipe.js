@@ -37,7 +37,7 @@ const actions = {
     async destroy({commit, state}, id) {
         let url = resource.url({id})
         await axios.delete(url)
-        router.push("/")
+        await router.push("/")
     },
     async update({commit, state}, recipe) {
         let url = resource.url({id: recipe._id})

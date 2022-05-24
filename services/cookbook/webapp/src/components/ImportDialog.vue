@@ -50,16 +50,17 @@ export default {
     async importRecipe() {
       this.loading = true;
       const job = {order: this.url}
-      try {
-        const url = resource.url()
-        const response = await axios.post(url, job)
-        await this.getJobResult(response.headers['location'])
-        await this.queryRecipes();
-      } catch (error) {
-        console.log(error)
-      }
-
-      this.loading = false
+      await this.$router.push({name : 'share-target', query: {title: "Seitentitel", text: this.url, url: "Meistens nicht benutzt"}})
+      // try {
+      //   const url = resource.url()
+      //   const response = await axios.post(url, job)
+      //   await this.getJobResult(response.headers['location'])
+      //   await this.queryRecipes();
+      // } catch (error) {
+      //   console.log(error)
+      // }
+      //
+      // this.loading = false
     },
 
     // That's evil.
