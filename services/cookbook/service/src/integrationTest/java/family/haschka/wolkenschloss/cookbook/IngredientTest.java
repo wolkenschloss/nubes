@@ -8,11 +8,12 @@ import io.quarkus.test.junit.QuarkusIntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matcher;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -20,12 +21,24 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.emptyIterable;
 
+// @Blueprint(tags = {"integration test", "multiple endpoints", "mongodb")
 @QuarkusIntegrationTest
 @QuarkusTestResource(MongoShellResource.class)
 @DisplayName("Ingredient CRUD Operations")
 public class IngredientTest {
 
     MongoShell mongosh;
+
+    @Test
+    @DisplayName("Verify RestAssured settings")
+    public void verifyRestAssured() throws URISyntaxException {
+        var expected = UriBuilder.fromUri(RestAssured.baseURI)
+                .port(RestAssured.port)
+                .path(RestAssured.basePath)
+                .build();
+
+        Assertions.assertEquals(expected, new URI("http://localhost:9292/cookbook"));
+    }
 
     @TestFactory
     @DisplayName("GET /ingredients")
@@ -47,13 +60,11 @@ public class IngredientTest {
                 .map(testcase -> DynamicTest.dynamicTest(testcase.name(), () -> {
                     mongosh.eval("db.dropDatabase();").verify();
                     testcase.given();
-                    var location = String.format("http://localhost:%s/ingredient",
-                            System.getProperty("quarkus.http.port"));
 
                     await()
                             .untilAsserted(() -> RestAssured.given()
                                     .when()
-                                    .get(location)
+                                    .get("ingredient")
                                     .then()
                                     .statusCode(Response.Status.OK.getStatusCode())
                                     .body("content.name", testcase.expect()));
@@ -65,20 +76,13 @@ public class IngredientTest {
             recipes.stream()
                     .map(recipe -> String.format("fixtures/%s", recipe))
                     .map(path -> new FileResource(path).read())
-                    .forEach(fixture -> {
-
-                        var postRecipeUrl = String.format(
-                                "http://localhost:%s/recipe",
-                                System.getProperty("quarkus.http.port"));
-
-                        RestAssured.given()
-                                .body(fixture)
-                                .contentType(ContentType.JSON)
-                                .when()
-                                .post(postRecipeUrl)
-                                .then()
-                                .statusCode(Response.Status.CREATED.getStatusCode());
-                    });
+                    .forEach(fixture -> RestAssured.given()
+                            .body(fixture)
+                            .contentType(ContentType.JSON)
+                            .when()
+                            .post("recipe")
+                            .then()
+                            .statusCode(Response.Status.CREATED.getStatusCode()));
         }
     }
 }

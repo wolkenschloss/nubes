@@ -9,6 +9,7 @@ import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import javax.json.Json;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,9 +59,8 @@ public class RecipeTest {
                 .body(str)
                 .contentType(ContentType.JSON)
                 .when()
-                .post(getUrl())
+                .post("recipe")
                 .then()
-
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -72,7 +72,13 @@ public class RecipeTest {
                         "fixtures/schlammkrabbeneintopf.json",
                         Response.Status.CREATED.getStatusCode(),
                         response -> response.contentType(ContentType.JSON)
-                                .header("Location", r -> equalTo(getUrl() + "/" + r.path("_id")))
+                                .header("Location", r -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
+                                        .port(RestAssured.port)
+                                        .path(RestAssured.basePath)
+                                        .path("recipe")
+                                        .path("{recipeId}")
+                                        .build(r.path("_id").toString())
+                                        .toString()))
                                 .body("title", equalTo("Schlammkrabbeneintopf"))),
 
                 // TODO: Es wäre schön, wenn der Fehler als JSON Objekt und nicht als HTML zurückkäme.
@@ -86,7 +92,7 @@ public class RecipeTest {
                         .body(readFixture(testcase.fixture))
                         .contentType(ContentType.JSON)
                         .when()
-                        .post(getUrl())
+                        .post("recipe")
                         .then()
                         .statusCode(testcase.status))));
     }
@@ -128,7 +134,7 @@ public class RecipeTest {
         RestAssured
                 .given()
                 .when()
-                .get(getUrl())
+                .get("recipe")
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("content.size()", greaterThan(0))
@@ -146,7 +152,7 @@ public class RecipeTest {
 
         ArrayList<Map<String, Object>> result = RestAssured.given()
                 .when()
-                .get(getUrl())
+                .get("recipe")
                 .jsonPath()
                 .get("content");
 
@@ -247,14 +253,6 @@ public class RecipeTest {
                 .body("title", equalTo("Schneebeeren-Crostata"));
     }
 
-    private String getPort() {
-        return System.getProperty("quarkus.http.port");
-    }
-
-    private String getUrl() {
-        return "http://localhost:" + getPort() + "/recipe";
-    }
-
     public ValidatableResponse createRecipe() throws URISyntaxException, IOException {
         var str = readFixture("fixtures/schlammkrabbeneintopf.json");
 
@@ -264,10 +262,16 @@ public class RecipeTest {
                 .body(str)
                 .contentType(ContentType.JSON)
                 .when()
-                .post(getUrl())
+                .post("recipe")
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
-                .header("Location", response -> equalTo(getUrl() + "/" + response.path("_id")));
+                .header("Location", response -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
+                        .port(RestAssured.port)
+                        .path(RestAssured.basePath)
+                        .path("recipe")
+                        .path("{recipeId}")
+                        .build(response.path("_id").toString())
+                        .toString()));
     }
 
     private String location(ValidatableResponse response) {
@@ -290,18 +294,18 @@ public class RecipeTest {
     }
 
     record PostRecipeTestcase(String name, String fixture, int status,
-                                     ThrowingConsumer<ValidatableResponse> assertions) {
+                              ThrowingConsumer<ValidatableResponse> assertions) {
     }
 
     public static class GetRecipeTestcase {
         String name;
         String recipeId;
         ThrowingConsumer<ValidatableResponse> assertions;
+
         public GetRecipeTestcase(
                 String name,
                 String recipeId,
-                @SuppressWarnings("CdiInjectionPointsInspection")
-                        ThrowingConsumer<ValidatableResponse> assertions) {
+                ThrowingConsumer<ValidatableResponse> assertions) {
             this.name = name;
             this.recipeId = recipeId;
             this.assertions = assertions;

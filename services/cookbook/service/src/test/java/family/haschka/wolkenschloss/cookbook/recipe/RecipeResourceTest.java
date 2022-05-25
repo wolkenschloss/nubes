@@ -1,7 +1,6 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
@@ -21,9 +20,6 @@ import javax.json.bind.Jsonb;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -32,14 +28,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 
 @QuarkusTest
+@DisplayName("Recipe Resource")
+@TestHTTPEndpoint(RecipeResource.class)
 public class RecipeResourceTest {
 
     @InjectMock
     RecipeService service;
-
-    @TestHTTPEndpoint(RecipeResource.class)
-    @TestHTTPResource
-    URL url;
 
     @Inject
     Jsonb jsonb;
@@ -62,7 +56,7 @@ public class RecipeResourceTest {
 
     @Test
     @DisplayName("GET /recipe?from=x&to=y")
-    void searchTest() throws URISyntaxException, MalformedURLException {
+    void searchTest() {
 
         var recipes = new ArrayList<Summary>();
         recipes.add(new Summary(ObjectId.get().toHexString(), "Blaukraut"));
@@ -71,16 +65,12 @@ public class RecipeResourceTest {
         Mockito.when(service.list(0, 4, null))
                 .thenReturn(Uni.createFrom().item(toc));
 
-        var query = UriBuilder.fromUri(url.toURI())
-                .queryParam("from", 0)
-                .queryParam("to", 4)
-                .build()
-                .toURL();
-
         RestAssured.given()
                 .when()
                 .accept(MediaType.APPLICATION_JSON)
-                .get(query)
+                .queryParam("from", 0)
+                .queryParam("to", 4)
+                .get()
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("content.size()", is(recipes.size()));
@@ -104,13 +94,15 @@ public class RecipeResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .when()
-                .post(url)
+                .post()
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
-                .header("Location", response -> {
-                    var expected = UriBuilder.fromUri(url.toURI()).path(id).build();
-                    return equalTo(expected.toString());
-                });
+                .header("Location", response -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
+                        .port(RestAssured.port)
+                        .path(RestAssured.basePath)
+                        .path(id)
+                        .build()
+                        .toString()));
 
         Mockito.verify(creator, Mockito.times(1)).save(recipe);
         Mockito.verifyNoMoreInteractions(service);
@@ -119,9 +111,8 @@ public class RecipeResourceTest {
 
     @Test
     @DisplayName("GET /recipe/{id}")
-    public void getRecipe() throws URISyntaxException {
+    public void getRecipe() {
         var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
-        var query = UriBuilder.fromUri(url.toURI()).path(recipe._id.toString()).build();
 
         Mockito.when(service.get(recipe._id.toHexString(), Optional.empty()))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
@@ -130,7 +121,7 @@ public class RecipeResourceTest {
         RestAssured.given()
                 .accept(ContentType.JSON)
                 .when()
-                .get(query)
+                .get(recipe._id.toString())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body(is(jsonb.toJson(recipe)));
@@ -140,12 +131,11 @@ public class RecipeResourceTest {
 
     @Test
     @DisplayName("DELETE /recipe/{id}")
-    public void deleteRecipe() throws URISyntaxException {
+    public void deleteRecipe() {
         var id = ObjectId.get();
-        var query = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
         RestAssured.given()
                 .when()
-                .delete(query)
+                .delete(id.toString())
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
@@ -154,16 +144,15 @@ public class RecipeResourceTest {
 
     @Test
     @DisplayName("PUT /recipe/{id}")
-    public void putRecipe() throws URISyntaxException {
+    public void putRecipe() {
         var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
-        var query = UriBuilder.fromUri(url.toURI()).path(recipe._id.toString()).build();
 
         RestAssured.given()
                 .body(recipe, ObjectMapperType.JSONB)
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .put(query)
+                .put(recipe._id.toString())
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
