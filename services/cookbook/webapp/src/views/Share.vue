@@ -9,13 +9,24 @@
         <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"></v-progress-linear>
       </v-col>
     </v-row>
-    <v-alert type="error" v-if="errorMessage">
-      {{ errorMessage }}
-    </v-alert>
-    <v-alert type="success" v-if="!errorMessage && recipeImported">
-      Recipe {{ title }} imported.
-    </v-alert>
+    <v-col cols="12">
+      <v-alert type="error" v-if="errorMessage">
+        {{ errorMessage }}
+      </v-alert>
+      <v-alert type="success" v-if="!errorMessage && recipeImported">
+        Recipe {{ title }} imported.
+      </v-alert>
+    </v-col>
+    <v-col cols="12">
+      <ul>
+        <li>{{this.$props.title}}</li>
+        <li>{{this.$props.text}}</li>
+        <li>{{this.$props.url}}</li>
+        <li>{{this.location}}</li>
+      </ul>
+    </v-col>
     <v-btn :to="{name: 'contents'}">Table of Contents</v-btn>
+
   </v-container>
 </template>
 
@@ -25,6 +36,7 @@ import axios from "axios";
 import {mapActions} from "vuex";
 
 const resource = new Resource("{+baseUrl}/job/{id}")
+const recipeResource = new Resource("{+baseUrl}")
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -40,7 +52,8 @@ export default {
   data() {
     return {
       recipeImported: false,
-      errorMessage: null
+      errorMessage: null,
+      location: null
     }
   },
   async mounted() {
@@ -52,8 +65,10 @@ export default {
       console.log("POST:", job)
       // return
       const response = await axios.post(resource.url(), job)
+      const jobLocation = new URL(response.headers['location'])
+      const path = jobLocation.pathname
       await delay(1000)
-      const location = await this.getJobResult(response.headers['location'], 1)
+      const location = await this.getJobResult(path, 1)
       console.log("recipe created at location ", location)
       this.recipeImported = true
     } catch (error) {

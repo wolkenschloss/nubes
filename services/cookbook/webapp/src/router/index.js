@@ -20,6 +20,7 @@ const routes = [
     name: 'share-target',
     path: '/share-target',
     components: {default: Share},
+    // components: {default: ()  => import(/* webpackChunkName "share-target" */ '@/views/Share')},
     props: {
       default: route => ({title: route.query.title, text: route.query.text, url: route.query.url})
     },

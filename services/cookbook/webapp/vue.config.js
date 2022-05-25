@@ -56,7 +56,7 @@ module.exports = {
             maxAssetSize: 512000
         },
         optimization: {
-            // minimize: false,
+            minimize: false,
 
             splitChunks: {
                 minSize: 10000,
@@ -119,7 +119,7 @@ module.exports = {
         // workboxPluginMode: 'InjectManifest',
         workboxPluginMode: 'GenerateSW',
         workboxOptions: {
-            navigateFallback: '/',
+            navigateFallback: '/cookbook/index.html',
             mode: 'development',
             // runtimeCaching: [{
             //     handler: async ({event, params, request, url}) => {

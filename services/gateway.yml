@@ -6,6 +6,7 @@ metadata:
     cert-manager.io/cluster-issuer: ca-issuer
     kubernetes.io/ingress.class: public
     nginx.ingress.kubernetes.io/service-upstream: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   tls:
     - hosts:
