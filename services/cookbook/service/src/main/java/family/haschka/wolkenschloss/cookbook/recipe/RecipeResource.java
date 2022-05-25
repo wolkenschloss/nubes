@@ -14,11 +14,11 @@ import java.util.Optional;
 
 @Path("/recipe")
 public class RecipeResource {
-
     public static final String TEXT_MARKDOWN = "text/markdown";
 
     @Inject
     RecipeService service;
+
     @Inject
     CreatorService creator;
 

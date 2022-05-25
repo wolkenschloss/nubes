@@ -46,7 +46,7 @@ module.exports = {
         extract: {ignoreOrder: true}
     },
     configureWebpack: {
-        watch: process.env.NODE_ENV === 'development',
+        // watch: process.env.NODE_ENV === 'development',
         watchOptions: {
             ignored: /node_modules/,
         },
