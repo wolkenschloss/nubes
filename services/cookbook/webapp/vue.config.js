@@ -1,62 +1,41 @@
 const path = require("path")
-
 const ca_dir = path.resolve(process.env.HOME, ".local/share/wolkenschloss/ca")
 
-const options = {
-    key: process.env.WOLKENSCHLOSS_HTTPS_KEY || path.resolve(ca_dir, "localhost+1/key.pem"),
-    cert: process.env.WOLKENSCHLOSS_HTTPS_CRT || path.resolve(ca_dir, "localhost+1/crt.pem")
-}
-
-const server = process.env.NODE_ENV === 'production' ? {type: 'https', options} : {type: 'http'}
-const webSocketURL = process.env.NODE_ENV === 'production' ? {protocol: 'wss'} : {protocol: 'ws'}
-
-const proxy_development = {
-    '^/': {
-        ws: false,
-            target: 'http://localhost:8180/',
-            changeOrigin: true,
-            onProxyRes: (proxyRes) => {
-            if (proxyRes.headers.location) {
-                let loc = proxyRes.headers.location;
-                loc = loc.replace('http://localhost:8180', '');
-                proxyRes.headers.location = loc;
-            }
-        }
-    }
-}
-
-const proxy_production = {
-    '^/cookbook': {
-        ws: false,
-        target: 'http://localhost:8180/',
-        changeOrigin: true,
-        logLevel: 'debug',
-        pathRewrite: {"^/cookbook": ""},
-        // onProxyRes: (proxyRes) => {
-        //     if (proxyRes.headers.location) {
-        //         let loc = proxyRes.headers.location;
-        //         loc = loc.replace('http://localhost:8180', '');
-        //         proxyRes.headers.location = loc;
-        //     }
-        // }
-    }
-}
-
 module.exports = {
-    // publicPath: process.env.NODE_ENV === 'production' ? '/cookbook/' : '',
     publicPath: '/cookbook/',
+    productionSourceMap: false,
     transpileDependencies: ['vuetify'],
     devServer: {
+        hot: process.env.NODE_ENV === 'development',
         historyApiFallback: false,
         port: 8181,
-        server,
+        server: {
+            type: 'https', options: {
+                key: process.env.WOLKENSCHLOSS_HTTPS_KEY || path.resolve(ca_dir, "localhost+1/key.pem"),
+                cert: process.env.WOLKENSCHLOSS_HTTPS_CRT || path.resolve(ca_dir, "localhost+1/crt.pem")
+            }
+        },
         client: {
             logging: 'verbose',
             overlay: true,
             progress: true,
-            webSocketURL,
+            webSocketURL: {protocol: 'wss'},
         },
-        proxy: process.env.NODE_ENV === 'production' ? proxy_production : proxy_development,
+        proxy: {
+            '^/cookbook': {
+                ws: false,
+                logLevel: 'debug',
+                target: 'http://localhost:8180',
+                changeOrigin: true,
+                onProxyRes: (proxyRes) => {
+                    if (proxyRes.headers.location) {
+                        let loc = proxyRes.headers.location;
+                        loc = loc.replace('http://localhost:8180/cookbook', '/cookbook');
+                        proxyRes.headers.location = loc;
+                    }
+                }
+            }
+        },
         headers: {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -67,19 +46,24 @@ module.exports = {
         extract: {ignoreOrder: true}
     },
     configureWebpack: {
+        // watch: process.env.NODE_ENV === 'development',
+        watchOptions: {
+            ignored: /node_modules/,
+        },
         performance: {
             // maxEntrypointSize: 700000,
             maxEntrypointSize: 819200,
             maxAssetSize: 512000
         },
         optimization: {
+            minimize: false,
+
             splitChunks: {
                 minSize: 10000,
                 maxSize: 250000
             }
         }
     },
-
     pwa: {
         name: 'Cookbook',
         themeColor: '#009688',
@@ -126,13 +110,25 @@ module.exports = {
         iconPaths: {
             faviconSVG: 'favicon.svg',
             favicon32: null,
-            favicon16:  null,
-            appleTouchIcon:  null,
-            maskIcon:  null,
-            msTileImage:  null,
+            favicon16: null,
+            appleTouchIcon: null,
+            maskIcon: null,
+            msTileImage: null,
         },
         // configure the workbox plugin
         // workboxPluginMode: 'InjectManifest',
-        workboxPluginMode: 'GenerateSW'
+        workboxPluginMode: 'GenerateSW',
+        workboxOptions: {
+            navigateFallback: '/cookbook/index.html',
+            mode: 'development',
+            // runtimeCaching: [{
+            //     handler: async ({event, params, request, url}) => {
+            //         console.log("handler for route called!", params)
+            //         return Response.redirect("https://google.de", 301)
+            //     },
+            //     method: 'GET',
+            //     urlPattern: '/share-target'
+            // }]
+        }
     }
 }

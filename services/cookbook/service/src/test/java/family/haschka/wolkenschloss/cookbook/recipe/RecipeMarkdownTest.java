@@ -1,7 +1,6 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
@@ -13,32 +12,25 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Optional;
 
 @QuarkusTest
+@TestHTTPEndpoint(RecipeResource.class)
 public class RecipeMarkdownTest {
-
-    @TestHTTPEndpoint(RecipeResource.class)
-    @TestHTTPResource
-    URL url;
 
     @InjectMock
     RecipeService service;
 
     @Test
-    public void getRecipeAsMarkdown() throws URISyntaxException {
+    public void getRecipeAsMarkdown() {
         var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
-        var query = UriBuilder.fromUri(url.toURI()).path(recipe._id.toString()).build();
 
         Mockito.when(service.get(recipe._id.toHexString(), Optional.empty()))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         //noinspection SpellCheckingInspection
         String expected = """
-                # Lasagne               
+                # Lasagne              
                 
                 ## Ingredients for 1 servings
                                                         
@@ -65,7 +57,7 @@ public class RecipeMarkdownTest {
         var actual = RestAssured.given()
                 .accept("text/markdown; charset=UTF-8")
                 .when()
-                .get(query)
+                .get(recipe._id.toString())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract().body().asString();

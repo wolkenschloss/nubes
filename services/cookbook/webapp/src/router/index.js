@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Share from "@/views/Share";
 
 Vue.use(VueRouter)
 
@@ -14,6 +15,16 @@ const routes = [
     },
     name: "contents",
     meta: { title: "Cookbook" }
+  },
+  {
+    name: 'share-target',
+    path: '/share-target',
+    components: {default: Share},
+    // components: {default: ()  => import(/* webpackChunkName "share-target" */ '@/views/Share')},
+    props: {
+      default: route => ({title: route.query.title, text: route.query.text, url: route.query.url})
+    },
+    meta: {title: 'Share'}
   },
   {
     name: "details",

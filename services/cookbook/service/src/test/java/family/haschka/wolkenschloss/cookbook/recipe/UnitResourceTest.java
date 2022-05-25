@@ -1,7 +1,6 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
@@ -16,22 +15,20 @@ import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.ws.rs.core.Response;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;
 
 @QuarkusTest
+@DisplayName("Units Resource")
+@TestHTTPEndpoint(UnitsResource.class)
 public class UnitResourceTest {
-
-    @TestHTTPEndpoint(UnitsResource.class)
-    @TestHTTPResource
-    URL url;
 
     public record Item(String name, String[] values) {
         @JsonbCreator
-        public Item {}
+        public Item {
+        }
     }
 
     @Inject
@@ -52,7 +49,7 @@ public class UnitResourceTest {
 
         var items = RestAssured.given()
                 .when()
-                .get(url)
+                .get()
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract().body().as(Item[].class);
@@ -65,7 +62,7 @@ public class UnitResourceTest {
     public void listAllAliases(String alias) {
         var items = RestAssured.given()
                 .when()
-                .get(url)
+                .get()
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract().body().as(Item[].class);

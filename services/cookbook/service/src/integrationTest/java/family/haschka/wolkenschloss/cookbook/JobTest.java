@@ -59,23 +59,22 @@ public class JobTest {
                 )
 
                 .map(testcase -> DynamicTest.dynamicTest(testcase.display, () -> {
-                    var template = UriBuilder.fromUri("http://localhost:8080/{resource}");
-                    var job = template
-                            .host("localhost")
-                            .port(Integer.parseInt(System.getProperty("quarkus.http.port")))
-                            .build("job");
 
                     var location = RestAssured
                             .given()
                             .body(testcase.job())
                             .contentType(ContentType.JSON)
                             .when()
-                            .post(job)
+                            .post("job")
                             .then()
                             .statusCode(Response.Status.CREATED.getStatusCode())
-                            .header("Location", r -> equalTo(UriBuilder.fromUri(job)
+                            .header("Location", r -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
+                                    .port(RestAssured.port)
+                                    .path(RestAssured.basePath)
+                                    .path("job")
                                     .path("{jobId}")
-                                    .build(r.path("jobId").toString()).toString()))
+                                    .build(r.path("jobId").toString())
+                                    .toString()))
                             .extract().header("location");
 
                     await().atMost(Duration.ofSeconds(5))

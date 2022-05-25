@@ -1,7 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
+import family.haschka.wolkenschloss.cookbook.testing.Blueprint;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
@@ -20,14 +20,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 
+@Blueprint(tags = {"ReST Resource", "Unit test"})
 @QuarkusTest
+@TestHTTPEndpoint(JobResource.class)
+@DisplayName("Job Resource")
 public class JobResourceTest {
 
     public static final URI JOB_URL = URI.create("http://meinkochbuch.local/lasagne.html");
@@ -35,12 +37,20 @@ public class JobResourceTest {
     @InjectMock
     JobService service;
 
-    @TestHTTPEndpoint(JobResource.class)
-    @TestHTTPResource
-    URL url;
-
     @Inject
     Jsonb jsonb;
+
+    @Test
+    @DisplayName("Verify RestAssured baseUri")
+    public void verifyBaseUri() throws URISyntaxException {
+
+        var expectedUri = UriBuilder.fromUri(RestAssured.baseURI)
+                .port(RestAssured.port)
+                .path(RestAssured.basePath)
+                .build();
+
+        Assertions.assertEquals(new URI("http://localhost:9292/cookbook/job"), expectedUri);
+    }
 
     @Test
     @DisplayName("POST /job")
@@ -58,13 +68,15 @@ public class JobResourceTest {
                 .body(order, ObjectMapperType.JSONB)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .post(url)
+                .post()
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
-                .header("Location", response -> {
-                    var expected = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
-                    return equalTo(expected.toString());
-                });
+                .header("Location", response -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
+                        .port(RestAssured.port)
+                        .path(RestAssured.basePath)
+                        .path(id.toString())
+                        .build()
+                        .toString()));
 
         Mockito.verify(service, Mockito.times(1)).create(order.order);
         Mockito.verifyNoMoreInteractions(service);
@@ -72,9 +84,8 @@ public class JobResourceTest {
 
     @Test
     @DisplayName("GET /job/{id} not found")
-    public void readImportJobNotFoundTest() throws URISyntaxException {
+    public void readImportJobNotFoundTest() {
         var id = UUID.randomUUID();
-        var location = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
 
         Mockito.when(service.get(id))
                 .thenReturn(Uni.createFrom().item(Optional.empty()));
@@ -82,16 +93,15 @@ public class JobResourceTest {
         RestAssured.given()
                 .accept(MediaType.APPLICATION_JSON)
                 .when()
-                .get(location)
+                .get(id.toString())
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test
     @DisplayName("GET /job/{id} ok")
-    public void readImportJobFoundTest() throws URISyntaxException {
+    public void readImportJobFoundTest() {
         var id = UUID.randomUUID();
-        var location = UriBuilder.fromUri(url.toURI()).path(id.toString()).build();
 
         var job = new ImportJob();
         job.jobId = id;
@@ -103,7 +113,7 @@ public class JobResourceTest {
         var actual = RestAssured.given()
                 .accept(MediaType.APPLICATION_JSON)
                 .when()
-                .get(location)
+                .get(id.toString())
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK)

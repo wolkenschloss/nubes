@@ -16,7 +16,7 @@
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-btn text color="primary" @click="importRecipe()" :loading="loading">
+        <v-btn text color="primary" :loading="loading" :to="{name: 'share-target', query: {text: this.url, title: 'default title'}}">
           Import
           <v-icon right>mdi-cloud-upload</v-icon>
         </v-btn>
@@ -29,11 +29,6 @@
 </template>
 
 <script>
-import axios from "axios";
-import {mapActions} from 'vuex'
-import {Resource} from "@/store/modules/resource";
-
-const resource = new Resource("{+baseUrl}/job/{id}")
 
 export default {
   name: "ImportDialog",
@@ -45,52 +40,6 @@ export default {
       error: null
     }
   },
-  methods: {
-    ...mapActions('toc', ['queryRecipes']),
-    async importRecipe() {
-      this.loading = true;
-      const job = {order: this.url}
-      try {
-        const url = resource.url()
-        const response = await axios.post(url, job)
-        await this.getJobResult(response.headers['location'])
-        await this.queryRecipes();
-      } catch (error) {
-        console.log(error)
-      }
-
-      this.loading = false
-    },
-
-    // That's evil.
-    async getJobResult(location) {
-      try {
-        console.log(`getJobResult(${location})`)
-        const response = await axios.get(location)
-        if (response.data.state === "CREATED") {
-          console.log("job in progress")
-          setTimeout(async () => {
-            console.log("await recursive call")
-            await this.getJobResult(location)
-          }, 100)
-        } else {
-          console.log(`job completed: ${JSON.stringify(response.data)}`)
-          this.loading = false
-          this.error = response.data.error
-          if (!response.data.error) {
-            console.log(`New Recipe added at ${response.data.location}`)
-            await this.queryRecipes()
-            this.dialog = false
-            this.url = null
-          }
-        }
-      } catch (exception) {
-        this.loading = false;
-        this.error = "Job not available"
-        console.log(exception)
-      }
-    }
-  }
 }
 </script>
 
