@@ -14,17 +14,17 @@
         {{ errorMessage }}
       </v-alert>
       <v-alert type="success" v-if="!errorMessage && recipeImported">
-        Recipe {{ title }} imported.
+        Recipe '{{ title }}' imported.
       </v-alert>
     </v-col>
-    <v-col cols="12">
-      <ul>
-        <li>{{this.$props.title}}</li>
-        <li>{{this.$props.text}}</li>
-        <li>{{this.$props.url}}</li>
-        <li>{{this.location}}</li>
-      </ul>
-    </v-col>
+<!--    <v-col cols="12">-->
+<!--      <ul>-->
+<!--        <li>{{this.$props.title}}</li>-->
+<!--        <li>{{this.$props.text}}</li>-->
+<!--        <li>{{this.$props.url}}</li>-->
+<!--        <li>{{this.location}}</li>-->
+<!--      </ul>-->
+<!--    </v-col>-->
     <v-btn :to="{name: 'contents'}">Table of Contents</v-btn>
 
   </v-container>
