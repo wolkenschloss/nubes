@@ -19,12 +19,8 @@
               <v-icon>mdi-view-list</v-icon>
             </v-btn>
           </v-btn-toggle>
-          <v-text-field v-model="search"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                        clearable/>
+          <v-spacer></v-spacer>
+          <ExpandingSearchField v-model="search" @resize="(expanded) => this.searching = expanded"/>
         </v-toolbar>
       </template>
       <template v-slot:default="props">
@@ -57,9 +53,11 @@
 <script>
 import { debounce } from "lodash";
 import {mapActions, mapGetters} from 'vuex'
+import ExpandingSearchField from "@/components/ExpandingSearchField";
 
 export default {
   name: "Ingredients",
+  components: {ExpandingSearchField},
   watch: {
     pagination: {
       async handler() {
@@ -77,6 +75,7 @@ export default {
   data() {
     return {
       loading: false,
+      searching: false,
       view_mode: 0
     }
   },

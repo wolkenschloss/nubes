@@ -1,7 +1,10 @@
 <template>
   <v-dialog v-model="dialog" max-width="560px">
     <template v-slot:activator="{on, attrs}">
-      <v-btn text v-bind="attrs" v-on="on" v-shortcut="'i'">Import Recipe</v-btn>
+      <v-btn v-bind="attrs" v-on="on" :icon="$vuetify.breakpoint.xsOnly">
+        <v-icon class="d-flex d-sm-none">mdi-file-import</v-icon>
+        <span class="d-none d-sm-flex">Import Recipe</span>
+      </v-btn>
     </template>
     <v-card>
       <v-card-title>
