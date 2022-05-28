@@ -1,13 +1,14 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 public class IngredientTest {
 
     public enum ParseIngredientTestcase {
-        EMPTY("", new Ingredient(null, null, null)),
         QUANTITY_G_NAME("250 g Mehl", new Ingredient(new Rational(250), "g", "Mehl")),
         QUANTITY_KG_NAME("1 kg Potatoes", new Ingredient(new Rational(1), "kg", "Potatoes")),
         QUANTITY_ML_NAME("125 ml Milk", new Ingredient(new Rational(125), "ml", "Milk")),
@@ -19,11 +20,6 @@ public class IngredientTest {
         NAME("Zutat ohne Menge und Einheit", new Ingredient(null, null, "Zutat ohne Menge und Einheit")),
         UNIT_NAME("g name of ingredient", new Ingredient(null, "g", "name of ingredient")),
         UNIT_ONLY("g", new Ingredient(null, null, "g")),
-        QUANTITY_ONLY("123", new Ingredient(new Rational(123), null, null)),
-        QUANTITY_FRACTION("1/2", new Ingredient(new Rational(1,2), null, null)),
-        QUANTITY_FRACTION1("1 1/2", new Ingredient(new Rational(3,2), null, null)),
-        QUANTITY_FRACTION2("1 ½", new Ingredient(new Rational(3,2), null, null)),
-        QUANTITY_FRACTION3("1½", new Ingredient(new Rational(3,2), null, null)),
         QUANTITY_FRACTION_UNIT_NAME1("1/2 cl Rum", new Ingredient(new Rational(1,2), "cl", "Rum")),
         QUANTITY_FRACTION_UNIT_NAME2("1/2 g Mehl", new Ingredient(new Rational(1,2), "g", "Mehl")),
         QUANTITY_FRACTION_UNIT_NAME3("1 1/2 kg Mehl", new Ingredient(new Rational(3,2), "kg", "Mehl")),
@@ -80,7 +76,7 @@ public class IngredientTest {
     }
 
     public enum PrintIngredientTestcase {
-        EMPTY(new Ingredient(null, null, null), ""),
+//        EMPTY(new Ingredient(null, null, null), ""),
         FULL(new Ingredient(new Rational(5, 2), "St.", "Zwiebeln"), "2 ½ St. Zwiebeln"),
         NAME(new Ingredient(null, null, "Rotwein"), "Rotwein"),
         QUANTITY(new Ingredient(new Rational(42), null, "Blaubeeren"), "42 Blaubeeren");
@@ -94,9 +90,19 @@ public class IngredientTest {
             this.expectation = expectation;
         }
     }
+
     @ParameterizedTest
     @EnumSource
     public void shouldDisplayAsString(PrintIngredientTestcase testcase) {
         Assertions.assertEquals(testcase.expectation, testcase.ingredient.toString());
+    }
+
+    @Test
+    @DisplayName("should not be able to be created without a name")
+    public void shouldNotBeAbleToBeCreatedWithoutAName() {
+        var thrown = Assertions.assertThrows(NullPointerException.class,
+                () -> new Ingredient(new Rational(1), Unit.CUP.name(), null));
+
+        Assertions.assertEquals("name required for ingredient", thrown.getMessage());
     }
 }

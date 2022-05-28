@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 public record Ingredient(Rational quantity, String unit, String name) {
 
     public Ingredient {
+        Objects.requireNonNull(name, "name required for ingredient");
     }
 
     public static Ingredient parse(String string) {
