@@ -5,7 +5,7 @@ import javax.json.bind.adapter.JsonbAdapter;
 public class IngredientAdapter implements JsonbAdapter<Ingredient, IngredientAnnotated> {
     @Override
     public IngredientAnnotated adaptToJson(Ingredient obj) {
-        return new IngredientAnnotated(obj.quantity, obj.unit, obj.name);
+        return new IngredientAnnotated(obj.quantity(), obj.unit(), obj.name());
     }
 
     @Override

@@ -70,7 +70,7 @@ public class CreatorServiceTest {
                 .thenReturn(Uni.createFrom().item(RecipeFixture.LASAGNE.withId(recipeId.toHexString())));
 
         recipe.ingredients.forEach(ingredient -> Mockito.when(
-                        emitter.send(new IngredientRequiredEvent(recipeId.toHexString(), ingredient.name)))
+                        emitter.send(new IngredientRequiredEvent(recipeId.toHexString(), ingredient.name())))
                 .thenReturn(CompletableFuture.allOf()));
 
         CreatorService subjectUnderTest = new CreatorService(repository, generator, emitter);

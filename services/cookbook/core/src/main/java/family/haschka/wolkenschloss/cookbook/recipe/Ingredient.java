@@ -7,17 +7,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Ingredient {
+public record Ingredient(Rational quantity, String unit, String name) {
 
-    public Ingredient(Rational quantity, String unit, String name) {
-        this.name = name;
-        this.unit = unit;
-        this.quantity = quantity;
+    public Ingredient {
     }
-
-    public String name;
-    public String unit;
-    public Rational quantity;
 
     public static Ingredient parse(String string) {
         var units = Unit.regex();

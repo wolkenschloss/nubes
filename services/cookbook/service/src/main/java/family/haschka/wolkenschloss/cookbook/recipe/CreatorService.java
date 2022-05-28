@@ -34,6 +34,6 @@ public class CreatorService {
 
     private void lookupIngredients(Recipe recipe) {
         recipe.ingredients.forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe._id.toHexString(), ingredient.name)));
+                emitter.send(new IngredientRequiredEvent(recipe._id.toHexString(), ingredient.name())));
     }
 }
