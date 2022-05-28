@@ -51,7 +51,8 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
     @Override
     public void encode(BsonWriter writer, ImportJob value, EncoderContext encoderContext) {
         Document doc = new Document();
-        doc.put("_id", generateIdIfAbsentFromDocument(value).jobId);
+
+        doc.put("_id", value.jobId);
         doc.put("order", value.order);
         doc.put("error", value.error);
         doc.put("location", value.location);
@@ -65,6 +66,14 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
         return ImportJob.class;
     }
 
+    /**
+     * Wird vom Mongo Client aufgerufen, wenn die Entität geschrieben wird.
+     * Bewirkt, dass encode immer mit einer Entität aufgerufen wird, die eine
+     * id besitzt.
+     *
+     * @param document the document for which to generate a value for the _id.
+     * @return Ein ImportJob Objekt, dessen jobId Feld garantiert gesetzt ist.
+     */
     @Override
     public ImportJob generateIdIfAbsentFromDocument(ImportJob document) {
         if (!documentHasId(document)) {

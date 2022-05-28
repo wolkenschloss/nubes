@@ -9,10 +9,6 @@ import java.util.stream.Stream;
 
 public class Ingredient {
 
-    @SuppressWarnings("unused")
-    public Ingredient() {
-    }
-
     public Ingredient(Rational quantity, String unit, String name) {
         this.name = name;
         this.unit = unit;
