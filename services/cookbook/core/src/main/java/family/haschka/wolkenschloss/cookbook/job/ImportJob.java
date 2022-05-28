@@ -1,13 +1,10 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import org.bson.codecs.pojo.annotations.BsonId;
-
 import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 
 public class ImportJob {
-    @BsonId
     public UUID jobId;
 
     public URI order;
@@ -15,7 +12,6 @@ public class ImportJob {
     public URI location;
     public String error;
 
-    // Required by JSON-B
     public ImportJob() {
     }
 
