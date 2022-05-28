@@ -35,7 +35,7 @@ dependencies {
         testImplementation(it)
     }
 
-    libs.findBundle("junit").ifPresent {
+    libs.findLibrary("junit-jupiter").ifPresent {
         testImplementation(it)
         integrationTestImplementation(it)
     }

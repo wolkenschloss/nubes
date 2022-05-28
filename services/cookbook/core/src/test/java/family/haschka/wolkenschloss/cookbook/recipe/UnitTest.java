@@ -1,8 +1,8 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import com.mongodb.assertions.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,21 +45,5 @@ public class UnitTest {
         Matcher matcher = regex.matcher(testcase);
 
         Assertions.assertTrue(matcher.matches());
-    }
-
-    enum UnitTestcase {
-        CUBIC("cubic"),
-        LITER("Liter"),
-        DECILITER("decilitre", "Deziliter", "dl"),
-        CENTILITER("centilitre", "Centiliter", "cl"),
-        MILLILITER("millilitre", "Milliliter", "ml"),
-        FLUID_ONCE("fluid ounce", "fl", "fl.oz.", "oz.fl."),
-        CUP("cup", "c", "Tasse", "Ta");
-
-        private final String unit;
-
-        UnitTestcase(String unit, String... aliases) {
-            this.unit = unit;
-        }
     }
 }

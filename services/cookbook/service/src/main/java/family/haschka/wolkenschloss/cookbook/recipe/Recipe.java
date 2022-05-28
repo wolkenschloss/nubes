@@ -1,6 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
@@ -8,7 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Recipe {
-    @BsonId
+//    @BsonId
     public ObjectId _id;
     public String title;
     public String preparation;
