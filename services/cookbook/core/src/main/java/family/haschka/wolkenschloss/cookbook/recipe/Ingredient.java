@@ -1,7 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -11,17 +9,11 @@ import java.util.stream.Stream;
 
 public class Ingredient {
 
-    // Required by Bson
     @SuppressWarnings("unused")
     public Ingredient() {
     }
 
-    @JsonbCreator
-    public Ingredient(
-            @JsonbProperty("quantity") Rational quantity,
-            @JsonbProperty("unit") String unit,
-            @JsonbProperty("name") String name) {
-
+    public Ingredient(Rational quantity, String unit, String name) {
         this.name = name;
         this.unit = unit;
         this.quantity = quantity;

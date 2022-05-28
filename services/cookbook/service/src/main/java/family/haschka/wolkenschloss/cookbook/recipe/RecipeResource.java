@@ -35,6 +35,7 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Response> post(Recipe recipe, @Context UriInfo uriInfo) {
+
         return creator.save(recipe)
                 .log("saved")
                 .map(r -> {
