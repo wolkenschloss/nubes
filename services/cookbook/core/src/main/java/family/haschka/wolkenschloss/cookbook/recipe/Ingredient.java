@@ -34,27 +34,6 @@ public record Ingredient(Rational quantity, String unit, String name) {
         }
     }
 
-    @Override
-    public String toString() {
-        return Stream.of(quantity, unit, name)
-                .filter(Objects::nonNull)
-                .map(Object::toString)
-                .collect(Collectors.joining(" "));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Ingredient that = (Ingredient) o;
-        return Objects.equals(name, that.name) && Objects.equals(unit, that.unit) && Objects.equals(quantity, that.quantity);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, unit, quantity);
-    }
-
     public Ingredient scale(Rational factor) {
 
         var scaledQuantity = Optional.ofNullable(quantity)
@@ -62,5 +41,13 @@ public record Ingredient(Rational quantity, String unit, String name) {
                 .orElse(null);
 
         return new Ingredient(scaledQuantity, unit, name);
+    }
+
+    @Override
+    public String toString() {
+        return Stream.of(quantity, unit, name)
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .collect(Collectors.joining(" "));
     }
 }
