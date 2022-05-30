@@ -89,7 +89,7 @@ public class JobServiceTest {
         Mockito.when(repository.persist(job))
                 .thenReturn(Uni.createFrom().failure(failure));
 
-        service.create(job.order)
+        service.create(job.order())
                 .subscribe()
                 .withSubscriber(UniAssertSubscriber.create())
                 .awaitFailure()
@@ -121,7 +121,7 @@ public class JobServiceTest {
         Mockito.when(emitter.send(testcase.created()))
                 .thenReturn(CompletableFuture.failedStage(failure));
 
-        service.create(job.order)
+        service.create(job.order())
                 .subscribe()
                 .withSubscriber(UniAssertSubscriber.create())
                 .awaitItem()

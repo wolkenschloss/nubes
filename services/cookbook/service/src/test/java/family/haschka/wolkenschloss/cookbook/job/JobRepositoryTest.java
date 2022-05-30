@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.UUID;
 
 @QuarkusTest
 @DisplayName("Job Repository")
@@ -20,7 +21,7 @@ public class JobRepositoryTest {
 
     @BeforeEach
     public void persistJob() {
-        theJob = ImportJob.create(null, URI.create("/myRecipe/123"))
+        theJob = ImportJob.create(UUID.randomUUID(), URI.create("/myRecipe/123"))
                 .complete(URI.create("/myLocation/123"), "Das hat nicht geklappt.");
 
         repository.deleteAll().await().indefinitely();
@@ -30,8 +31,7 @@ public class JobRepositoryTest {
     @Test
     @DisplayName("should find job by id")
     public void findJob() {
-
-        var clone = repository.findById(theJob.jobId).await().indefinitely();
+        var clone = repository.findById(theJob.jobId()).await().indefinitely();
         Assertions.assertNotNull(clone);
         Assertions.assertEquals(theJob, clone);
     }
@@ -39,7 +39,7 @@ public class JobRepositoryTest {
     @Test
     @DisplayName("should delete job by id")
     public void deleteJob() {
-        repository.deleteById(theJob.jobId).await().indefinitely();
+        repository.deleteById(theJob.jobId()).await().indefinitely();
         Assertions.assertEquals(0, repository.findAll().count().await().indefinitely());
     }
 
@@ -47,13 +47,12 @@ public class JobRepositoryTest {
     @DisplayName("should update job")
     public void updateJob() {
 
-        repository.findById(theJob.jobId)
+        repository.findById(theJob.jobId())
                 .map(job -> job.complete(URI.create("/myOtherLocation"), null))
                 .flatMap(job -> repository.update(job))
                 .await().indefinitely();
 
-
-        Assertions.assertNotEquals(theJob, repository.findById(theJob.jobId).await().indefinitely());
+        Assertions.assertNotEquals(theJob, repository.findById(theJob.jobId()).await().indefinitely());
     }
 
     @Test

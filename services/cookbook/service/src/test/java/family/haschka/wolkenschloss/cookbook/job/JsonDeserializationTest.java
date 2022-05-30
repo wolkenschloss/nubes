@@ -8,14 +8,15 @@ import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 
 @QuarkusTest
-public class JsonDeserialisationTest {
+public class JsonDeserializationTest {
     @Inject
     Jsonb jsonb;
 
     @Test
     public void deserializeJob() {
         var json = "{\"order\": \"http://meinerezepte.local/lasagne.html\"}";
-        var job = jsonb.fromJson(json, ImportJob.class);
-        Assertions.assertEquals(true, true);
+        Assertions.assertDoesNotThrow(() -> {
+            var job = jsonb.fromJson(json, ImportJobAnnotation.class);
+        });
     }
 }

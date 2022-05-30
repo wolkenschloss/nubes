@@ -26,37 +26,30 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
     @Override
     public ImportJob decode(BsonReader reader, DecoderContext decoderContext) {
         Document document = documentCodec.decode(reader, decoderContext);
-        ImportJob job = new ImportJob();
 
-        job.jobId = document.get("_id", UUID.class);
-
-        job.order = Optional.ofNullable(document.getString("order"))
-                .map(URI::create)
-                .orElse(null);
-
-        job.error = document.getString("error");
-
-        job.location = Optional.ofNullable(document.getString("location"))
-                .map(URI::create)
-                .orElse(null);
-
-
-        job.state = Optional.ofNullable(document.getString("state"))
-                .map(State::valueOf)
-                .orElse(null);
-
-        return job;
+        return new ImportJob(
+                document.get("_id", UUID.class),
+                Optional.ofNullable(document.getString("order"))
+                        .map(URI::create)
+                        .orElse(null),
+                Optional.ofNullable(document.getString("state"))
+                        .map(State::valueOf)
+                        .orElse(null),
+                Optional.ofNullable(document.getString("location"))
+                        .map(URI::create)
+                        .orElse(null),
+                document.getString("error"));
     }
 
     @Override
     public void encode(BsonWriter writer, ImportJob value, EncoderContext encoderContext) {
         Document doc = new Document();
 
-        doc.put("_id", value.jobId);
-        doc.put("order", value.order);
-        doc.put("error", value.error);
-        doc.put("location", value.location);
-        doc.put("state", value.state.toString());
+        doc.put("_id", value.jobId());
+        doc.put("order", value.order());
+        doc.put("error", value.error());
+        doc.put("location", value.location());
+        doc.put("state", value.state().toString());
 
         documentCodec.encode(writer, doc, encoderContext);
     }
@@ -71,28 +64,28 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
      * Bewirkt, dass encode immer mit einer Entität aufgerufen wird, die eine
      * id besitzt.
      *
-     * @param document the document for which to generate a value for the _id.
+     * @param document the document for which to generate a value for the jobId.
      * @return Ein ImportJob Objekt, dessen jobId Feld garantiert gesetzt ist.
      */
     @Override
     public ImportJob generateIdIfAbsentFromDocument(ImportJob document) {
         if (!documentHasId(document)) {
-            document.jobId = UUID.randomUUID();
+            return new ImportJob(UUID.randomUUID(), document.order(), document.state(), document.location(), document.error());
         }
         return document;
     }
 
     @Override
     public boolean documentHasId(ImportJob document) {
-        return document.jobId != null;
+        return document.jobId() != null;
     }
 
     @Override
     public BsonValue getDocumentId(ImportJob document) {
         if (!documentHasId(document)) {
-            throw new IllegalStateException("document das not contain an id");
+            throw new IllegalStateException("document does not contain an id");
         }
 
-        return new BsonBinary(document.jobId);
+        return new BsonBinary(document.jobId());
     }
 }
