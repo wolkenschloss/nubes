@@ -98,7 +98,7 @@ public class RationalTest {
     @ParameterizedTest
     @EnumSource(MultiplicationTestcase.class)
     public void multiplyTests(MultiplicationTestcase testcase) {
-        Assertions.assertEquals(testcase.product, testcase.op1.multiply(testcase.op2));
+        Assertions.assertEquals(testcase.product, testcase.op1.times(testcase.op2));
     }
 
     enum ParseTestcase {

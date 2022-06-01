@@ -37,7 +37,7 @@ public record Ingredient(Rational quantity, String unit, String name) {
     public Ingredient scale(Rational factor) {
 
         var scaledQuantity = Optional.ofNullable(quantity)
-                .map(q -> q.multiply(factor))
+                .map(q -> q.times(factor))
                 .orElse(null);
 
         return new Ingredient(scaledQuantity, unit, name);
