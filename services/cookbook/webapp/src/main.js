@@ -4,6 +4,7 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import store from './store'
 import './registerServiceWorker'
+import '@/mobile-patch.css'
 
 Vue.config.productionTip = true
 Vue.use(require('vue-shortkey'))

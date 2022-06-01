@@ -1,23 +1,25 @@
 <template>
   <v-container>
-    <v-toolbar elevation="0">
-      <v-btn color="secondary"  @click="edit({ingredients: [], servings: 1})"
-             v-shortcut="'n'">
-        New Recipe
+    <v-toolbar elevation="0" class="farbig">
+      <v-toolbar-title v-if="searching">
+        {{ this.total }} Recipes
+      </v-toolbar-title>
+      <v-btn color="primary" @click="edit({ingredients: [], servings: 1})"
+             v-if="!searching"
+             :icon="$vuetify.breakpoint.xsOnly">
+        <v-icon class="d-flex d-sm-none">mdi-file-plus</v-icon>
+        <span class="d-none d-sm-flex">New Recipe</span>
       </v-btn>
       <edit title="New Recipe" v-bind:value="recipe" @input="create" @cancel="cancel"/>&nbsp;
-      <import-dialog/>&nbsp;
-      <v-text-field v-model="search"
-                    append-icon="mdi-magnify"
-                    label="Search"
-                    single-line
-                    hide-details
-                    clearable/>
+      <import-dialog v-if="!searching"/>&nbsp;
+      <v-spacer/>
+      <ExpandingSearchField v-model="search" @resize="(expanded) => this.searching = expanded"></ExpandingSearchField>
     </v-toolbar>
     <v-data-table
         class="mt-4"
         hide-default-header
         :items-per-page="$vuetify.breakpoint.mobile ? 5 : 10"
+        mobile-breakpoint="500"
         :footer-props="{'items-per-page-options': [5, 10, 15, 20]}"
         :loading="loading"
         :items="toc"
@@ -35,10 +37,11 @@ import Edit from "@/views/Edit";
 import {debounce} from "lodash";
 import {mapActions, mapGetters} from 'vuex'
 import ImportDialog from "@/components/ImportDialog";
+import ExpandingSearchField from "@/components/ExpandingSearchField";
 
 export default {
   name: 'Contents',
-  components: {ImportDialog, Edit},
+  components: {ExpandingSearchField, ImportDialog, Edit},
   watch: {
     pagination: {
       async handler() {
@@ -48,6 +51,7 @@ export default {
     },
     search: {
       async handler() {
+        console.log("search changed")
         await this.load()
       },
       deep: true
@@ -62,7 +66,7 @@ export default {
       },
       set(value) {
         console.log(`!!!! contents set copy ${JSON.stringify(value)}`)
-        if(value) {
+        if (value) {
           this.create(value)
         }
         this.edit(null)
@@ -89,6 +93,7 @@ export default {
   data() {
     return {
       loading: false,
+      searching: false,
       headers: [
         {text: "Recipe", value: 'title'},
       ]
@@ -99,6 +104,7 @@ export default {
   },
   mounted() {
     console.log("Mounted")
+    console.log("Breakpoint: ", this.$vuetify.breakpoint.name)
   },
 
   methods: {
@@ -116,3 +122,31 @@ export default {
   }
 }
 </script>
+
+<!--<style lang="css" >-->
+
+<!--@media only screen and (max-width: 600px) {-->
+<!--  .v-data-footer {-->
+<!--    justify-content: center;-->
+<!--    padding-bottom: 8px;-->
+<!--  }-->
+
+<!--  .v-data-footer .v-data-footer__select {-->
+<!--    margin: 0 auto;-->
+<!--  }-->
+
+<!--  .v-data-footer .v-data-footer__pagination {-->
+<!--    width: 100%;-->
+<!--    margin: 0;-->
+<!--  }-->
+
+<!--  .v-application&#45;&#45;is-ltr .v-data-footer__select .v-select {-->
+<!--    margin: 5px 0 5px 13px;-->
+<!--  }-->
+
+<!--  .v-application&#45;&#45;is-rtl .v-data-footer__select .v-select {-->
+<!--    margin: 5px 13px 5px 0;-->
+<!--  }-->
+<!--}-->
+<!--</style>-->
+
