@@ -25,7 +25,7 @@ public enum JobFixture {
         return new Testcase(this, UUID.randomUUID(), UUID.randomUUID());
     }
 
-    public static record Testcase(JobFixture fixture, UUID jobId, UUID recipeId) {
+    public record Testcase(JobFixture fixture, UUID jobId, UUID recipeId) {
         public ImportJob job() throws URISyntaxException {
             return ImportJob.create(jobId, fixture.source.getRecipeSource());
         }

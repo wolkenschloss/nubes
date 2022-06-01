@@ -49,7 +49,6 @@ public class RecipeServiceTest {
         var subscriber = actual.subscribe().withSubscriber(UniAssertSubscriber.create());
         subscriber.assertCompleted().assertItem(RecipeFixture.LASAGNE.withId(id.toHexString()));
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(id);
     }
 
@@ -60,18 +59,17 @@ public class RecipeServiceTest {
 
         var recipe = testcase.recipe;
 
-        Mockito.when(recipeRepository.findByIdOptional(recipe._id))
+        Mockito.when(recipeRepository.findByIdOptional(new ObjectId(recipe._id())))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         var actual = subjectUnderTest
-                .get(recipe._id.toHexString(), Optional.ofNullable(testcase.servings))
+                .get(recipe._id(), Optional.ofNullable(testcase.servings))
                 .map(uni -> uni.orElseThrow(AssertionFailedError::new));
 
         var subscriber = actual.subscribe().withSubscriber(UniAssertSubscriber.create());
         subscriber.assertCompleted().assertItem(testcase.expected);
 
-        //noinspection ReactiveStreamsUnusedPublisher
-        Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(recipe._id);
+        Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(new ObjectId(recipe._id()));
     }
 
     @Test
@@ -89,7 +87,6 @@ public class RecipeServiceTest {
         var subscriber = recipe.subscribe().withSubscriber(UniAssertSubscriber.create());
         subscriber.assertCompleted().assertItem(Optional.empty());
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(anotherId);
     }
 
@@ -105,7 +102,6 @@ public class RecipeServiceTest {
         var subscriber = result.subscribe().withSubscriber(UniAssertSubscriber.create());
         subscriber.assertCompleted().assertItem(value);
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(recipeRepository, Mockito.times(1)).deleteById(id);
     }
 
@@ -119,7 +115,6 @@ public class RecipeServiceTest {
         var result = subjectUnderTest.update(recipe);
         var subscriber = result.subscribe().withSubscriber(UniAssertSubscriber.create());
         subscriber.assertCompleted().assertItem(recipe);
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(recipeRepository, Mockito.times(1)).update(recipe);
     }
 

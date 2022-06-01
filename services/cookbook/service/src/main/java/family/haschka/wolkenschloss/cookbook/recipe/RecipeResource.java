@@ -35,11 +35,12 @@ public class RecipeResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Response> post(Recipe recipe, @Context UriInfo uriInfo) {
+
         return creator.save(recipe)
                 .log("saved")
                 .map(r -> {
                     var location = uriInfo.getAbsolutePathBuilder()
-                            .path(r._id.toString())
+                            .path(r._id().toString())
                             .build();
                     return Response.created(location).entity(r).build();
                 });

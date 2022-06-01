@@ -1,11 +1,14 @@
 package family.haschka.wolkenschloss.cookbook;
 
+import family.haschka.wolkenschloss.cookbook.job.ImportJobAdapter;
 import family.haschka.wolkenschloss.cookbook.recipe.*;
+import io.quarkus.jsonb.JsonbConfigCustomizer;
 import io.quarkus.mongodb.panache.common.jsonb.ObjectIdDeserializer;
 import io.quarkus.mongodb.panache.common.jsonb.ObjectIdSerializer;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
@@ -22,7 +25,7 @@ public class Serialization {
     Logger log;
 
     @Produces
-    public Jsonb createJsonb() {
+    public Jsonb createJsonb(Instance<JsonbConfigCustomizer> customizers) {
 
         log.infov("Configure Jsonb");
 
@@ -40,7 +43,8 @@ public class Serialization {
         };
 
         var config = new JsonbConfig()
-                .withAdapters(new UnitAdapter())
+
+                .withAdapters(new UnitAdapter(), new ImportJobAdapter(), new RecipeAdapter())
                 .withDeserializers(
                         new ServingsDeserializer(),
                         new RationalDeserializer(),
@@ -53,6 +57,8 @@ public class Serialization {
                         new ObjectIdSerializer())
                 .withNullValues(true)
                 .withPropertyVisibilityStrategy(visibilityStrategy);
+
+        customizers.forEach(customizer -> customizer.customize(config));
 
         return JsonbBuilder.create(config);
     }

@@ -60,7 +60,7 @@ In diesem Fall wird die Verarbeitung in einem reaktiven Modell ausgeführt.
 
 ```java
 import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
-import family.haschka.wolkenschloss.cookbook.recipe.RecipeImport;
+import family.haschka.wolkenschloss.cookbook.recipe.download.RecipeImport;
 import io.quarkus.vertx.ConsumeEvent;
 
 import javax.inject.Inject;
@@ -87,6 +87,7 @@ class RecipeApplication {
 
 interface Grabber {
     extract(URI source, Function<String, RecipeImport.GrabResult> fn);
+
     then(Consumer<RecipeImport.GrabResult> fn);
 }
 
