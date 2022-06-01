@@ -1,7 +1,8 @@
+const { defineConfig } = require('@vue/cli-service')
 const path = require("path")
 const ca_dir = path.resolve(process.env.HOME, ".local/share/wolkenschloss/ca")
 
-module.exports = {
+module.exports = defineConfig({
     publicPath: '/cookbook/',
     productionSourceMap: false,
     transpileDependencies: ['vuetify'],
@@ -43,7 +44,8 @@ module.exports = {
         }
     },
     css: {
-        extract: {ignoreOrder: true}
+        // extract: {ignoreOrder: true}
+        // extract: {}
     },
     configureWebpack: {
         // watch: process.env.NODE_ENV === 'development',
@@ -131,4 +133,4 @@ module.exports = {
             // }]
         }
     }
-}
+})
