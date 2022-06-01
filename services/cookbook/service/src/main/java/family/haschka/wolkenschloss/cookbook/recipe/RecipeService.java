@@ -39,7 +39,7 @@ public class RecipeService {
         // TODO: Statt alle Rezepte vollständig zu laden, könnte auch eine
         //  Projektion angewendet werden.
         var summaries = elements.map(e -> e.stream()
-                .map(recipe -> new Summary(recipe._id.toHexString(), recipe.title))
+                .map(recipe -> new Summary(recipe._id().toHexString(), recipe.title()))
                 .collect(Collectors.toList()));
 
         return Uni.combine().all().unis(summaries, total).asTuple()

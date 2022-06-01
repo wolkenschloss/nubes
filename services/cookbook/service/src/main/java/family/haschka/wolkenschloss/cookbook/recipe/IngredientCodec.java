@@ -32,13 +32,32 @@ public class IngredientCodec implements Codec<Ingredient> {
         String unit = null;
         Rational quantity = null;
 
-        while(reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+        var bsonType = reader.readBsonType();
+        while(bsonType != BsonType.END_OF_DOCUMENT) {
             var fieldName = reader.readName();
             switch (fieldName) {
                 case "name" -> name = reader.readString();
-                case "unit" -> unit = reader.readString();
-                case "quantity" -> quantity = rationalCodec.decode(reader, decoderContext);
+                case "unit" -> {
+                    if (bsonType == BsonType.STRING) {
+                        unit = reader.readString();
+                    } else if (bsonType == BsonType.NULL) {
+                        reader.readNull();
+                    } else {
+                        throw new IllegalStateException("Unknown type for field unit while decoding ingredient");
+                    }
+                }
+                case "quantity" -> {
+                    if (bsonType == BsonType.STRING) {
+                        quantity = rationalCodec.decode(reader, decoderContext);
+                    } else if (bsonType == BsonType.NULL) {
+                        reader.readNull();
+                    }
+                    else {
+                        throw new IllegalStateException("Unknwon type for field quantity while decoding ingredient");
+                    }
+                }
             }
+            bsonType = reader.readBsonType();
         }
 
         reader.readEndDocument();

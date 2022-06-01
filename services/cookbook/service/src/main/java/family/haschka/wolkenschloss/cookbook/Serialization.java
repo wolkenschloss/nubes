@@ -44,7 +44,7 @@ public class Serialization {
 
         var config = new JsonbConfig()
 
-                .withAdapters(new UnitAdapter(), new ImportJobAdapter())
+                .withAdapters(new UnitAdapter(), new ImportJobAdapter(), new RecipeAdapter())
                 .withDeserializers(
                         new ServingsDeserializer(),
                         new RationalDeserializer(),

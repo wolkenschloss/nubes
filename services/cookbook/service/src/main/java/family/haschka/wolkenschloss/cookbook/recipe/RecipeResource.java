@@ -40,7 +40,7 @@ public class RecipeResource {
                 .log("saved")
                 .map(r -> {
                     var location = uriInfo.getAbsolutePathBuilder()
-                            .path(r._id.toString())
+                            .path(r._id().toString())
                             .build();
                     return Response.created(location).entity(r).build();
                 });

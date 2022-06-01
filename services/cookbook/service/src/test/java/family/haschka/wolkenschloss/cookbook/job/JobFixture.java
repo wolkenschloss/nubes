@@ -1,8 +1,8 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.recipe.ImportRecipeFailedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.download.ImportRecipeFailedEvent;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeFixture;
-import family.haschka.wolkenschloss.cookbook.recipe.RecipeImportedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.download.RecipeImportedEvent;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -25,7 +25,7 @@ public enum JobFixture {
         return new Testcase(this, UUID.randomUUID(), UUID.randomUUID());
     }
 
-    public static record Testcase(JobFixture fixture, UUID jobId, UUID recipeId) {
+    public record Testcase(JobFixture fixture, UUID jobId, UUID recipeId) {
         public ImportJob job() throws URISyntaxException {
             return ImportJob.create(jobId, fixture.source.getRecipeSource());
         }

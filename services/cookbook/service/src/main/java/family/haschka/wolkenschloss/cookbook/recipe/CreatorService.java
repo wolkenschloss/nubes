@@ -7,6 +7,7 @@ import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.ArrayList;
 
 @ApplicationScoped
 public class CreatorService {
@@ -26,14 +27,21 @@ public class CreatorService {
     }
 
     public Uni<Recipe> save(Recipe recipe) {
-       recipe._id = new ObjectId(identityGenerator.generateObjectId());
-        return recipeRepository.persist(recipe)
+        var toSave = new Recipe(
+                new ObjectId(identityGenerator.generateObjectId()),
+                recipe.title(),
+                recipe.preparation(),
+                new ArrayList<>(recipe.ingredients()),
+                new Servings(recipe.servings().amount()),
+                recipe.created()
+        );
+        return recipeRepository.persist(toSave)
                 .log("persisted")
                 .onItem().invoke(this::lookupIngredients);
     }
 
     private void lookupIngredients(Recipe recipe) {
-        recipe.ingredients.forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe._id.toHexString(), ingredient.name())));
+        recipe.ingredients().forEach(ingredient ->
+                emitter.send(new IngredientRequiredEvent(recipe._id().toHexString(), ingredient.name())));
     }
 }

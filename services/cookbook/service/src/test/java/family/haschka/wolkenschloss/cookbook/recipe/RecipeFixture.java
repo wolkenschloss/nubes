@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,45 +49,60 @@ public enum RecipeFixture {
     }
 
     public Recipe withId(String id) {
-        var recipeWithId = new Recipe(this.recipe.title, this.recipe.preparation);
-        recipeWithId._id = Optional.ofNullable(id).map(ObjectId::new).orElse(null);
-        recipeWithId.servings = recipe.servings;
-        recipeWithId.ingredients = new ArrayList<>(recipe.ingredients);
-
-        return recipeWithId;
+        return new Recipe(
+                Optional.ofNullable(id).map(ObjectId::new).orElse(null),
+                this.recipe.title(),
+                this.recipe.preparation(),
+                new ArrayList<>(recipe.ingredients()),
+                this.recipe.servings(),
+                0L);
     }
 
     private static Recipe getLasagne() {
-        Recipe lasagne = new Recipe("Lasagne", LOREM);
-        lasagne.ingredients.add(new Ingredient(new Rational(500), "g", "Hackfleisch"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), null, "Zwiebel(n)"));
-        lasagne.ingredients.add(new Ingredient(new Rational(2), null, "Knoblauchzehen"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), "Bund", "Petersilie oder TK"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), "EL", "Tomatenmark"));
-        lasagne.ingredients.add(new Ingredient(new Rational(1), "Dose", "Tomaten, geschälte (800g)"));
-        lasagne.ingredients.add(new Ingredient(null, null, "Etwas Rotwein"));
 
-        return lasagne;
+        return new Recipe(
+                null,
+                "Lasagne",
+                LOREM,
+                List.of(
+                        new Ingredient(new Rational(500), "g", "Hackfleisch"),
+                        new Ingredient(new Rational(1), null, "Zwiebel(n)"),
+                        new Ingredient(new Rational(2), null, "Knoblauchzehen"),
+                        new Ingredient(new Rational(1), "Bund", "Petersilie oder TK"),
+                        new Ingredient(new Rational(1), "EL", "Tomatenmark"),
+                        new Ingredient(new Rational(1), "Dose", "Tomaten, geschälte (800g)"),
+                        new Ingredient(null, null, "Etwas Rotwein")),
+                new Servings(1),
+                0L);
     }
 
     public static final String LOREM_IPSUM = "Lorem ipsum dolor sit amet";
 
     private static Recipe getAntipasti() {
-        Recipe antipasti = new Recipe("Antipasti", LOREM_IPSUM);
-        antipasti.ingredients.add(new Ingredient(new Rational(500), "ml", "Olivenöl"));
-        antipasti.ingredients.add(new Ingredient(new Rational(4), null, "Knoblauchzehen"));
-        antipasti.ingredients.add(new Ingredient(new Rational(4), "EL", "getrocknete italienische Kräuter"));
-        antipasti.servings = new Servings(4);
-
-        return antipasti;
+        return new Recipe(
+                null,
+                "Antipasti",
+                LOREM_IPSUM,
+                List.of(
+                        new Ingredient(new Rational(500), "ml", "Olivenöl"),
+                        new Ingredient(new Rational(4), null, "Knoblauchzehen"),
+                        new Ingredient(new Rational(4), "EL", "getrocknete italienische Kräuter")),
+                new Servings(4),
+                0L);
     }
 
     private static Recipe getChiliConCarne() {
-        Recipe chiliConCarne = new Recipe("Chili con carne", "Preparation");
-        chiliConCarne.ingredients.add(new Ingredient(new Rational(800), "g", "Rinderhackfleisch"));
-        chiliConCarne.ingredients.add(new Ingredient(new Rational(1200), "g", "Tomaten, geschält"));
-        chiliConCarne.ingredients.add(new Ingredient(new Rational(1), null, "Zimtstange"));
-        return chiliConCarne;
+        return new Recipe(
+                null,
+                "Chili con carne",
+                "Preparation",
+                List.of(
+                        new Ingredient(new Rational(800), "g", "Rinderhackfleisch"),
+                        new Ingredient(new Rational(1200), "g", "Tomaten, geschält"),
+                        new Ingredient(new Rational(1), null, "Zimtstange")
+                ),
+                new Servings(1),
+                0L);
     }
 
     public String asJson(Jsonb jsonb) {
@@ -98,7 +114,7 @@ public enum RecipeFixture {
     }
 
     public String read() throws URISyntaxException, IOException {
-        try(InputStream in = this.getRecipeSource().toURL().openStream()) {
+        try (InputStream in = this.getRecipeSource().toURL().openStream()) {
             byte[] bytes = in.readAllBytes();
             return new String(bytes, Charset.defaultCharset());
         }

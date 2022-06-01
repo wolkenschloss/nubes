@@ -1,4 +1,6 @@
-package family.haschka.wolkenschloss.cookbook.recipe;
+package family.haschka.wolkenschloss.cookbook.recipe.download;
+
+import family.haschka.wolkenschloss.cookbook.recipe.Servings;
 
 import javax.json.bind.annotation.JsonbProperty;
 import java.util.List;

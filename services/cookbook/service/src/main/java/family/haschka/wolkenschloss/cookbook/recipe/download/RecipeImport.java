@@ -1,7 +1,11 @@
-package family.haschka.wolkenschloss.cookbook.recipe;
+package family.haschka.wolkenschloss.cookbook.recipe.download;
 
 import family.haschka.wolkenschloss.cookbook.job.JobCompletedEvent;
 import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.RationalDeserializer;
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
+import family.haschka.wolkenschloss.cookbook.recipe.ServingsDeserializer;
+import family.haschka.wolkenschloss.cookbook.recipe.SingletonCollector;
 import io.smallrye.mutiny.Uni;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,19 +43,19 @@ public class RecipeImport {
                         "Data source contains more than one recipe"));
     }
 
-    public List<Recipe> extract(String content) {
+    public List<Recipe> extract(String content) throws Exception {
         Stream<String> scripts = extractJsonLdScripts(content);
 
         var config = new JsonbConfig()
                 .withDeserializers(new ServingsDeserializer(), new RationalDeserializer())
                 .withAdapters(new RecipeAdapterFromRecipeAnnotated());
 
-        var jsonb = JsonbBuilder.create(config);
-
-        return scripts
-                .filter(this::isRecipe)
-                .map(s -> jsonb.fromJson(s, Recipe.class))
-                .collect(Collectors.toList());
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            return scripts
+                    .filter(this::isRecipe)
+                    .map(s -> jsonb.fromJson(s, Recipe.class))
+                    .collect(Collectors.toList());
+        }
     }
 
     public Stream<String> extractJsonLdScripts(String content) {

@@ -1,5 +1,6 @@
-package family.haschka.wolkenschloss.cookbook.recipe;
+package family.haschka.wolkenschloss.cookbook.recipe.download;
 
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
 import io.smallrye.mutiny.Uni;
 
 import java.net.URI;

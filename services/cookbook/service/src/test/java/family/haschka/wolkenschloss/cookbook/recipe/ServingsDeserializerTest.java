@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
+import java.util.List;
 
 @QuarkusTest
 public class ServingsDeserializerTest {
@@ -17,25 +18,22 @@ public class ServingsDeserializerTest {
     public void shouldDeserializeServings() {
 
         var deserialized = jsonb.fromJson("{\"servings\": 4}", Recipe.class);
-        var expected = new Recipe();
-        expected.servings = new Servings(4);
+        var expected = new Recipe(null, null, null, List.of(), new Servings(4), 0L);
         Assertions.assertEquals(expected, deserialized);
     }
 
     @Test
     public void shouldHaveDefaultValue() {
         var deserialized = jsonb.fromJson("{}", Recipe.class);
+        var expected = new Recipe(null, null, null, List.of(), new Servings(1), 0L);
 
-        var expected = new Recipe();
-        expected.servings = new Servings(1);
         Assertions.assertEquals(expected, deserialized);
     }
 
     @Test
     public void shouldExtractValue() {
         var deserialized = jsonb.fromJson("{\"servings\": \"3 Portion(en)\"}", Recipe.class);
-        var expected = new Recipe();
-        expected.servings = new Servings(3);
+        var expected = new Recipe(null, null, null, List.of(), new Servings(3), 0L);
 
         Assertions.assertEquals(expected, deserialized);
     }

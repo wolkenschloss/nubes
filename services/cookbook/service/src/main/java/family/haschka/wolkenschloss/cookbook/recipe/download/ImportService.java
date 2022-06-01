@@ -1,6 +1,8 @@
-package family.haschka.wolkenschloss.cookbook.recipe;
+package family.haschka.wolkenschloss.cookbook.recipe.download;
 
 import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.CreatorService;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeResource;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.*;
@@ -33,7 +35,7 @@ public class ImportService {
         return event.onItem().transformToUniAndMerge(e ->
                 service.grab(dataSource, e.getPayload())
                         .chain(creator::save)
-                        .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe._id))
+                        .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe._id()))
                         .map(location -> new RecipeImportedEvent(e.getPayload().jobId(), location))
                         .call(x -> Uni.createFrom().completionStage(e.ack()))
                         .map(e::withPayload)

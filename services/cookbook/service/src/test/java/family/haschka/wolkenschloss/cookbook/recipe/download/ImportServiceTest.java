@@ -1,6 +1,9 @@
-package family.haschka.wolkenschloss.cookbook.recipe;
+package family.haschka.wolkenschloss.cookbook.recipe.download;
 
 import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.CreatorService;
+import family.haschka.wolkenschloss.cookbook.recipe.Recipe;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeFixture;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.helpers.test.AssertSubscriber;
@@ -72,7 +75,7 @@ public class ImportServiceTest {
 
         @Override
         public String toString() {
-            return fixture.get().title;
+            return fixture.get().title();
         }
     }
 
@@ -96,11 +99,9 @@ public class ImportServiceTest {
                 .awaitCompletion()
                 .assertItems(new RecipeImportedEvent(testcase.jobId(), testcase.expectedLocation()));
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(creator, Mockito.times(1))
                         .save(testcase.fixture.get());
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(dataSource, Mockito.times(1))
                 .extract(eq(testcase.source()), any());
     }
@@ -126,7 +127,6 @@ public class ImportServiceTest {
         Mockito.verify(nack, Mockito.times(1))
                         .apply(failure);
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(dataSource, Mockito.times(1))
                 .extract(eq(testcase.source()), any());
 
@@ -159,11 +159,9 @@ public class ImportServiceTest {
         Mockito.verify(nack, Mockito.times(1))
                         .apply(failure);
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(creator, Mockito.times(1))
                 .save(testcase.fixture.get());
 
-        //noinspection ReactiveStreamsUnusedPublisher
         Mockito.verify(dataSource, Mockito.timeout(1000).times(1))
                 .extract(eq(testcase.source()), any());
 
