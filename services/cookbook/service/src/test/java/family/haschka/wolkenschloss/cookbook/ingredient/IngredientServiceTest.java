@@ -38,12 +38,12 @@ public class IngredientServiceTest {
         Ingredient ingredient = IngredientFixture.FLOUR.withId(UUID.randomUUID());
 
         Mockito.when(identityGenerator.generate())
-                .thenReturn(ingredient.id());
+                .thenReturn(ingredient.getId());
 
         Mockito.when(repository.persist(ingredient))
                 .thenReturn(Uni.createFrom().item(ingredient));
 
-        Mockito.when(repository.find("name like ?1", ingredient.name()))
+        Mockito.when(repository.find("name like ?1", ingredient.getName()))
                 .thenReturn(query);
 
         Mockito.when(query.firstResultOptional())
@@ -51,7 +51,7 @@ public class IngredientServiceTest {
 
         var service = new IngredientService(repository, identityGenerator);
 
-        service.create(ingredient.name())
+        service.create(ingredient.getName())
                 .subscribe()
                 .withSubscriber(UniAssertSubscriber.create())
                 .assertCompleted()
@@ -59,7 +59,7 @@ public class IngredientServiceTest {
 
         Mockito.verify(identityGenerator, Mockito.times(1)).generate();
         Mockito.verify(repository, Mockito.times(1)).persist(ingredient);
-        Mockito.verify(repository, Mockito.times(1)).find("name like ?1", ingredient.name());
+        Mockito.verify(repository, Mockito.times(1)).find("name like ?1", ingredient.getName());
         Mockito.verify(query, Mockito.times(1)).firstResultOptional();
     }
 
@@ -67,7 +67,7 @@ public class IngredientServiceTest {
     public void createDuplicateIngredient() {
         Ingredient ingredient = IngredientFixture.FLOUR.withId(UUID.randomUUID());
 
-        Mockito.when(repository.find("name like ?1", ingredient.name()))
+        Mockito.when(repository.find("name like ?1", ingredient.getName()))
                 .thenReturn(query);
 
         Mockito.when(query.firstResultOptional())
@@ -75,13 +75,13 @@ public class IngredientServiceTest {
 
         var service = new IngredientService(repository, identityGenerator);
 
-        service.create(ingredient.name())
+        service.create(ingredient.getName())
                 .subscribe()
                 .withSubscriber(UniAssertSubscriber.create())
                 .assertCompleted()
                 .assertItem(ingredient);
 
-        Mockito.verify(repository, Mockito.times(1)).find("name like ?1", ingredient.name());
+        Mockito.verify(repository, Mockito.times(1)).find("name like ?1", ingredient.getName());
         Mockito.verify(query, Mockito.times(1)).firstResultOptional();
     }
 
@@ -209,7 +209,7 @@ public class IngredientServiceTest {
 
         Mockito.when(identityGenerator.generate()).thenReturn(ingredientId);
         Mockito.when(repository.persist(entity)).thenReturn(Uni.createFrom().item(entity));
-        Mockito.when(repository.find("name like ?1", entity.name())).thenReturn(query);
+        Mockito.when(repository.find("name like ?1", entity.getName())).thenReturn(query);
 
         Mockito.when(query.firstResultOptional())
                 .thenReturn(Uni.createFrom().item(Optional.empty()));
@@ -225,7 +225,7 @@ public class IngredientServiceTest {
 
         Mockito.verify(identityGenerator, Mockito.times(1)).generate();
         Mockito.verify(repository, Mockito.times(1)).persist(entity);
-        Mockito.verify(repository, Mockito.times(1)).find("name like ?1", entity.name());
+        Mockito.verify(repository, Mockito.times(1)).find("name like ?1", entity.getName());
         Mockito.verify(query, Mockito.times(1)).firstResultOptional();
     }
 

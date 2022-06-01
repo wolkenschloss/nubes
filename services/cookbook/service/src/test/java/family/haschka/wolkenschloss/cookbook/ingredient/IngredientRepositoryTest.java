@@ -27,7 +27,7 @@ public class IngredientRepositoryTest {
     @Test
     @DisplayName("should find ingredient by id")
     public void findIngredient() {
-        var clone = repository.findById(theIngredient.id()).await().indefinitely();
+        var clone = repository.findById(theIngredient.getId()).await().indefinitely();
         Assertions.assertNotNull(clone);
         Assertions.assertEquals(theIngredient, clone);
     }
@@ -35,20 +35,20 @@ public class IngredientRepositoryTest {
     @Test
     @DisplayName("should delete ingredient by id")
     public void deleteIngredient() {
-        repository.deleteById(theIngredient.id()).await().indefinitely();
+        repository.deleteById(theIngredient.getId()).await().indefinitely();
         Assertions.assertEquals(0, repository.findAll().count().await().indefinitely());
     }
 
     @Test
     @DisplayName("should update ingredient")
     public void updateIngredient() {
-        repository.findById(theIngredient.id())
-                .map(ingredient -> new Ingredient(ingredient.id(), "Schlammkrabbenchitin"))
+        repository.findById(theIngredient.getId())
+                .map(ingredient -> new Ingredient(ingredient.getId(), "Schlammkrabbenchitin"))
                 .flatMap(ingredient -> repository.update(ingredient))
                 .await()
                 .indefinitely();
 
-        Assertions.assertNotEquals(theIngredient, repository.findById(theIngredient.id()).await().indefinitely());
+        Assertions.assertNotEquals(theIngredient, repository.findById(theIngredient.getId()).await().indefinitely());
     }
 
     @Test
