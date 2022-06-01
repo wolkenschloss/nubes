@@ -11,9 +11,9 @@ public class GroupSerializer implements JsonbSerializer<Group> {
     @Override
     public void serialize(Group group, JsonGenerator generator, SerializationContext context) {
             generator.writeStartObject();
-            generator.write("name", group.name);
+            generator.write("name", group.getTitle());
             generator.writeStartArray("units");
-            Arrays.asList(group.units).forEach(unit -> context.serialize(unit, generator));
+            Arrays.asList(group.getUnits()).forEach(unit -> context.serialize(unit, generator));
             generator.writeEnd();
             generator.writeEnd();
     }

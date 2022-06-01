@@ -1,12 +1,11 @@
-package family.haschka.wolkenschloss.cookbook.recipe;
+package family.haschka.wolkenschloss.cookbook.recipe
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 // https://www.kochwiki.org/wiki/Zubereitung:Ma%C3%9Fe_und_Gewichte
-public enum Unit {
+enum class Unit(val unit: String, vararg val aliases: String) {
     // Volumenangaben
     CUBIC("cubic", "Kubikzentimeter", "cc", "centimeter", "ccm"),
     LITER("Liter", "l"),
@@ -40,32 +39,32 @@ public enum Unit {
     PIECE("piece", "pc", "Stück", "Stk"),
     PACKAGE("package", "pk", "Packung", "Pk", "Päckchen", "Pck"),
     SLICE("slice", "sl", "Scheibe", "Sch"),
-    SHEET("sheet", "sh", "Blatt", "Bl")
-    ;
+    SHEET("sheet", "sh", "Blatt", "Bl");
 
+//    @JvmField
+//    val aliases: Array<String>
+//
+//    init {
+//        this.aliases = aliases
+//    }
 
-    final String unit;
-    final String[] aliases;
-
-    Unit(String unit, String... aliases) {
-        this.unit = unit;
-        this.aliases = aliases;
+    fun pattern(): String {
+        return unit + "|" + java.lang.String.join("|", Arrays.asList(*aliases))
     }
 
-    public String pattern() {
-        return unit  + "|" + String.join("|", Arrays.asList(aliases));
-    }
+    companion object {
+        @JvmStatic
+        fun regex(): String {
+            return Arrays.stream(values()).map { obj: Unit -> obj.pattern() }.collect(Collectors.joining("|"))
+        }
 
-    public static String regex() {
-        return Arrays.stream(Unit.values()).map(Unit::pattern)
-                .collect(Collectors.joining("|"));
-    }
+        @JvmStatic
+        fun stream(): Stream<String> {
+            return Arrays.stream(values()).flatMap { u: Unit -> Arrays.stream(u.aliases) }
+        }
 
-    static public Stream<String> stream() {
-        return Arrays.stream(Unit.values()).flatMap(u -> Arrays.stream(u.aliases));
-    }
-
-    static public List<String> list() {
-        return stream().collect(Collectors.toList());
+        fun list(): List<String> {
+            return stream().collect(Collectors.toList())
+        }
     }
 }

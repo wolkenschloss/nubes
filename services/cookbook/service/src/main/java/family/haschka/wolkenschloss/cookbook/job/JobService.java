@@ -32,8 +32,8 @@ public class JobService {
     @Incoming("recipe-imported")
     public Uni<Void> onRecipeImported(RecipeImportedEvent event) {
 
-        return repository.findById(event.jobId())
-                .map(job -> job.located(event.location()))
+        return repository.findById(event.getJobId())
+                .map(job -> job.located(event.getLocation()))
                 .chain(repository::update)
                 .log("updated")
                 .onItem().ignore().andContinueWithNull();
@@ -41,8 +41,8 @@ public class JobService {
 
     @Incoming("import-failed")
     public Uni<Void> onImportFailed(ImportRecipeFailedEvent event) {
-        return repository.findById(event.uuid())
-                .chain(job -> repository.update(job.failed(event.cause())))
+        return repository.findById(event.getUuid())
+                .chain(job -> repository.update(job.failed(event.getCause())))
                 .onItem().ignore().andContinueWithNull();
     }
 

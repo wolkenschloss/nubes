@@ -44,11 +44,11 @@ public class GroupResourceTest {
         }
 
         public String selector() {
-            return String.format("groups.findAll {group -> group.name == '%s' }.units.name.flatten().size()", group.name);
+            return String.format("groups.findAll {group -> group.name == '%s' }.units.name.flatten().size()", group.getTitle());
         }
 
         public Matcher<?> expectation() {
-            return is(group.units.length);
+            return is(group.getUnits().length);
         }
     }
 
