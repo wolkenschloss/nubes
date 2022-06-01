@@ -89,14 +89,11 @@ public class RecipeTest {
         ).map(testcase -> DynamicTest.dynamicTest(testcase.name,
                 () -> testcase.assertions.accept(RestAssured
                         .given()
-                                .log().all()
                         .body(readFixture(testcase.fixture))
                         .contentType(ContentType.JSON)
                         .when()
-
                         .post("recipe")
                         .then()
-                        .log().all()
                         .statusCode(testcase.status))));
     }
 

@@ -1,5 +1,6 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
+import family.haschka.wolkenschloss.cookbook.UuidExtensionsKt;
 import family.haschka.wolkenschloss.cookbook.testing.Blueprint;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -57,8 +58,14 @@ public class JobResourceTest {
     public void createImportJobTest() {
 
         UUID id = UUID.randomUUID();
-        ImportJob order = new ImportJob(null, URI.create("http://meinerezepte.local/lasagne.html"), null, null, null);
-        ImportJob result = ImportJob.create(id, order.order());
+        ImportJob order = new ImportJob(
+                UuidExtensionsKt.nil,
+                URI.create("http://meinerezepte.local/lasagne.html"),
+                State.UNKNOWN,
+                ImportJob.getNoLocation(),
+                "");
+
+        ImportJob result = ImportJob.create(id, order.getOrder());
 
         Mockito.when(service.create(any(URI.class)))
                 .thenReturn(Uni.createFrom().item(result));
@@ -77,7 +84,7 @@ public class JobResourceTest {
                         .build()
                         .toString()));
 
-        Mockito.verify(service, Mockito.times(1)).create(order.order());
+        Mockito.verify(service, Mockito.times(1)).create(order.getOrder());
         Mockito.verifyNoMoreInteractions(service);
     }
 
@@ -102,7 +109,7 @@ public class JobResourceTest {
     public void readImportJobFoundTest() {
         var id = UUID.randomUUID();
 
-        var job = new ImportJob(id, JOB_URL, null, null, null);
+        var job = new ImportJob(id, JOB_URL, State.UNKNOWN, ImportJob.getNoLocation(), "");
 
         Mockito.when(service.get(id))
                 .thenReturn(Uni.createFrom().item(Optional.of(job)));
@@ -134,6 +141,6 @@ public class JobResourceTest {
     }
 
     private ImportJob getImportJob() {
-        return new ImportJob(UUID.randomUUID(), JOB_URL, State.COMPLETED, URI.create("https://google.de"), null);
+        return new ImportJob(UUID.randomUUID(), JOB_URL, State.COMPLETED, URI.create("https://google.de"), "");
     }
 }

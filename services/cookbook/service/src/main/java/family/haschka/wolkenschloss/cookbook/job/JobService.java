@@ -51,7 +51,7 @@ public class JobService {
         return repository.persist(job)
                 .ifNoItem().after(Duration.ofMillis(1000)).fail()
                 .invoke(created -> {
-                    var e = new JobCreatedEvent(created.jobId(), created.order());
+                    var e = new JobCreatedEvent(created.getJobId(), created.getOrder());
                     var cs = emitter.send(e);
                     cs.exceptionally(failure -> {
                         log.infov("Error emitting JobCreatedEvent: {0}", failure.getMessage());
