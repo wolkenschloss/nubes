@@ -68,9 +68,9 @@ public class IngredientCodec implements Codec<Ingredient> {
     public void encode(BsonWriter writer, Ingredient value, EncoderContext encoderContext) {
 
         var document = new Document();
-        document.put("name", value.name());
-        document.put("unit", value.unit());
-        document.put("quantity", value.quantity());
+        document.put("name", value.getName());
+        document.put("unit", value.getUnit());
+        document.put("quantity", value.getQuantity());
 
         documentCodec.encode(writer, document, encoderContext);
     }

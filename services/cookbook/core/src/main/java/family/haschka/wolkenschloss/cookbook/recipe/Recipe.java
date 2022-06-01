@@ -1,6 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -10,10 +11,22 @@ public record Recipe(String _id, String title, String preparation, List<Ingredie
     public Recipe {
         Objects.requireNonNull(ingredients);
         Objects.requireNonNull(servings);
+        ingredients = new ArrayList<>(ingredients);
     }
 
     public Recipe(String title, String preparation) {
         this(null, title, preparation, new ArrayList<>(), new Servings(1), 0L);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = _id != null ? _id.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (preparation != null ? preparation.hashCode() : 0);
+        result = 31 * result + ingredients.hashCode();
+        result = 31 * result + servings.hashCode();
+        result = 31 * result + (created != null ? created.hashCode() : 0);
+        return result;
     }
 
     @Override

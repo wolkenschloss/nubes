@@ -66,8 +66,10 @@ public class RecipeServiceTest {
                 .get(recipe._id(), Optional.ofNullable(testcase.servings))
                 .map(uni -> uni.orElseThrow(AssertionFailedError::new));
 
-        var subscriber = actual.subscribe().withSubscriber(UniAssertSubscriber.create());
-        subscriber.assertCompleted().assertItem(testcase.expected);
+        actual.subscribe()
+                .withSubscriber(UniAssertSubscriber.create())
+                .assertCompleted()
+                .assertItem(testcase.expected);
 
         Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(new ObjectId(recipe._id()));
     }

@@ -67,7 +67,7 @@ public class CreatorServiceTest {
                 .thenReturn(Uni.createFrom().item(recipeWithId));
 
         recipe.ingredients().forEach(ingredient -> Mockito.when(
-                        emitter.send(new IngredientRequiredEvent(recipeWithId._id(), ingredient.name())))
+                        emitter.send(new IngredientRequiredEvent(recipeWithId._id(), ingredient.getName())))
                 .thenReturn(CompletableFuture.allOf()));
 
         CreatorService subjectUnderTest = new CreatorService(repository, generator, emitter);

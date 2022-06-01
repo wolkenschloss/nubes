@@ -102,7 +102,5 @@ public class IngredientTest {
     public void shouldNotBeAbleToBeCreatedWithoutAName() {
         var thrown = Assertions.assertThrows(NullPointerException.class,
                 () -> new Ingredient(new Rational(1), Unit.CUP.name(), null));
-
-        Assertions.assertEquals("name required for ingredient", thrown.getMessage());
     }
 }

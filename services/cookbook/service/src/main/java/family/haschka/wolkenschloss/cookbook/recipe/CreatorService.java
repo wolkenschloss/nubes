@@ -9,6 +9,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 
+
 @ApplicationScoped
 public class CreatorService {
 
@@ -40,8 +41,8 @@ public class CreatorService {
                 .onItem().invoke(this::lookupIngredients);
     }
 
-    private void lookupIngredients(Recipe recipe) {
+    public void lookupIngredients(Recipe recipe) {
         recipe.ingredients().forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe._id(), ingredient.name())));
+                emitter.send(new IngredientRequiredEvent(recipe._id(), ingredient.getName())));
     }
 }
