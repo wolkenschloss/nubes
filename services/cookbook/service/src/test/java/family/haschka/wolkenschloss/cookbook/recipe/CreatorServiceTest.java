@@ -36,7 +36,7 @@ public class CreatorServiceTest {
         var recipeWithId = RecipeFixture.LASAGNE.withId();
 
         Mockito.when(generator.generateObjectId())
-                .thenReturn(recipeWithId._id().toHexString());
+                .thenReturn(recipeWithId._id());
 
         Mockito.when(repository.persist(recipeWithId))
                 .thenReturn(Uni.createFrom().failure(failure));
@@ -61,13 +61,13 @@ public class CreatorServiceTest {
         var recipeWithId = RecipeFixture.LASAGNE.withId();
 
         Mockito.when(generator.generateObjectId())
-                .thenReturn(recipeWithId._id().toHexString());
+                .thenReturn(recipeWithId._id());
 
         Mockito.when(repository.persist(recipeWithId))
                 .thenReturn(Uni.createFrom().item(recipeWithId));
 
         recipe.ingredients().forEach(ingredient -> Mockito.when(
-                        emitter.send(new IngredientRequiredEvent(recipeWithId._id().toHexString(), ingredient.name())))
+                        emitter.send(new IngredientRequiredEvent(recipeWithId._id(), ingredient.name())))
                 .thenReturn(CompletableFuture.allOf()));
 
         CreatorService subjectUnderTest = new CreatorService(repository, generator, emitter);

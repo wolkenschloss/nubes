@@ -1,19 +1,16 @@
 package family.haschka.wolkenschloss.cookbook.recipe;
 
-import org.bson.types.ObjectId;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public record Recipe(ObjectId _id, String title, String preparation, List<Ingredient> ingredients, Servings servings, Long created) {
+public record Recipe(String _id, String title, String preparation, List<Ingredient> ingredients, Servings servings, Long created) {
 
     public Recipe {
         Objects.requireNonNull(ingredients);
         Objects.requireNonNull(servings);
     }
-//    public ArrayList ingredients = new ArrayList<>();
 
     public Recipe(String title, String preparation) {
         this(null, title, preparation, new ArrayList<>(), new Servings(1), 0L);

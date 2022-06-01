@@ -113,19 +113,19 @@ public class RecipeResourceTest {
     public void getRecipe() {
         var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
 
-        Mockito.when(service.get(recipe._id().toHexString(), Optional.empty()))
+        Mockito.when(service.get(recipe._id(), Optional.empty()))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         System.out.println(RecipeFixture.LASAGNE.asJson(jsonb));
         RestAssured.given()
                 .accept(ContentType.JSON)
                 .when()
-                .get(recipe._id().toString())
+                .get(recipe._id())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body(is(jsonb.toJson(recipe)));
 
-        Mockito.verify(service, Mockito.times(1)).get(recipe._id().toHexString(), Optional.empty());
+        Mockito.verify(service, Mockito.times(1)).get(recipe._id(), Optional.empty());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class RecipeResourceTest {
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .put(recipe._id().toString())
+                .put(recipe._id())
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 

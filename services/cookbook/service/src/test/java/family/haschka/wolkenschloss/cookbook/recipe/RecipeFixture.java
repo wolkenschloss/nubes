@@ -50,7 +50,7 @@ public enum RecipeFixture {
 
     public Recipe withId(String id) {
         return new Recipe(
-                Optional.ofNullable(id).map(ObjectId::new).orElse(null),
+                id,
                 this.recipe.title(),
                 this.recipe.preparation(),
                 new ArrayList<>(recipe.ingredients()),

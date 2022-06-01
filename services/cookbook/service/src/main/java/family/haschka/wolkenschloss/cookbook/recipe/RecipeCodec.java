@@ -10,12 +10,10 @@ import java.util.List;
 
 public class RecipeCodec implements CollectibleCodec<Recipe> {
 
-    private final Codec<Document> documentCodec;
     private final Codec<Servings> servingsCodec;
     private final Codec<Ingredient> ingredientCodec;
 
     public RecipeCodec(CodecRegistry registry) {
-        this.documentCodec = new DocumentCodec(registry);
         this.servingsCodec = registry.get(Servings.class);
         this.ingredientCodec = registry.get(Ingredient.class);
     }
@@ -24,7 +22,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
     public Recipe generateIdIfAbsentFromDocument(Recipe document) {
         if(!documentHasId(document)) {
             return new Recipe(
-                    ObjectId.get(),
+                    ObjectId.get().toHexString(),
                     document.title(),
                     document.preparation(),
                     new ArrayList<>(document.ingredients()),
@@ -46,7 +44,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
             throw new IllegalStateException("document does not contain an id");
         }
 
-        return new BsonObjectId(document._id());
+        return new BsonObjectId(new ObjectId(document._id()));
     }
 
     @Override
@@ -74,7 +72,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
 
         reader.readEndDocument();
 
-        return new Recipe(_id, title, preparation, ingredients, servings, created);
+        return new Recipe(_id.toHexString(), title, preparation, ingredients, servings, created);
     }
 
     private List<Ingredient> readIngredients(BsonReader reader, DecoderContext decoderContext) {
@@ -90,15 +88,21 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
 
     @Override
     public void encode(BsonWriter writer, Recipe value, EncoderContext encoderContext) {
-        Document document = new Document();
-        document.put("_id", value._id());
-        document.put("title", value.title());
-        document.put("preparation", value.preparation());
-        document.put("ingredients", value.ingredients());
-        document.put("servings", value.servings());
-        document.put("created", value.created());
 
-        documentCodec.encode(writer, document, encoderContext);
+        writer.writeStartDocument();
+
+        writer.writeObjectId("_id", new ObjectId(value._id()));
+        writer.writeString("title", value.title());
+        writer.writeString("preparation", value.preparation());
+
+        writer.writeStartArray("ingredients");
+        value.ingredients().forEach(ingredient -> ingredientCodec.encode(writer, ingredient, encoderContext));
+        writer.writeEndArray();
+
+        writer.writeName("servings");
+        servingsCodec.encode(writer, value.servings(), encoderContext);
+        writer.writeInt64("created", value.created());
+        writer.writeEndDocument();
     }
 
     @Override

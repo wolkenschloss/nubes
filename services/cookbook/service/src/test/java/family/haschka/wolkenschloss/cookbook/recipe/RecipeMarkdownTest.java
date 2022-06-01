@@ -25,7 +25,7 @@ public class RecipeMarkdownTest {
     public void getRecipeAsMarkdown() {
         var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
 
-        Mockito.when(service.get(recipe._id().toHexString(), Optional.empty()))
+        Mockito.when(service.get(recipe._id(), Optional.empty()))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         //noinspection SpellCheckingInspection
@@ -57,7 +57,7 @@ public class RecipeMarkdownTest {
         var actual = RestAssured.given()
                 .accept("text/markdown; charset=UTF-8")
                 .when()
-                .get(recipe._id().toString())
+                .get(recipe._id())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract().body().asString();
@@ -66,7 +66,7 @@ public class RecipeMarkdownTest {
         // between expected and actual value in IntelliJ.
         Assertions.assertEquals(expected, actual);
 
-        Mockito.verify(service, Mockito.times(1)).get(recipe._id().toHexString(), Optional.empty());
+        Mockito.verify(service, Mockito.times(1)).get(recipe._id(), Optional.empty());
     }
 
     @AfterEach

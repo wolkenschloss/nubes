@@ -28,7 +28,7 @@ public class CreatorService {
 
     public Uni<Recipe> save(Recipe recipe) {
         var toSave = new Recipe(
-                new ObjectId(identityGenerator.generateObjectId()),
+                new ObjectId(identityGenerator.generateObjectId()).toHexString(),
                 recipe.title(),
                 recipe.preparation(),
                 new ArrayList<>(recipe.ingredients()),
@@ -42,6 +42,6 @@ public class CreatorService {
 
     private void lookupIngredients(Recipe recipe) {
         recipe.ingredients().forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe._id().toHexString(), ingredient.name())));
+                emitter.send(new IngredientRequiredEvent(recipe._id(), ingredient.name())));
     }
 }
