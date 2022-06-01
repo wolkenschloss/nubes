@@ -32,7 +32,7 @@ public class CreatorService {
                 recipe.title(),
                 recipe.preparation(),
                 new ArrayList<>(recipe.ingredients()),
-                new Servings(recipe.servings().amount()),
+                new Servings(recipe.servings().getAmount()),
                 recipe.created()
         );
         return recipeRepository.persist(toSave)

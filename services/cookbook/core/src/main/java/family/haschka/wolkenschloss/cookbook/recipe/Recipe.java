@@ -28,13 +28,13 @@ public record Recipe(String _id, String title, String preparation, List<Ingredie
     }
 
     public Recipe scale(Servings servings) {
-        var factor = new Rational(servings.amount(), this.servings.amount());
+        var factor = new Rational(servings.getAmount(), this.servings.getAmount());
         return new Recipe(
                 this._id(),
                 this.title(),
                 this.preparation(),
                 this.ingredients.stream().map(i -> i.scale(factor)).collect(Collectors.toCollection(ArrayList::new)),
-                new Servings(servings.amount()),
+                new Servings(servings.getAmount()),
                 created());
     }
 }

@@ -27,7 +27,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
                     document.title(),
                     document.preparation(),
                     new ArrayList<>(document.ingredients()),
-                    new Servings(document.servings().amount()),
+                    new Servings(document.servings().getAmount()),
                     0L);
         }
 

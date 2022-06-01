@@ -54,7 +54,13 @@ public class RecipeRepositoryTest {
     @DisplayName("should update recipe")
     public void updateRecipe() {
         repository.findById(new ObjectId(theRecipe._id()))
-                .map(recipe -> new Recipe(recipe._id(), recipe.title(), "New preparation", new ArrayList<>(recipe.ingredients()), new Servings(recipe.servings().amount()), recipe.created()))
+                .map(recipe -> new Recipe(
+                        recipe._id(),
+                        recipe.title(),
+                        "New preparation",
+                        new ArrayList<>(recipe.ingredients()),
+                        new Servings(recipe.servings().getAmount()),
+                        recipe.created()))
                 .flatMap(recipe -> repository.update(recipe))
                 .await()
                 .indefinitely();

@@ -14,7 +14,7 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotations> {
         json.title = obj.title();
         json.preparation = obj.preparation();
         json.ingredients = new ArrayList<>(obj.ingredients());
-        json.servings = new Servings(obj.servings().amount());
+        json.servings = new Servings(obj.servings().getAmount());
         json.created = obj.created();
         return json;
     }
@@ -26,7 +26,7 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotations> {
                 obj.title,
                 obj.preparation,
                 Optional.ofNullable(obj.ingredients).map(ArrayList::new).orElse(new ArrayList<>()),
-                Optional.ofNullable(obj.servings).map(servings -> new Servings(servings.amount())).orElse(new Servings(1)),
+                Optional.ofNullable(obj.servings).map(servings -> new Servings(servings.getAmount())).orElse(new Servings(1)),
                 0L);
     }
 }

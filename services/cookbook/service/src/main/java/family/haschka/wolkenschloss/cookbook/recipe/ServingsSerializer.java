@@ -7,6 +7,6 @@ import javax.json.stream.JsonGenerator;
 public class ServingsSerializer implements JsonbSerializer<Servings> {
     @Override
     public void serialize(Servings obj, JsonGenerator generator, SerializationContext ctx) {
-        ctx.serialize(obj.amount(), generator);
+        ctx.serialize(obj.getAmount(), generator);
     }
 }
