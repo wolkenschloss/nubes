@@ -1,7 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.recipe.download.ImportRecipeFailedEvent;
-import family.haschka.wolkenschloss.cookbook.recipe.download.RecipeImportedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.ImportRecipeFailedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeImportedEvent;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;

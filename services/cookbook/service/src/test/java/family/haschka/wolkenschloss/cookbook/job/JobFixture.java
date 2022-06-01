@@ -1,8 +1,8 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
-import family.haschka.wolkenschloss.cookbook.recipe.download.ImportRecipeFailedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.ImportRecipeFailedEvent;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeFixture;
-import family.haschka.wolkenschloss.cookbook.recipe.download.RecipeImportedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeImportedEvent;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;

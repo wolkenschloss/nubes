@@ -2,6 +2,8 @@ package family.haschka.wolkenschloss.cookbook.recipe.download;
 
 import family.haschka.wolkenschloss.cookbook.job.JobCreatedEvent;
 import family.haschka.wolkenschloss.cookbook.recipe.CreatorService;
+import family.haschka.wolkenschloss.cookbook.recipe.ImportRecipeFailedEvent;
+import family.haschka.wolkenschloss.cookbook.recipe.RecipeImportedEvent;
 import family.haschka.wolkenschloss.cookbook.recipe.RecipeResource;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;

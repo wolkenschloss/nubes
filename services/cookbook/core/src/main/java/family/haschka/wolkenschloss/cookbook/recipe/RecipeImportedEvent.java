@@ -1,4 +1,4 @@
-package family.haschka.wolkenschloss.cookbook.recipe.download;
+package family.haschka.wolkenschloss.cookbook.recipe;
 
 import java.net.URI;
 import java.util.UUID;

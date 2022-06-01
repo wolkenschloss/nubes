@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RecipeCodec implements CollectibleCodec<Recipe> {
 
@@ -58,16 +59,28 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
         Servings servings = null;
         Long created = null;
 
-        while(reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+        var bsonType = reader.readBsonType();
+        while(bsonType != BsonType.END_OF_DOCUMENT) {
             var fieldName = reader.readName();
             switch (fieldName) {
                 case "_id" -> _id = reader.readObjectId();
                 case "title" -> title = reader.readString();
-                case "preparation" -> preparation = reader.readString();
+                case "preparation" -> {
+                    if (bsonType == BsonType.STRING) {
+                        preparation = reader.readString();
+                    } else if (bsonType == BsonType.NULL) {
+                        preparation = null;
+                        reader.readNull();
+                    } else {
+                        throw new IllegalStateException("Unknown type of field 'preparation'");
+                    }
+                }
                 case "ingredients" -> ingredients = readIngredients(reader, decoderContext);
                 case "servings" -> servings = servingsCodec.decode(reader, decoderContext);
                 case "created" -> created = reader.readInt64();
             }
+
+            bsonType = reader.readBsonType();
         }
 
         reader.readEndDocument();
@@ -93,7 +106,10 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
 
         writer.writeObjectId("_id", new ObjectId(value._id()));
         writer.writeString("title", value.title());
-        writer.writeString("preparation", value.preparation());
+
+        Optional.ofNullable(value.preparation()).ifPresentOrElse(
+                preparation -> writer.writeString("preparation", preparation),
+                () -> writer.writeNull("preparation"));
 
         writer.writeStartArray("ingredients");
         value.ingredients().forEach(ingredient -> ingredientCodec.encode(writer, ingredient, encoderContext));
