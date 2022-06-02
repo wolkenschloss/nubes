@@ -37,7 +37,7 @@ public class ImportService {
         return event.onItem().transformToUniAndMerge(e ->
                 service.grab(dataSource, e.getPayload())
                         .chain(creator::save)
-                        .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe._id()))
+                        .map(recipe -> UriBuilder.fromResource(RecipeResource.class).path("{id}").build(recipe.get_id()))
                         .map(location -> new RecipeImportedEvent(e.getPayload().getJobId(), location))
                         .call(x -> Uni.createFrom().completionStage(e.ack()))
                         .map(e::withPayload)

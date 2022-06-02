@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public enum RecipeFixture {
 
@@ -51,17 +50,17 @@ public enum RecipeFixture {
     public Recipe withId(String id) {
         return new Recipe(
                 id,
-                this.recipe.title(),
-                this.recipe.preparation(),
-                new ArrayList<>(recipe.ingredients()),
-                this.recipe.servings(),
+                this.recipe.getTitle(),
+                this.recipe.getPreparation(),
+                new ArrayList<>(recipe.getIngredients()),
+                this.recipe.getServings(),
                 0L);
     }
 
     private static Recipe getLasagne() {
 
         return new Recipe(
-                null,
+                "unset",
                 "Lasagne",
                 LOREM,
                 List.of(
@@ -80,7 +79,7 @@ public enum RecipeFixture {
 
     private static Recipe getAntipasti() {
         return new Recipe(
-                null,
+                "unset",
                 "Antipasti",
                 LOREM_IPSUM,
                 List.of(
@@ -93,7 +92,7 @@ public enum RecipeFixture {
 
     private static Recipe getChiliConCarne() {
         return new Recipe(
-                null,
+                "unset",
                 "Chili con carne",
                 "Preparation",
                 List.of(
@@ -121,6 +120,6 @@ public enum RecipeFixture {
     }
 
     public Recipe get() {
-        return withId(null);
+        return withId("unset");
     }
 }

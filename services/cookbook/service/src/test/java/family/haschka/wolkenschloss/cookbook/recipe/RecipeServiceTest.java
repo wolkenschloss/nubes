@@ -59,11 +59,11 @@ public class RecipeServiceTest {
 
         var recipe = testcase.recipe;
 
-        Mockito.when(recipeRepository.findByIdOptional(new ObjectId(recipe._id())))
+        Mockito.when(recipeRepository.findByIdOptional(new ObjectId(recipe.get_id())))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         var actual = subjectUnderTest
-                .get(recipe._id(), Optional.ofNullable(testcase.servings))
+                .get(recipe.get_id(), Optional.ofNullable(testcase.servings))
                 .map(uni -> uni.orElseThrow(AssertionFailedError::new));
 
         actual.subscribe()
@@ -71,7 +71,7 @@ public class RecipeServiceTest {
                 .assertCompleted()
                 .assertItem(testcase.expected);
 
-        Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(new ObjectId(recipe._id()));
+        Mockito.verify(recipeRepository, Mockito.times(1)).findByIdOptional(new ObjectId(recipe.get_id()));
     }
 
     @Test

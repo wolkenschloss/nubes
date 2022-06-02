@@ -73,7 +73,7 @@ public class ImportServiceTest {
 
         @Override
         public String toString() {
-            return fixture.get().title();
+            return fixture.get().getTitle();
         }
     }
 

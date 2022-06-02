@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class RecipeCodec implements CollectibleCodec<Recipe> {
@@ -24,10 +25,10 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
         if(!documentHasId(document)) {
             return new Recipe(
                     ObjectId.get().toHexString(),
-                    document.title(),
-                    document.preparation(),
-                    new ArrayList<>(document.ingredients()),
-                    new Servings(document.servings().getAmount()),
+                    document.getTitle(),
+                    document.getPreparation(),
+                    new ArrayList<>(document.getIngredients()),
+                    new Servings(document.getServings().getAmount()),
                     0L);
         }
 
@@ -36,7 +37,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
 
     @Override
     public boolean documentHasId(Recipe document) {
-        return document._id() != null;
+        return !document.get_id().equals("unset");
     }
 
     @Override
@@ -45,7 +46,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
             throw new IllegalStateException("document does not contain an id");
         }
 
-        return new BsonObjectId(new ObjectId(document._id()));
+        return new BsonObjectId(new ObjectId(document.get_id()));
     }
 
     @Override
@@ -57,7 +58,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
         String preparation = null;
         List<Ingredient> ingredients = null;
         Servings servings = null;
-        Long created = null;
+        long created = 0L;
 
         var bsonType = reader.readBsonType();
         while(bsonType != BsonType.END_OF_DOCUMENT) {
@@ -85,7 +86,13 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
 
         reader.readEndDocument();
 
-        return new Recipe(_id.toHexString(), title, preparation, ingredients, servings, created);
+        return new Recipe(
+                Objects.requireNonNull(_id).toHexString(),
+                Objects.requireNonNull(title),
+                preparation,
+                Objects.requireNonNull(ingredients),
+                Objects.requireNonNull(servings),
+                created);
     }
 
     private List<Ingredient> readIngredients(BsonReader reader, DecoderContext decoderContext) {
@@ -104,20 +111,20 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
 
         writer.writeStartDocument();
 
-        writer.writeObjectId("_id", new ObjectId(value._id()));
-        writer.writeString("title", value.title());
+        writer.writeObjectId("_id", new ObjectId(value.get_id()));
+        writer.writeString("title", value.getTitle());
 
-        Optional.ofNullable(value.preparation()).ifPresentOrElse(
+        Optional.ofNullable(value.getPreparation()).ifPresentOrElse(
                 preparation -> writer.writeString("preparation", preparation),
                 () -> writer.writeNull("preparation"));
 
         writer.writeStartArray("ingredients");
-        value.ingredients().forEach(ingredient -> ingredientCodec.encode(writer, ingredient, encoderContext));
+        value.getIngredients().forEach(ingredient -> ingredientCodec.encode(writer, ingredient, encoderContext));
         writer.writeEndArray();
 
         writer.writeName("servings");
-        servingsCodec.encode(writer, value.servings(), encoderContext);
-        writer.writeInt64("created", value.created());
+        servingsCodec.encode(writer, value.getServings(), encoderContext);
+        writer.writeInt64("created", value.getCreated());
         writer.writeEndDocument();
     }
 

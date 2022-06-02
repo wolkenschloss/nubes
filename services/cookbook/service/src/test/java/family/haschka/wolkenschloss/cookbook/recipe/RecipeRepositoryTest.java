@@ -43,9 +43,9 @@ public class RecipeRepositoryTest {
                         new Servings(4),
                         0L
                 )
-        ).map(recipe -> DynamicTest.dynamicTest(recipe.title(), () -> {
+        ).map(recipe -> DynamicTest.dynamicTest(recipe.getTitle(), () -> {
             var r1 = repository.persist(recipe).await().indefinitely();
-            var r2 = repository.findById(new ObjectId(recipe._id())).await().indefinitely();
+            var r2 = repository.findById(new ObjectId(recipe.get_id())).await().indefinitely();
             Assertions.assertEquals(r1, r2);
         }));
     }
@@ -53,25 +53,25 @@ public class RecipeRepositoryTest {
     @Test
     @DisplayName("should update recipe")
     public void updateRecipe() {
-        repository.findById(new ObjectId(theRecipe._id()))
+        repository.findById(new ObjectId(theRecipe.get_id()))
                 .map(recipe -> new Recipe(
-                        recipe._id(),
-                        recipe.title(),
+                        recipe.get_id(),
+                        recipe.getTitle(),
                         "New preparation",
-                        new ArrayList<>(recipe.ingredients()),
-                        new Servings(recipe.servings().getAmount()),
-                        recipe.created()))
+                        new ArrayList<>(recipe.getIngredients()),
+                        new Servings(recipe.getServings().getAmount()),
+                        recipe.getCreated()))
                 .flatMap(recipe -> repository.update(recipe))
                 .await()
                 .indefinitely();
 
-        Assertions.assertNotEquals(theRecipe, repository.findById(new ObjectId(theRecipe._id())).await().indefinitely());
+        Assertions.assertNotEquals(theRecipe, repository.findById(new ObjectId(theRecipe.get_id())).await().indefinitely());
     }
 
     @Test
     @DisplayName("should delete recipe")
     public void deleteRecipe() {
-        repository.deleteById(new ObjectId(theRecipe._id())).await().indefinitely();
+        repository.deleteById(new ObjectId(theRecipe.get_id())).await().indefinitely();
         Assertions.assertEquals(0, repository.findAll().count().await().indefinitely());
     }
 }
