@@ -30,7 +30,7 @@ public class RecipeAdapterFromJsonObject implements JsonbAdapter<Recipe, JsonObj
     @Override
     public Recipe adaptFromJson(JsonObject obj) {
         return new Recipe(
-                null,
+                "unset",
                 obj.getString("name"),
                 obj.getString("recipeInstructions"),
                 Optional.ofNullable(obj.getJsonArray("recipeIngredient"))

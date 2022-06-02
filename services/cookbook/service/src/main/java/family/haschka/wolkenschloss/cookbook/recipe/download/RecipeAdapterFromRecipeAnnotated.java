@@ -20,7 +20,7 @@ public class RecipeAdapterFromRecipeAnnotated implements JsonbAdapter<Recipe, Re
     @Override
     public Recipe adaptFromJson( RecipeAnnotated obj) {
         return new Recipe(
-                null,
+                "unset",
                 obj.name,
                 obj.instruction,
                 Optional.ofNullable(obj.ingredients)

@@ -22,4 +22,28 @@ public class RecipeTest {
 
         Assertions.assertEquals(scaled1, scaled2);
     }
+
+    @Test
+    public void scaleRecipeTest() {
+
+        var recipe = new Recipe(
+                "unset",
+                "Pure Water",
+                "Fill pure water into a glass",
+                List.of(new Ingredient(new Rational(300), "ml", "Water")),
+                new Servings(3),
+                0L);
+
+        var scaled = recipe.scale(new Servings(4));
+
+        var expected = new Recipe(
+                "unset",
+                "Pure Water",
+                "Fill pure water into a glass",
+                List.of(new Ingredient(new Rational(400), "ml", "Water")),
+                new Servings(4),
+                0L);
+
+        Assertions.assertEquals(expected, scaled);
+    }
 }
