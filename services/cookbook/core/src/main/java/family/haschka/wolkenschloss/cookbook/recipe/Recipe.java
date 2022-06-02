@@ -14,8 +14,23 @@ public record Recipe(String _id, String title, String preparation, List<Ingredie
         ingredients = new ArrayList<>(ingredients);
     }
 
-    public Recipe(String title, String preparation) {
-        this(null, title, preparation, new ArrayList<>(), new Servings(1), 0L);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Recipe recipe = (Recipe) o;
+
+        if (_id != null ? !_id.equals(recipe._id) : recipe._id != null) return false;
+        if (title != null ? !title.equals(recipe.title) : recipe.title != null) return false;
+        if (preparation != null ? !preparation.equals(recipe.preparation) : recipe.preparation != null) return false;
+
+        if (!ingredients.containsAll(recipe.ingredients) || !recipe.ingredients.containsAll(ingredients)) {
+            return false;
+        }
+
+        if (!servings.equals(recipe.servings)) return false;
+        return created != null ? created.equals(recipe.created) : recipe.created == null;
     }
 
     @Override

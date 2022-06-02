@@ -3,7 +3,6 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
-import org.bson.types.ObjectId;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -11,7 +10,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Path("/recipe")
@@ -33,15 +31,10 @@ public class RecipeResource {
         return service.list(from, to, search);
     }
 
-    @Inject
-    IdentityGenerator identityGenerator;
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Response> post(Recipe recipe, @Context UriInfo uriInfo) {
-
-
 
         return creator.save(recipe)
                 .log("saved")
