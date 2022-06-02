@@ -69,7 +69,7 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
     }
 
     companion object {
-        private val codes: Map<Rational, Char> = hashMapOf(
+        val codes: Map<Rational, Char> = hashMapOf(
             Rational(1, 2) to '\u00bd',
             Rational(1, 3) to '\u2153',
             Rational(2, 3) to '\u2154',
@@ -90,7 +90,7 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
             Rational(1, 10) to '\u2152',
         )
 
-        private val fractions: Map<String, Rational> =
+        val fractions: Map<String, Rational> =
             codes.entries.associate { (key, value) -> value.toString() to key }
 
         const val REGEX: String = "((?<number>-?(0|[1-9]\\d*)(?<!-0))[ ]?)?(((?<numerator>-?(0|[1-9]\\d*)(?<!-0))([/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?"
