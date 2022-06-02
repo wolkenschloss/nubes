@@ -10,6 +10,13 @@ plugins {
 group = "family.haschka.nubes.cookbook"
 val buildSrcPackagePrefix = "family.haschka.wolkenschloss.cookbook"
 
+dependencies {
+    testImplementation(platform(libs.kotest5.bom))
+    testImplementation(libs.kotest5.runner)
+    testImplementation(libs.kotest5.assertions)
+    testImplementation(libs.kotest5.datatest)
+}
+
 idea {
     module {
 ////        jdkName = "17"
@@ -18,7 +25,7 @@ idea {
             packagePrefix["src/main/kotlin"] = buildSrcPackagePrefix
 ////            packagePrefix["src/test/integration/kotlin"] = buildSrcPackagePrefix
 ////            packagePrefix["src/test/functional/kotlin"] = buildSrcPackagePrefix
-////            packagePrefix["src/test/unit/kotlin"] = buildSrcPackagePrefix
+            packagePrefix["src/test/kotlin"] = buildSrcPackagePrefix
 ////            packagePrefix["src/test/fixtures/kotlin"] = buildSrcPackagePrefix
         }
     }
