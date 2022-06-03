@@ -14,7 +14,7 @@ public class ServingsCodec implements Codec<Servings> {
 
     @Override
     public void encode(BsonWriter writer, Servings value, EncoderContext encoderContext) {
-        writer.writeInt32(value.amount());
+        writer.writeInt32(value.getAmount());
     }
 
     @Override

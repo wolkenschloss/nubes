@@ -9,10 +9,7 @@ import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
@@ -26,6 +23,7 @@ import java.util.Optional;
 import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
 @DisplayName("Recipe Resource")
@@ -78,6 +76,17 @@ public class RecipeResourceTest {
         Mockito.verify(service, Mockito.times(1)).list(0, 4, null);
     }
 
+
+    @Test
+    @DisplayName("Test equality")
+    public void equalityTest() {
+        var id = ObjectId.get().toHexString();
+        var recipe1 = RecipeFixture.LASAGNE.withId(id);
+        var recipe2 = RecipeFixture.LASAGNE.withId(id);
+
+        Assertions.assertEquals(recipe1, recipe2);
+    }
+
     @Test
     @DisplayName("POST /recipe")
     void postRecipeTest() {
@@ -85,16 +94,19 @@ public class RecipeResourceTest {
         var recipe = RecipeFixture.LASAGNE.get();
         var id = ObjectId.get().toHexString();
 
-        Mockito.when(creator.save(recipe))
-                .thenReturn(Uni.createFrom().item(RecipeFixture.LASAGNE.withId(id)));
+        var recipeWithId = RecipeFixture.LASAGNE.withId(id);
+        Mockito.when(creator.save(any(Recipe.class)))
+                .thenReturn(Uni.createFrom().item(recipeWithId));
 
         RestAssured.given()
+                .log().all()
                 .body(recipe, ObjectMapperType.JSONB)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .when()
                 .post()
                 .then()
+                .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .header("Location", response -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
                         .port(RestAssured.port)
@@ -113,19 +125,19 @@ public class RecipeResourceTest {
     public void getRecipe() {
         var recipe = RecipeFixture.LASAGNE.withId(ObjectId.get().toHexString());
 
-        Mockito.when(service.get(recipe._id(), Optional.empty()))
+        Mockito.when(service.get(recipe.get_id(), Optional.empty()))
                 .thenReturn(Uni.createFrom().item(Optional.of(recipe)));
 
         System.out.println(RecipeFixture.LASAGNE.asJson(jsonb));
         RestAssured.given()
                 .accept(ContentType.JSON)
                 .when()
-                .get(recipe._id())
+                .get(recipe.get_id())
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body(is(jsonb.toJson(recipe)));
 
-        Mockito.verify(service, Mockito.times(1)).get(recipe._id(), Optional.empty());
+        Mockito.verify(service, Mockito.times(1)).get(recipe.get_id(), Optional.empty());
     }
 
     @Test
@@ -151,7 +163,7 @@ public class RecipeResourceTest {
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .put(recipe._id())
+                .put(recipe.get_id())
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 

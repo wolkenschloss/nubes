@@ -17,25 +17,32 @@ public class ServingsDeserializerTest {
     @Test
     public void shouldDeserializeServings() {
 
-        var deserialized = jsonb.fromJson("{\"servings\": 4}", Recipe.class);
-        var expected = new Recipe(null, null, null, List.of(), new Servings(4), 0L);
+        var deserialized = jsonb.fromJson("{\"title\": \"TITLE\",  \"servings\": 4}", Recipe.class);
+        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(4), 0L);
         Assertions.assertEquals(expected, deserialized);
     }
 
     @Test
     public void shouldHaveDefaultValue() {
-        var deserialized = jsonb.fromJson("{}", Recipe.class);
-        var expected = new Recipe(null, null, null, List.of(), new Servings(1), 0L);
+        var deserialized = jsonb.fromJson("{\"title\": \"TITLE\"}", Recipe.class);
+        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(1), 0L);
 
         Assertions.assertEquals(expected, deserialized);
     }
 
     @Test
     public void shouldExtractValue() {
-        var deserialized = jsonb.fromJson("{\"servings\": \"3 Portion(en)\"}", Recipe.class);
-        var expected = new Recipe(null, null, null, List.of(), new Servings(3), 0L);
+        var deserialized = jsonb.fromJson("{\"title\": \"TITLE\", \"servings\": \"3 Portion(en)\"}", Recipe.class);
+        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(3), 0L);
 
         Assertions.assertEquals(expected, deserialized);
+    }
+
+    @Test
+    public void shouldFailIfIsIsNull() {
+
+        var recipe = jsonb.fromJson("{\"title\": \"TITLE\", \"servings\": \"3 Portion(en)\"}", Recipe.class);
+        Assertions.assertEquals("unset", recipe.get_id());
     }
 
     @Test

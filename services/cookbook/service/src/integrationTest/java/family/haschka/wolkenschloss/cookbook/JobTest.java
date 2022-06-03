@@ -103,7 +103,7 @@ public class JobTest {
             assertion
                     .body("state", equalTo("INCOMPLETE"))
                     .body("location", matchesPattern(locationPattern))
-                    .body("error", equalTo(null));
+                    .body("error", equalTo(""));
         }
 
         @NotNull

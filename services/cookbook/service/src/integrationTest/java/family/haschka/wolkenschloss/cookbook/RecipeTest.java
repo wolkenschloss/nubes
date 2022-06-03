@@ -89,14 +89,11 @@ public class RecipeTest {
         ).map(testcase -> DynamicTest.dynamicTest(testcase.name,
                 () -> testcase.assertions.accept(RestAssured
                         .given()
-                                .log().all()
                         .body(readFixture(testcase.fixture))
                         .contentType(ContentType.JSON)
                         .when()
-
                         .post("recipe")
                         .then()
-                        .log().all()
                         .statusCode(testcase.status))));
     }
 
@@ -262,11 +259,13 @@ public class RecipeTest {
         // POST /recipe valid data
         return RestAssured
                 .given()
+                .log().all()
                 .body(str)
                 .contentType(ContentType.JSON)
                 .when()
                 .post("recipe")
                 .then()
+                .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .header("Location", response -> equalTo(UriBuilder.fromUri(RestAssured.baseURI)
                         .port(RestAssured.port)

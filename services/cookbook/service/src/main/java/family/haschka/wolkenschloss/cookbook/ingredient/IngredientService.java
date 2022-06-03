@@ -33,8 +33,6 @@ public class IngredientService {
                     var ingredient = new Ingredient(identityGenerator.generate(), title);
                     return repository.persist(ingredient);
                 }));
-
-//        return repository.persist(ingredient);
     }
 
     public Uni<TableOfContents> list(int from, int to, String search) {
@@ -58,7 +56,7 @@ public class IngredientService {
     public Uni<Void> onIngredientRequired(Message<IngredientRequiredEvent> event) {
         return Uni.createFrom().item(event)
                 .log("ingredient required")
-                .chain(e -> create(e.getPayload().ingredient()))
+                .chain(e -> create(e.getPayload().getIngredient()))
                 .onItem().transformToUni(x -> Uni.createFrom().completionStage(event.ack()));
     }
 }

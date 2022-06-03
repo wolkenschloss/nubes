@@ -2,9 +2,11 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 
 import org.bson.types.ObjectId;
 
+import javax.json.bind.annotation.JsonbProperty;
 import java.util.List;
 
 public class RecipeAnnotations {
+    @JsonbProperty(nillable = true)
     public ObjectId _id;
     public String title;
     public String preparation;

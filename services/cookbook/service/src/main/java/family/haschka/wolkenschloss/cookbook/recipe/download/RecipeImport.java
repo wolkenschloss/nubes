@@ -34,7 +34,7 @@ public class RecipeImport {
 
     public Uni<Recipe> grab(DataSource dataSource, JobCreatedEvent event) {
 
-        return dataSource.extract(event.source(), content -> extractJsonLdScripts(content).filter(this::isRecipe)
+        return dataSource.extract(event.getSource(), content -> extractJsonLdScripts(content).filter(this::isRecipe)
                         .map(script -> jsonb.fromJson(script, Recipe.class))
                         .collect(SingletonCollector.toItem()))
                 .onFailure(SingletonCollector.TooFewItemsException.class).transform(failure -> new RuntimeException(

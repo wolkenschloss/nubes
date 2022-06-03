@@ -10,7 +10,7 @@ public class UnitAdapter implements JsonbAdapter<Unit, JsonObject> {
     public JsonObject adaptToJson(Unit unit) {
         return Json.createObjectBuilder()
                 .add("name", unit.name())
-                .add("values", Json.createArrayBuilder(Arrays.asList(unit.aliases)).add(unit.unit))
+                .add("values", Json.createArrayBuilder(Arrays.asList(unit.getAliases())).add(unit.getUnit()))
                 .build();
     }
 

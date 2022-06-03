@@ -20,7 +20,7 @@ public class IngredientCodec implements CollectibleCodec<Ingredient> {
     @Override
     public Ingredient generateIdIfAbsentFromDocument(Ingredient document) {
         if (!documentHasId(document)) {
-            return new Ingredient(UUID.randomUUID(), document.name());
+            return new Ingredient(UUID.randomUUID(), document.getName());
         }
 
         return document;
@@ -28,7 +28,7 @@ public class IngredientCodec implements CollectibleCodec<Ingredient> {
 
     @Override
     public boolean documentHasId(Ingredient document) {
-        return document.id() != null;
+        return true;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class IngredientCodec implements CollectibleCodec<Ingredient> {
         if (!documentHasId(document)) {
             throw new IllegalStateException("document does not contain an id");
         }
-        return new BsonBinary(document.id());
+        return new BsonBinary(document.getId());
     }
 
     @Override
@@ -50,8 +50,8 @@ public class IngredientCodec implements CollectibleCodec<Ingredient> {
     @Override
     public void encode(BsonWriter writer, Ingredient value, EncoderContext encoderContext) {
         Document document = new Document();
-        document.put("_id", value.id());
-        document.put("name", value.name());
+        document.put("_id", value.getId());
+        document.put("name", value.getName());
 
         documentCodec.encode(writer, document, encoderContext);
     }

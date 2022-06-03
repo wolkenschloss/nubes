@@ -29,10 +29,10 @@ public class JobResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> post(ImportJob job, @Context UriInfo uriInfo) {
 
-        return service.create(job.order())
+        return service.create(job.getOrder())
                 .map(entity -> Response
                         .status(Response.Status.CREATED)
-                        .header("Location", uriInfo.getAbsolutePathBuilder().path(GET_PATH).build(entity.jobId()))
+                        .header("Location", uriInfo.getAbsolutePathBuilder().path(GET_PATH).build(entity.getJobId()))
                         .entity(entity)
                         .build());
     }

@@ -9,6 +9,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 
+
 @ApplicationScoped
 public class CreatorService {
 
@@ -29,19 +30,19 @@ public class CreatorService {
     public Uni<Recipe> save(Recipe recipe) {
         var toSave = new Recipe(
                 new ObjectId(identityGenerator.generateObjectId()).toHexString(),
-                recipe.title(),
-                recipe.preparation(),
-                new ArrayList<>(recipe.ingredients()),
-                new Servings(recipe.servings().amount()),
-                recipe.created()
+                recipe.getTitle(),
+                recipe.getPreparation(),
+                new ArrayList<>(recipe.getIngredients()),
+                new Servings(recipe.getServings().getAmount()),
+                recipe.getCreated()
         );
         return recipeRepository.persist(toSave)
                 .log("persisted")
                 .onItem().invoke(this::lookupIngredients);
     }
 
-    private void lookupIngredients(Recipe recipe) {
-        recipe.ingredients().forEach(ingredient ->
-                emitter.send(new IngredientRequiredEvent(recipe._id(), ingredient.name())));
+    public void lookupIngredients(Recipe recipe) {
+        recipe.getIngredients().forEach(ingredient ->
+                emitter.send(new IngredientRequiredEvent(recipe.get_id(), ingredient.getName())));
     }
 }

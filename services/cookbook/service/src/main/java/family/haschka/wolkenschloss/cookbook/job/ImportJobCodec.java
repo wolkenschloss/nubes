@@ -15,6 +15,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
+import static family.haschka.wolkenschloss.cookbook.UuidExtensionsKt.nil;
+
 public class ImportJobCodec implements CollectibleCodec<ImportJob> {
 
     private final Codec<Document> documentCodec;
@@ -29,15 +31,9 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
 
         return new ImportJob(
                 document.get("_id", UUID.class),
-                Optional.ofNullable(document.getString("order"))
-                        .map(URI::create)
-                        .orElse(null),
-                Optional.ofNullable(document.getString("state"))
-                        .map(State::valueOf)
-                        .orElse(null),
-                Optional.ofNullable(document.getString("location"))
-                        .map(URI::create)
-                        .orElse(null),
+                URI.create(document.getString("order")),
+                State.valueOf(document.getString("state")),
+                URI.create(document.getString("location")),
                 document.getString("error"));
     }
 
@@ -45,11 +41,11 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
     public void encode(BsonWriter writer, ImportJob value, EncoderContext encoderContext) {
         Document doc = new Document();
 
-        doc.put("_id", value.jobId());
-        doc.put("order", value.order());
-        doc.put("error", value.error());
-        doc.put("location", value.location());
-        doc.put("state", value.state().toString());
+        doc.put("_id", value.getJobId());
+        doc.put("order", value.getOrder());
+        doc.put("error", value.getError());
+        doc.put("location", value.getLocation());
+        doc.put("state", value.getState().toString());
 
         documentCodec.encode(writer, doc, encoderContext);
     }
@@ -69,15 +65,22 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
      */
     @Override
     public ImportJob generateIdIfAbsentFromDocument(ImportJob document) {
+
         if (!documentHasId(document)) {
-            return new ImportJob(UUID.randomUUID(), document.order(), document.state(), document.location(), document.error());
+            return new ImportJob(
+                    UUID.randomUUID(),
+                    document.getOrder(),
+                    document.getState(),
+                    document.getLocation(),
+                    document.getError());
         }
+
         return document;
     }
 
     @Override
     public boolean documentHasId(ImportJob document) {
-        return document.jobId() != null;
+        return document.getJobId() != nil;
     }
 
     @Override
@@ -86,6 +89,6 @@ public class ImportJobCodec implements CollectibleCodec<ImportJob> {
             throw new IllegalStateException("document does not contain an id");
         }
 
-        return new BsonBinary(document.jobId());
+        return new BsonBinary(document.getJobId());
     }
 }
