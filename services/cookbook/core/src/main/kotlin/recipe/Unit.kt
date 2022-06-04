@@ -1,9 +1,5 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-import java.util.*
-import java.util.stream.Collectors
-import java.util.stream.Stream
-
 // https://www.kochwiki.org/wiki/Zubereitung:Ma%C3%9Fe_und_Gewichte
 enum class Unit(val unit: String, vararg val aliases: String) {
     // Volumenangaben
@@ -41,30 +37,11 @@ enum class Unit(val unit: String, vararg val aliases: String) {
     SLICE("slice", "sl", "Scheibe", "Sch"),
     SHEET("sheet", "sh", "Blatt", "Bl");
 
-//    @JvmField
-//    val aliases: Array<String>
-//
-//    init {
-//        this.aliases = aliases
-//    }
-
-    fun pattern(): String {
-        return unit + "|" + java.lang.String.join("|", Arrays.asList(*aliases))
-    }
+    fun pattern(): String = unit + "|" + aliases.joinToString("|")
 
     companion object {
-        @JvmStatic
-        fun regex(): String {
-            return Arrays.stream(values()).map { obj: Unit -> obj.pattern() }.collect(Collectors.joining("|"))
-        }
+        fun regex(): String = values().joinToString("|") { it.pattern() }
 
-        @JvmStatic
-        fun stream(): Stream<String> {
-            return Arrays.stream(values()).flatMap { u: Unit -> Arrays.stream(u.aliases) }
-        }
-
-        fun list(): List<String> {
-            return stream().collect(Collectors.toList())
-        }
+        fun list(): List<String> = values().flatMap { u: Unit -> u.aliases.asList() }
     }
 }

@@ -1,6 +1,6 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-import java.util.regex.Pattern
+import kotlin.math.absoluteValue
 
 data class Rational(private var numerator: Int, private var denominator: Int) {
 
@@ -27,14 +27,17 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         if (denominator == 1) {
             builder.append(numerator)
         } else {
-            val number: Int = numerator / denominator
+            if ((numerator * denominator) < 0) {
+                builder.append('-')
+            }
+            val number: Int = numerator.absoluteValue / denominator.absoluteValue
             if (number != 0) {
                 builder.append(number)
                 builder.append(" ")
-                val rest = this.minus(Rational(number, 1))
+                val rest = this.absoluteValue().minus(Rational(number, 1))
                 appendRational(builder, rest)
             } else {
-                appendRational(builder, this)
+                appendRational(builder, this.absoluteValue())
             }
         }
         return builder.toString()
@@ -68,6 +71,10 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         return Rational(numerator * b.numerator, denominator * b.denominator)
     }
 
+    fun absoluteValue(): Rational {
+        return Rational(this.numerator.absoluteValue, this.denominator.absoluteValue)
+    }
+
     companion object {
         val codes: Map<Rational, Char> = hashMapOf(
             Rational(1, 2) to '\u00bd',
@@ -93,34 +100,40 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         val fractions: Map<String, Rational> =
             codes.entries.associate { (key, value) -> value.toString() to key }
 
-        const val REGEX: String = "((?<number>-?(0|[1-9]\\d*)(?<!-0))[ ]?)?(((?<numerator>-?(0|[1-9]\\d*)(?<!-0))([/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?"
-        private val pattern: Pattern = Pattern.compile("^$REGEX$")
+        const val REGEX: String =
+            "(?<sign>[+-](?!0))?((?<number>(0|[1-9]\\d*))[ ]?(?!/))?(((?<numerator>(0|[1-9]\\d*))([\\/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?"
+        private val pattern = Regex("^$REGEX$", RegexOption.MULTILINE)
 
-        @JvmStatic
         fun parse(input: String): Rational {
-            val m = pattern.matcher(input)
-            if (m.find()) {
-                val number = m.group("number")
-                val fraction = m.group("fraction")
-                val numerator = m.group("numerator")
-                val denominator = m.group("denominator")
+            pattern.find(input)?.let {
 
-                if (number != null) {
-                    return if (fraction != null) {
-                        fractions.getValue(fraction) + Rational(number.toInt(), 1)
+                val sign = it.groups["sign"]
+                val number = it.groups["number"]
+                val fraction = it.groups["fraction"]
+                val numerator = it.groups["numerator"]
+                val denominator = it.groups["denominator"]
+
+                println("in echt: number: $number, numerator: $numerator, denominator: $denominator, fraction: $fraction")
+
+                val signValue = if (sign != null) { if (sign.value == "-") {Rational(-1)} else {Rational(1)}} else {Rational(1)}
+
+                return signValue * if (number != null) {
+                     (Rational(number.value.toInt()) + if (fraction != null) {
+                        fractions.getValue(fraction.value)
                     } else if (numerator != null) {
-                        Rational(number.toInt()) + Rational(numerator.toInt(), denominator.toInt())
+                        Rational(numerator.value.toInt(), denominator!!.value.toInt())
                     } else {
-                        Rational(number.toInt())
-                    }
+                        Rational(0)
+                    })
+                } else  if(fraction != null) {
+                        fractions.getValue(fraction.value)
+                } else if (numerator  != null) {
+                        Rational(numerator.value.toInt(), denominator!!.value.toInt())
                 } else {
-                    if (fraction != null) {
-                        return fractions.getValue(fraction)
-                    } else if (numerator != null) {
-                        return Rational(numerator.toInt(), denominator.toInt())
-                    }
+                    throw InvalidNumber()
                 }
             }
+
             throw InvalidNumber()
         }
     }

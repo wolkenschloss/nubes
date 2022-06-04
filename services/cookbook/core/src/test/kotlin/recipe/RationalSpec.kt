@@ -20,9 +20,17 @@ class RationalSpec : FunSpec({
     }
 
     val data = Rational.fractions + mapOf(
-        "2 \u00bd" to Rational(5, 2),
-        "2 \u2153" to Rational(7, 3)
-    )
+            "42" to Rational(42),
+            "-42" to Rational(-42),
+            "5/13" to Rational(5, 13),
+            "-5/13" to Rational(-5, 13),
+            "⅓" to Rational(1, 3),
+            "-⅓" to Rational(-1, 3),
+            "2 \u00bd" to Rational(5, 2),
+            "-2 \u2153" to Rational(-7, 3),
+            "4 ⅓" to Rational(13, 3),
+        )
+
     context("Fractional integers prints unicode characters") {
         withData(data) { rational ->
             rational.toString() shouldBe this.testCase.name.testName

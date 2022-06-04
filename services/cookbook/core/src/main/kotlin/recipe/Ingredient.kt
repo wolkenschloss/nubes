@@ -2,27 +2,21 @@ package family.haschka.wolkenschloss.cookbook.recipe
 
 import java.util.*
 import java.util.regex.Pattern
-import java.util.stream.Collectors
-import java.util.stream.Stream
 
 data class Ingredient(val quantity: Rational? = null, val unit: String? = null, val name: String) {
 
-    fun scale(factor: Rational): Ingredient {
-        val scaledQuantity = Optional.ofNullable<Rational>(quantity)
-            .map { q: Rational -> q.times(factor) }
-            .orElse(null)
-        return Ingredient(scaledQuantity, unit, name)
-    }
+    fun scale(factor: Rational): Ingredient = Ingredient(
+        quantity?.let { it * factor },
+        unit,
+        name
+    )
 
-    override fun toString(): String {
-        return Stream.of<Any>(quantity, unit, name)
-            .filter { obj: Any? -> Objects.nonNull(obj) }
-            .map { obj: Any -> obj.toString() }
-            .collect(Collectors.joining(" "))
-    }
+    override fun toString(): String = listOfNotNull(quantity, unit, name)
+        .joinToString(" ") { obj: Any -> obj.toString() }
 
     companion object {
         @JvmStatic
+        // TODO
         fun parse(string: String): Ingredient {
             val units = Unit.regex()
             val regex = "^(?<quant>${Rational.REGEX})?\\s?((?<unit>$units)?\\s(?<name>.*?))?$"
