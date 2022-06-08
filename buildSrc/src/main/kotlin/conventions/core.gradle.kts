@@ -6,6 +6,7 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 val catalogs = extensions.getByType<VersionCatalogsExtension>()

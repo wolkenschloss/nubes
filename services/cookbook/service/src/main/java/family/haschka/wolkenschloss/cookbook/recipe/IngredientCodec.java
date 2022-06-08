@@ -61,7 +61,7 @@ public class IngredientCodec implements Codec<Ingredient> {
         }
 
         reader.readEndDocument();
-        return new Ingredient(quantity, unit, name);
+        return new Ingredient(name, quantity, unit);
     }
 
     @Override

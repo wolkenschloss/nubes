@@ -16,8 +16,8 @@ dependencies {
     implementation(libs.quarkus.resteasy.reactive.qute)
     implementation(libs.jsoup)
 
-    implementation(project(":services:cookbook:core"))
-    implementation(project(":services:cookbook:webapp"))
+    implementation(projects.services.cookbook.core)
+    implementation(projects.services.cookbook.webapp)
 
     testImplementation(libs.awaitility)
 

@@ -7,6 +7,10 @@ data class Servings(val amount: Int) {
         }
     }
 
+    fun amount(): Int {
+        return amount
+    }
+
     override fun toString(): String {
         return amount.toString()
     }

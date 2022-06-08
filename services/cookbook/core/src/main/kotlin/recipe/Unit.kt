@@ -8,7 +8,7 @@ enum class Unit(val unit: String, vararg val aliases: String) {
     DECILITER("decilitre", "Deziliter", "dl"),
     CENTILITER("centilitre", "Centiliter", "cl"),
     MILLILITER("millilitre", "Milliliter", "ml"),
-    FLUID_ONCE("fluid ounce", "fl", "fl[\\. ]oz\\.?", "oz[\\. ]fl\\.?"),
+    FLUID_ONCE("fluid ounce", "fl", "fl.oz.", "oz.fl."),
     CUP("cup", "c", "Tasse", "Ta"),
 
     // Gewichtsangaben
@@ -37,11 +37,8 @@ enum class Unit(val unit: String, vararg val aliases: String) {
     SLICE("slice", "sl", "Scheibe", "Sch"),
     SHEET("sheet", "sh", "Blatt", "Bl");
 
-    fun pattern(): String = unit + "|" + aliases.joinToString("|")
-
     companion object {
-        fun regex(): String = values().joinToString("|") { it.pattern() }
 
-        fun list(): List<String> = values().flatMap { u: Unit -> u.aliases.asList() }
+        fun list(): List<String> = values().flatMap { u: Unit -> listOf(u.unit) + u.aliases.asList() }
     }
 }

@@ -1,14 +1,17 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-import java.util.*
-import java.util.regex.Pattern
+import family.haschka.wolkenschloss.cookbook.parser.IngredientLexer
+import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 
-data class Ingredient(val quantity: Rational? = null, val unit: String? = null, val name: String) {
+// TODO: Add the property "malformed" if the ingredient was parsed with a syntax error
+data class Ingredient(val name: String, val quantity: Rational? = null, val unit: String? = null) {
 
     fun scale(factor: Rational): Ingredient = Ingredient(
+        name,
         quantity?.let { it * factor },
-        unit,
-        name
+        unit
     )
 
     override fun toString(): String = listOfNotNull(quantity, unit, name)
@@ -18,21 +21,17 @@ data class Ingredient(val quantity: Rational? = null, val unit: String? = null, 
         @JvmStatic
         // TODO
         fun parse(string: String): Ingredient {
-            val units = Unit.regex()
-            val regex = "^(?<quant>${Rational.REGEX})?\\s?((?<unit>$units)?\\s(?<name>.*?))?$"
-            val p = Pattern.compile(regex)
-            val m = p.matcher(string)
-            return if (m.find()) {
-                val quant = Optional.ofNullable(m.group("quant"))
-                    .filter { r: String -> !r.isEmpty() }
-                    .map { r: String -> Rational.parse(r.trim { it <= ' ' }) }
-                    .orElse(null)
-                val unit = m.group("unit")
-                val name = m.group("name")
-                Ingredient(quant, unit, name)
-            } else {
-                Ingredient(null, null, string)
+            val input = CharStreams.fromString(string)
+            val lexer = IngredientLexer(input)
+            val tokens = CommonTokenStream(lexer)
+            val parser = IngredientParser(tokens)
+            val tree = parser.line()
+
+            if (parser.numberOfSyntaxErrors > 0) {
+                return Ingredient(string, null, null)
             }
+
+            return IngredientBuilder().visit(tree)
         }
     }
 }

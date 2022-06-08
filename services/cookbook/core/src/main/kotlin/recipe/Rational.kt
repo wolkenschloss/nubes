@@ -1,5 +1,9 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
+import family.haschka.wolkenschloss.cookbook.parser.IngredientLexer
+import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import kotlin.math.absoluteValue
 
 data class Rational(private var numerator: Int, private var denominator: Int) {
@@ -8,7 +12,7 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
 
     init {
         if (denominator == 0) {
-            throw InvalidNumber()
+            throw InvalidNumber("Denominator must not be 0")
         }
 
         val gcd = gcd(numerator, denominator)
@@ -71,6 +75,10 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         return Rational(numerator * b.numerator, denominator * b.denominator)
     }
 
+    operator fun div(b: Rational): Rational {
+        return this.times(Rational(b.denominator, b.numerator))
+    }
+
     fun absoluteValue(): Rational {
         return Rational(this.numerator.absoluteValue, this.denominator.absoluteValue)
     }
@@ -100,41 +108,23 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         val fractions: Map<String, Rational> =
             codes.entries.associate { (key, value) -> value.toString() to key }
 
-        const val REGEX: String =
-            "(?<sign>[+-](?!0))?((?<number>(0|[1-9]\\d*))[ ]?(?!/))?(((?<numerator>(0|[1-9]\\d*))([\\/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?"
-        private val pattern = Regex("^$REGEX$", RegexOption.MULTILINE)
-
         fun parse(input: String): Rational {
-            pattern.find(input)?.let {
+            val stream = CharStreams.fromString(input)
+            val lexer = IngredientLexer(stream)
+            val tokens = CommonTokenStream(lexer)
+            val parser = IngredientParser(tokens)
+            val listener = SyntaxErrorListener()
+            parser.addErrorListener(listener)
+            val tree = parser.mixed_fraction()
 
-                val sign = it.groups["sign"]
-                val number = it.groups["number"]
-                val fraction = it.groups["fraction"]
-                val numerator = it.groups["numerator"]
-                val denominator = it.groups["denominator"]
-
-                println("in echt: number: $number, numerator: $numerator, denominator: $denominator, fraction: $fraction")
-
-                val signValue = if (sign != null) { if (sign.value == "-") {Rational(-1)} else {Rational(1)}} else {Rational(1)}
-
-                return signValue * if (number != null) {
-                     (Rational(number.value.toInt()) + if (fraction != null) {
-                        fractions.getValue(fraction.value)
-                    } else if (numerator != null) {
-                        Rational(numerator.value.toInt(), denominator!!.value.toInt())
-                    } else {
-                        Rational(0)
-                    })
-                } else  if(fraction != null) {
-                        fractions.getValue(fraction.value)
-                } else if (numerator  != null) {
-                        Rational(numerator.value.toInt(), denominator!!.value.toInt())
-                } else {
-                    throw InvalidNumber()
-                }
+            if (parser.numberOfSyntaxErrors > 0) {
+                throw InvalidNumber(listener.errors.joinToString(", "))
             }
 
-            throw InvalidNumber()
+            println(listener.errors)
+            println(tree.toStringTree(parser))
+
+            return RationalBuilder().visit(tree)
         }
     }
 }
