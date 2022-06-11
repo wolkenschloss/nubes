@@ -14,7 +14,7 @@ class IngredientParserSpec : FunSpec({
     val data = mapOf(
         "200 g Mehl" to Ingredient("Mehl", Rational(200), "g"),
         "1/2 l Wasser" to Ingredient("Wasser", Rational(1, 2), "l"),
-        "-4 2/3 kg Heuschrecken" to Ingredient("Heuschrecken", Rational(-14, 3), "kg")
+
     )
 
     context("parse ingredient with visitor") {
@@ -37,8 +37,9 @@ class IngredientParserSpec : FunSpec({
 
     context("parser should report syntax errors") {
         withData(
-            "- Mondzucker" to listOf("no viable alternative at input '-Mondzucker'"),
+            "- Mondzucker" to listOf("extraneous input '-' expecting {UINT, SYMBOL, NAME}"),
             "5- Waffeln" to listOf("no viable alternative at input '5-'"),
+            "-4 2/3 kg Heuschrecken" to listOf("extraneous input '-' expecting {UINT, SYMBOL, NAME}"),
             "p Dingens" to emptyList()
         ) {
             val input = CharStreams.fromString(it.first)

@@ -6,6 +6,31 @@ import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
 class RationalBuilder : IngredientBaseVisitor<Rational>() {
 
     override fun visitMixed_fraction(ctx: IngredientParser.Mixed_fractionContext): Rational {
+
+//        if (ctx.ZERO() != null) {
+//            return Rational(0)
+//        }
+//
+//        if (ctx.childCount == 1) {
+//            return Rational(ctx.getChild(0).text.toInt())
+//        }
+//
+//        if (ctx.childCount == 2) {
+//            return Rational(
+//                ctx.getChild(0).text.toInt(),
+//                ctx.getChild(1).text.toInt()
+//            )
+//        }
+//
+//        if (ctx.childCount == 3) {
+//            return Rational(ctx.getChild(0).text.toInt()) + Rational(
+//                ctx.getChild(1).text.toInt(),
+//                ctx.getChild(2).text.toInt()
+//            )
+//        }
+//
+//        throw InvalidNumber(ctx.text)
+
         val sign = visitSign(ctx.sign())
         val number = visitNumber(ctx.number())
         val fraction = visitRational(ctx.rational())
@@ -33,15 +58,15 @@ class RationalBuilder : IngredientBaseVisitor<Rational>() {
             return Rational(0)
         }
 
-        return Rational(ctx.DIGIT().text.toInt())
+        return Rational(ctx.UINT().text.toInt())
     }
 
     override fun visitNumerator(ctx: IngredientParser.NumeratorContext): Rational {
-        return Rational(ctx.DIGIT().text.toInt())
+        return Rational(ctx.UINT().text.toInt())
     }
 
     override fun visitDenominator(ctx: IngredientParser.DenominatorContext): Rational {
-        return Rational(1, ctx.DIGIT().text.toInt())
+        return Rational(1, ctx.UINT().text.toInt())
     }
 
     override fun visitRational(ctx: IngredientParser.RationalContext?): Rational {

@@ -39,8 +39,10 @@ class IngredientSpec : FunSpec({
             )
         ) { ingredient ->
 
-            Ingredient.parse(this.testCase.name.testName).name shouldBe ingredient.name
-            Ingredient.parse(this.testCase.name.testName) shouldBe ingredient
+            val result = Ingredient.parse(this.testCase.name.testName)
+            println("quantity: ${result.quantity}, unit: ${result.unit}, name: ${result.name}")
+            result.name shouldBe ingredient.name
+            result shouldBe ingredient
         }
     }
 
