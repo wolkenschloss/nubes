@@ -16,7 +16,7 @@ class IngredientBuilder : IngredientBaseVisitor<Ingredient>() {
         return Ingredient(
             this.visitName(ctx.name()).name,
             quant.quantity,
-            this.visitUnit(ctx.unit()).unit
+            ctx.UNIT()?.text
         )
     }
 
@@ -30,14 +30,6 @@ class IngredientBuilder : IngredientBaseVisitor<Ingredient>() {
         }
 
         return Ingredient("", quantity, null)
-    }
-
-    override fun visitUnit(ctx: IngredientParser.UnitContext?): Ingredient {
-        if (ctx == null) {
-            return Ingredient("", null, null)
-        }
-
-        return Ingredient("", null, ctx.text)
     }
 
     override fun visitName(ctx: IngredientParser.NameContext): Ingredient {
