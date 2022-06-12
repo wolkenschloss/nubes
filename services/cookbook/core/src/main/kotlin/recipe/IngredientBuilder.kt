@@ -1,17 +1,17 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-import family.haschka.wolkenschloss.cookbook.parser.IngredientBaseVisitor
+import family.haschka.wolkenschloss.cookbook.parser.IngredientParserBaseVisitor
 import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
 
-class IngredientBuilder : IngredientBaseVisitor<Ingredient>() {
+class IngredientBuilder : IngredientParserBaseVisitor<Ingredient>() {
 
     override fun visitLine(ctx: IngredientParser.LineContext): Ingredient {
 
         if (ctx.name() == null) {
-            return Ingredient("", null, null)
+            return Ingredient("")
         }
 
-        val quant = ctx.quantity()?.let { this.visitQuantity(ctx.quantity()) } ?: Ingredient("", null, null)
+        val quant = ctx.quantity()?.let { this.visitQuantity(ctx.quantity()) } ?: Ingredient("")
 
         return Ingredient(
             this.visitName(ctx.name()).name,
@@ -25,23 +25,14 @@ class IngredientBuilder : IngredientBaseVisitor<Ingredient>() {
         val quantity = builder.visitQuantity(ctx)
 
         if (quantity == Rational(0)) {
-            println("visit quantity -> 0 -> null")
-            return Ingredient("", null, null)
+            return Ingredient("")
         }
 
-        return Ingredient("", quantity, null)
+        return Ingredient("", quantity)
     }
 
     override fun visitName(ctx: IngredientParser.NameContext): Ingredient {
-        val ingredient = Ingredient(ctx.NAME().text, null, null)
-
-        ctx.name()?.let {
-            return Ingredient(
-                visitName(ctx.name()).name + " " + ingredient.name, null,
-                null
-            )
-        }
-
-        return ingredient
+        val text = (ctx.TEXT_START()?.text ?: "") + (ctx.REST()?.text ?: "")
+        return Ingredient(text)
     }
 }

@@ -117,14 +117,9 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
             parser.addErrorListener(listener)
             val tree = parser.mixed_fraction()
 
-            println(tree.toStringTree(parser))
-
             if (parser.numberOfSyntaxErrors > 0) {
                 throw InvalidNumber(listener.errors.joinToString(", "))
             }
-
-            println(listener.errors)
-            println(tree.toStringTree(parser))
 
             return RationalBuilder().visit(tree)
         }

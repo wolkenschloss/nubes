@@ -1,36 +1,11 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-import family.haschka.wolkenschloss.cookbook.parser.IngredientBaseVisitor
+import family.haschka.wolkenschloss.cookbook.parser.IngredientParserBaseVisitor
 import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
 
-class RationalBuilder : IngredientBaseVisitor<Rational>() {
+class RationalBuilder : IngredientParserBaseVisitor<Rational>() {
 
     override fun visitMixed_fraction(ctx: IngredientParser.Mixed_fractionContext): Rational {
-
-//        if (ctx.ZERO() != null) {
-//            return Rational(0)
-//        }
-//
-//        if (ctx.childCount == 1) {
-//            return Rational(ctx.getChild(0).text.toInt())
-//        }
-//
-//        if (ctx.childCount == 2) {
-//            return Rational(
-//                ctx.getChild(0).text.toInt(),
-//                ctx.getChild(1).text.toInt()
-//            )
-//        }
-//
-//        if (ctx.childCount == 3) {
-//            return Rational(ctx.getChild(0).text.toInt()) + Rational(
-//                ctx.getChild(1).text.toInt(),
-//                ctx.getChild(2).text.toInt()
-//            )
-//        }
-//
-//        throw InvalidNumber(ctx.text)
-
         val sign = visitSign(ctx.sign())
         val number = visitNumber(ctx.number())
         val fraction = visitRational(ctx.rational())

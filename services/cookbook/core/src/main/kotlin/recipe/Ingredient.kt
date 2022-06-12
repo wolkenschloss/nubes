@@ -19,7 +19,6 @@ data class Ingredient(val name: String, val quantity: Rational? = null, val unit
 
     companion object {
         @JvmStatic
-        // TODO
         fun parse(string: String): Ingredient {
             val input = CharStreams.fromString(string)
             val lexer = IngredientLexer(input)
@@ -28,7 +27,7 @@ data class Ingredient(val name: String, val quantity: Rational? = null, val unit
             val tree = parser.line()
 
             if (parser.numberOfSyntaxErrors > 0) {
-                return Ingredient(string, null, null)
+                return Ingredient(string)
             }
 
             return IngredientBuilder().visit(tree)

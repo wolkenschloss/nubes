@@ -15,9 +15,6 @@ public class IngredientAdapter implements JsonbAdapter<Ingredient, IngredientAnn
 
     @Override
     public Ingredient adaptFromJson(IngredientAnnotations obj) {
-        return new Ingredient(
-                obj.name, obj.quantity,
-                obj.unit
-        );
+        return new Ingredient(obj.name, obj.quantity,obj.unit);
     }
 }
