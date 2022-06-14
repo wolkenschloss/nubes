@@ -3,7 +3,7 @@ package family.haschka.wolkenschloss.cookbook.recipe
 import family.haschka.wolkenschloss.cookbook.parser.IngredientParserBaseVisitor
 import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
 
-class RationalBuilder : IngredientParserBaseVisitor<Rational>() {
+class RationalVisitor : IngredientParserBaseVisitor<Rational>() {
 
     override fun visitMixed_fraction(ctx: IngredientParser.Mixed_fractionContext): Rational {
         val sign = visitSign(ctx.sign())

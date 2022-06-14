@@ -121,7 +121,7 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
                 throw InvalidNumber(listener.errors.joinToString(", "))
             }
 
-            return RationalBuilder().visit(tree)
+            return RationalVisitor().visit(tree)
         }
     }
 }

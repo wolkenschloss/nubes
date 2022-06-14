@@ -26,7 +26,7 @@ class IngredientParserSpec : FunSpec({
             val parser = IngredientParser(tokens)
             val tree = parser.line()
 
-            val ingredient = IngredientBuilder().visit(tree)
+            val ingredient = IngredientVisitor().visit(tree)
             parser.numberOfSyntaxErrors shouldBe 0
             ingredient shouldBe it
         }

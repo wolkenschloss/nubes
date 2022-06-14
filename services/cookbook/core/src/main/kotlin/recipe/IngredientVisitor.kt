@@ -3,7 +3,7 @@ package family.haschka.wolkenschloss.cookbook.recipe
 import family.haschka.wolkenschloss.cookbook.parser.IngredientParserBaseVisitor
 import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
 
-class IngredientBuilder : IngredientParserBaseVisitor<Ingredient>() {
+class IngredientVisitor : IngredientParserBaseVisitor<Ingredient>() {
 
     override fun visitLine(ctx: IngredientParser.LineContext): Ingredient {
 
@@ -21,7 +21,7 @@ class IngredientBuilder : IngredientParserBaseVisitor<Ingredient>() {
     }
 
     override fun visitQuantity(ctx: IngredientParser.QuantityContext): Ingredient {
-        val builder = RationalBuilder()
+        val builder = RationalVisitor()
         val quantity = builder.visitQuantity(ctx)
 
         if (quantity == Rational(0)) {

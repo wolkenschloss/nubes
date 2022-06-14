@@ -30,7 +30,7 @@ data class Ingredient(val name: String, val quantity: Rational? = null, val unit
                 return Ingredient(string)
             }
 
-            return IngredientBuilder().visit(tree)
+            return IngredientVisitor().visit(tree)
         }
     }
 }
