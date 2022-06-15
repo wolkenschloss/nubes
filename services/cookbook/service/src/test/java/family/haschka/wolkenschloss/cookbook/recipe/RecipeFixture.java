@@ -64,13 +64,13 @@ public enum RecipeFixture {
                 "Lasagne",
                 LOREM,
                 List.of(
-                        new Ingredient(new Rational(500), "g", "Hackfleisch"),
-                        new Ingredient(new Rational(1), null, "Zwiebel(n)"),
-                        new Ingredient(new Rational(2), null, "Knoblauchzehen"),
-                        new Ingredient(new Rational(1), "Bund", "Petersilie oder TK"),
-                        new Ingredient(new Rational(1), "EL", "Tomatenmark"),
-                        new Ingredient(new Rational(1), "Dose", "Tomaten, geschälte (800g)"),
-                        new Ingredient(null, null, "Etwas Rotwein")),
+                        new Ingredient("Hackfleisch", new Rational(500), "g"),
+                        new Ingredient("Zwiebel(n)", new Rational(1), null),
+                        new Ingredient("Knoblauchzehen", new Rational(2), null),
+                        new Ingredient("Petersilie oder TK", new Rational(1), "Bund"),
+                        new Ingredient("Tomatenmark", new Rational(1), "EL"),
+                        new Ingredient("Tomaten, geschälte (800g)", new Rational(1), "Dose"),
+                        new Ingredient("Etwas Rotwein", null, null)),
                 new Servings(1),
                 0L);
     }
@@ -83,9 +83,9 @@ public enum RecipeFixture {
                 "Antipasti",
                 LOREM_IPSUM,
                 List.of(
-                        new Ingredient(new Rational(500), "ml", "Olivenöl"),
-                        new Ingredient(new Rational(4), null, "Knoblauchzehen"),
-                        new Ingredient(new Rational(4), "EL", "getrocknete italienische Kräuter")),
+                        new Ingredient("Olivenöl", new Rational(500), "ml"),
+                        new Ingredient("Knoblauchzehen", new Rational(4), null),
+                        new Ingredient("getrocknete italienische Kräuter", new Rational(4), "EL")),
                 new Servings(4),
                 0L);
     }
@@ -96,9 +96,9 @@ public enum RecipeFixture {
                 "Chili con carne",
                 "Preparation",
                 List.of(
-                        new Ingredient(new Rational(800), "g", "Rinderhackfleisch"),
-                        new Ingredient(new Rational(1200), "g", "Tomaten, geschält"),
-                        new Ingredient(new Rational(1), null, "Zimtstange")
+                        new Ingredient("Rinderhackfleisch", new Rational(800), "g"),
+                        new Ingredient("Tomaten, geschält", new Rational(1200), "g"),
+                        new Ingredient("Zimtstange", new Rational(1), null)
                 ),
                 new Servings(1),
                 0L);

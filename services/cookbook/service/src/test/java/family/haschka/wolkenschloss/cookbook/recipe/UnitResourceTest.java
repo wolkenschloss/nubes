@@ -71,7 +71,7 @@ public class UnitResourceTest {
                 Arrays.stream(items).anyMatch(i -> Arrays.asList(i.values).contains(alias)));
     }
 
-    private static Stream<String> aliases() {
-        return Unit.stream();
+    private static Iterable<String> aliases() {
+        return Unit.Companion.list();
     }
 }

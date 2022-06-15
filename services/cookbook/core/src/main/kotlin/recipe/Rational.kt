@@ -1,6 +1,10 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-import java.util.regex.Pattern
+import family.haschka.wolkenschloss.cookbook.parser.IngredientLexer
+import family.haschka.wolkenschloss.cookbook.parser.IngredientParser
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import kotlin.math.absoluteValue
 
 data class Rational(private var numerator: Int, private var denominator: Int) {
 
@@ -8,7 +12,7 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
 
     init {
         if (denominator == 0) {
-            throw InvalidNumber()
+            throw InvalidNumber("Denominator must not be zero")
         }
 
         val gcd = gcd(numerator, denominator)
@@ -27,14 +31,17 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         if (denominator == 1) {
             builder.append(numerator)
         } else {
-            val number: Int = numerator / denominator
+            if ((numerator * denominator) < 0) {
+                builder.append('-')
+            }
+            val number: Int = numerator.absoluteValue / denominator.absoluteValue
             if (number != 0) {
                 builder.append(number)
                 builder.append(" ")
-                val rest = this.minus(Rational(number, 1))
+                val rest = this.absoluteValue().minus(Rational(number, 1))
                 appendRational(builder, rest)
             } else {
-                appendRational(builder, this)
+                appendRational(builder, this.absoluteValue())
             }
         }
         return builder.toString()
@@ -68,6 +75,14 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         return Rational(numerator * b.numerator, denominator * b.denominator)
     }
 
+    operator fun div(b: Rational): Rational {
+        return this.times(Rational(b.denominator, b.numerator))
+    }
+
+    fun absoluteValue(): Rational {
+        return Rational(this.numerator.absoluteValue, this.denominator.absoluteValue)
+    }
+
     companion object {
         val codes: Map<Rational, Char> = hashMapOf(
             Rational(1, 2) to '\u00bd',
@@ -93,35 +108,20 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
         val fractions: Map<String, Rational> =
             codes.entries.associate { (key, value) -> value.toString() to key }
 
-        const val REGEX: String = "((?<number>-?(0|[1-9]\\d*)(?<!-0))[ ]?)?(((?<numerator>-?(0|[1-9]\\d*)(?<!-0))([/](?<denominator>[1-9]\\d*))*)|(?<fraction>[½⅔¾⅘⅚⅞⅓⅗¼⅖⅝⅕⅙⅜⅐⅛⅑⅒]))?"
-        private val pattern: Pattern = Pattern.compile("^$REGEX$")
-
-        @JvmStatic
         fun parse(input: String): Rational {
-            val m = pattern.matcher(input)
-            if (m.find()) {
-                val number = m.group("number")
-                val fraction = m.group("fraction")
-                val numerator = m.group("numerator")
-                val denominator = m.group("denominator")
+            val stream = CharStreams.fromString(input)
+            val lexer = IngredientLexer(stream)
+            val tokens = CommonTokenStream(lexer)
+            val parser = IngredientParser(tokens)
+            val listener = SyntaxErrorListener()
+            parser.addErrorListener(listener)
+            val tree = parser.mixed_fraction()
 
-                if (number != null) {
-                    return if (fraction != null) {
-                        fractions.getValue(fraction) + Rational(number.toInt(), 1)
-                    } else if (numerator != null) {
-                        Rational(number.toInt()) + Rational(numerator.toInt(), denominator.toInt())
-                    } else {
-                        Rational(number.toInt())
-                    }
-                } else {
-                    if (fraction != null) {
-                        return fractions.getValue(fraction)
-                    } else if (numerator != null) {
-                        return Rational(numerator.toInt(), denominator.toInt())
-                    }
-                }
+            if (parser.numberOfSyntaxErrors > 0) {
+                throw InvalidNumber(listener.errors.joinToString(", "))
             }
-            throw InvalidNumber()
+
+            return RationalVisitor().visit(tree)
         }
     }
 }

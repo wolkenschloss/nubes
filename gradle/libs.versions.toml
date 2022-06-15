@@ -1,10 +1,7 @@
 [versions]
 quarkus = "2.9.1.Final"
-awaitility = "4.1.0"
 jsoup = "1.14.2"
-mockserver = "5.11.2"
-testcontainers = "1.17.2"
-junit = "5.8.2"
+antlr4 = "4.9.2"
 node = "16.13.1"
 gradle-node-plugin = "3.1.1"
 # Waiting for Gradle update to use kotlin version 1.6.
@@ -12,6 +9,10 @@ gradle-node-plugin = "3.1.1"
 # https://github.com/kotest/kotest/issues/2666
 kotest5  = "5.3.0"
 kotest = "4.6.3"
+awaitility = "4.1.0"
+mockserver = "5.11.2"
+testcontainers = "1.17.2"
+junit = "5.8.2"
 
 # buildSrc only
 jib = "0.19.0"
@@ -21,29 +22,21 @@ bouncycastle = "1.71"
 [libraries]
 quarkus-bom = { group = "io.quarkus", name = "quarkus-bom", version.ref = "quarkus"}
 quarkus-plugin = {group = "io.quarkus", name = "gradle-application-plugin", version.ref = "quarkus"}
-
 quarkus-config-yaml = {module = "io.quarkus:quarkus-config-yaml" }
 quarkus-arc = {module = "io.quarkus:quarkus-arc"}
-#quarkus-web
 quarkus-resteasy-reactive-jsonb = {module = "io.quarkus:quarkus-resteasy-reactive-jsonb"}
 quarkus-vertx = {module = "io.quarkus:quarkus-vertx"}
 smallrye-mutiny-vertx-web-client = {module = "io.smallrye.reactive:smallrye-mutiny-vertx-web-client"}
-#quarkus-data
 quarkus-mongodb-panache = {module = "io.quarkus:quarkus-mongodb-panache"}
-#quarkus-messaging
 quarkus-smallrye-reactive-messaging = {module = "io.quarkus:quarkus-smallrye-reactive-messaging"}
-#quarkus-templates
 quarkus-resteasy-reactive-qute = {module = "io.quarkus:quarkus-resteasy-reactive-qute" }
-
-#quarkus-deployment
 quarkus-container-docker = {module = "io.quarkus:quarkus-container-image-docker"}
 quarkus-kubernetes = {module = "io.quarkus:quarkus-kubernetes"}
 
+antlr4 = {module  = "org.antlr:antlr4", version.ref = "antlr4" }
 gradle-node-plugin = {module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradle-node-plugin"}
 awaitility = { group = "org.awaitility", name = "awaitility", version.ref = "awaitility" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
-mockserver = { group = "org.mock-server", name = "mockserver-client-java", version.ref = "mockserver" }
-testcontainers = { group = "org.testcontainers", name = "testcontainers-bom", version.ref = "testcontainers" }
 
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
@@ -51,14 +44,14 @@ kotest5-bom = {module = "io.kotest:kotest-bom", version.ref="kotest5"}
 kotest5-runner = {module = "io.kotest:kotest-runner-junit5"}
 kotest5-assertions = {module = "io.kotest:kotest-assertions-core"}
 kotest5-datatest = { module = "io.kotest:kotest-framework-datatest"}
-
 kotest-junit-runner = {module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-framework-runner = {module = "io.kotest:kotest-framework-engine-jvm", version.ref = "kotest" }
 kotest-assertions-core = {module = "io.kotest:kotest-assertions-core", version.ref = "kotest"}
-
 quarkus-junit = { module = "io.quarkus:quarkus-junit5", version.ref = "quarkus" }
 quarkus-junit-mockito = { module = "io.quarkus:quarkus-junit5-mockito", version.ref = "quarkus"}
 restassured = { module = "io.rest-assured:rest-assured" }
+mockserver = { group = "org.mock-server", name = "mockserver-client-java", version.ref = "mockserver" }
+testcontainers = { group = "org.testcontainers", name = "testcontainers-bom", version.ref = "testcontainers" }
 
 # buildSrc only
 jib = { module = "com.google.cloud.tools:jib-core", version.ref = "jib" }

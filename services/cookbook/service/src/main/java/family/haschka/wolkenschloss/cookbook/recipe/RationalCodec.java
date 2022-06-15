@@ -15,7 +15,7 @@ public class RationalCodec implements Codec<Rational> {
             return new Rational((int) reader.readInt64(), 1);
         }
 
-        return Rational.parse(reader.readString());
+        return Rational.Companion.parse(reader.readString());
     }
 
     @Override

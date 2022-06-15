@@ -1,9 +1,8 @@
 package family.haschka.wolkenschloss.cookbook.recipe
 
-enum class Group(val title: String, val description: String, vararg val units: Unit) {
+enum class Group(val title: String, vararg val units: Unit) {
     VOLUME(
         "Volumes",
-        "",
         Unit.CUBIC,
         Unit.LITER,
         Unit.DECILITER,
@@ -14,7 +13,6 @@ enum class Group(val title: String, val description: String, vararg val units: U
     ),
     WEIGHT(
         "Weights",
-        "",
         Unit.GRAM,
         Unit.DECIGRAM,
         Unit.MILLIGRAM,
@@ -24,7 +22,6 @@ enum class Group(val title: String, val description: String, vararg val units: U
     ),
     KITCHEN(
         "Kitchen Terms",
-        "",
         Unit.BUNCH,
         Unit.DROP,
         Unit.DASH,
@@ -36,11 +33,11 @@ enum class Group(val title: String, val description: String, vararg val units: U
     ),
     COMMON(
         "Common Terms",
-        "",
         Unit.CAN,
         Unit.CARTON,
         Unit.PIECE,
         Unit.PACKAGE,
         Unit.SLICE,
-        Unit.SHEET);
+        Unit.SHEET
+    );
 }

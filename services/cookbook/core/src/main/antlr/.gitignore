@@ -1,0 +1,3 @@
+# Something is also generating the IngredientLexer.tokens file in this directory, even though a
+# different output directory is specified. It could be the Intellij ANTLR plugin.
+*.tokens

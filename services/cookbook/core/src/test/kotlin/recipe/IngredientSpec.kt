@@ -6,33 +6,51 @@ import io.kotest.matchers.shouldBe
 
 class IngredientSpec : FunSpec({
 
-
     context("Parsing ingredient string") {
         withData(
             mapOf(
-                "250 g Mehl" to Ingredient(Rational(250), "g", "Mehl"),
-                "1 kg Potatoes" to Ingredient(Rational(1), "kg", "Potatoes"),
-                "125 ml Milk" to Ingredient(Rational(125), "ml", "Milk"),
-                "1 l Water" to Ingredient(Rational(1), "l", "Water"),
-                "1 cl Rum" to Ingredient(Rational(1), "cl", "Rum"),
-                "42 Zutat ohne Einheit" to Ingredient(Rational(42), null, "Zutat ohne Einheit"),
-                "42 1/2 Zutat ohne Einheit" to Ingredient(Rational(85, 2), null, "Zutat ohne Einheit"),
-                "42½ Zutat ohne Einheit" to Ingredient(Rational(85, 2), null, "Zutat ohne Einheit"),
-                "Zutat ohne Menge und Einheit" to Ingredient(null, null, "Zutat ohne Menge und Einheit"),
-                "g name of ingredient" to Ingredient(null, "g", "name of ingredient"),
-                "g" to Ingredient(null, null, "g"),
-                "1/2 cl Rum" to Ingredient(Rational(1, 2), "cl", "Rum"),
-                "1/2 g Mehl" to Ingredient(Rational(1, 2), "g", "Mehl"),
-                "1 1/2 kg Mehl" to Ingredient(Rational(3, 2), "kg", "Mehl"),
-                "1 1/2kg Mehl" to Ingredient(Rational(3, 2), "kg", "Mehl"),
-                "⅛ l Sahne" to Ingredient(Rational(1, 8), "l", "Sahne"),
-                "1 ⅛ l Sahne" to Ingredient(Rational(9, 8), "l", "Sahne"),
-                "1⅛ l Sahne" to Ingredient(Rational(9, 8), "l", "Sahne"),
-                "20g Moon Sugar" to Ingredient(Rational(20), "g", "Moon Sugar"),
-                "2⅒g Moon Sugar" to Ingredient(Rational(21, 10), "g", "Moon Sugar")
+                "X" to Ingredient("X"),
+                "1 Dose Tomaten, geschälte (800g)" to Ingredient("Tomaten, geschälte (800g)", Rational(1), "Dose"),
+                "250 g Mehl" to Ingredient("Mehl", Rational(250), "g"),
+                "1 kg Potatoes" to Ingredient("Potatoes", Rational(1), "kg"),
+                "125 ml Milk" to Ingredient("Milk", Rational(125), "ml"),
+                "1 l Water" to Ingredient("Water", Rational(1), "l"),
+                "1 cl Rum" to Ingredient("Rum", Rational(1), "cl"),
+                "42 Zutat ohne Einheit" to Ingredient("Zutat ohne Einheit", Rational(42)),
+                "42 1/2 Zutat ohne Einheit" to Ingredient("Zutat ohne Einheit", Rational(85, 2)),
+                "42½ Zutat ohne Einheit" to Ingredient("Zutat ohne Einheit", Rational(85, 2)),
+                "Zutat ohne Menge und Einheit" to Ingredient("Zutat ohne Menge und Einheit"),
+                "g name of ingredient" to Ingredient("g name of ingredient"),
+                "g" to Ingredient("g"),
+                "1/2 cl Rum" to Ingredient("Rum", Rational(1, 2), "cl"),
+                "1/2 g Mehl" to Ingredient("Mehl", Rational(1, 2), "g"),
+                "1 1/2 kg Mehl" to Ingredient("Mehl", Rational(3, 2), "kg"),
+                "1 1/2kg Mehl" to Ingredient("Mehl", Rational(3, 2), "kg"),
+                "⅛ l Sahne" to Ingredient("Sahne", Rational(1, 8), "l"),
+                "1 ⅛ l Sahne" to Ingredient("Sahne", Rational(9, 8), "l"),
+                "1⅛ l Sahne" to Ingredient("Sahne", Rational(9, 8), "l"),
+                "20g Moon Sugar" to Ingredient("Moon Sugar", Rational(20), "g"),
+                "2⅒g Moon Sugar" to Ingredient("Moon Sugar", Rational(21, 10), "g"),
+                "1 1/2 kg (kl.) Tomaten" to Ingredient("(kl.) Tomaten", Rational(3, 2), "kg"),
+                "13 mg Ąņŷ pøśŝīble \uD83D\uDC7D unicode character for name \uD83D\uDCA9" to Ingredient(
+                    "Ąņŷ pøśŝīble \uD83D\uDC7D unicode character for name \uD83D\uDCA9",
+                    Rational(13),
+                    "mg"
+                )
             )
         ) { ingredient ->
-            Ingredient.parse(this.testCase.name.testName) shouldBe ingredient
+
+            val result = Ingredient.parse(this.testCase.name.testName)
+            result.name shouldBe ingredient.name
+            result shouldBe ingredient
+        }
+    }
+
+    context("Parse ingredient with all known units") {
+        withData(Unit.values().flatMap { listOf(it.unit, *it.aliases) }) {
+            val input = "1 1/2 $it (kl.) Dinger"
+            Ingredient.parse(input).name shouldBe "(kl.) Dinger"
+            Ingredient.parse(input) shouldBe Ingredient("(kl.) Dinger", Rational(3, 2), it)
         }
     }
 
@@ -41,14 +59,14 @@ class IngredientSpec : FunSpec({
     context("Scale servings") {
         withData(
             ServingsTestcase(
-                Ingredient(Rational(2), null, "Onions"),
+                Ingredient("Onions", Rational(2)),
                 Rational(5, 4),
-                Ingredient(Rational(5, 2), null, "Onions")
+                Ingredient("Onions", Rational(5, 2))
             ),
             ServingsTestcase(
-                Ingredient(Rational(800), "g", "Tomatoes"),
+                Ingredient("Tomatoes", Rational(800), "g"),
                 Rational(2, 3),
-                Ingredient(Rational(1600, 3), "g", "Tomatoes")
+                Ingredient("Tomatoes", Rational(1600, 3), "g")
             )
         ) { testcase ->
             testcase.ingredient.scale(testcase.factor) shouldBe testcase.expected
@@ -58,9 +76,9 @@ class IngredientSpec : FunSpec({
     context("Print servings") {
         withData(
             mapOf(
-                "2 ½ St. Zwiebeln" to Ingredient(Rational(5, 2), "St.", "Zwiebeln"),
-                "Rotwein" to Ingredient(null, null, "Rotwein"),
-                "42 Blaubeeren" to Ingredient(Rational(42), null, "Blaubeeren")
+                "2 ½ St. Zwiebeln" to Ingredient("Zwiebeln", Rational(5, 2), "St."),
+                "Rotwein" to Ingredient("Rotwein"),
+                "42 Blaubeeren" to Ingredient("Blaubeeren", Rational(42))
             )
         ) { ingredient ->
             ingredient.toString() shouldBe this.testCase.name.testName
