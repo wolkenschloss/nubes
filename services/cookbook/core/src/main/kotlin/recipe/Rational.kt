@@ -12,7 +12,7 @@ data class Rational(private var numerator: Int, private var denominator: Int) {
 
     init {
         if (denominator == 0) {
-            throw InvalidNumber("Denominator must not be 0")
+            throw InvalidNumber("Denominator must not be zero")
         }
 
         val gcd = gcd(numerator, denominator)

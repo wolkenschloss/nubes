@@ -39,6 +39,6 @@ enum class Unit(val unit: String, vararg val aliases: String) {
 
     companion object {
 
-        fun list(): List<String> = values().flatMap { u: Unit -> listOf(u.unit) + u.aliases.asList() }
+        fun list(): List<String> = values().flatMap { u -> listOf(u.unit) + u.aliases.asList() }
     }
 }

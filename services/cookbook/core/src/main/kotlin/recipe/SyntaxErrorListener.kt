@@ -19,10 +19,10 @@ class SyntaxErrorListener : BaseErrorListener() {
         offendingSymbol: Any?,
         line: Int,
         charPositionInLine: Int,
-        msg: String?,
+        msg: String,
         e: RecognitionException?
     ) {
         super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
-        errors = errors + listOf(msg!!)
+        errors = errors + listOf(msg)
     }
 }
