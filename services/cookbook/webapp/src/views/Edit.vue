@@ -39,7 +39,35 @@
                             :rules="titleRules"
                             required
                             autofocus>
+
               </v-text-field>
+              <h2>Hello World</h2>
+              <p>{{previewUrl}}</p>
+              <v-file-input v-model="value.upload" accept="image/*" show-size prepend-icon="mdi-camera"/>
+
+<!--              <v-img id="preview" :src="previewUrl" max-height="60%" contain aspect-ratio="1.7778"/>-->
+              <v-icon>mdi-image-area</v-icon>
+              <v-card v-if="value.upload" outlined>
+                <v-img
+                    id="preview"
+                    class="white--text grey darken-2 align-end"
+                    gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+                    :src="previewUrl"
+                    max-height="60%"
+                    contain aspect-ratio="1.61803"
+                >
+                  <v-card-title v-text="value.upload.name" ></v-card-title>
+                </v-img>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn icon @click="value.upload=null" color="secondary">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </v-card-actions>
+
+              </v-card>
+
+
             </v-tab-item>
             <v-tab-item key="1" v-on:keyup.stop.insert="addIngredient">
               <servings autofocus v-model="value.servings" hint="Number of servings the recipe is designed for." class="mb-6"/>
@@ -125,10 +153,15 @@ export default {
         }
         // ???
       }
+    },
+    previewUrl() {
+      if(!this.value.upload) return;
+      return URL.createObjectURL(this.value.upload)
     }
   },
   data() {
     return {
+      preview: null,
       showFab: false,
       ingredientPanel: null,
       tab: null,
@@ -170,4 +203,8 @@ export default {
   height: 100vh;
 }
 
+/*#preview {*/
+/*  border: fuchsia 3px solid;*/
+/*  background: darkgrey;*/
+/*}*/
 </style>

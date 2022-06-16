@@ -3,6 +3,8 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
+import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.MultipartForm;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -38,6 +40,23 @@ public class RecipeResource {
 
         return creator.save(recipe)
                 .log("saved")
+                .map(r -> {
+                    var location = uriInfo.getAbsolutePathBuilder()
+                            .path(r.get_id())
+                            .build();
+                    return Response.created(location).entity(r).build();
+                })
+                .log("mapped");
+    }
+
+    private static final Logger log = Logger.getLogger(RecipeResource.class);
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Response> postForm(@MultipartForm FormData formData, @Context UriInfo uriInfo) {
+        return creator.save(formData.recipe, formData.upload)
+                .log("multipart saved")
                 .map(r -> {
                     var location = uriInfo.getAbsolutePathBuilder()
                             .path(r.get_id())

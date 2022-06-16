@@ -58,8 +58,33 @@ const actions = {
         commit('setCopy', recipe)
     },
     async create({commit, state}, recipe) {
+        console.log(`create recipe ${recipe.title}`)
         let url = resource.url()
-        await axios.post(url, recipe)
+
+        if (recipe.upload != null) {
+            console.log(`upload recipe with preview image ${recipe.upload.name} (${recipe.upload.size} Bytes)`)
+            console.log(`content type: ${recipe.upload.type}`)
+            const formData = new FormData();
+            formData.append('preview', recipe.upload, recipe.upload.name)
+            formData.append('recipe{}', JSON.stringify(recipe))
+
+            if (recipe.upload == null) {
+                console.warn("upload ist null")
+            }
+
+            await fetch(url, {method: 'POST', body: formData})
+
+            // await axios.post(url, {'recipe{}': recipe, preview: recipe.upload}, {
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data'
+            //     }
+            // })
+        }
+        else {
+            console.log("upload recipe")
+            await axios.post(url, recipe)
+        }
+
         commit('setCopy', null) // Close Dialog
         this.dispatch("toc/queryRecipes", {}, {root: true})
     }

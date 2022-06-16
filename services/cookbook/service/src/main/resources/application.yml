@@ -11,6 +11,11 @@ quarkus:
     port: 8180
     access-log:
       enabled: true
+    body:
+      handle-file-uploads: true
+      delete-uploaded-files-on-end: false
+      preallocate-body-buffer: true
+
   mongodb:
     database: cookbook
     devservices:
@@ -38,7 +43,6 @@ quarkus:
    quarkus:
      http:
        port: 8180
-
 "%test":
   quarkus:
     http:
