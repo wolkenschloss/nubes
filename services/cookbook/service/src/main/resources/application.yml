@@ -50,3 +50,6 @@ quarkus:
       test-port: 9292
     log:
       level: INFO
+    category:
+      "io.quarkus.mongodb.panache.runtime":
+        level: DEBUG

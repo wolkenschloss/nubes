@@ -29,7 +29,7 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
                     document.getPreparation(),
                     new ArrayList<>(document.getIngredients()),
                     new Servings(document.getServings().getAmount()),
-                    0L);
+                    0L, null);
         }
 
         return document;
@@ -92,7 +92,8 @@ public class RecipeCodec implements CollectibleCodec<Recipe> {
                 preparation,
                 Objects.requireNonNull(ingredients),
                 Objects.requireNonNull(servings),
-                created);
+                created,
+                null);
     }
 
     private List<Ingredient> readIngredients(BsonReader reader, DecoderContext decoderContext) {

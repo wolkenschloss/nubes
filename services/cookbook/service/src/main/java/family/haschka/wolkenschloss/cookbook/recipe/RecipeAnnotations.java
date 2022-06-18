@@ -3,6 +3,7 @@ package family.haschka.wolkenschloss.cookbook.recipe;
 import org.bson.types.ObjectId;
 
 import javax.json.bind.annotation.JsonbProperty;
+import java.net.URI;
 import java.util.List;
 
 public class RecipeAnnotations {
@@ -13,4 +14,5 @@ public class RecipeAnnotations {
     public List<Ingredient> ingredients;
     public Servings servings;
     public Long created;
+    public URI image;
 }

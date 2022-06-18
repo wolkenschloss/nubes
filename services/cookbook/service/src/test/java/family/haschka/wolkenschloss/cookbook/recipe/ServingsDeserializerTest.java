@@ -18,14 +18,14 @@ public class ServingsDeserializerTest {
     public void shouldDeserializeServings() {
 
         var deserialized = jsonb.fromJson("{\"title\": \"TITLE\",  \"servings\": 4}", Recipe.class);
-        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(4), 0L);
+        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(4), 0L, null);
         Assertions.assertEquals(expected, deserialized);
     }
 
     @Test
     public void shouldHaveDefaultValue() {
         var deserialized = jsonb.fromJson("{\"title\": \"TITLE\"}", Recipe.class);
-        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(1), 0L);
+        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(1), 0L, null);
 
         Assertions.assertEquals(expected, deserialized);
     }
@@ -33,7 +33,7 @@ public class ServingsDeserializerTest {
     @Test
     public void shouldExtractValue() {
         var deserialized = jsonb.fromJson("{\"title\": \"TITLE\", \"servings\": \"3 Portion(en)\"}", Recipe.class);
-        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(3), 0L);
+        var expected = new Recipe("unset", "TITLE", null, List.of(), new Servings(3), 0L, null);
 
         Assertions.assertEquals(expected, deserialized);
     }

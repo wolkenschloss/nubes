@@ -21,6 +21,7 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotations> {
         dto.ingredients = new ArrayList<>(obj.getIngredients());
         dto.servings = new Servings(obj.getServings().getAmount());
         dto.created = obj.getCreated();
+        dto.image = obj.getImage();
 
         return dto;
     }
@@ -33,7 +34,8 @@ public class RecipeAdapter implements JsonbAdapter<Recipe, RecipeAnnotations> {
                 obj.preparation,
                 Optional.ofNullable(obj.ingredients).orElse(new ArrayList<>()),
                 Optional.ofNullable(obj.servings).orElse(new Servings(1)),
-                Optional.ofNullable(obj.created).orElse(0L)
+                Optional.ofNullable(obj.created).orElse(0L),
+                obj.image
         );
     }
 }

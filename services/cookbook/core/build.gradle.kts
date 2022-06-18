@@ -4,13 +4,25 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("family.haschka.wolkenschloss.conventions.core")
-    kotlin("jvm") version "1.6.21"
     antlr
+
+    kotlin("jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.noarg") version "1.6.21"
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.4"
 }
 
 group = "family.haschka.nubes.cookbook"
 val buildSrcPackagePrefix = "family.haschka.wolkenschloss.cookbook"
+
+noArg {
+    annotation("family.haschka.wolkenschloss.cookbook.Entity")
+//    invokeInitializers = true
+}
+
+allOpen {
+    annotation("family.haschka.wolkenschloss.cookbook.Entity")
+}
 
 tasks {
     generateGrammarSource {

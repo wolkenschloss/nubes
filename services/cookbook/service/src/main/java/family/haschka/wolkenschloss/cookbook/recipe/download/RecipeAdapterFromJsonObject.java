@@ -40,6 +40,6 @@ public class RecipeAdapterFromJsonObject implements JsonbAdapter<Recipe, JsonObj
                         .collect(Collectors.toCollection(ArrayList::new)))
                     .orElse(new ArrayList<>()),
                 new Servings(obj.getInt("recipeYield", 1)),
-                0L);
+                0L, null);
     }
 }

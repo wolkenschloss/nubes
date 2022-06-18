@@ -1,7 +1,7 @@
 package family.haschka.wolkenschloss.cookbook.job;
 
+import family.haschka.wolkenschloss.cookbook.Blueprint;
 import family.haschka.wolkenschloss.cookbook.UuidExtensionsKt;
-import family.haschka.wolkenschloss.cookbook.testing.Blueprint;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;

@@ -54,7 +54,7 @@ public enum RecipeFixture {
                 this.recipe.getPreparation(),
                 new ArrayList<>(recipe.getIngredients()),
                 this.recipe.getServings(),
-                0L);
+                0L, null);
     }
 
     private static Recipe getLasagne() {
@@ -72,7 +72,7 @@ public enum RecipeFixture {
                         new Ingredient("Tomaten, geschälte (800g)", new Rational(1), "Dose"),
                         new Ingredient("Etwas Rotwein", null, null)),
                 new Servings(1),
-                0L);
+                0L, null);
     }
 
     public static final String LOREM_IPSUM = "Lorem ipsum dolor sit amet";
@@ -87,7 +87,7 @@ public enum RecipeFixture {
                         new Ingredient("Knoblauchzehen", new Rational(4), null),
                         new Ingredient("getrocknete italienische Kräuter", new Rational(4), "EL")),
                 new Servings(4),
-                0L);
+                0L, null);
     }
 
     private static Recipe getChiliConCarne() {
@@ -101,7 +101,7 @@ public enum RecipeFixture {
                         new Ingredient("Zimtstange", new Rational(1), null)
                 ),
                 new Servings(1),
-                0L);
+                0L, null);
     }
 
     public String asJson(Jsonb jsonb) {

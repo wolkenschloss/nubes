@@ -12,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.util.Optional;
 
 @Path("/recipe")
@@ -54,7 +55,7 @@ public class RecipeResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> postForm(@MultipartForm FormData formData, @Context UriInfo uriInfo) {
+    public Uni<Response> postForm(@MultipartForm FormData formData, @Context UriInfo uriInfo) throws IOException {
         return creator.save(formData.recipe, formData.upload)
                 .log("multipart saved")
                 .map(r -> {

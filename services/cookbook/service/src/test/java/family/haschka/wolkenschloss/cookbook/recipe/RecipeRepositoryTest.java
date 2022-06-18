@@ -34,14 +34,14 @@ public class RecipeRepositoryTest {
                         "Preparation 1",
                         new ArrayList<>(),
                         new Servings(1),
-                        0L),
+                        0L, null),
                 new Recipe(
                         ObjectId.get().toHexString(),
                         "Recipe 2 without preparation",
                         null,
                         new ArrayList<>(),
                         new Servings(4),
-                        0L
+                        0L, null
                 )
         ).map(recipe -> DynamicTest.dynamicTest(recipe.getTitle(), () -> {
             var r1 = repository.persist(recipe).await().indefinitely();
@@ -60,7 +60,7 @@ public class RecipeRepositoryTest {
                         "New preparation",
                         new ArrayList<>(recipe.getIngredients()),
                         new Servings(recipe.getServings().getAmount()),
-                        recipe.getCreated()))
+                        recipe.getCreated(), null))
                 .flatMap(recipe -> repository.update(recipe))
                 .await()
                 .indefinitely();

@@ -29,6 +29,6 @@ public class RecipeAdapterFromRecipeAnnotated implements JsonbAdapter<Recipe, Re
                         .collect(Collectors.toCollection(ArrayList::new)))
                     .orElse(new ArrayList<>()),
                 Optional.ofNullable(obj.servings).orElse(new Servings(1)),
-                0L);
+                0L, null);
     }
 }
