@@ -15,7 +15,7 @@
             <option value="quarkusDev" />
           </list>
         </option>
-        <option name="vmOptions" value="" />
+        <option name="vmOptions" value="-Dquarkus.package.type=uber-jar" />
       </ExternalSystemSettings>
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>

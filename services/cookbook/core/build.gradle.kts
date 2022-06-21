@@ -2,11 +2,26 @@ import org.jetbrains.gradle.ext.packagePrefix
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+// see https://youtrack.jetbrains.com/issue/KTIJ-19369
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("family.haschka.wolkenschloss.conventions.core")
-    kotlin("jvm") version "1.6.21"
+    alias(libs.plugins.kotlin.noarg)
+    alias(libs.plugins.kotlin.allopen)
     antlr
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.4"
+}
+
+noArg {
+    annotations(
+        "family.haschka.wolkenschloss.cookbook.Value",
+        "family.haschka.wolkenschloss.cookbook.Aggregate",
+        "family.haschka.wolkenschloss.cookbook.Event"
+    )
+}
+
+allOpen {
+    annotations("family.haschka.wolkenschloss.cookbook.Event")
+
 }
 
 group = "family.haschka.nubes.cookbook"
@@ -26,6 +41,10 @@ tasks {
 
     withType(KotlinCompile::class.java) {
         dependsOn(generateGrammarSource)
+    }
+
+    compileTestKotlin {
+        dependsOn(generateTestGrammarSource)
     }
 }
 

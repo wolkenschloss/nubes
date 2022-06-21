@@ -5,10 +5,6 @@ plugins {
     id("java-library")
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
 val catalogs = extensions.getByType<VersionCatalogsExtension>()
 val libs = catalogs.named("libs")
 
@@ -25,8 +21,5 @@ dependencies {
 tasks {
     withType(Test::class.java) {
         useJUnitPlatform()
-        testLogging {
-            setEvents(listOf("passed", "skipped", "failed"))
-        }
     }
 }

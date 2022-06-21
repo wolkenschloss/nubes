@@ -1,21 +1,13 @@
 buildscript {
-
 }
 
+// see https://youtrack.jetbrains.com/issue/KTIJ-19369
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    idea
+    alias(libs.plugins.ide) apply false
 }
 
-idea {
-    module {
-    // Das funktioniert, macht aber keinen Sinn. Die Build Verzeichnisse und
-    // Dateien sollten über Scopes ausgeblendet werden. Ich lasse es als
-    // Beispiel hier stehen, damit das in einem anderen Zusammenhang vielleicht
-    // benutzt werden kann.
-//        excludeDirs.plusAssign(files(
-//            ".git-hooks",
-//            ".github",
-//            ".run",
-//            "gradle"))
-    }
+val ideaPlugin = libs.plugins.ide
+allprojects {
+    apply(plugin = ideaPlugin.get().pluginId)
 }
